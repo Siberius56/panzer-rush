@@ -77,10 +77,8 @@ text = "Se déclarer prêt"
 layout_mode = 2
 text = "Lancer la partie"
 
-
-[node name="InviteFriendButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=324982731]
+[node name="InviteFriendButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1357913579]
 layout_mode = 2
-visible = false
 text = "Inviter un ami Steam"
 
 [node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=2024873518]
@@ -94,4 +92,5 @@ autowrap_mode = 3
 
 [connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/ReadyButton" to="." method="_on_ready_button_pressed"]
 [connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/InviteFriendButton" to="." method="_on_invite_friend_pressed"]
 [connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/BackButton" to="." method="_on_back_button_pressed"]

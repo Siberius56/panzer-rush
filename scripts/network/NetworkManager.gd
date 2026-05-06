@@ -7,6 +7,7 @@ signal player_list_changed
 
 const GAME_SCENE_PATH := "res://scenes/game/NetworkMain.tscn"
 const STEAM_VIRTUAL_PORT := 0
+const SERVER_PEER_ID := 1
 
 enum NetworkMode {
 	NONE,
@@ -23,6 +24,10 @@ var last_message: String = ""
 var network_mode: NetworkMode = NetworkMode.NONE
 var steam_host_id: int = 0
 var steam_peer: MultiplayerPeer = null
+
+# Important : on ne se fie pas uniquement à multiplayer.is_server().
+# Avec SteamMultiplayerPeer, certains états peuvent être ambigus pendant le prototype.
+var is_host_session := false
 
 
 func _ready() -> void:
@@ -46,6 +51,7 @@ func host_game(port: int, player_name: String, desired_max_clients: int = 4) -> 
 	leave_game(false)
 
 	network_mode = NetworkMode.LAN
+	is_host_session = true
 	local_player_name = _sanitize_player_name(player_name)
 	current_port = port
 	max_clients = max(desired_max_clients, 1)
@@ -59,18 +65,11 @@ func host_game(port: int, player_name: String, desired_max_clients: int = 4) -> 
 	if error != OK:
 		last_message = "Impossible d'héberger la partie. Code %s." % error
 		network_mode = NetworkMode.NONE
+		is_host_session = false
 		return error
 
 	multiplayer.multiplayer_peer = peer
-
-	players = {
-		1: {
-			"name": local_player_name,
-			"ready": false,
-			"steam_id": 0
-		}
-	}
-
+	_add_or_update_local_host_player(0)
 	_broadcast_player_list()
 	connection_succeeded.emit()
 	return OK
@@ -80,6 +79,7 @@ func join_game(ip: String, port: int, player_name: String) -> int:
 	leave_game(false)
 
 	network_mode = NetworkMode.LAN
+	is_host_session = false
 	local_player_name = _sanitize_player_name(player_name)
 	current_ip = ip.strip_edges()
 	current_port = port
@@ -113,6 +113,7 @@ func host_steam(player_name: String) -> int:
 		return ERR_UNAVAILABLE
 
 	network_mode = NetworkMode.STEAM
+	is_host_session = true
 	local_player_name = _sanitize_player_name(player_name)
 	last_message = ""
 	steam_host_id = _get_local_steam_id()
@@ -125,23 +126,18 @@ func host_steam(player_name: String) -> int:
 	if error != OK:
 		last_message = "Impossible de créer le host Steam. Code %s." % error
 		network_mode = NetworkMode.NONE
+		is_host_session = false
 		steam_peer = null
 		return error
 
 	steam_peer = peer
 	multiplayer.multiplayer_peer = steam_peer
 
-	players = {
-		1: {
-			"name": local_player_name,
-			"ready": false,
-			"steam_id": _get_local_steam_id()
-		}
-	}
-
+	_add_or_update_local_host_player(_get_local_steam_id())
 	_broadcast_player_list()
+
 	last_message = "Host Steam actif."
-	print("[NET_STEAM] Host ready. unique_id=", multiplayer.get_unique_id(), " steam_id=", _get_local_steam_id())
+	print("[NET_STEAM] Host ready. unique_id=", multiplayer.get_unique_id(), " steam_id=", _get_local_steam_id(), " is_server=", multiplayer.is_server())
 
 	connection_succeeded.emit()
 	return OK
@@ -166,6 +162,7 @@ func join_steam(host_steam_id: int, player_name: String) -> int:
 		return ERR_UNAVAILABLE
 
 	network_mode = NetworkMode.STEAM
+	is_host_session = false
 	local_player_name = _sanitize_player_name(player_name)
 	steam_host_id = host_steam_id
 	last_message = ""
@@ -184,6 +181,7 @@ func join_steam(host_steam_id: int, player_name: String) -> int:
 	steam_peer = peer
 	multiplayer.multiplayer_peer = steam_peer
 	last_message = "Connexion Steam en cours..."
+	print("[NET_STEAM] Client peer created. local unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
 	return OK
 
 
@@ -195,6 +193,7 @@ func leave_game(emit_update: bool = true) -> void:
 	steam_peer = null
 	steam_host_id = 0
 	network_mode = NetworkMode.NONE
+	is_host_session = false
 	players.clear()
 
 	if emit_update:
@@ -203,27 +202,31 @@ func leave_game(emit_update: bool = true) -> void:
 
 func set_local_ready(to_ready: bool) -> void:
 	if multiplayer.multiplayer_peer == null:
+		print("[NET] set_local_ready ignored. No multiplayer peer.")
 		return
 
-	if multiplayer.is_server():
-		var local_id := multiplayer.get_unique_id()
-		if players.has(local_id):
-			players[local_id]["ready"] = to_ready
+	print("[NET] set_local_ready to=", to_ready, " is_host_session=", is_host_session, " unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
+
+	if is_host_session:
+		if players.has(SERVER_PEER_ID):
+			players[SERVER_PEER_ID]["ready"] = to_ready
 			_broadcast_player_list()
+		else:
+			print("[NET] Host ready failed. Host player missing from players.")
 		return
 
-	_set_ready_state.rpc_id(1, to_ready)
+	_set_ready_state.rpc_id(SERVER_PEER_ID, to_ready)
 
 
 func is_local_player_ready() -> bool:
-	var local_id := multiplayer.get_unique_id()
+	var local_id := SERVER_PEER_ID if is_host_session else multiplayer.get_unique_id()
 	if players.has(local_id):
 		return bool(players[local_id].get("ready", false))
 	return false
 
 
 func can_start_game() -> bool:
-	if not multiplayer.is_server():
+	if not is_host_session:
 		return false
 	if players.is_empty():
 		return false
@@ -235,9 +238,11 @@ func can_start_game() -> bool:
 
 
 func start_game() -> void:
-	if not multiplayer.is_server():
+	if not is_host_session:
+		print("[NET] start_game ignored. Not host session.")
 		return
 	if not can_start_game():
+		print("[NET] start_game ignored. Not everyone ready.")
 		return
 	_load_game_scene.rpc()
 
@@ -268,6 +273,10 @@ func is_lan_mode() -> bool:
 	return network_mode == NetworkMode.LAN
 
 
+func is_host() -> bool:
+	return is_host_session
+
+
 func _sanitize_player_name(value: String) -> String:
 	var trimmed := value.strip_edges()
 	if trimmed.is_empty():
@@ -275,20 +284,30 @@ func _sanitize_player_name(value: String) -> String:
 	return trimmed.substr(0, 20)
 
 
+func _add_or_update_local_host_player(steam_id: int) -> void:
+	players[SERVER_PEER_ID] = {
+		"name": local_player_name,
+		"ready": false,
+		"steam_id": steam_id
+	}
+
+
 func _broadcast_player_list() -> void:
-	if not multiplayer.is_server():
+	if not is_host_session:
 		return
+
+	print("[NET] broadcast_player_list players=", players)
 	_receive_player_list.rpc(players)
 
 
 func _on_peer_connected(id: int) -> void:
-	print("[NET] peer_connected id=", id, " mode=", NetworkMode.keys()[network_mode])
+	print("[NET] peer_connected id=", id, " mode=", NetworkMode.keys()[network_mode], " is_host_session=", is_host_session, " is_server=", multiplayer.is_server())
 
 
 func _on_peer_disconnected(id: int) -> void:
 	print("[NET] peer_disconnected id=", id, " mode=", NetworkMode.keys()[network_mode])
 
-	if not multiplayer.is_server():
+	if not is_host_session:
 		return
 
 	if players.has(id):
@@ -297,9 +316,9 @@ func _on_peer_disconnected(id: int) -> void:
 
 
 func _on_connected_to_server() -> void:
-	print("[NET] connected_to_server mode=", NetworkMode.keys()[network_mode], " unique_id=", multiplayer.get_unique_id())
+	print("[NET] connected_to_server mode=", NetworkMode.keys()[network_mode], " unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
 
-	_register_player.rpc_id(1, {
+	_register_player.rpc_id(SERVER_PEER_ID, {
 		"name": local_player_name,
 		"ready": false,
 		"steam_id": _get_local_steam_id() if network_mode == NetworkMode.STEAM else 0
@@ -345,7 +364,8 @@ func _get_local_steam_name() -> String:
 
 @rpc("any_peer", "reliable")
 func _register_player(player_data: Dictionary) -> void:
-	if not multiplayer.is_server():
+	if not is_host_session:
+		print("[NET] register_player ignored. Not host session.")
 		return
 
 	var sender_id := multiplayer.get_remote_sender_id()
@@ -362,13 +382,18 @@ func _register_player(player_data: Dictionary) -> void:
 
 @rpc("any_peer", "reliable")
 func _set_ready_state(to_ready: bool) -> void:
-	if not multiplayer.is_server():
+	if not is_host_session:
+		print("[NET] _set_ready_state ignored. Not host session.")
 		return
 
 	var sender_id := multiplayer.get_remote_sender_id()
+	print("[NET] _set_ready_state sender=", sender_id, " ready=", to_ready)
+
 	if players.has(sender_id):
 		players[sender_id]["ready"] = to_ready
 		_broadcast_player_list()
+	else:
+		print("[NET] _set_ready_state ignored. Sender not registered: ", sender_id)
 
 
 @rpc("authority", "call_local", "reliable")
@@ -379,4 +404,5 @@ func _load_game_scene() -> void:
 @rpc("authority", "call_local", "reliable")
 func _receive_player_list(new_players: Dictionary) -> void:
 	players = new_players.duplicate(true)
+	print("[NET] receive_player_list unique_id=", multiplayer.get_unique_id(), " players=", players)
 	player_list_changed.emit()
