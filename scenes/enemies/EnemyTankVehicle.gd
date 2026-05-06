@@ -226,7 +226,7 @@ func _server_sync_network_state(delta: float) -> void:
 	)
 
 
-@rpc("authority", "call_remote", "unreliable_ordered", 3)
+@rpc("authority", "call_remote", "unreliable_ordered", 1)
 func _rpc_sync_tank_state(
 	synced_transform: Transform3D,
 	synced_linear_velocity: Vector3,

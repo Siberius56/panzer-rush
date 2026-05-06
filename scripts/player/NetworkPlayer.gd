@@ -1098,10 +1098,14 @@ func _finish_local_reload() -> void:
 func _sync_weapon_inventory_to_peers() -> void:
 	var slot_0 = weapon_slots[0].duplicate(true)
 	var slot_1 = weapon_slots[1].duplicate(true)
+
+	# Envoie l'inventaire aux autres peers.
 	_receive_weapon_inventory.rpc(slot_0, slot_1, current_weapon_slot, is_reloading_server, reload_timer_server)
 
-	if multiplayer.get_unique_id() == player_id:
-		_apply_received_weapon_inventory(slot_0, slot_1, current_weapon_slot, is_reloading_server, reload_timer_server)
+	# Important :
+	# Le serveur doit aussi appliquer localement l'inventaire du joueur concerné.
+	# Sinon le host voit l'état serveur dans les données, mais pas le visuel équipé.
+	_apply_received_weapon_inventory(slot_0, slot_1, current_weapon_slot, is_reloading_server, reload_timer_server)
 
 func _apply_received_weapon_inventory(slot_0: Dictionary, slot_1: Dictionary, selected_slot: int, reloading: bool, remaining_reload: float) -> void:
 	weapon_slots[0] = slot_0.duplicate(true)
@@ -1597,6 +1601,35 @@ func _receive_state(position_value: Vector3, velocity_value: Vector3, aim_rotati
 	replicated_aim_rotation = aim_rotation
 	replicated_visual_y = visual_yaw
 
+func _is_valid_owner_request(action_name: String) -> bool:
+	if not multiplayer.is_server():
+		return false
+
+	var sender_id := multiplayer.get_remote_sender_id()
+	var expected_id := get_multiplayer_authority()
+
+	# Fallback de sécurité si l'autorité n'a pas été définie au spawn.
+	if expected_id == 0:
+		expected_id = player_id
+
+	if sender_id != expected_id:
+		print(
+			"[WEAPON_NET] rejected ",
+			action_name,
+			" sender=",
+			sender_id,
+			" expected_authority=",
+			expected_id,
+			" player_id=",
+			player_id,
+			" node=",
+			name
+		)
+		return false
+
+	return true
+
+
 @rpc("any_peer", "call_remote", "unreliable")
 func _spawn_bullet_fx(shot_origin: Vector3, shot_direction: Vector3, slot_index: int) -> void:
 	if is_multiplayer_authority():
@@ -1619,42 +1652,37 @@ func _spawn_bullet_fx(shot_origin: Vector3, shot_direction: Vector3, slot_index:
 
 @rpc("any_peer", "reliable")
 func _request_fire_weapon(slot_index: int, shot_origin: Vector3, shot_direction: Vector3) -> void:
-	if not multiplayer.is_server():
+	if not _is_valid_owner_request("fire_weapon"):
 		return
-	if multiplayer.get_remote_sender_id() != player_id:
-		return
+
 	_server_fire_weapon(slot_index, shot_origin, shot_direction.normalized())
 
 @rpc("any_peer", "call_remote", "reliable")
 func _request_pickup_nearest_weapon_rpc() -> void:
-	if not multiplayer.is_server():
+	if not _is_valid_owner_request("pickup_nearest_weapon"):
 		return
-	if multiplayer.get_remote_sender_id() != player_id:
-		return
+
 	_server_pickup_nearest_weapon()
 
 @rpc("any_peer", "reliable")
 func _request_drop_current_weapon_rpc() -> void:
-	if not multiplayer.is_server():
+	if not _is_valid_owner_request("drop_current_weapon"):
 		return
-	if multiplayer.get_remote_sender_id() != player_id:
-		return
+
 	_server_drop_current_weapon()
 
 @rpc("any_peer", "reliable")
 func _request_reload_current_weapon_rpc() -> void:
-	if not multiplayer.is_server():
+	if not _is_valid_owner_request("reload_current_weapon"):
 		return
-	if multiplayer.get_remote_sender_id() != player_id:
-		return
+
 	_server_start_reload_current_weapon()
 
 @rpc("any_peer", "reliable")
 func _request_select_weapon_slot_rpc(slot_index: int) -> void:
-	if not multiplayer.is_server():
+	if not _is_valid_owner_request("select_weapon_slot"):
 		return
-	if multiplayer.get_remote_sender_id() != player_id:
-		return
+
 	_server_select_weapon_slot(slot_index)
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -1688,10 +1716,9 @@ func _despawn_world_weapon_remote(net_id: int, node_path: NodePath) -> void:
 
 @rpc("any_peer", "reliable")
 func _request_respawn_rpc() -> void:
-	if not multiplayer.is_server():
+	if not _is_valid_owner_request("respawn"):
 		return
-	if multiplayer.get_remote_sender_id() != player_id:
-		return
+
 	_server_respawn_player()
 
 @rpc("any_peer", "call_remote", "reliable")
