@@ -163,17 +163,17 @@ func _draw_network_players() -> void:
 		var line := Label.new()
 
 		var steam_id := int(player_data.get("steam_id", 0))
-		var name := str(player_data.get("name", "Player"))
+		var to_name := str(player_data.get("name", "Player"))
 		if steam_lobby_mode and steam_id != 0:
 			var steam_name := SteamLobbyManager.get_member_name(steam_id)
 			if not str(steam_name).is_empty():
-				name = steam_name
+				to_name = steam_name
 
 		var role := _get_role_text(peer_id, steam_id)
 		var ready_text := "Prêt" if bool(player_data.get("ready", false)) else "En attente"
 		var local_text := " (vous)" if peer_id == local_id else ""
 
-		line.text = "%s%s, %s, %s" % [name, local_text, role, ready_text]
+		line.text = "%s%s, %s, %s" % [to_name, local_text, role, ready_text]
 		players_list.add_child(line)
 
 

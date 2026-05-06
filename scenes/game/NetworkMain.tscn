@@ -43,6 +43,10 @@ roughness = 0.8
 albedo_color = Color(0.78, 0.43, 0.14, 1)
 roughness = 0.75
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ji5ar"]
+albedo_color = Color(0.15, 0.75, 0.25, 1)
+roughness = 0.7
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wg2r1"]
 albedo_color = Color(0.25, 0.35, 0.95, 1)
 roughness = 0.7
@@ -50,10 +54,6 @@ roughness = 0.7
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q6l4v"]
 albedo_color = Color(0.95, 0.82, 0.2, 1)
 roughness = 0.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ji5ar"]
-albedo_color = Color(0.15, 0.75, 0.25, 1)
-roughness = 0.7
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y832o"]
 albedo_color = Color(0.1, 0.85, 0.9, 1)
@@ -568,14 +568,6 @@ collision_mask = 0
 size = Vector3(5, 1, 2)
 material = SubResource("StandardMaterial3D_mhaih")
 
-[node name="Merchant_Counter" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Obstacles" unique_id=1346536279]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 62)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(7, 1.2, 2)
-material = SubResource("StandardMaterial3D_wg2r1")
-
 [node name="Tunnel_Blocker_LeftNib" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Obstacles" unique_id=693618248]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7, 0.7, 76)
 use_collision = true
@@ -631,14 +623,6 @@ collision_layer = 8
 collision_mask = 0
 size = Vector3(6, 1, 2)
 material = SubResource("StandardMaterial3D_mhaih")
-
-[node name="AmmoStation_Crates" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Obstacles" unique_id=1388715678]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 128)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(6, 1.2, 3)
-material = SubResource("StandardMaterial3D_q6l4v")
 
 [node name="Final_Pillar_Left" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Obstacles" unique_id=1550152185]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.5, 148)
@@ -1035,6 +1019,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.079105, 0.49999905, -3.831
 
 [node name="TurretAmmoRefillArea" parent="." unique_id=2007283422 instance=ExtResource("19_353k1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.872131, 0.4999981, -41.03252)
+
+[node name="TurretAmmoRefillArea2" parent="." unique_id=360724074 instance=ExtResource("19_353k1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36471176, 0.4999981, -129.54297)
 
 [node name="VehicleUpgradeStation" parent="." unique_id=127582380 instance=ExtResource("4_e3e5m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3393173, 0.6500019, 2.6803055)

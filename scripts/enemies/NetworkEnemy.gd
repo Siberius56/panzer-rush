@@ -1335,22 +1335,22 @@ func _attack_debug(message: String) -> void:
 	print("[NetworkEnemyAttack:%s] %s" % [name, message])
 
 
-func _debug(message: String) -> void:
+func _debug(_message: String) -> void:
 	return
 	
-	if not debug_logs:
-		return
-	print("[NetworkEnemy:%s] %s" % [name, message])
+	#if not debug_logs:
+		#return
+	#print("[NetworkEnemy:%s] %s" % [name, message])
 
 
-func _debug_move(message: String) -> void:
+func _debug_move(_message: String) -> void:
 	return
 	
-	if not debug_logs:
-		return
-	if Engine.get_physics_frames() % 20 != 0:
-		return
-	print("[NetworkEnemy:%s] %s" % [name, message])
+	#if not debug_logs:
+		#return
+	#if Engine.get_physics_frames() % 20 != 0:
+		#return
+	#print("[NetworkEnemy:%s] %s" % [name, message])
 
 
 @rpc("authority", "call_remote", "unreliable_ordered")
