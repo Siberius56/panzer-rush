@@ -68,6 +68,7 @@ var replicated_brake: float = 0.0
 @export var max_health: int = 600
 @export var armor_rating: int = 0
 var health := 0
+var is_destroyed := false
 
 @export_group("Impact Damage")
 @export var impact_damage_enabled: bool = true
@@ -212,6 +213,13 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 
 func _server_physics(delta: float) -> void:
+	if is_destroyed:
+		steer_input = 0.0
+		drive_input = 0.0
+		engine_force = 0.0
+		brake = brake_force
+		return
+
 	_update_drive_controls(delta)
 	_process_enemy_soft_impacts(delta)
 
@@ -631,10 +639,36 @@ func apply_damage(amount: int) -> void:
 	if not multiplayer.is_server():
 		return
 
+	if is_destroyed:
+		return
+
 	health = max(health - amount, 0)
 	if health <= 0:
-		queue_free()
+		_server_destroy_vehicle()
 		return
+
+	_sync_vehicle_health.rpc(health)
+
+
+func _server_destroy_vehicle() -> void:
+	if is_destroyed:
+		return
+
+	is_destroyed = true
+	health = 0
+	steer_input = 0.0
+	drive_input = 0.0
+	engine_force = 0.0
+	brake = brake_force
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	freeze = true
+	sleeping = true
+
+	_force_all_players_out()
+	set_use_area_enabled(false)
+	_broadcast_seat_layout()
+	_sync_vehicle_destroyed.rpc()
 
 func apply_projectile_damage(
 	amount: int,
@@ -1004,6 +1038,8 @@ func _try_call_damage_method(target: Node, method_name: StringName, candidate_ar
 
 
 func is_available() -> bool:
+	if is_destroyed:
+		return false
 	return _get_first_available_seat_index() != -1 and not bool(get_meta("upgrade_station_locked", false))
 
 
@@ -1150,6 +1186,9 @@ func apply_host_input(steer: float, drive: float) -> void:
 func request_enter() -> void:
 	if not multiplayer.is_server():
 		return
+
+	if is_destroyed:
+		return
 	
 	print("[VEHICLE] request_enter | sender= x", " | locked=", get_meta("upgrade_station_locked", false), " | seats=", seat_occupants)
 	var sender := multiplayer.get_remote_sender_id()
@@ -1237,6 +1276,9 @@ func server_open_loadout_for_host() -> void:
 
 
 func _server_try_enter(peer_id: int) -> void:
+	if is_destroyed:
+		return
+
 	if bool(get_meta("upgrade_station_locked", false)):
 		return
 
@@ -1353,11 +1395,15 @@ func _can_peer_open_menu(peer_id: int) -> bool:
 
 
 func _force_all_players_out() -> void:
+	var safe_exit_position := global_position
+	if exit_point != null:
+		safe_exit_position = exit_point.global_position
+
 	for i in range(seat_count):
 		var peer_id := seat_occupants[i]
 		if peer_id != -1:
 			seat_occupants[i] = -1
-			sync_exit.rpc(peer_id, exit_point.global_position)
+			sync_exit.rpc(peer_id, safe_exit_position)
 
 	steer_input = 0.0
 	drive_input = 0.0
@@ -1500,6 +1546,30 @@ func sync_exit(peer_id: int, exit_pos: Vector3) -> void:
 	var interactor := _get_interactor_for_peer(peer_id)
 	if interactor != null:
 		interactor.exit_vehicle(exit_pos)
+
+	emit_signal("seat_layout_changed")
+
+@rpc("call_local", "reliable")
+func _sync_vehicle_health(new_health: int) -> void:
+	health = clampi(new_health, 0, max_health)
+
+
+@rpc("call_local", "reliable")
+func _sync_vehicle_destroyed() -> void:
+	is_destroyed = true
+	health = 0
+	steer_input = 0.0
+	drive_input = 0.0
+	engine_force = 0.0
+	brake = brake_force
+
+	if use_area != null:
+		use_area.set_deferred("monitoring", false)
+		use_area.set_deferred("monitorable", false)
+
+	if multiplayer.is_server():
+		freeze = true
+		sleeping = true
 
 	emit_signal("seat_layout_changed")
 

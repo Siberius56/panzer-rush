@@ -45,8 +45,26 @@ func _ready() -> void:
 		if node != null:
 			_disabled_nodes.append(node)
 
+func _is_valid_vehicle_ref(vehicle: Vehicle) -> bool:
+	return vehicle != null and is_instance_valid(vehicle) and not bool(vehicle.get("is_destroyed"))
+
+
+func _clear_invalid_vehicle_refs() -> void:
+	if current_vehicle != null and not _is_valid_vehicle_ref(current_vehicle):
+		current_vehicle = null
+		current_seat_index = -1
+		if player_body != null:
+			player_body.set_meta("in_vehicle", false)
+			if player_body.has_method("set_vehicle_mode"):
+				player_body.set_vehicle_mode(false)
+
+	if nearby_vehicle != null and not _is_valid_vehicle_ref(nearby_vehicle):
+		nearby_vehicle = null
+
 
 func _unhandled_input(event: InputEvent) -> void:
+	_clear_invalid_vehicle_refs()
+
 	if not _is_local_player():
 		return
 
@@ -89,6 +107,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	_clear_invalid_vehicle_refs()
+
 	if current_vehicle != null and sync_player_to_seat:
 		_sync_body_to_vehicle()
 
@@ -211,7 +231,7 @@ func _get_reloadable_turret_from_mount(mount: Node) -> Node:
 
 
 func is_in_vehicle() -> bool:
-	return current_vehicle != null
+	return _is_valid_vehicle_ref(current_vehicle)
 
 
 func get_current_seat_index() -> int:
@@ -219,7 +239,7 @@ func get_current_seat_index() -> int:
 
 
 func get_current_seat_marker() -> Marker3D:
-	if current_vehicle == null:
+	if not _is_valid_vehicle_ref(current_vehicle):
 		return null
 	return current_vehicle.get_seat_marker(current_seat_index)
 
@@ -234,6 +254,9 @@ func clear_near_vehicle(vehicle: Vehicle) -> void:
 
 
 func enter_vehicle(vehicle: Vehicle, seat_index: int = -1) -> void:
+	if not _is_valid_vehicle_ref(vehicle):
+		return
+
 	current_vehicle = vehicle
 	nearby_vehicle = vehicle
 	current_seat_index = seat_index
@@ -288,7 +311,7 @@ func exit_vehicle(exit_pos: Vector3) -> void:
 
 
 func _sync_body_to_vehicle() -> void:
-	if player_body == null or current_vehicle == null:
+	if player_body == null or not _is_valid_vehicle_ref(current_vehicle):
 		return
 
 	var seat := current_vehicle.get_seat_marker(current_seat_index)
@@ -326,6 +349,9 @@ func _compute_turret_aim_point_from_mouse() -> Vector3:
 		excludes.append(player_body.get_rid())
 
 	query.exclude = excludes
+
+	if not _is_valid_vehicle_ref(current_vehicle):
+		return ray_end
 
 	var result := current_vehicle.get_world_3d().direct_space_state.intersect_ray(query)
 	if not result.is_empty():

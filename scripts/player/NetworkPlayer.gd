@@ -1506,16 +1506,21 @@ func get_hud_data() -> Dictionary:
 
 func _get_current_vehicle_for_hud() -> Node:
 	if current_vehicle != null:
-		return current_vehicle
+		if is_instance_valid(current_vehicle):
+			return current_vehicle
+		current_vehicle = null
 
-	if vehicle_interactor != null:
+	if vehicle_interactor != null and is_instance_valid(vehicle_interactor):
 		for p in vehicle_interactor.get_property_list():
 			if p.name == "current_vehicle":
-				return vehicle_interactor.get("current_vehicle")
+				var property_value = vehicle_interactor.get("current_vehicle")
+				if property_value != null and is_instance_valid(property_value) and property_value is Node:
+					return property_value
+				return null
 
 		if vehicle_interactor.has_method("get_current_vehicle"):
 			var value = vehicle_interactor.call("get_current_vehicle")
-			if value is Node:
+			if value != null and is_instance_valid(value) and value is Node:
 				return value
 
 	return null
