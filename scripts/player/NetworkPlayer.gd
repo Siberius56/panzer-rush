@@ -1693,11 +1693,32 @@ func _receive_weapon_inventory(slot_0: Dictionary, slot_1: Dictionary, selected_
 func _spawn_world_weapon_remote(net_id: int, weapon_id: String, ammo_in_magazine: int, reserve_ammo: int, spawn_position: Vector3, forward: Vector3) -> void:
 	if multiplayer.is_server():
 		return
+
+	# Seul le serveur doit créer les armes au sol sur les clients.
+	# Avec SteamMultiplayerPeer, ce RPC peut être appelé depuis le node joueur d'un client.
+	# On valide donc l'expéditeur au lieu de dépendre de l'autorité du node.
+	if multiplayer.get_remote_sender_id() != 1:
+		print("[WEAPON_NET] rejected world weapon spawn from sender=", multiplayer.get_remote_sender_id())
+		return
+
+	# Évite les doublons si le RPC est reçu deux fois ou si une arme stale existe encore localement.
+	var existing := _find_world_weapon_by_net_id(net_id)
+	if existing != null and is_instance_valid(existing):
+		existing.queue_free()
+
 	_spawn_world_weapon_local(net_id, weapon_id, ammo_in_magazine, reserve_ammo, spawn_position, forward)
 
-@rpc("authority", "call_remote", "reliable")
+@rpc("any_peer", "call_remote", "reliable")
 func _despawn_world_weapon_remote(net_id: int, node_path: NodePath) -> void:
 	if multiplayer.is_server():
+		return
+
+	# Important : ne pas utiliser @rpc("authority") ici.
+	# Ce script est attaché à chaque NetworkPlayer. Pour le joueur client,
+	# l'autorité du node est le client, pas le serveur.
+	# Le serveur doit pourtant pouvoir ordonner la disparition de l'arme au sol.
+	if multiplayer.get_remote_sender_id() != 1:
+		print("[WEAPON_NET] rejected world weapon despawn from sender=", multiplayer.get_remote_sender_id())
 		return
 
 	var world_weapon: WorldWeapon3D = null
@@ -1711,7 +1732,10 @@ func _despawn_world_weapon_remote(net_id: int, node_path: NodePath) -> void:
 			world_weapon = node as WorldWeapon3D
 
 	if world_weapon != null and is_instance_valid(world_weapon):
+		print("[WEAPON_NET] despawn world weapon on client net_id=", net_id)
 		world_weapon.queue_free()
+	else:
+		print("[WEAPON_NET] despawn requested but weapon not found on client net_id=", net_id, " path=", node_path)
 
 
 @rpc("any_peer", "reliable")
