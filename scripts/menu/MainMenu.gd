@@ -14,16 +14,42 @@ const DEBUG_PREFIX := "[MAIN_MENU_NET]"
 @onready var wifi_ip_label: Label = %IpLocal_Wifi
 @onready var ethernet_ip_label: Label = %IpLocal_Ethernet
 
+@onready var host_steam_button: Button = %Host_Steam_Lobby
+@onready var invite_friend_button: Button = %Invite_Friend
+
 var join_attempt_id := 0
 var debug_history: PackedStringArray = []
 
 
 func _ready() -> void:
-	print("Steam class exists: ", ClassDB.class_exists("Steam"))
-	print("SteamMultiplayerPeer exists: ", ClassDB.class_exists("SteamMultiplayerPeer"))
-	print()
-	print()
-	print()
+	#print("Steam exists: ", ClassDB.class_exists("Steam"))
+	#print("SteamMultiplayerPeer exists: ", ClassDB.class_exists("SteamMultiplayerPeer"))
+#
+	#if ClassDB.class_exists("SteamMultiplayerPeer"):
+		#var peer := SteamMultiplayerPeer.new()
+		#print("Peer: ", peer)
+		#print("has create_host: ", peer.has_method("create_host"))
+		#print("has create_client: ", peer.has_method("create_client"))
+	
+	
+	if not host_steam_button.pressed.is_connected(_on_host_steam_button_pressed):
+		host_steam_button.pressed.connect(_on_host_steam_button_pressed)
+
+	if not invite_friend_button.pressed.is_connected(_on_invite_friend_button_pressed):
+		invite_friend_button.pressed.connect(_on_invite_friend_button_pressed)
+
+	if not SteamLobbyManager.lobby_created_success.is_connected(_on_steam_lobby_created):
+		SteamLobbyManager.lobby_created_success.connect(_on_steam_lobby_created)
+
+	if not SteamLobbyManager.lobby_joined_success.is_connected(_on_steam_lobby_joined):
+		SteamLobbyManager.lobby_joined_success.connect(_on_steam_lobby_joined)
+
+	if not SteamLobbyManager.lobby_failed.is_connected(_on_steam_lobby_failed):
+		SteamLobbyManager.lobby_failed.connect(_on_steam_lobby_failed)
+
+	if not SteamLobbyManager.lobby_members_changed.is_connected(_on_steam_lobby_members_changed):
+		SteamLobbyManager.lobby_members_changed.connect(_on_steam_lobby_members_changed)
+	
 	
 	_connect_network_signals()
 
@@ -582,3 +608,53 @@ func _on_join_timeout(attempt_id: int, ip: String, port: int) -> void:
 
 	status_label.text = "Connexion impossible vers %s:%s. Ping la machine hôte. Si ping échoue, c'est la box ou le Wi-Fi. Si ping marche, vérifie pare-feu macOS et port UDP 7000." % [ip, port]
 	_set_buttons_enabled(true)
+
+
+func _on_host_steam_button_pressed() -> void:
+	status_label.text = "Création du lobby Steam..."
+	print("[MAIN_MENU_STEAM] Host Steam Lobby pressed")
+
+	SteamLobbyManager.create_lobby()
+
+
+func _on_invite_friend_button_pressed() -> void:
+	print("[MAIN_MENU_STEAM] Invite Friend pressed")
+
+	if SteamLobbyManager.current_lobby_id == 0:
+		status_label.text = "Crée d'abord un lobby Steam."
+		return
+
+	SteamLobbyManager.invite_friends()
+
+
+func _on_steam_lobby_created(lobby_id: int) -> void:
+	status_label.text = "Lobby Steam créé : %s" % lobby_id
+	print("[MAIN_MENU_STEAM] Steam lobby created: ", lobby_id)
+
+	if not is_inside_tree():
+		return
+
+	get_tree().change_scene_to_file(LOBBY_SCENE_PATH)
+
+
+func _on_steam_lobby_joined(lobby_id: int) -> void:
+	status_label.text = "Lobby Steam rejoint : %s" % lobby_id
+	print("[MAIN_MENU_STEAM] Steam lobby joined: ", lobby_id)
+
+	if not is_inside_tree():
+		return
+
+	get_tree().change_scene_to_file(LOBBY_SCENE_PATH)
+
+
+func _on_steam_lobby_failed(message: String) -> void:
+	status_label.text = message
+	print("[MAIN_MENU_STEAM] Steam lobby failed: ", message)
+
+
+func _on_steam_lobby_members_changed() -> void:
+	print("[MAIN_MENU_STEAM] Lobby members changed")
+
+	for steam_id in SteamLobbyManager.lobby_members:
+		var member_name := SteamLobbyManager.get_member_name(steam_id)
+		print("[MAIN_MENU_STEAM] Member: ", member_name, " / ", steam_id)

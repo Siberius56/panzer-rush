@@ -183,5 +183,30 @@ layout_mode = 2
 horizontal_alignment = 1
 autowrap_mode = 3
 
+[node name="PanelSteam" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=383328140]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer/PanelSteam" unique_id=2132054026]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer" unique_id=1597253285]
+layout_mode = 2
+
+[node name="Host_Steam_Lobby" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/HBoxContainer" unique_id=652296351]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HOST STEAM LOBBY"
+
+[node name="Invite_Friend" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/HBoxContainer" unique_id=2133638368]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "INVITE FRIEND"
+
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/JoinButton" to="." method="_on_join_button_pressed"]
