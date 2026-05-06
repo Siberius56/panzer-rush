@@ -1,0 +1,211 @@
+[gd_scene format=4 uid="uid://bi8rfru842h6q"]
+
+[ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_7af67"]
+[ext_resource type="PackedScene" uid="uid://c3kpi687gtclf" path="res://vehicle_system/turrets/Turret_Light.tscn" id="4_3ojlu"]
+
+[sub_resource type="PhysicsMaterial" id="1"]
+friction = 0.2
+
+[sub_resource type="BoxShape3D" id="2"]
+size = Vector3(2.2891235, 1.4, 3.0295289)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_df5w6"]
+resource_name = "MasterMat"
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+metallic = 1.0
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_vwhek"]
+_surfaces = [{
+"aabb": AABB(-0.6475, 0.10000008, -0.84806335, 1.295, 0.90000004, 1.6961265),
+"format": 34896613377,
+"index_count": 318,
+"index_data": PackedByteArray("AAABAAIAAAADAAEABAAAAAIABQABAAMABAACAAYABQAHAAEABwAFAAQAAgABAAcABwAEAAYAAgAHAAYACAAJAAoACQAIAAsACAAKAAwACAAMAAsADAAKAA0ACQANAAoACwAMAA4ACQALAA4ADAANAA8ADgAMAA8ACQAQAA0ADwANABEAEAARAA0ADwARABIAEAATABEAEgARABMAFAAPABIADgAPABQAEgATABUAFAASABUAEwAUABUAEwAQABQADgAUABYAFAAQABcAFAAXABYACQAXABAADgAWABgAFwAYABYAGQAJAA4ACQAZABcAGQAOABgAFwAZABgAGgAbABwAGgAdABsAHgAaABwAHQAfABsAHgAcACAAHQAhAB8AIgAeACAAIQAjAB8AIgAgACQAIQAlACMAJgAiACQAJQAnACMAJgAkACgAJQApACcAKQAmACgAKQAoACcAKgArACwAKgAtACsALAArAC4ALQAuACsALAAvACoALQAqAC8ALAAuADAALAAwAC8ALQAxAC4AMAAuADEALQAvADEAMAAxAC8AMgAzADQANQAyADQAMgA2ADMANQA0ADcANwA0ADMAMgA1ADgANwA4ADUAMgA4ADYANwAzADkANwA5ADgANgA5ADMANgA4ADkAOgA7ADwAOgA9ADsAPAA7AD4APQA+ADsAPAA/ADoAPQA6AD8APAA+AEAAPABAAD8APQBBAD4AQQBAAD4APQA/AEEAQQA/AEAAQgBDAEQARABDAEUAQgBGAEMARABFAEcAQgBEAEcASABFAEMASABDAEYASABHAEUASQBGAEIASQBIAEYAQgBHAEkASABJAEcA"),
+"lods": [0.46289143, PackedByteArray("AAABAAIAAAADAAEABAAAAAIABQABAAMABAACAAYABQAHAAEABwAFAAQAAgABAAcABwAEAAYAAgAHAAYACAAJAAoACQAIAAsACAAKAAwACAAMAAsADAAKAA0ACQANAAoACwAMAA4ACQALAA4ADAANAA8ADgAMAA8ACQAQAA0ADwANABEAEAARAA0ADwARABIAEAATABEAEgARABMAFAAPABIADgAPABQAEgATABUAFAASABUAEwAUABUAEwAQABQADgAUABYAFAAQABcAFAAXABYACQAXABAADgAWABgAFwAYABYAGQAJAA4ACQAZABcAGQAOABgAFwAZABgA")],
+"name": "MasterMat",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 74,
+"vertex_data": PackedByteArray("Oz2NYxriAADDwqoqGuIAADs9qioa4gAAw8KNYxriAAA7PY1j5B0AAMPCjWPkHQAAOz2qKuQdAADDwqoq5B0AAAf3jWPMDgAAB/eNY+dwAAAH9///zA4AAPcIjWPMDgAA9wj//8wOAAAH9///AtMAAPcIjWPncAAA9wj//wLTAAAH941jF48AAAf34rgy8QAA9wjiuDLxAAAH941jMvEAAPcIjWMXjwAA9wiNYzLxAAAtHQAAF48AANHiAAAXjwAALR0AAOdwAADR4gAA53AAAElxKzczOwAA53mSQ8vEAABJcSs3y8QAAOd5kkMzOwAASXGiJTM7AAAXhpJDy8QAAElxoiXLxAAAF4aSQzM7AADneTwZMzsAALWOKzfLxAAA53k8GcvEAAC1jis3MzsAABeGPBkzOwAAtY6iJcvEAAAXhjwZy8QAALWOoiUzOwAA//99OFtpAABNu0qFW2kAAP//SoVbaQAATbt9OFtpAABNu0qFoQcAAP//fTgAAAAA//9KhZ4HAABNu304AAAAAP//SoWjlgAATbtKhV34AABNu0qFo5YAAP//fTijlgAA//9KhV34AABNu304o5YAAP//fTj//wAATbt9OP7/AAAAAH04W2kAALFESoVbaQAAsUR9OFtpAAAAAEqFW2kAALFESoWhBwAAAAB9OAAAAACxRH04AAAAAAAASoWeBwAAAABKhaOWAACxREqFXfgAAAAASoVd+AAAsUR9OP7/AACxREqFo5YAAAAAfTj//wAAsUR9OKOWAAAAAH04o5YAAA==")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_gsgk6"]
+resource_name = "Tank_Light_Recon_Shadow"
+_surfaces = [{
+"aabb": AABB(-0.6475, 0.10000008, -0.84806335, 1.295, 0.90000004, 1.6961265),
+"attribute_data": PackedByteArray("iADyAowA5gKMAPICiADmAoIAhgGCAJEBeQCGAXkAnQGCAJUBfQCgAYIAoAGWAOIDmQD0A5YA9AOZAOIDggARAogAFQKCABUCiAARAogAcgGMAIkBiACJAYwAcgGgACAEpgANBKYAHgSgAAsEkAB0A5sAiQOQAIkDmwB0A4IAhgKIAHACiACGAoIAcAKWAPIDkADfA5YA4QOQAPQDlACLA6AAoAOUAKADoACLA2kAbwB+AIYAaQCGAH4AbwClAIkCmwB0AqUAdAKbAIkClACgA4gAiQOUAIkDiACgA4EA8AJ+AOUCgQDlAn4A8AJyAKABaQCgAXIAlQFpAIkBcgCRAW0AhgFyAIYBcgAVAnkAEQJ5ABUCcgARAowAiQGQAHIBkACJAYwAcgF+AIYAggBwAIIAhgB+AHAAmQHkAZoB9AGZAfQBmgHkAaAB5AGhAfQBoAH0AaEB5AGdAeQBngH0AZ0B9AGeAeQBmwHkAZwB9AGbAfQBnAHkAZ4B5AGfAfQBngH0AZ8B5AGfAeQBoAH0AZ8B9AGgAeQBnAHkAZ0B9AGcAfQBnQHkAZoB5AGbAfQBmgH0AZsB5AGgAGEClQBvApUAYQKgAG8ChwBjAHgAfgB4AGMAhwB+AJ0AjAKSAH4CnQB+ApIAjAKHAP4BkgAaAocAGAKSAP4BoAB+ApUAbwKgAG8ClQB+ApIAmgKdAIwCnQCaApIAjAJfAP4DagDjA2oA/gNfAOEDhwD+AXwAGgJ8AP4BhwAYApUAfgCHAGMAlQBjAIcAfgB1AP4DagDjA3UA4QNqAP4DbQAaBF8A/gNtAP4DXwAaBHwA/gNtABoEbQD+A3wAGgSgAGEClQBvAqAAbwKVAGEChwBjAHgAfgCHAH4AeABjAJ0AjAKSAH4CkgCMAp0AfgKHAP4BkgAaApIA/gGHABgCoAB+ApUAbwKVAH4CoABvApIAmgKdAIwCkgCMAp0AmgJfAP4DagDjA18A4QNqAP4DhwD+AXwAGgKHABgCfAD+AZUAfgCHAGMAhwB+AJUAYwB1AP4DagDjA2oA/gN1AOEDbQAaBF8A/gNfABoEbQD+A3wA/gNtABoEfAAaBG0A/gM="),
+"format": 34896613399,
+"index_count": 318,
+"index_data": PackedByteArray("AAABAAIAAAADAAEABAAFAAYABQAHAAYABQAIAAcACAAJAAcACAAKAAkACwAMAA0ACwAOAAwADwAQABEADwASABAAEwAUABUAEwAWABQAFwAYABkAFwAaABgAGwAcAB0AGwAeABwAHwAgACEAHwAiACAAIwAkACUAIwAmACQAJwAoACkAJwAqACgAKwAsAC0AKwAuACwALwAwADEALwAyADAAMwA0ADUAMwA2ADQANwA4ADkANwA6ADgAOwA8AD0APQA8AD4APQA+AD8APwA+AEAAPwBAAEEAQgBDAEQAQgBFAEMARgBHAEgARgBJAEcASgBLAEwASgBNAEsATgBPAFAATgBRAE8AUgBTAFQAUgBVAFMAVgBXAFgAVgBZAFcAWgBbAFwAWgBdAFsAXgBfAGAAXgBhAF8AYgBjAGQAYgBlAGMAZgBnAGgAZgBpAGcAagBrAGwAagBtAGsAbgBvAHAAbgBxAG8AcgBzAHQAcgB1AHMAdgB3AHgAdgB5AHcAegB7AHwAegB9AHsAfgB/AIAAfgCBAH8AggCDAIQAggCFAIMAhgCHAIgAhgCJAIcAigCLAIwAigCNAIsAjgCPAJAAjgCRAI8AkgCTAJQAkgCVAJMAlgCXAJgAlgCZAJcAmgCbAJwAmgCdAJsAngCfAKAAngChAJ8AogCjAKQAogClAKMApgCnAKgApgCpAKcAqgCrAKwAqgCtAKsArgCvALAArgCxAK8AsgCzALQAsgC1ALMAtgC3ALgAtgC5ALcAugC7ALwAugC9ALsAvgC/AMAAvgDBAL8AwgDDAMQAwgDFAMMAxgDHAMgAxgDJAMcAygDLAMwAygDNAMsA"),
+"lods": [0.46289143, PackedByteArray("AAABAAIAAAADAAEABAAFAAYABQAHAAYABQAIAAcACAAJAAcACAAKAAkACwAMAA0ACwAOAAwADwAQABEADwASABAAEwAUABUAEwAWABQAFwAYABkAFwAaABgAGwAcAB0AGwAeABwAHwAgACEAHwAiACAAIwAkACUAIwAmACQAJwAoACkAJwAqACgAKwAsAC0AKwAuACwALwAwADEALwAyADAAMwA0ADUAMwA2ADQANwA4ADkANwA6ADgAOwA8AD0APQA8AD4APQA+AD8APwA+AEAAPwBAAEEAQgBDAEQAQgBFAEMARgBHAEgARgBJAEcASgBLAEwASgBNAEsA")],
+"material": SubResource("StandardMaterial3D_df5w6"),
+"name": "MasterMat",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 206,
+"vertex_data": PackedByteArray("Oz2NYxri/7/DwqoqGuL/vzs9qioa4v+/w8KNYxri/78H941jzA5U1Qf3jWPncJbXB/f//8wOU9UH9///AtNV1Qf3jWMXj5nXB/fiuDLxVdUH941jMvFU1dHiAAAXj1TVLR0AAOdwVNUtHQAAF49U1dHiAADncFTVB/eNY+dwldfR4gAAF49N3Af3jWMXj5XX0eIAAOdwTdzDwo1j5B1U1cPCqioa4lTVw8KNYxriVNXDwqoq5B1U1fcIjWMXj/u/0eIAABeP+78tHQAAF4/7vwf3jWMXj/y/B/eNY+dwVNX3CI1jzA5U1fcIjWPncFTVB/eNY8wOVNX3COK4MvH/vwf3jWMy8f+/9wiNYzLx/78H9+K4MvH/v9HiAADncP//9wiNY+dw//8tHQAA53D//wf3jWPncP//B/eNYzLxVNX3CI1jF49U1fcIjWMy8VTVB/eNYxePVNX3CP//zA7/vwf3//8C0/+/9wj//wLT/78H9///zA7/vwf3jWPMDv//9wj//8wO///3CI1jzA7//wf3///MDv//Oz2qKhri///Dwqoq5B3//zs9qirkHf//w8KqKhri///Dwqoq5B3//zs9jWPkHf//Oz2qKuQd///Dwo1j5B3///cIjWPMDlTV9wj//8wOVNX3CI1j53Aj0/cI//8C01TV9wiNYxePIdP3COK4MvFU1fcIjWMy8VTV9wiNY+dwJdMtHQAAF4/+zi0dAADncP7O9wiNYxePJdM7PY1j5B1U1Ts9qioa4lTVOz2qKuQdVNU7PY1jGuJU1fcI//8C03jEB/fiuDLxeMT3COK4MvF4xAf3//8C03jESXErNzM7/MXneZJDy8T8xUlxKzfLxPzF53mSQzM7/MUXhjwZMzv//+d5PBnLxP//F4Y8GcvE///neTwZMzv//7WOoiUzO6rpF4Y8GcvEqum1jqIly8Sq6ReGPBkzO6rpF4aSQzM7/MW1jis3y8T8xReGkkPLxPzFtY4rNzM7/MXneTwZMzuq6UlxoiXLxKrp53k8GcvEqulJcaIlMzuq6UlxoiUzO1TVSXErN8vEVNVJcaIly8RU1UlxKzczO1TVtY4rNzM7VNW1jqIly8RU1bWOKzfLxFTVtY6iJTM7VNXneZJDMzv/vxeGkkPLxP+/53mSQ8vE/78XhpJDMzv/v///fThbaf+/TbtKhVtp/7///0qFW2n/v027fThbaf+///9KhaOW/79Nu0qFXfj/v027SoWjlv+///9KhV34/7///0qFXfhYwE27fTj+/1jATbtKhV34WMD//304//9YwP//SoWjllPV//99OP//UdX//0qFXfhQ1f//fTijllTV//99OKOW//9Nu0qFo5b//027fTijlv////9KhaOW/////0qFnges+k27fTgAAKz6//99OAAArPpNu0qFoQes+k27fThbaVTVTbtKhaEHU9VNu0qFW2lU1U27fTgAAFPV//9KhVtpVNX//304AABT1f//fThbaVTV//9KhZ4HU9X//0qFW2n/v027SoWhB/+///9KhZ4H/79Nu0qFW2n/v027fTijllTVTbtKhV34U9VNu304/v9T1U27SoWjllTVTbt9OFtp/////304AAD//027fTgAAP////99OFtp//9Nu304o5b/////fTj///////99OKOW//9Nu304/v///wAAfThbaf8/sURKhVtp/z+xRH04W2n/PwAASoVbaf8/AABKhaOWAACxREqFXfgAAAAASoVd+AAAsURKhaOWAAAAAEqFXfimP7FEfTj+/6Y/AAB9OP//pj+xREqFXfimPwAASoWjlqkqAAB9OP//pyoAAH04o5aqKgAASoVd+KYqAAB9OKOWAACxREqFo5YAAAAASoWjlgAAsUR9OKOWAAAAAEqFngdTBbFEfTgAAFMFsURKhaEHUwUAAH04AABTBbFEfThbaaoqsURKhaEHqSqxRH04AACpKrFESoVbaaoqAABKhVtpqioAAH04AACpKgAASoWeB6kqAAB9OFtpqioAAEqFW2kAALFESoWhBwAAsURKhVtpAAAAAEqFngcAALFEfTijlqoqsURKhV34qSqxREqFo5aqKrFEfTj+/6kqsUR9OFtp/z8AAH04AAD/PwAAfThbaf8/sUR9OAAA/z+xRH04o5b/PwAAfTj///8/sUR9OP7//z8AAH04o5b/P/9//3//f/9//3//f/9//3+qqlRVBKgCVKmqVFWqqlZVBqgGVKqqVlWqqlRVVFVUVVRVVFVUVVRVVFVUVQSoAlTlonJRBKgCVOWiclGqqlRVqqpUVaqqVFWqqlRV/3//f/9//3//f/9//3//f1RVVFVUVVRVVFVUVVRVVFX/f/9//3//f/9//3//f/9/BsAGQALAA0ABwAFABsAHQFRVVFVUVVRVVFVUVVRVVFX///9/////f////3////9//z//v/8//7//P/+//z//v/9//z//f/8//3//P/9//z//P/+//z//v/8//7//P/+/VFWqqlRVqqqaUk2pVVWqqptSUKlUVamqVFWqqplSTKnJTGSmyUxkpplSTKlUVaqqVFWqqlRVqqpUVaqqYppimmKaYppimmKaYppimv/i/bn/4v25/+L9uf/i/bn/f/8//3//P/9//z//f/8/9ZX6SvWV+kr1lfpK9ZX6SgDGAGMAxgBjAMYAYwDGAGP6ygjq+soI6vrKCOr6ygjqVNVU1VTVVNVU1VTVVNVU1amqVFWqqlRVqqpUVamqVFX///9/////f////3////9//3//f/9//3//f/9//3//f/7//3/+//9//v//f/7//3/59QUK+fUFCvn1BQr59QUKqapUVaiqUVWnqlBVqqpVVf+//z//v/8//7//P/8//7/Vwik91cIpPdXCKT3Vwik9VNVU1VPVVNVU1VTVU9VV1aoqqiqrKqoqqiqqKqsqqSr7/wGA9/8DgPT/BID+//9/VVWqqlVVqqpVVauqVVWqqv9//z//f/8//3//P/9//z//f/8//3//P/9//z//f/8//3//f/9//3//f/9//3//f/9//7//f/+//3//v/9//7/59QUK+fUFCvn1BQr59QUKVFWpqlNVpqpVVaqqUlWlqv8//7//P/+//z//v/8//7/Uwik91MIpPdTCKT3Uwik9qiqqKqkqqiqpKqsqqiqqKlTVVNVV1VTVVdVT1VTVVNX/f/+//3//v/9//78CgP2/qqpVVaqqVVWqqlVVqqpWVQAA/38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_vwhek")
+
+[sub_resource type="StandardMaterial3D" id="4"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+roughness = 0.72
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_yxytb"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 0.216
+radial_segments = 18
+
+[sub_resource type="StandardMaterial3D" id="6"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="CylinderShape3D" id="7"]
+height = 2.7
+radius = 2.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jkun5"]
+size = Vector3(2.232974, 1, 3.5261698)
+
+[node name="Tank_Light" type="VehicleBody3D" unique_id=1286101069 groups=["ally"]]
+collision_layer = 4
+collision_mask = 12
+mass = 1500.0
+physics_material_override = SubResource("1")
+center_of_mass_mode = 1
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 16
+linear_damp = 0.08
+angular_damp = 0.18
+script = ExtResource("1")
+vehicle_display_name = "Light Tank"
+chassis_id = "light_tank"
+chassis_price = 1200
+chassis_trade_in_value = 900
+engine_force_forward = 8200.0
+engine_force_reverse = 3500.0
+max_steering_deg = 58.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009307861, 1.2991391, 0.0065979958)
+shape = SubResource("2")
+
+[node name="BodyVisualRoot" type="Node3D" parent="." unique_id=1288168528]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+
+[node name="Body" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=734452507]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
+mesh = SubResource("ArrayMesh_gsgk6")
+surface_material_override/0 = SubResource("4")
+
+[node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=1468659701]
+
+[node name="Seat1Driver" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=1915466685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6136669, 0.038060486, 0.8950527)
+
+[node name="Seat2Turret" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=1150537268]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+
+[node name="TurretMounts" type="Node3D" parent="BodyVisualRoot" unique_id=2110846060]
+
+[node name="Seat1" parent="BodyVisualRoot/TurretMounts" unique_id=1270461324 instance=ExtResource("2_7af67")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7812264, 0.27006984, 1.0365031)
+
+[node name="Seat2" parent="BodyVisualRoot/TurretMounts" unique_id=80008280 instance=ExtResource("2_7af67")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+seat_index = 2
+seat_label = "siege 2"
+turret_size = 2
+driver_turret = false
+turret_scene = ExtResource("4_3ojlu")
+
+[node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=1619376301]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -0.9, 0.5, 0.9)
+use_as_steering = true
+wheel_roll_influence = 0.12
+wheel_radius = 0.3
+wheel_rest_length = 0.18
+wheel_friction_slip = 1.15
+suspension_stiffness = 59.0
+damping_compression = 0.15
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FrontLeftWheel" unique_id=5496198]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_yxytb")
+surface_material_override/0 = SubResource("6")
+
+[node name="FrontRightWheel" type="VehicleWheel3D" parent="." unique_id=887756342]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0.9, 0.5, 0.9)
+use_as_steering = true
+wheel_roll_influence = 0.12
+wheel_radius = 0.3
+wheel_rest_length = 0.18
+wheel_friction_slip = 1.15
+suspension_stiffness = 59.0
+damping_compression = 0.15
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FrontRightWheel" unique_id=1299802971]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_yxytb")
+surface_material_override/0 = SubResource("6")
+
+[node name="RearLeftWheel" type="VehicleWheel3D" parent="." unique_id=347284515]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -0.9, 0.5, -0.9)
+use_as_traction = true
+wheel_roll_influence = 0.12
+wheel_radius = 0.3
+wheel_rest_length = 0.18
+wheel_friction_slip = 1.15
+suspension_stiffness = 59.0
+damping_compression = 0.15
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RearLeftWheel" unique_id=192094562]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_yxytb")
+surface_material_override/0 = SubResource("6")
+
+[node name="RearRightWheel" type="VehicleWheel3D" parent="." unique_id=999012565]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0.9, 0.5, -0.9)
+use_as_traction = true
+wheel_roll_influence = 0.12
+wheel_radius = 0.3
+wheel_rest_length = 0.18
+wheel_friction_slip = 1.15
+suspension_stiffness = 59.0
+damping_compression = 0.15
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RearRightWheel" unique_id=386629346]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_yxytb")
+surface_material_override/0 = SubResource("6")
+
+[node name="UseArea" type="Area3D" parent="." unique_id=1965562369]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="UseArea" unique_id=612863531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("7")
+
+[node name="EnemySoftImpactArea" type="Area3D" parent="." unique_id=369851147]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnemySoftImpactArea" unique_id=1682575010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00931859, 0.52192193, 0.014309168)
+shape = SubResource("BoxShape3D_jkun5")
+debug_color = Color(0.7607843, 0, 0.72156864, 0.69803923)
+
+[node name="ExitPoint" type="Marker3D" parent="." unique_id=1987541066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.5, 0)
+
+[connection signal="body_entered" from="UseArea" to="." method="_on_use_area_body_entered"]
+[connection signal="body_exited" from="UseArea" to="." method="_on_use_area_body_exited"]

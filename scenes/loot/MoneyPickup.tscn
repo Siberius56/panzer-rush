@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://d2xh1lt8ew0om"]
+
+[ext_resource type="Script" path="res://scripts/loot/LootPickup.gd" id="1_script"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_body"]
+radius = 0.22
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
+radius = 1.15
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_money"]
+albedo_color = Color(0.95, 0.78, 0.15, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_money"]
+top_radius = 0.18
+bottom_radius = 0.18
+height = 0.08
+radial_segments = 24
+rings = 1
+
+[node name="MoneyPickup" type="RigidBody3D"]
+collision_layer = 16
+collision_mask = 1
+mass = 0.4
+script = ExtResource("1_script")
+loot_type = 0
+amount = 25
+pickup_delay = 0.35
+lifetime = 90.0
+freeze_after_seconds = 0.8
+linear_damp_override = 2.0
+angular_damp_override = 2.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_body")
+
+[node name="PickupArea3D" type="Area3D" parent="."]
+collision_mask = 4294967295
+monitoring = true
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea3D"]
+shape = SubResource("SphereShape3D_pickup")
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot"]
+material_override = SubResource("StandardMaterial3D_money")
+mesh = SubResource("CylinderMesh_money")

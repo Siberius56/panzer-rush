@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://d002coqhtaetc"]
+
+[ext_resource type="Script" uid="uid://bt5d85rda4cry" path="res://scenes/enemies/EnemyTankVehicle.gd" id="1_tank_script"]
+[ext_resource type="PackedScene" uid="uid://2lynf3ba0mdk" path="res://scenes/weapons/ObusBullet.tscn" id="2_jg4of"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(2.2, 0.8, 3.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+size = Vector3(2.2, 0.8, 3.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_turret"]
+size = Vector3(1.25, 0.45, 1.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_barrel"]
+size = Vector3(0.22, 0.22, 1.7)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_detection"]
+radius = 45.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wheel"]
+top_radius = 0.36
+bottom_radius = 0.36
+height = 0.22
+
+[node name="EnemyTankVehicle" type="VehicleBody3D" unique_id=188689959 groups=["damageable", "enemy"]]
+collision_layer = 4
+collision_mask = 15
+mass = 1500.0
+script = ExtResource("1_tank_script")
+detection_radius = 25.0
+attack_range = 10.0
+projectile_scene = ExtResource("2_jg4of")
+fire_rate = 1.2000000000000002
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=794075745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("BoxShape3D_body")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="." unique_id=518082070]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("BoxMesh_body")
+
+[node name="TurretYaw" type="Node3D" parent="." unique_id=1429656833]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, -0.15)
+
+[node name="TurretMesh" type="MeshInstance3D" parent="TurretYaw" unique_id=1802477720]
+mesh = SubResource("BoxMesh_turret")
+
+[node name="BarrelPitch" type="Node3D" parent="TurretYaw" unique_id=1394384282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.6)
+
+[node name="BarrelMesh" type="MeshInstance3D" parent="TurretYaw/BarrelPitch" unique_id=1388295615]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)
+mesh = SubResource("BoxMesh_barrel")
+
+[node name="Muzzle" type="Marker3D" parent="TurretYaw/BarrelPitch" unique_id=1944380031]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.72)
+
+[node name="DetectionArea" type="Area3D" parent="." unique_id=1615200530]
+collision_layer = 0
+collision_mask = 3
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionArea" unique_id=727696219]
+shape = SubResource("SphereShape3D_detection")
+
+[node name="Wheel_FL" type="VehicleWheel3D" parent="." unique_id=146115710]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.64, -1.08)
+use_as_traction = true
+use_as_steering = true
+wheel_radius = 0.36
+wheel_rest_length = 0.32
+wheel_friction_slip = 5.0
+suspension_stiffness = 32.0
+damping_compression = 0.4
+damping_relaxation = 0.55
+
+[node name="WheelMesh" type="MeshInstance3D" parent="Wheel_FL" unique_id=225338171]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="Wheel_FR" type="VehicleWheel3D" parent="." unique_id=2079340136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.64, -1.08)
+use_as_traction = true
+use_as_steering = true
+wheel_radius = 0.36
+wheel_rest_length = 0.32
+wheel_friction_slip = 5.0
+suspension_stiffness = 32.0
+damping_compression = 0.4
+damping_relaxation = 0.55
+
+[node name="WheelMesh" type="MeshInstance3D" parent="Wheel_FR" unique_id=1581528362]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="Wheel_RL" type="VehicleWheel3D" parent="." unique_id=339336266]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.64, 1.08)
+use_as_traction = true
+wheel_radius = 0.36
+wheel_rest_length = 0.32
+wheel_friction_slip = 5.0
+suspension_stiffness = 32.0
+damping_compression = 0.4
+damping_relaxation = 0.55
+
+[node name="WheelMesh" type="MeshInstance3D" parent="Wheel_RL" unique_id=1972424858]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="Wheel_RR" type="VehicleWheel3D" parent="." unique_id=86600044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.64, 1.08)
+use_as_traction = true
+wheel_radius = 0.36
+wheel_rest_length = 0.32
+wheel_friction_slip = 5.0
+suspension_stiffness = 32.0
+damping_compression = 0.4
+damping_relaxation = 0.55
+
+[node name="WheelMesh" type="MeshInstance3D" parent="Wheel_RR" unique_id=904529852]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")

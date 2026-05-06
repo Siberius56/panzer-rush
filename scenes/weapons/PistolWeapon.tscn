@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dd33dmmqhjkul"]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/WeaponVisualBase.tscn" id="1_base"]
+
+[sub_resource type="StandardMaterial3D" id="1_mat"]
+albedo_color = Color(0.18, 0.18, 0.18, 1)
+
+[sub_resource type="BoxMesh" id="1_mesh"]
+size = Vector3(0.12, 0.14, 0.45)
+
+[node name="PistolWeapon" unique_id=1884597630 instance=ExtResource("1_base")]
+shot_dispersion_degrees = 4.0
+
+[node name="WeaponMesh" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.18)
+material_override = SubResource("1_mat")
+mesh = SubResource("1_mesh")
+
+[node name="WeaponMesh2" type="MeshInstance3D" parent="." index="1" unique_id=1627489867]
+transform = Transform3D(1, 0, 0, 0, 0.38174793, -0.92426646, 0, 0.92426646, 0.38174793, -2.3841858e-07, -0.18054295, 0.060610563)
+material_override = SubResource("1_mat")
+mesh = SubResource("1_mesh")
+
+[node name="Muzzle" parent="." index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.46378955)

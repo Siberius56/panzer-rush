@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://gxwjxawwhtm3"]
+
+[ext_resource type="Script" uid="uid://cjc51q5dbv5py" path="res://vehicle_system/ui/VehicleSeatEntry.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n5pr0"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.3, 0.3, 0.3, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="VehicleSeatEntry" type="PanelContainer" unique_id=1453010945]
+offset_right = 274.0
+offset_bottom = 120.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_n5pr0")
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2035009863]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Vbox" type="VBoxContainer" parent="MarginContainer" unique_id=259547516]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/Vbox" unique_id=677414254]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Siège"
+autowrap_mode = 2
+
+[node name="StateLabel" type="Label" parent="MarginContainer/Vbox" unique_id=1695125594]
+unique_name_in_owner = true
+layout_mode = 2
+text = "État"
+autowrap_mode = 2
+
+[node name="OccupantLabel" type="Label" parent="MarginContainer/Vbox" unique_id=328523548]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Occupant"
+autowrap_mode = 2
+
+[node name="Actions" type="HBoxContainer" parent="MarginContainer/Vbox" unique_id=826569130]
+layout_mode = 2
+
+[node name="InstallButton" type="Button" parent="MarginContainer/Vbox/Actions" unique_id=1565269125]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Installer ici"
+
+[node name="SellButton" type="Button" parent="MarginContainer/Vbox/Actions" unique_id=272048600]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Vendre"
+
+[node name="LockLabel" type="Label" parent="MarginContainer/Vbox/Actions" unique_id=1977311769]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="Separator" type="HSeparator" parent="MarginContainer/Vbox" unique_id=1975205172]
+visible = false
+layout_mode = 2

@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="1_mat"]
+albedo_color = Color(0.22, 0.22, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="1_mesh"]
+size = Vector3(0.18, 0.12, 0.9)
+
+[node name="WeaponVisualBase" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WeaponMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
+material_override = SubResource("1_mat")
+mesh = SubResource("1_mesh")
+
+[node name="Muzzle" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.75)

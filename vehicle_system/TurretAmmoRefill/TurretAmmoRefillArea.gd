@@ -1,0 +1,286 @@
+extends Area3D
+class_name TurretAmmoRefillArea
+
+@export_group("Recharge")
+@export var enabled: bool = true
+@export var server_only: bool = true
+@export var recharge_cooldown: float = 1.0
+@export var consume_after_success: bool = false
+
+@export_group("Vehicle Detection")
+@export var vehicle_group: StringName = &"vehicles"
+@export var require_vehicle_group: bool = false
+@export var parent_search_depth: int = 8
+
+@export_group("Debug")
+@export var debug_print: bool = false
+
+var _vehicle_cooldowns: Dictionary = {}
+
+
+func _ready() -> void:
+	body_entered.connect(_on_body_entered)
+
+
+func _process(delta: float) -> void:
+	if _vehicle_cooldowns.is_empty():
+		return
+
+	var ids_to_remove: Array = []
+	for vehicle_id in _vehicle_cooldowns.keys():
+		_vehicle_cooldowns[vehicle_id] = float(_vehicle_cooldowns[vehicle_id]) - delta
+		if float(_vehicle_cooldowns[vehicle_id]) <= 0.0:
+			ids_to_remove.append(vehicle_id)
+
+	for vehicle_id in ids_to_remove:
+		_vehicle_cooldowns.erase(vehicle_id)
+
+
+func _on_body_entered(body: Node) -> void:
+	if not enabled:
+		return
+
+	if server_only and not multiplayer.is_server():
+		return
+
+	var vehicle := _find_vehicle_root(body)
+	if vehicle == null:
+		return
+
+	var vehicle_id := vehicle.get_instance_id()
+	if _vehicle_cooldowns.has(vehicle_id):
+		return
+
+	var refilled_turret_count := refill_vehicle_ammo(vehicle)
+	if refilled_turret_count <= 0:
+		return
+
+	_vehicle_cooldowns[vehicle_id] = recharge_cooldown
+
+	if debug_print:
+		print("TurretAmmoRefillArea: recharged %d turret(s) on %s" % [refilled_turret_count, vehicle.name])
+
+	if consume_after_success:
+		queue_free()
+
+
+func refill_vehicle_ammo(vehicle: Node) -> int:
+	if vehicle == null or not is_instance_valid(vehicle):
+		return 0
+
+	if server_only and not multiplayer.is_server():
+		return 0
+
+	var turrets := _find_vehicle_turrets(vehicle)
+	var refilled_count := 0
+
+	for turret in turrets:
+		if _refill_turret_to_max(turret):
+			refilled_count += 1
+
+	return refilled_count
+
+
+func _find_vehicle_root(from_node: Node) -> Node:
+	var current := from_node
+	var depth := 0
+	var max_depth := maxi(parent_search_depth, 1)
+
+	while current != null and depth <= max_depth:
+		if _is_vehicle_node(current):
+			return current
+
+		current = current.get_parent()
+		depth += 1
+
+	return null
+
+
+func _is_vehicle_node(node: Node) -> bool:
+	if node == null:
+		return false
+
+	if vehicle_group != &"" and node.is_in_group(vehicle_group):
+		return true
+
+	if require_vehicle_group:
+		return false
+
+	if node.has_method("get_mount_for_seat") and _has_property(node, "seat_count"):
+		return true
+
+	if node.has_method("get_seat_occupant") and node.has_method("get_mount_for_seat"):
+		return true
+
+	return false
+
+
+func _find_vehicle_turrets(vehicle: Node) -> Array[Node]:
+	var out: Array[Node] = []
+
+	if vehicle.has_method("get_mount_for_seat"):
+		var seat_count_value := 0
+		if _has_property(vehicle, "seat_count"):
+			seat_count_value = int(vehicle.get("seat_count"))
+
+		for seat_index in range(1, seat_count_value + 1):
+			var mount = vehicle.call("get_mount_for_seat", seat_index)
+			_append_turret_from_mount(mount, out)
+
+	_scan_children_for_turrets(vehicle, out)
+	return out
+
+
+func _append_turret_from_mount(mount: Variant, out: Array[Node]) -> void:
+	if mount == null:
+		return
+
+	if not mount is Node:
+		return
+
+	var mount_node := mount as Node
+
+	if _is_ammo_turret(mount_node):
+		_append_unique_node(out, mount_node)
+		return
+
+	var method_names := [
+		"get_turret",
+		"get_current_turret",
+		"get_turret_instance",
+		"get_active_turret",
+	]
+
+	for method_name in method_names:
+		if not mount_node.has_method(method_name):
+			continue
+
+		var turret = mount_node.call(method_name)
+		if turret is Node and _is_ammo_turret(turret):
+			_append_unique_node(out, turret)
+			return
+
+	var property_names := [
+		"turret",
+		"current_turret",
+		"active_turret",
+		"turret_instance",
+	]
+
+	for property_name in property_names:
+		if not _has_property(mount_node, property_name):
+			continue
+
+		var turret = mount_node.get(property_name)
+		if turret is Node and _is_ammo_turret(turret):
+			_append_unique_node(out, turret)
+			return
+
+	_scan_children_for_turrets(mount_node, out)
+
+
+func _scan_children_for_turrets(root: Node, out: Array[Node]) -> void:
+	if root == null:
+		return
+
+	for child in root.get_children():
+		if child is Node:
+			if _is_ammo_turret(child):
+				_append_unique_node(out, child)
+			else:
+				_scan_children_for_turrets(child, out)
+
+
+func _is_ammo_turret(node: Node) -> bool:
+	if node == null:
+		return false
+
+	if node.has_method("reload_turret"):
+		return true
+
+	if node.has_method("get_magazine_ammo") and node.has_method("get_magazine_max_ammo"):
+		return true
+
+	if _has_property(node, "magazine_ammo") and _has_property(node, "magazine_max_ammo"):
+		return true
+
+	return false
+
+
+func _refill_turret_to_max(turret: Node) -> bool:
+	if turret == null or not is_instance_valid(turret):
+		return false
+
+	if not _is_ammo_turret(turret):
+		return false
+
+	if turret.has_method("cancel_reload"):
+		turret.call("cancel_reload")
+
+	var changed := false
+
+	var reserve_max := _read_int(turret, "get_reserve_max_ammo", "reserve_max_ammo", -1)
+	var has_infinite := _read_bool(turret, "has_infinite_ammo", "infinite_ammo", false)
+
+	if not has_infinite and reserve_max >= 0:
+		if _has_property(turret, "reserve_ammo"):
+			turret.set("reserve_ammo", reserve_max)
+			changed = true
+		elif turret.has_method("refill_reserve_instant"):
+			turret.call("refill_reserve_instant")
+			changed = true
+
+	var magazine_max := _read_int(turret, "get_magazine_max_ammo", "magazine_max_ammo", -1)
+	if magazine_max > 0:
+		if _has_property(turret, "magazine_ammo"):
+			turret.set("magazine_ammo", magazine_max)
+			changed = true
+		elif turret.has_method("refill_turret_instant"):
+			turret.call("refill_turret_instant")
+			changed = true
+
+	if turret.has_method("_sanitize_ammo_values"):
+		turret.call("_sanitize_ammo_values")
+
+	return changed
+
+
+func _read_int(node: Node, method_name: String, property_name: String, fallback: int) -> int:
+	if node.has_method(method_name):
+		return int(node.call(method_name))
+
+	if _has_property(node, property_name):
+		return int(node.get(property_name))
+
+	return fallback
+
+
+func _read_bool(node: Node, method_name: String, property_name: String, fallback: bool) -> bool:
+	if node.has_method(method_name):
+		return bool(node.call(method_name))
+
+	if _has_property(node, property_name):
+		return bool(node.get(property_name))
+
+	return fallback
+
+
+func _has_property(object: Object, property_name: String) -> bool:
+	if object == null:
+		return false
+
+	for property in object.get_property_list():
+		if str(property.get("name", "")) == property_name:
+			return true
+
+	return false
+
+
+func _append_unique_node(out: Array[Node], node: Node) -> void:
+	if node == null:
+		return
+
+	if out.has(node):
+		return
+
+	out.append(node)

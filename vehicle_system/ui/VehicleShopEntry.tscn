@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://c4p6yftvq1bgc"]
+
+[ext_resource type="Script" uid="uid://vbwosegdnmpp" path="res://vehicle_system/ui/VehicleShopEntry.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1waon"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.3, 0.3, 0.3, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="PanelContainer" type="PanelContainer" unique_id=939847870]
+offset_right = 258.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_1waon")
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=8081704]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VehicleShopEntry" type="VBoxContainer" parent="MarginContainer" unique_id=627216020]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InfoLabel" type="Label" parent="MarginContainer/VehicleShopEntry" unique_id=350925042]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tourelle"
+autowrap_mode = 2
+
+[node name="SelectButton" type="Button" parent="MarginContainer/VehicleShopEntry" unique_id=479726321]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Choisir"
+
+[node name="Separator" type="HSeparator" parent="MarginContainer/VehicleShopEntry" unique_id=2113108961]
+visible = false
+layout_mode = 2

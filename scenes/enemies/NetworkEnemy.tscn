@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://clhmm4drbsxau"]
+
+[ext_resource type="Script" uid="uid://bdbx23xwfl1e5" path="res://scripts/enemies/NetworkEnemy.gd" id="1_enemy"]
+[ext_resource type="PackedScene" uid="uid://cusdlnpquk17g" path="res://scenes/weapons/VisualBullet.tscn" id="2_3cldk"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.45
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_detection"]
+radius = 12.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(1, 0.25, 0.25, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+radius = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stick"]
+albedo_color = Color(0.35, 0.22, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stick"]
+size = Vector3(0.08, 1.1, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rifle"]
+albedo_color = Color(0.12, 0.12, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rifle"]
+size = Vector3(0.16, 0.12, 0.95)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3cldk"]
+size = Vector3(0.6, 0.3, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kilhg"]
+albedo_color = Color(0.11304883, 0.11304883, 0.11304883, 1)
+
+[node name="NetworkEnemy" type="CharacterBody3D" unique_id=1628666736]
+collision_layer = 2
+collision_mask = 9
+script = ExtResource("1_enemy")
+projectile_scene = ExtResource("2_3cldk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1023561533]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=420383496]
+
+[node name="DetectionArea3D" type="Area3D" parent="." unique_id=914849170]
+collision_mask = 13
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionArea3D" unique_id=2013577464]
+shape = SubResource("SphereShape3D_detection")
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=907130316]
+
+[node name="BodyMesh" type="MeshInstance3D" parent="VisualRoot" unique_id=2105606698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+material_override = SubResource("StandardMaterial3D_enemy")
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="WeaponPivot" type="Node3D" parent="VisualRoot" unique_id=504986805]
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0.38, 1.15, -0.08)
+
+[node name="StickMesh" type="MeshInstance3D" parent="VisualRoot/WeaponPivot" unique_id=1339530102]
+transform = Transform3D(0.87978137, 0.4103414, 0.2400099, -0.08100587, -0.36809057, 0.92625463, 0.4684258, -0.8343439, -0.2905992, -0.080266595, 0.025935411, 0.52198756)
+material_override = SubResource("StandardMaterial3D_stick")
+mesh = SubResource("BoxMesh_stick")
+
+[node name="RifleMesh" type="MeshInstance3D" parent="VisualRoot/WeaponPivot" unique_id=1034472056]
+transform = Transform3D(1, 0, 0, 0, 0.9327777, -0.3604528, 0, 0.3604528, 0.9327777, 0, -0.05000007, -0.44999996)
+material_override = SubResource("StandardMaterial3D_rifle")
+mesh = SubResource("BoxMesh_rifle")
+
+[node name="Muzzle" type="Node3D" parent="VisualRoot/WeaponPivot" unique_id=72105364]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11957407, -0.8991992)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot" unique_id=1865746753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4555095, -0.3796246)
+mesh = SubResource("BoxMesh_3cldk")
+surface_material_override/0 = SubResource("StandardMaterial3D_kilhg")

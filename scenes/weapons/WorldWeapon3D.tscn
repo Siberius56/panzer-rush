@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dha7qfqc5vywa"]
+
+[ext_resource type="Script" uid="uid://brw21aujh7jy3" path="res://scenes/weapons/WorldWeapon3D.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="1_box"]
+size = Vector3(0.35, 0.2, 1.2)
+
+[node name="WorldWeapon3D" type="RigidBody3D" unique_id=2144849267]
+collision_mask = 8
+contact_monitor = true
+max_contacts_reported = 4
+linear_damp = 0.5
+angular_damp = 1.0
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=873440532]
+shape = SubResource("1_box")
+
+[node name="VisualSocket" type="Node3D" parent="." unique_id=110911777]
+
+[node name="Label3D" type="Label3D" parent="." unique_id=741685875]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6315675, 0)
+text = "Weapon"

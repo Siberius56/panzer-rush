@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://cusdlnpquk17g"]
+
+[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scripts/weapons/VisualBullet.gd" id="1_bullet"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_irilk"]
+radius = 0.2607422
+height = 0.8215332
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(1, 0.85, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 0.7, 0.15, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_irilk"]
+radius = 0.2
+height = 0.7
+
+[node name="VisualBullet" type="Area3D" unique_id=1984719998]
+monitorable = false
+script = ExtResource("1_bullet")
+lifetime = 3.0
+debug_logs = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=832740459]
+transform = Transform3D(1.9106855e-15, -4.371139e-08, -1, -1, -4.371139e-08, 0, -4.371139e-08, 1, -4.371139e-08, 0.0009155273, -8.00382e-11, 0.00091552734)
+shape = SubResource("CapsuleShape3D_irilk")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1723184364]
+transform = Transform3D(1.9106855e-15, -4.371139e-08, -1, -1, -4.371139e-08, 0, -4.371139e-08, 1, -4.371139e-08, 0.0009155274, 0, -0.00091552734)
+material_override = SubResource("StandardMaterial3D_1")
+cast_shadow = 0
+mesh = SubResource("CapsuleMesh_irilk")

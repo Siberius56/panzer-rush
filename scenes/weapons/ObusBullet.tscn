@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://2lynf3ba0mdk"]
+
+[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scripts/weapons/VisualBullet.gd" id="1_r6fub"]
+[ext_resource type="PackedScene" uid="uid://b05w3s4sqvc32" path="res://scenes/weapons/ProjectileExplosion.tscn" id="2_s2h2k"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_bullet"]
+radius = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(1, 0, 0, 1)
+emission_enabled = true
+emission = Color(1, 0, 0.14901961, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1"]
+radius = 0.3
+height = 0.3
+
+[node name="ObusBullet" type="Area3D" unique_id=1984719998]
+monitorable = false
+script = ExtResource("1_r6fub")
+speed = 45.0
+lifetime = 3.0
+hit_effect_scene = ExtResource("2_s2h2k")
+debug_logs = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=832740459]
+shape = SubResource("SphereShape3D_bullet")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1723184364]
+material_override = SubResource("StandardMaterial3D_1")
+cast_shadow = 0
+mesh = SubResource("SphereMesh_1")

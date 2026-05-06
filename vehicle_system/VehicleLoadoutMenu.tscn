@@ -1,0 +1,207 @@
+[gd_scene format=3 uid="uid://dokopvgy2cx2f"]
+
+[ext_resource type="Script" uid="uid://xkdns7x1fwf2" path="res://vehicle_system/VehicleLoadoutMenu.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3cd0h"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ddkgo"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lrl4k"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="VehicleLoadoutMenu" type="CanvasLayer" unique_id=671967316]
+script = ExtResource("1")
+
+[node name="Root" type="ColorRect" parent="." unique_id=1703134395]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.78431374)
+
+[node name="Margin" type="MarginContainer" parent="Root" unique_id=29247769]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 256
+theme_override_constants/margin_top = 128
+theme_override_constants/margin_right = 256
+theme_override_constants/margin_bottom = 128
+
+[node name="VBox" type="VBoxContainer" parent="Root/Margin" unique_id=492548445]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="VBoxContainer" parent="Root/Margin/VBox" unique_id=1937884749]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Root/Margin/VBox/Header" unique_id=425245499]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Véhicule"
+
+[node name="Money" type="Label" parent="Root/Margin/VBox/Header" unique_id=1660492166]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Argent : 0"
+
+[node name="CurrentChassis" type="Label" parent="Root/Margin/VBox/Header" unique_id=159896664]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Châssis actuel : -"
+
+[node name="SelectedTurret" type="Label" parent="Root/Margin/VBox/Header" unique_id=630055741]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tourelle sélectionnée : aucune"
+
+[node name="Body" type="HSplitContainer" parent="Root/Margin/VBox" unique_id=93433397]
+layout_mode = 2
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(-219)
+split_offset = -219
+
+[node name="LeftPanel" type="PanelContainer" parent="Root/Margin/VBox/Body" unique_id=2027569903]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_3cd0h")
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/Margin/VBox/Body/LeftPanel" unique_id=1481860657]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="SeatScroll" type="ScrollContainer" parent="Root/Margin/VBox/Body/LeftPanel/MarginContainer" unique_id=889228131]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SeatList" type="VBoxContainer" parent="Root/Margin/VBox/Body/LeftPanel/MarginContainer/SeatScroll" unique_id=274889199]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/Margin/VBox/Body" unique_id=2112367852]
+custom_minimum_size = Vector2(384, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RightPanel1" type="PanelContainer" parent="Root/Margin/VBox/Body/VBoxContainer" unique_id=1403622573]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ddkgo")
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel1" unique_id=986592911]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="TurretSection" type="VBoxContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel1/MarginContainer" unique_id=477612566]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TurretTitle" type="Label" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel1/MarginContainer/TurretSection" unique_id=1075988405]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Tourelles disponibles"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="TurretScroll" type="ScrollContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel1/MarginContainer/TurretSection" unique_id=1838785959]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TurretList" type="VBoxContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel1/MarginContainer/TurretSection/TurretScroll" unique_id=266230649]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="RightPanel2" type="PanelContainer" parent="Root/Margin/VBox/Body/VBoxContainer" unique_id=1573171774]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_lrl4k")
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel2" unique_id=677395126]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ChassisSection" type="VBoxContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel2/MarginContainer" unique_id=201612451]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ChassisTitle" type="Label" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel2/MarginContainer/ChassisSection" unique_id=1292070419]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Châssis disponibles"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="ChassisScroll" type="ScrollContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel2/MarginContainer/ChassisSection" unique_id=154304363]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ChassisList" type="VBoxContainer" parent="Root/Margin/VBox/Body/VBoxContainer/RightPanel2/MarginContainer/ChassisSection/ChassisScroll" unique_id=1444796887]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Footer" type="HBoxContainer" parent="Root/Margin/VBox" unique_id=1951541179]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="ClearSelectionButton" type="Button" parent="Root/Margin/VBox/Footer" unique_id=80751487]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Effacer la sélection"
+
+[node name="CloseButton" type="Button" parent="Root/Margin/VBox/Footer" unique_id=909766636]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fermer"

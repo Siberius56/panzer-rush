@@ -1,0 +1,668 @@
+[gd_scene load_steps=12 format=3]
+
+; Godot 4 blockout scene.
+; Level: Route vers le Bastion / Proposition 1: Route industrielle.
+; Scale convention: 1 unit ~= 1 meter.
+; Main progression: Spawn -> Depot -> Merchant -> Tunnel -> Loading Yard -> Ammo Station -> Final Gate.
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.28, 0.28, 0.28, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+albedo_color = Color(0.12, 0.12, 0.13, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_obstacle"]
+albedo_color = Color(0.78, 0.43, 0.14, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spawn"]
+albedo_color = Color(0.15, 0.75, 0.25, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_merchant"]
+albedo_color = Color(0.25, 0.35, 0.95, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ammo"]
+albedo_color = Color(0.95, 0.82, 0.2, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(0.9, 0.18, 0.13, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_heavy_enemy"]
+albedo_color = Color(0.55, 0.06, 0.06, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goal"]
+albedo_color = Color(0.1, 0.85, 0.9, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_roadline"]
+albedo_color = Color(0.92, 0.92, 0.75, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_note"]
+albedo_color = Color(0.7, 0.7, 0.75, 1)
+roughness = 0.8
+
+[node name="RouteVersLeBastion_Blockout" type="Node3D"]
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lighting"]
+position = Vector3(-20, 35, -15)
+rotation = Vector3(-0.85, -0.55, -0.15)
+light_energy = 2.0
+shadow_enabled = true
+
+[node name="Camera_TopDown_Debug" type="Camera3D" parent="."]
+position = Vector3(0, 86, 79)
+rotation = Vector3(-1.570796, 0, 0)
+projection = 1
+size = 180.0
+current = true
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Floors" type="Node3D" parent="Geometry"]
+
+[node name="Floor_01_Spawn_RouteDepart" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(18, 0.2, 16)
+position = Vector3(0, -0.1, 0)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_02_Road_Corridor" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(8, 0.2, 19)
+position = Vector3(0, -0.1, 17.5)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_03_DepotOuvert" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(34, 0.2, 26)
+position = Vector3(0, -0.1, 40)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_03B_DetourBonusAmmo" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(12, 0.2, 14)
+position = Vector3(25, -0.1, 41)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_04_MerchantStop" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(18, 0.2, 14)
+position = Vector3(0, -0.1, 62)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_05_TunnelEtroit" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(8, 0.2, 20)
+position = Vector3(0, -0.1, 79)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_06_CourDeChargement" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(42, 0.2, 30)
+position = Vector3(0, -0.1, 105)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_07_StationRavitaillement" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(16, 0.2, 12)
+position = Vector3(0, -0.1, 128)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="Floor_08_PorteDuBastion_Final" type="CSGBox3D" parent="Geometry/Floors"]
+size = Vector3(34, 0.2, 28)
+position = Vector3(0, -0.1, 150)
+material = SubResource("StandardMaterial3D_floor")
+use_collision = true
+
+[node name="RoadLines" type="Node3D" parent="Geometry"]
+
+[node name="RoadLine_Spawn" type="CSGBox3D" parent="Geometry/RoadLines"]
+size = Vector3(0.35, 0.04, 10)
+position = Vector3(0, 0.03, 0)
+material = SubResource("StandardMaterial3D_roadline")
+
+[node name="RoadLine_Corridor" type="CSGBox3D" parent="Geometry/RoadLines"]
+size = Vector3(0.25, 0.04, 14)
+position = Vector3(0, 0.03, 17.5)
+material = SubResource("StandardMaterial3D_roadline")
+
+[node name="RoadLine_Tunnel" type="CSGBox3D" parent="Geometry/RoadLines"]
+size = Vector3(0.25, 0.04, 13)
+position = Vector3(0, 0.03, 79)
+material = SubResource("StandardMaterial3D_roadline")
+
+[node name="Walls" type="Node3D" parent="Geometry"]
+
+[node name="Wall_Spawn_Back" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(18, 3, 1)
+position = Vector3(0, 1.5, -8.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Spawn_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 16)
+position = Vector3(-9.5, 1.5, 0)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Spawn_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 16)
+position = Vector3(9.5, 1.5, 0)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Road_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 19)
+position = Vector3(-4.5, 1.5, 17.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Road_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 19)
+position = Vector3(4.5, 1.5, 17.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 26)
+position = Vector3(-17.5, 1.5, 40)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Right_Lower" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 9)
+position = Vector3(17.5, 1.5, 31.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Right_Upper" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 9)
+position = Vector3(17.5, 1.5, 48.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Back_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(12, 3, 1)
+position = Vector3(-11, 1.5, 26.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Back_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(12, 3, 1)
+position = Vector3(11, 1.5, 26.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Front_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(11, 3, 1)
+position = Vector3(-11.5, 1.5, 53.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Depot_Front_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(11, 3, 1)
+position = Vector3(11.5, 1.5, 53.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Detour_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 14)
+position = Vector3(31.5, 1.5, 41)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Detour_Top" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(12, 3, 1)
+position = Vector3(25, 1.5, 48.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Detour_Bottom" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(12, 3, 1)
+position = Vector3(25, 1.5, 33.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Merchant_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 14)
+position = Vector3(-9.5, 1.5, 62)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Merchant_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 14)
+position = Vector3(9.5, 1.5, 62)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Merchant_Back_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(5, 3, 1)
+position = Vector3(-6.5, 1.5, 54.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Merchant_Back_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(5, 3, 1)
+position = Vector3(6.5, 1.5, 54.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Merchant_Front_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(5, 3, 1)
+position = Vector3(-6.5, 1.5, 69.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Merchant_Front_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(5, 3, 1)
+position = Vector3(6.5, 1.5, 69.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Tunnel_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 20)
+position = Vector3(-4.5, 1.5, 79)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Tunnel_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 20)
+position = Vector3(4.5, 1.5, 79)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Yard_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 30)
+position = Vector3(-21.5, 1.5, 105)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Yard_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 30)
+position = Vector3(21.5, 1.5, 105)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Yard_Back_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(17, 3, 1)
+position = Vector3(-12.5, 1.5, 89.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Yard_Back_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(17, 3, 1)
+position = Vector3(12.5, 1.5, 89.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Yard_Front_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(16, 3, 1)
+position = Vector3(-13, 1.5, 120.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Yard_Front_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(16, 3, 1)
+position = Vector3(13, 1.5, 120.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Ammo_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 12)
+position = Vector3(-8.5, 1.5, 128)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Ammo_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 12)
+position = Vector3(8.5, 1.5, 128)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Final_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 28)
+position = Vector3(-17.5, 1.5, 150)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Final_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(1, 3, 28)
+position = Vector3(17.5, 1.5, 150)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Final_Back_LeftSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(11, 3, 1)
+position = Vector3(-11.5, 1.5, 135.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Final_Back_RightSegment" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(11, 3, 1)
+position = Vector3(11.5, 1.5, 135.5)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Final_Gate_Left" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(10, 4, 1.4)
+position = Vector3(-12, 2, 164.7)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Wall_Final_Gate_Right" type="CSGBox3D" parent="Geometry/Walls"]
+size = Vector3(10, 4, 1.4)
+position = Vector3(12, 2, 164.7)
+material = SubResource("StandardMaterial3D_wall")
+use_collision = true
+
+[node name="Obstacles" type="Node3D" parent="Geometry"]
+
+[node name="Depot_Container_A_LongCover" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(3, 2, 9)
+position = Vector3(-11, 1, 38)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Depot_Container_B_Horizontal" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(9, 2, 3)
+position = Vector3(4, 1, 34)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Depot_Container_C_RightCover" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(4, 2, 10)
+position = Vector3(12, 1, 46)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Depot_LowCover_01" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(5, 1, 2)
+position = Vector3(-4, 0.5, 46)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Detour_AmmoCrate_Cover" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(3, 1.4, 3)
+position = Vector3(25, 0.7, 41)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Merchant_Counter" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(7, 1.2, 2)
+position = Vector3(0, 0.6, 62)
+material = SubResource("StandardMaterial3D_merchant")
+use_collision = true
+
+[node name="Tunnel_Blocker_LeftNib" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(2.2, 1.4, 2)
+position = Vector3(-2.7, 0.7, 76)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Tunnel_Blocker_RightNib" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(2.2, 1.4, 2)
+position = Vector3(2.7, 0.7, 84)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Yard_Container_LeftLane" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(4, 2.2, 12)
+position = Vector3(-14, 1.1, 101)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Yard_Container_CenterBlock" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(8, 2.2, 4)
+position = Vector3(0, 1.1, 104)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Yard_Container_RightLane" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(4, 2.2, 12)
+position = Vector3(14, 1.1, 109)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Yard_LowCover_01" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(6, 1, 2)
+position = Vector3(-6, 0.5, 114)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Yard_LowCover_02" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(6, 1, 2)
+position = Vector3(8, 0.5, 96)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="AmmoStation_Crates" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(6, 1.2, 3)
+position = Vector3(0, 0.6, 128)
+material = SubResource("StandardMaterial3D_ammo")
+use_collision = true
+
+[node name="Final_Pillar_Left" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(4, 3, 4)
+position = Vector3(-10, 1.5, 148)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Final_Pillar_Right" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(4, 3, 4)
+position = Vector3(10, 1.5, 148)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="Final_LowCover_Center" type="CSGBox3D" parent="Geometry/Obstacles"]
+size = Vector3(8, 1, 2)
+position = Vector3(0, 0.5, 157)
+material = SubResource("StandardMaterial3D_obstacle")
+use_collision = true
+
+[node name="GameplayMarkers" type="Node3D" parent="."]
+
+[node name="PlayerSpawn" type="Marker3D" parent="GameplayMarkers"]
+position = Vector3(0, 0.15, -3)
+
+[node name="MerchantStation" type="Marker3D" parent="GameplayMarkers"]
+position = Vector3(0, 0.15, 62)
+
+[node name="AmmoStation_Main" type="Marker3D" parent="GameplayMarkers"]
+position = Vector3(0, 0.15, 128)
+
+[node name="AmmoStation_BonusDetour" type="Marker3D" parent="GameplayMarkers"]
+position = Vector3(25, 0.15, 41)
+
+[node name="MiniBossSpawn" type="Marker3D" parent="GameplayMarkers"]
+position = Vector3(0, 0.15, 145)
+
+[node name="LevelExit" type="Marker3D" parent="GameplayMarkers"]
+position = Vector3(0, 0.15, 165)
+
+[node name="VisualMarkers" type="Node3D" parent="."]
+
+[node name="SpawnPad" type="CSGBox3D" parent="VisualMarkers"]
+size = Vector3(5, 0.12, 5)
+position = Vector3(0, 0.08, -3)
+material = SubResource("StandardMaterial3D_spawn")
+
+[node name="MerchantPad_Blue" type="CSGBox3D" parent="VisualMarkers"]
+size = Vector3(8, 0.12, 5)
+position = Vector3(0, 0.08, 62)
+material = SubResource("StandardMaterial3D_merchant")
+
+[node name="AmmoPad_Main" type="CSGBox3D" parent="VisualMarkers"]
+size = Vector3(7, 0.12, 4)
+position = Vector3(0, 0.08, 128)
+material = SubResource("StandardMaterial3D_ammo")
+
+[node name="AmmoPad_Bonus" type="CSGBox3D" parent="VisualMarkers"]
+size = Vector3(4, 0.12, 4)
+position = Vector3(25, 0.08, 41)
+material = SubResource("StandardMaterial3D_ammo")
+
+[node name="ExitPad_Gate" type="CSGBox3D" parent="VisualMarkers"]
+size = Vector3(8, 0.12, 3)
+position = Vector3(0, 0.08, 163)
+material = SubResource("StandardMaterial3D_goal")
+
+[node name="EnemyMarkers" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01_Tutorial_A" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-4, 0.2, 3)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_01_Tutorial_B" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(4, 0.2, 5)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_02_Depot_A" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-11, 0.2, 31)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_02_Depot_B" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(7, 0.2, 31)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_02_Depot_C" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-6, 0.2, 49)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_02_Depot_D" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(11, 0.2, 49)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_05_Tunnel_AmbushLeft" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-2.5, 0.2, 82)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_05_Tunnel_AmbushRight" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(2.5, 0.2, 76)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_06_Yard_LeftWave" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-16, 0.2, 95)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_06_Yard_CenterWave" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(0, 0.2, 96)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_06_Yard_RightWave" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(16, 0.2, 97)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_06_Yard_FastFlankLeft" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-18, 0.2, 115)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_06_Yard_FastFlankRight" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(18, 0.2, 115)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_06_Yard_Heavy" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(2.2, 0.6, 2.2)
+position = Vector3(0, 0.3, 113)
+material = SubResource("StandardMaterial3D_heavy_enemy")
+
+[node name="EnemySpawn_08_Final_MiniBoss" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(3.2, 0.8, 3.2)
+position = Vector3(0, 0.4, 145)
+material = SubResource("StandardMaterial3D_heavy_enemy")
+
+[node name="EnemySpawn_08_Final_Adds_Left" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(-13, 0.2, 154)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="EnemySpawn_08_Final_Adds_Right" type="CSGBox3D" parent="EnemyMarkers"]
+size = Vector3(1.2, 0.4, 1.2)
+position = Vector3(13, 0.2, 154)
+material = SubResource("StandardMaterial3D_enemy")
+
+[node name="Labels" type="Node3D" parent="."]
+
+[node name="Label_01_Spawn" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, -6)
+text = "01 SPAWN / Route detruite"
+font_size = 34
+modulate = Color(0.8, 1, 0.8, 1)
+
+[node name="Label_02_Depot" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, 28)
+text = "02 DEPOT OUVERT / Premier vrai combat"
+font_size = 34
+modulate = Color(1, 1, 1, 1)
+
+[node name="Label_03_Bonus" type="Label3D" parent="Labels"]
+position = Vector3(25, 2.5, 34)
+text = "Detour bonus: munitions"
+font_size = 26
+modulate = Color(1, 0.9, 0.4, 1)
+
+[node name="Label_04_Merchant" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, 57)
+text = "03 MARCHAND / Upgrade tank et armes"
+font_size = 34
+modulate = Color(0.6, 0.7, 1, 1)
+
+[node name="Label_05_Tunnel" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, 73)
+text = "04 TUNNEL / Transition + embuscade"
+font_size = 30
+modulate = Color(1, 1, 1, 1)
+
+[node name="Label_06_Yard" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, 91)
+text = "05 COUR DE CHARGEMENT / Test des upgrades"
+font_size = 34
+modulate = Color(1, 1, 1, 1)
+
+[node name="Label_07_Ammo" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, 124)
+text = "06 RAVITAILLEMENT / Preparer le final"
+font_size = 30
+modulate = Color(1, 0.9, 0.4, 1)
+
+[node name="Label_08_Final" type="Label3D" parent="Labels"]
+position = Vector3(0, 2.5, 138)
+text = "07 PORTE DU BASTION / Mini-boss + vagues"
+font_size = 34
+modulate = Color(0.7, 1, 1, 1)
+
+[node name="DesignNotes" type="Node3D" parent="."]
+
+[node name="Note_CombatRhythm" type="Label3D" parent="DesignNotes"]
+position = Vector3(-24, 3, 62)
+text = "Rythme: combat moyen -> marchand -> tunnel -> combat dur -> ammo -> final"
+font_size = 22
+modulate = Color(0.75, 0.75, 0.8, 1)
+
+[node name="Note_Scale" type="Label3D" parent="DesignNotes"]
+position = Vector3(-24, 3, 70)
+text = "Ajuste les largeurs selon le rayon de braquage et la taille du tank."
+font_size = 22
+modulate = Color(0.75, 0.75, 0.8, 1)

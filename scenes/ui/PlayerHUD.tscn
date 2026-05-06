@@ -1,0 +1,288 @@
+[gd_scene format=3 uid="uid://q654pbgk6xhk"]
+
+[ext_resource type="Script" uid="uid://cp786xiv1ceq1" path="res://scenes/ui/PlayerHUD.gd" id="1_playerhud"]
+
+[node name="PlayerHUD" type="CanvasLayer" unique_id=1032802562]
+script = ExtResource("1_playerhud")
+
+[node name="Root" type="Control" parent="." unique_id=675732997]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LeftMargin" type="MarginContainer" parent="Root" unique_id=1400163101]
+layout_mode = 1
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 344.0
+offset_bottom = 320.0
+mouse_filter = 2
+
+[node name="LeftVBox" type="VBoxContainer" parent="Root/LeftMargin" unique_id=85744788]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CommonPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1010767737]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="CommonMargin" type="MarginContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel" unique_id=490244285]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CommonVBox" type="VBoxContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin" unique_id=988903530]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CommonTitle" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=502112993]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Statut"
+
+[node name="HPLabel" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=769256348]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PV : 0 / 0"
+
+[node name="OnFootPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1033469617]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="OnFootMargin" type="MarginContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel" unique_id=1135009053]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="OnFootVBox" type="VBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin" unique_id=527225305]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="OnFootTitle" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=941591861]
+unique_name_in_owner = true
+layout_mode = 2
+text = "À pied"
+
+[node name="EquippedWeaponLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1247367780]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Arme équipée : Aucune"
+
+[node name="Weapon1Label" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2008896332]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Arme 1 : Aucune"
+
+[node name="Weapon2Label" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2079577145]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Arme 2 : Aucune"
+
+[node name="AmmoLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=263193364]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Munitions : 0 / 0"
+
+[node name="ReserveLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2019493005]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Munitions : 0 / 0"
+
+[node name="MoneyLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1784108769]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Argent : 0"
+
+[node name="RightMargin" type="MarginContainer" parent="Root" unique_id=492481391]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -344.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 420.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="VehiclePanel" type="PanelContainer" parent="Root/RightMargin" unique_id=1963320942]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="VehicleMargin" type="MarginContainer" parent="Root/RightMargin/VehiclePanel" unique_id=1258618346]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VehicleVBox" type="VBoxContainer" parent="Root/RightMargin/VehiclePanel/VehicleMargin" unique_id=47278814]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="VehicleTitle" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=632833623]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Véhicule"
+
+[node name="VehicleNameLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=906979803]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Véhicule"
+
+[node name="VehicleHealthLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=1621358853]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1000/1000"
+
+[node name="CurrentSeatLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=975744003]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Siège : inconnu"
+
+[node name="SeatsTitle" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=785234662]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Occupants"
+
+[node name="SeatsVBox" type="VBoxContainer" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=1417872011]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Seat1Label" type="RichTextLabel" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox" unique_id=868539986]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "Siège 1 : Libre"
+fit_content = true
+scroll_active = false
+
+[node name="Seat2Label" type="RichTextLabel" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox" unique_id=930438325]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "Siège 2 : Libre"
+fit_content = true
+scroll_active = false
+
+[node name="Seat3Label" type="RichTextLabel" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox" unique_id=796866584]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "Siège 3 : Libre"
+fit_content = true
+scroll_active = false
+
+[node name="Seat4Label" type="RichTextLabel" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox" unique_id=354342340]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "Siège 4 : Libre"
+fit_content = true
+scroll_active = false
+
+[node name="Seat5Label" type="RichTextLabel" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox" unique_id=1036438002]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "Siège 5 : Libre"
+fit_content = true
+scroll_active = false
+
+[node name="Seat6Label" type="RichTextLabel" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox" unique_id=67139145]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "Siège 6 : Libre"
+fit_content = true
+scroll_active = false
+
+[node name="TurretLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=2050298124]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tourelle : aucune"
+
+[node name="TurretAmmo" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=1789264029]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tourelle : aucune"
+
+[node name="DeathOverlay" type="Control" parent="Root" unique_id=1480259341]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DeathDim" type="ColorRect" parent="Root/DeathOverlay" unique_id=1792251406]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="DeathCenter" type="CenterContainer" parent="Root/DeathOverlay" unique_id=2012063821]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DeathPanel" type="PanelContainer" parent="Root/DeathOverlay/DeathCenter" unique_id=618322044]
+custom_minimum_size = Vector2(420, 180)
+layout_mode = 2
+
+[node name="DeathMargin" type="MarginContainer" parent="Root/DeathOverlay/DeathCenter/DeathPanel" unique_id=303761391]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="DeathVBox" type="VBoxContainer" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin" unique_id=542160501]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DeathMessageLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1589284047]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Vous êtes mort."
+horizontal_alignment = 1
+
+[node name="DeathHintLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1816924573]
+layout_mode = 2
+text = "Vos armes ont été lâchées au sol."
+horizontal_alignment = 1
+
+[node name="RespawnButton" type="Button" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=469228994]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 42)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Respawn"

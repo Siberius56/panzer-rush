@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://nykf7fy7m5jg"]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/WeaponVisualBase.tscn" id="1_base"]
+
+[sub_resource type="StandardMaterial3D" id="1_mat"]
+albedo_color = Color(0.16, 0.16, 0.16, 1)
+
+[sub_resource type="BoxMesh" id="1_mesh"]
+size = Vector3(0.14, 0.16, 0.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8h87y"]
+size = Vector3(0.14, 0.16, 0.91)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pxxu8"]
+size = Vector3(0.14, 0.16, 0.3)
+
+[node name="SMGWeapon" unique_id=756254549 instance=ExtResource("1_base")]
+weapon_id = "smg"
+weapon_label = "smg"
+magazine_size = 20
+automatic_fire = true
+fire_cooldown = 0.09
+shot_dispersion_degrees = 6.0
+
+[node name="WeaponMesh" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.28)
+material_override = SubResource("1_mat")
+mesh = SubResource("1_mesh")
+
+[node name="WeaponMesh4" type="MeshInstance3D" parent="." index="1" unique_id=1078120938]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08727509, -0.3984268)
+material_override = SubResource("1_mat")
+mesh = SubResource("BoxMesh_8h87y")
+
+[node name="WeaponMesh3" type="MeshInstance3D" parent="." index="2" unique_id=1498441904]
+transform = Transform3D(1, 0, 0, 0, 0.9136235, -0.40656126, 0, 0.40656126, 0.9136235, 0, -0.085274965, 0.1671302)
+material_override = SubResource("1_mat")
+mesh = SubResource("BoxMesh_pxxu8")
+
+[node name="WeaponMesh2" type="MeshInstance3D" parent="." index="3" unique_id=1800260594]
+transform = Transform3D(1, 0, 0, 0, -0.22481503, -0.9744015, 0, 0.9744015, -0.22481503, 2.3841858e-07, -0.21749061, -0.41748005)
+material_override = SubResource("1_mat")
+mesh = SubResource("1_mesh")
+
+[node name="Muzzle" parent="." index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07573971, -0.93855333)

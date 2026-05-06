@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://ccv88msvp1esx"]
+
+[ext_resource type="Script" uid="uid://bb30nt354apuh" path="res://scripts/lobby/Lobby.gd" id="1_lobby"]
+
+[node name="Lobby" type="Control" unique_id=667272118]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="." unique_id=946130747]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0470588, 0.054902, 0.0862745, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1610432145]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1480428387]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=2004820423]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1998633629]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=253663536]
+layout_mode = 2
+text = "Lobby coop"
+horizontal_alignment = 1
+
+[node name="InfoLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1589219910]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PlayersTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=509818284]
+layout_mode = 2
+text = "Joueurs connectés"
+
+[node name="PlayersPanel" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1111110359]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+
+[node name="PlayersList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayersPanel" unique_id=1620842480]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Buttons" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=852949942]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="ReadyButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1267450842]
+layout_mode = 2
+text = "Se déclarer prêt"
+
+[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1439525338]
+layout_mode = 2
+text = "Lancer la partie"
+
+[node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=2024873518]
+layout_mode = 2
+text = "Retour"
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=432007954]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/ReadyButton" to="." method="_on_ready_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/BackButton" to="." method="_on_back_button_pressed"]

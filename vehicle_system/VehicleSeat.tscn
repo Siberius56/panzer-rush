@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://b4bpxkvofd6b"]
+
+[ext_resource type="Script" uid="uid://kbgpa64k8p2e" path="res://vehicle_system/turrets/VehicleTurretMount.gd" id="1_n3x02"]
+
+[node name="Seat" type="Node3D" unique_id=1270461324 groups=["vehicle_turret_mount"]]
+script = ExtResource("1_n3x02")
+driver_turret = true

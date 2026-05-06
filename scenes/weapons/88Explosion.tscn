@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://b6trnxx5qlwc2"]
+
+[ext_resource type="Script" uid="uid://c61uo3r1fkvwo" path="res://scenes/weapons/ProjectileExplosion.gd" id="1_c62tc"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_explosion"]
+radius = 5.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_explosion"]
+transparency = 1
+albedo_color = Color(1, 0, 0.016666412, 0.34901962)
+emission_enabled = true
+emission = Color(1, 0.050000012, 0.06583309, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_explosion"]
+radius = 5.0
+height = 10.0
+
+[node name="ProjectileExplosion" type="Area3D" unique_id=1144352729]
+collision_mask = 4294967295
+monitoring = false
+monitorable = false
+script = ExtResource("1_c62tc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=382472642]
+shape = SubResource("SphereShape3D_explosion")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=700307353]
+material_override = SubResource("StandardMaterial3D_explosion")
+mesh = SubResource("SphereMesh_explosion")

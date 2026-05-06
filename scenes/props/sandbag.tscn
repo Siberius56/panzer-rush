@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://s40q2ft30bab"]
+
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_canvas"]
+albedo_color = Color(0.48, 0.41, 0.29, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh_sandbag"]
+material = SubResource("mat_canvas")
+size = Vector3(1.65, 0.45, 0.65)
+
+[sub_resource type="BoxShape3D" id="shape_sandbag"]
+size = Vector3(1.65, 0.94191897, 0.65)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ubkyo"]
+size = Vector3(3.3427367, 0.45582277, 0.65)
+
+[sub_resource type="BoxMesh" id="mesh_bag_chunk"]
+material = SubResource("mat_canvas")
+size = Vector3(0.72, 0.34, 0.54)
+
+[sub_resource type="BoxShape3D" id="shape_bag_chunk"]
+size = Vector3(0.72, 0.34, 0.54)
+
+[sub_resource type="StandardMaterial3D" id="mat_sand"]
+albedo_color = Color(0.57, 0.49, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="mesh_sand_clump"]
+material = SubResource("mat_sand")
+size = Vector3(0.35, 0.18, 0.32)
+
+[sub_resource type="BoxShape3D" id="shape_sand_clump"]
+size = Vector3(0.35, 0.18, 0.32)
+
+[node name="Sandbag" type="Node3D" unique_id=1168931571 groups=["destructible_props"]]
+script = ExtResource("1_script")
+max_hp = 55.0
+armor = 8.0
+debris_lifetime_seconds = 7.0
+debris_min_impulse = 0.7
+debris_max_impulse = 1.8
+debris_upward_bias = 0.2
+debris_torque_impulse = 1.2
+debris_collision_layer = 0
+debris_collision_mask = 4278190095
+
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=2124742872 groups=["destructible_prop_bodies"]]
+collision_layer = 16
+collision_mask = 4294967295
+mass = 1800.0
+linear_damp = 1.2
+angular_damp = 1.5
+
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=2008784928]
+
+[node name="Mesh" type="MeshInstance3D" parent="IntactBody/Intact" unique_id=1691933378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91017985, 0, 0)
+mesh = SubResource("mesh_sandbag")
+
+[node name="Mesh2" type="MeshInstance3D" parent="IntactBody/Intact" unique_id=8418121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7966995, 0, 0)
+mesh = SubResource("mesh_sandbag")
+
+[node name="Mesh3" type="MeshInstance3D" parent="IntactBody/Intact" unique_id=193901766]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.013218582, 0.4867562, 0)
+mesh = SubResource("mesh_sandbag")
+
+[node name="Collision" type="CollisionShape3D" parent="IntactBody" unique_id=867056327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.24595948, 0)
+shape = SubResource("shape_sandbag")
+
+[node name="Collision2" type="CollisionShape3D" parent="IntactBody" unique_id=484348387]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06577757, 0.002911374, 0)
+shape = SubResource("BoxShape3D_ubkyo")
+
+[node name="DebrisRoot" type="Node3D" parent="." unique_id=1402071822]
+visible = false
+
+[node name="BagChunkLeft" type="RigidBody3D" parent="DebrisRoot" unique_id=1993887346]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0, 0)
+visible = false
+collision_layer = 0
+collision_mask = 4294967295
+mass = 8.0
+
+[node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/BagChunkLeft" unique_id=2031558090]
+mesh = SubResource("mesh_bag_chunk")
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/BagChunkLeft" unique_id=689086653]
+shape = SubResource("shape_bag_chunk")
+
+[node name="BagChunkRight" type="RigidBody3D" parent="DebrisRoot" unique_id=1723153733]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0, 0)
+visible = false
+collision_layer = 0
+collision_mask = 4294967295
+mass = 8.0
+
+[node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/BagChunkRight" unique_id=1932092796]
+mesh = SubResource("mesh_bag_chunk")
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/BagChunkRight" unique_id=1827100233]
+shape = SubResource("shape_bag_chunk")
+
+[node name="BagChunkCenter" type="RigidBody3D" parent="DebrisRoot" unique_id=2102050282]
+transform = Transform3D(0.97, 0, -0.26, 0, 1, 0, 0.26, 0, 0.97, 0, 0.08, 0.02)
+visible = false
+collision_layer = 0
+collision_mask = 4294967295
+mass = 9.0
+
+[node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/BagChunkCenter" unique_id=2143881102]
+mesh = SubResource("mesh_bag_chunk")
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/BagChunkCenter" unique_id=1794078927]
+shape = SubResource("shape_bag_chunk")
+
+[node name="SandClumpA" type="RigidBody3D" parent="DebrisRoot" unique_id=75110537]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, -0.08, -0.22)
+visible = false
+collision_layer = 0
+collision_mask = 4294967295
+mass = 3.5
+
+[node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/SandClumpA" unique_id=293721055]
+mesh = SubResource("mesh_sand_clump")
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/SandClumpA" unique_id=261613886]
+shape = SubResource("shape_sand_clump")
+
+[node name="SandClumpB" type="RigidBody3D" parent="DebrisRoot" unique_id=1830408300]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, -0.08, 0.23)
+visible = false
+collision_layer = 0
+collision_mask = 4294967295
+mass = 3.5
+
+[node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/SandClumpB" unique_id=578374672]
+mesh = SubResource("mesh_sand_clump")
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/SandClumpB" unique_id=487841115]
+shape = SubResource("shape_sand_clump")

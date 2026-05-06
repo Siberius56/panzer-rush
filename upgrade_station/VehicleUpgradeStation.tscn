@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://doo6u62srmmdm"]
+
+[ext_resource type="Script" uid="uid://dljgjclvmpbyq" path="res://upgrade_station/VehicleUpgradeStation.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="1"]
+size = Vector3(6, 0.3, 6)
+
+[sub_resource type="StandardMaterial3D" id="6"]
+albedo_color = Color(0.12, 0.12, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="2"]
+size = Vector3(5.5, 1.2, 5.5)
+
+[sub_resource type="BoxMesh" id="3"]
+size = Vector3(0.9, 1.4, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="5"]
+albedo_color = Color(0.25, 0.25, 0.25, 1)
+roughness = 0.82
+
+[sub_resource type="BoxShape3D" id="4"]
+size = Vector3(3, 2, 3)
+
+[node name="VehicleUpgradeStation" type="Node3D" unique_id=1731693252]
+script = ExtResource("1")
+
+[node name="PlatformMesh" type="MeshInstance3D" parent="." unique_id=1586815209]
+mesh = SubResource("1")
+surface_material_override/0 = SubResource("6")
+
+[node name="VehicleSpawnPoint" type="Marker3D" parent="." unique_id=29205143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+
+[node name="PlatformArea" type="Area3D" parent="." unique_id=2042751837]
+collision_layer = 0
+collision_mask = 5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformArea" unique_id=266829575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("2")
+
+[node name="ButtonPivot" type="Node3D" parent="." unique_id=804724807]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.7, 0)
+
+[node name="ButtonMesh" type="MeshInstance3D" parent="ButtonPivot" unique_id=324986948]
+mesh = SubResource("3")
+surface_material_override/0 = SubResource("5")
+
+[node name="ButtonArea" type="Area3D" parent="ButtonPivot" unique_id=298659191]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ButtonPivot/ButtonArea" unique_id=2124514493]
+shape = SubResource("4")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=1268682496]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.16287231, 0)
+text = "UPGRADE STATION"
+font_size = 64
+
+[connection signal="body_entered" from="PlatformArea" to="." method="_on_platform_area_body_entered"]
+[connection signal="body_exited" from="PlatformArea" to="." method="_on_platform_area_body_exited"]
+[connection signal="body_entered" from="ButtonPivot/ButtonArea" to="." method="_on_button_area_body_entered"]
+[connection signal="body_exited" from="ButtonPivot/ButtonArea" to="." method="_on_button_area_body_exited"]

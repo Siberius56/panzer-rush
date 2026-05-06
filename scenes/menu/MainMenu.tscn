@@ -1,0 +1,187 @@
+[gd_scene format=3 uid="uid://teynokkfjcf7"]
+
+[ext_resource type="Script" uid="uid://cieexldrxg2nt" path="res://scripts/menu/MainMenu.gd" id="1_main_menu"]
+
+[node name="MainMenu" type="Control" unique_id=1175622331]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_menu")
+
+[node name="Background" type="ColorRect" parent="." unique_id=727651473]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0470588, 0.054902, 0.0862745, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1891891473]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=2141054321]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=210730782]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer/Panel" unique_id=1459143640]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/Panel/MarginContainer" unique_id=1820101349]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1762924749]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "What's your IP?"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=17219784]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Ip_locale1" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer" unique_id=184973854]
+visible = false
+layout_mode = 2
+text = " "
+horizontal_alignment = 2
+
+[node name="IpLocal_Ethernet" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer" unique_id=665063513]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "192.0.0.0.1"
+horizontal_alignment = 1
+
+[node name="Ip_locale2" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer" unique_id=1173133904]
+visible = false
+layout_mode = 2
+text = " "
+horizontal_alignment = 2
+
+[node name="IpLocal_Wifi" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer" unique_id=2121312985]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "192.0.0.0.1"
+horizontal_alignment = 1
+
+[node name="Ip_Internet" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer" unique_id=302841871]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "192.0.0.0.1"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer" unique_id=1735033363]
+layout_mode = 2
+
+[node name="Ip" type="Label" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer/HBoxContainer" unique_id=2041279410]
+layout_mode = 2
+text = "IP (internet): "
+horizontal_alignment = 2
+
+[node name="LinkButton" type="LinkButton" parent="CenterContainer/VBoxContainer/Panel/MarginContainer/VBoxContainer/GridContainer/HBoxContainer" unique_id=307840689]
+layout_mode = 2
+text = "whatismyipaddress.com"
+uri = "https://whatismyipaddress.com/fr/mon-ip"
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=1318859786]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer/PanelContainer" unique_id=1328690585]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer" unique_id=987450305]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1294394385]
+layout_mode = 2
+text = "Prototype coop, partie B"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1192287189]
+layout_mode = 2
+text = "Créer ou rejoindre une session ENet"
+horizontal_alignment = 1
+
+[node name="FormGrid" type="GridContainer" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=939898788]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="NameLabel" type="Label" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/FormGrid" unique_id=1692670303]
+layout_mode = 2
+text = "Nom"
+
+[node name="NameEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/FormGrid" unique_id=1120493997]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Nom du joueur"
+
+[node name="IpLabel" type="Label" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/FormGrid" unique_id=518408585]
+layout_mode = 2
+text = "IP"
+
+[node name="IpEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/FormGrid" unique_id=1130537380]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "127.0.0.1"
+
+[node name="PortLabel" type="Label" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/FormGrid" unique_id=717878214]
+layout_mode = 2
+text = "Port"
+
+[node name="PortEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/FormGrid" unique_id=1847852477]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "7000"
+
+[node name="Buttons" type="HBoxContainer" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1336601608]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="HostButton" type="Button" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=568141610]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Héberger"
+
+[node name="JoinButton" type="Button" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=344147251]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Rejoindre"
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=432170991]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/HostButton" to="." method="_on_host_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/JoinButton" to="." method="_on_join_button_pressed"]
