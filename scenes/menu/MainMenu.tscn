@@ -193,20 +193,37 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer" unique_id=1597253285]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer" unique_id=914627929]
 layout_mode = 2
 
-[node name="Host_Steam_Lobby" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/HBoxContainer" unique_id=652296351]
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/VBoxContainer" unique_id=1597253285]
+layout_mode = 2
+
+[node name="Host_Steam_Lobby" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/VBoxContainer/HBoxContainer" unique_id=652296351]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "HOST STEAM LOBBY"
 
-[node name="Invite_Friend" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/HBoxContainer" unique_id=2133638368]
+[node name="Invite_Friend" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2133638368]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "INVITE FRIEND"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/VBoxContainer" unique_id=1414196655]
+layout_mode = 2
+
+[node name="Join_Lobby" type="Button" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1167566767]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(196, 0)
+layout_mode = 2
+text = "JOIN LOBBY"
+
+[node name="Join_Lobby_LineEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=2070832928]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/JoinButton" to="." method="_on_join_button_pressed"]

@@ -15,7 +15,9 @@ func _ready() -> void:
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_joined)
 	Steam.lobby_chat_update.connect(_on_lobby_chat_update)
-
+		
+	if not Steam.join_requested.is_connected(_on_join_requested):
+		Steam.join_requested.connect(_on_join_requested)
 
 func create_lobby() -> void:
 	if not SteamManager.is_ready:
@@ -54,6 +56,9 @@ func invite_friends() -> void:
 	if current_lobby_id == 0:
 		lobby_failed.emit("Aucun lobby Steam actif.")
 		return
+
+	print("[STEAM_LOBBY] Invite friends for lobby: ", current_lobby_id)
+	print("[STEAM_LOBBY] Overlay enabled: ", Steam.isOverlayEnabled())
 
 	Steam.activateGameOverlayInviteDialog(current_lobby_id)
 
@@ -124,3 +129,12 @@ func _on_lobby_chat_update(lobby_id: int, _changed_id: int, _making_change_id: i
 
 	print("[STEAM_LOBBY] lobby_chat_update")
 	refresh_members()
+
+func _on_join_requested(lobby_id: int, friend_id: int) -> void:
+	print("[STEAM_LOBBY] Join requested. Lobby: ", lobby_id, " Friend: ", friend_id)
+
+	if not SteamManager.is_ready:
+		lobby_failed.emit("Steam n'est pas prêt.")
+		return
+
+	join_lobby(lobby_id)

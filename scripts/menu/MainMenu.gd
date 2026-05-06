@@ -16,6 +16,8 @@ const DEBUG_PREFIX := "[MAIN_MENU_NET]"
 
 @onready var host_steam_button: Button = %Host_Steam_Lobby
 @onready var invite_friend_button: Button = %Invite_Friend
+@onready var join_lobby_id_edit: LineEdit = %Join_Lobby_LineEdit #%Join_Lobby_Id
+@onready var join_lobby_id_button: Button = %Join_Lobby #%Join_Lobby_Id_Button
 
 var join_attempt_id := 0
 var debug_history: PackedStringArray = []
@@ -50,6 +52,8 @@ func _ready() -> void:
 	if not SteamLobbyManager.lobby_members_changed.is_connected(_on_steam_lobby_members_changed):
 		SteamLobbyManager.lobby_members_changed.connect(_on_steam_lobby_members_changed)
 	
+	if not join_lobby_id_button.pressed.is_connected(_on_join_lobby_id_button_pressed):
+		join_lobby_id_button.pressed.connect(_on_join_lobby_id_button_pressed)
 	
 	_connect_network_signals()
 
@@ -658,3 +662,20 @@ func _on_steam_lobby_members_changed() -> void:
 	for steam_id in SteamLobbyManager.lobby_members:
 		var member_name := SteamLobbyManager.get_member_name(steam_id)
 		print("[MAIN_MENU_STEAM] Member: ", member_name, " / ", steam_id)
+
+func _on_join_lobby_id_button_pressed() -> void:
+	var text := join_lobby_id_edit.text.strip_edges()
+
+	if text.is_empty():
+		print("[STEAM_LOBBY] Lobby ID vide.")
+		return
+
+	if not text.is_valid_int():
+		print("[STEAM_LOBBY] Lobby ID invalide: ", text)
+		return
+
+	var lobby_id := int(text)
+
+	print("[STEAM_LOBBY] Manual join lobby: ", lobby_id)
+	SteamLobbyManager.join_lobby(lobby_id)
+	
