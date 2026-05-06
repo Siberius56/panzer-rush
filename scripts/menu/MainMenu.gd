@@ -21,18 +21,9 @@ const DEBUG_PREFIX := "[MAIN_MENU_NET]"
 
 var join_attempt_id := 0
 var debug_history: PackedStringArray = []
-
+var steam_scene_change_started := false
 
 func _ready() -> void:
-	#print("Steam exists: ", ClassDB.class_exists("Steam"))
-	#print("SteamMultiplayerPeer exists: ", ClassDB.class_exists("SteamMultiplayerPeer"))
-#
-	#if ClassDB.class_exists("SteamMultiplayerPeer"):
-		#var peer := SteamMultiplayerPeer.new()
-		#print("Peer: ", peer)
-		#print("has create_host: ", peer.has_method("create_host"))
-		#print("has create_client: ", peer.has_method("create_client"))
-	
 	
 	if not host_steam_button.pressed.is_connected(_on_host_steam_button_pressed):
 		host_steam_button.pressed.connect(_on_host_steam_button_pressed)
@@ -74,8 +65,25 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
-	debug_log("Menu exit_tree. Disconnecting network signals.")
+	debug_log("Menu exit_tree. Disconnecting signals.")
 	_disconnect_network_signals()
+	_disconnect_steam_lobby_signals()
+
+func _disconnect_steam_lobby_signals() -> void:
+	if not is_instance_valid(SteamLobbyManager):
+		return
+
+	if SteamLobbyManager.lobby_created_success.is_connected(_on_steam_lobby_created):
+		SteamLobbyManager.lobby_created_success.disconnect(_on_steam_lobby_created)
+
+	if SteamLobbyManager.lobby_joined_success.is_connected(_on_steam_lobby_joined):
+		SteamLobbyManager.lobby_joined_success.disconnect(_on_steam_lobby_joined)
+
+	if SteamLobbyManager.lobby_failed.is_connected(_on_steam_lobby_failed):
+		SteamLobbyManager.lobby_failed.disconnect(_on_steam_lobby_failed)
+
+	if SteamLobbyManager.lobby_members_changed.is_connected(_on_steam_lobby_members_changed):
+		SteamLobbyManager.lobby_members_changed.disconnect(_on_steam_lobby_members_changed)
 
 
 func _connect_network_signals() -> void:
@@ -632,6 +640,9 @@ func _on_invite_friend_button_pressed() -> void:
 
 
 func _on_steam_lobby_created(lobby_id: int) -> void:
+	if steam_scene_change_started:
+		return
+
 	status_label.text = "Lobby Steam créé : %s" % lobby_id
 	print("[MAIN_MENU_STEAM] Steam lobby created: ", lobby_id)
 
@@ -642,17 +653,40 @@ func _on_steam_lobby_created(lobby_id: int) -> void:
 		print("[MAIN_MENU_STEAM] host_steam failed: ", NetworkManager.last_message)
 		return
 
-	get_tree().change_scene_to_file(LOBBY_SCENE_PATH)
-
-
-func _on_steam_lobby_joined(lobby_id: int) -> void:
-	status_label.text = "Lobby Steam rejoint : %s" % lobby_id
-	print("[MAIN_MENU_STEAM] Steam lobby joined: ", lobby_id)
+	steam_scene_change_started = true
 
 	if not is_inside_tree():
 		return
 
-	get_tree().change_scene_to_file(LOBBY_SCENE_PATH)
+	_change_scene_safely(LOBBY_SCENE_PATH)
+
+
+func _on_steam_lobby_joined(lobby_id: int) -> void:
+	if steam_scene_change_started:
+		print("[MAIN_MENU_STEAM] Ignored lobby_joined because scene change already started.")
+		return
+
+	status_label.text = "Lobby Steam rejoint : %s" % lobby_id
+	print("[MAIN_MENU_STEAM] Steam lobby joined: ", lobby_id)
+
+	var host_steam_id := int(Steam.getLobbyOwner(lobby_id))
+
+	print("[MAIN_MENU_STEAM] Lobby owner Steam ID: ", host_steam_id)
+	print("[MAIN_MENU_STEAM] Local Steam ID: ", SteamManager.steam_id)
+
+	if host_steam_id == int(SteamManager.steam_id):
+		print("[MAIN_MENU_STEAM] Local player is lobby owner. No join_steam needed.")
+		return
+
+	var result := NetworkManager.join_steam(host_steam_id, player_name_edit.text)
+
+	if result != OK:
+		status_label.text = NetworkManager.last_message
+		print("[MAIN_MENU_STEAM] join_steam failed: ", NetworkManager.last_message)
+		return
+
+	status_label.text = "Connexion Steam en cours..."
+	print("[MAIN_MENU_STEAM] join_steam started.")
 
 
 func _on_steam_lobby_failed(message: String) -> void:
