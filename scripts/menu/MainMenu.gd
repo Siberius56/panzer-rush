@@ -635,7 +635,11 @@ func _on_steam_lobby_created(lobby_id: int) -> void:
 	status_label.text = "Lobby Steam créé : %s" % lobby_id
 	print("[MAIN_MENU_STEAM] Steam lobby created: ", lobby_id)
 
-	if not is_inside_tree():
+	var result := NetworkManager.host_steam(player_name_edit.text)
+
+	if result != OK:
+		status_label.text = NetworkManager.last_message
+		print("[MAIN_MENU_STEAM] host_steam failed: ", NetworkManager.last_message)
 		return
 
 	get_tree().change_scene_to_file(LOBBY_SCENE_PATH)
@@ -660,7 +664,7 @@ func _on_steam_lobby_members_changed() -> void:
 	print("[MAIN_MENU_STEAM] Lobby members changed")
 
 	for steam_id in SteamLobbyManager.lobby_members:
-		var member_name := SteamLobbyManager.get_member_name(steam_id)
+		var member_name = SteamLobbyManager.get_member_name(steam_id)
 		print("[MAIN_MENU_STEAM] Member: ", member_name, " / ", steam_id)
 
 func _on_join_lobby_id_button_pressed() -> void:

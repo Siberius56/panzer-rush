@@ -8,8 +8,9 @@ const MENU_SCENE_PATH := "res://scenes/menu/MainMenu.tscn"
 @onready var start_button: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/StartButton
 @onready var status_label: Label = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/StatusLabel
 
+@onready var invite_friend_button: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/InviteFriendButton
+
 var steam_lobby_mode := false
-var invite_friend_button: Button = null
 
 
 func _exit_tree() -> void:
@@ -67,14 +68,22 @@ func _ready() -> void:
 	var steam_lobby_manager := _get_steam_lobby_manager()
 	steam_lobby_mode = steam_lobby_manager != null and int(steam_lobby_manager.current_lobby_id) != 0
 
-	if steam_lobby_mode:
+	# Cas 1, Steam Lobby créé, mais SteamMultiplayerPeer pas encore branché.
+	# On affiche seulement les membres Steam.
+	if steam_lobby_mode and not _has_network_peer():
 		_setup_steam_lobby_mode()
 		return
 
-	_setup_lan_lobby_mode()
+	# Cas 2, LAN ou SteamMultiplayerPeer déjà actif.
+	# On utilise le lobby NetworkManager normal, ready / start compris.
+	_setup_network_lobby_mode()
 
 
-func _setup_lan_lobby_mode() -> void:
+func _has_network_peer() -> bool:
+	return NetworkManager.multiplayer.multiplayer_peer != null
+
+
+func _setup_network_lobby_mode() -> void:
 	var peer: MultiplayerPeer = NetworkManager.multiplayer.multiplayer_peer
 
 	if peer == null:
@@ -97,6 +106,11 @@ func _setup_lan_lobby_mode() -> void:
 		var closed_callable := Callable(self, "_on_connection_closed")
 		if not NetworkManager.is_connected("connection_closed", closed_callable):
 			NetworkManager.connect("connection_closed", closed_callable)
+
+	if steam_lobby_mode:
+		_setup_invite_friend_button()
+	elif invite_friend_button != null and is_instance_valid(invite_friend_button):
+		invite_friend_button.visible = false
 
 	_refresh_ui()
 
@@ -132,15 +146,11 @@ func _setup_steam_lobby_mode() -> void:
 
 
 func _setup_invite_friend_button() -> void:
-	if invite_friend_button != null and is_instance_valid(invite_friend_button):
+	if invite_friend_button == null or not is_instance_valid(invite_friend_button):
+		push_warning("InviteFriendButton est introuvable dans Lobby.tscn.")
 		return
 
-	invite_friend_button = Button.new()
-	invite_friend_button.name = "InviteFriendButton"
-	invite_friend_button.text = "Inviter un ami Steam"
-
-	var buttons_parent := ready_button.get_parent()
-	buttons_parent.add_child(invite_friend_button)
+	invite_friend_button.visible = steam_lobby_mode
 
 	if not invite_friend_button.pressed.is_connected(_on_invite_friend_pressed):
 		invite_friend_button.pressed.connect(_on_invite_friend_pressed)
@@ -151,14 +161,23 @@ func _refresh_ui() -> void:
 		return
 
 	var is_host := NetworkManager.multiplayer.is_server()
-	info_label.text = "Hôte: %s, port %s" % [NetworkManager.current_ip if not is_host else "local", NetworkManager.current_port]
+	if steam_lobby_mode:
+		info_label.text = "Lobby Steam: %s" % SteamLobbyManager.current_lobby_id
+	else:
+		info_label.text = "Hôte: %s, port %s" % [NetworkManager.current_ip if not is_host else "local", NetworkManager.current_port]
 
 	for child in players_list.get_children():
 		child.queue_free()
 
 	var local_id := NetworkManager.multiplayer.get_unique_id()
+	var player_ids := NetworkManager.get_player_ids()
 
-	for peer_id in NetworkManager.get_player_ids():
+	if player_ids.is_empty() and steam_lobby_mode:
+		status_label.text = "SteamMultiplayerPeer actif, mais NetworkManager.players est vide. Vérifie que NetworkManager.host_steam() est appelé avant d’ouvrir le lobby."
+		_refresh_steam_lobby_ui()
+		return
+
+	for peer_id in player_ids:
 		var player_data: Dictionary = NetworkManager.players[peer_id]
 		var line := Label.new()
 		var role := "Hôte" if peer_id == 1 else "Client"
@@ -167,6 +186,7 @@ func _refresh_ui() -> void:
 		line.text = "%s%s, %s, %s" % [str(player_data.get("name", "Player")), local_text, role, ready_text]
 		players_list.add_child(line)
 
+	ready_button.visible = true
 	ready_button.text = "Annuler prêt" if NetworkManager.is_local_player_ready() else "Se déclarer prêt"
 	start_button.visible = is_host
 	start_button.disabled = not NetworkManager.can_start_game()
@@ -229,8 +249,8 @@ func _on_ready_button_pressed() -> void:
 	if not is_inside_tree():
 		return
 
-	if steam_lobby_mode:
-		status_label.text = "Le ready Steam sera branché après SteamMultiplayerPeer."
+	if steam_lobby_mode and not _has_network_peer():
+		status_label.text = "Connexion Steam pas encore active."
 		return
 
 	NetworkManager.set_local_ready(not NetworkManager.is_local_player_ready())
@@ -240,8 +260,8 @@ func _on_start_button_pressed() -> void:
 	if not is_inside_tree():
 		return
 
-	if steam_lobby_mode:
-		status_label.text = "Le lancement Steam sera branché après SteamMultiplayerPeer."
+	if steam_lobby_mode and not _has_network_peer():
+		status_label.text = "Connexion Steam pas encore active."
 		return
 
 	if not NetworkManager.can_start_game():
@@ -259,8 +279,8 @@ func _on_back_button_pressed() -> void:
 		var steam_lobby_manager := _get_steam_lobby_manager()
 		if steam_lobby_manager != null and steam_lobby_manager.has_method("leave_lobby"):
 			steam_lobby_manager.leave_lobby()
-	else:
-		NetworkManager.leave_game()
+
+	NetworkManager.leave_game()
 
 	_change_scene_safely(MENU_SCENE_PATH)
 

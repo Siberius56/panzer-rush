@@ -77,6 +77,12 @@ text = "Se déclarer prêt"
 layout_mode = 2
 text = "Lancer la partie"
 
+
+[node name="InviteFriendButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=324982731]
+layout_mode = 2
+visible = false
+text = "Inviter un ami Steam"
+
 [node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=2024873518]
 layout_mode = 2
 text = "Retour"
