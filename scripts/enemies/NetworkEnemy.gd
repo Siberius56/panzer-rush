@@ -28,7 +28,7 @@ enum EnemyState {
 @export var investigate_reach_distance: float = 1.0
 @export var return_reach_distance: float = 0.8
 
-@export_group("Vehicle Impact")
+@export_group("Vehicle Impact", "vehicle_impact_")
 @export var vehicle_impact_stun_duration: float = 0.25
 @export var vehicle_impact_friction: float = 22.0
 @export var vehicle_impact_max_horizontal_speed: float = 12.0
@@ -40,7 +40,7 @@ enum EnemyState {
 @export var max_health: int = 30
 @export var armor_rating: int = 0
 
-@export_group("Damage Feedback")
+@export_group("Damage Feedback", "damage_feedback_")
 @export var damage_feedback_enabled: bool = true
 @export_range(0.02, 0.5, 0.01) var damage_feedback_duration: float = 0.14
 @export_range(1.0, 1.4, 0.01) var damage_feedback_scale_up: float = 1.08
@@ -53,6 +53,20 @@ enum EnemyState {
 @export var detection_radius: float = 12.0
 @export var damage_retarget_max_distance: float = 18.0
 @export_flags_3d_physics var line_of_sight_mask: int = 0xFFFFFFFF
+
+@export_group("Performance Scans")
+@export_range(1, 120, 1) var scan_interval_frames: int = 20
+@export var randomize_scan_frame: bool = true
+@export var throttle_path_target_updates: bool = true
+
+@export_group("Enemy Separation", "enemy_separation_")
+@export var enemy_separation_enabled: bool = true
+@export_range(0.2, 6.0, 0.05) var enemy_separation_radius: float = 1.25
+@export_range(0.1, 12.0, 0.1) var enemy_separation_strength: float = 2.8
+@export_range(0.1, 8.0, 0.1) var enemy_separation_max_velocity: float = 2.4
+@export_range(0.1, 30.0, 0.1) var enemy_separation_decay: float = 12.0
+@export_range(0.2, 6.0, 0.1) var enemy_separation_y_tolerance: float = 1.8
+@export_range(1.0, 12.0, 0.25) var enemy_grid_cell_size: float = 4.0
 
 @export_group("Attack")
 @export var is_melee_attack: bool = false
@@ -83,7 +97,7 @@ enum EnemyState {
 @export var loot_spawn_height: float = 0.4
 @export var loot_throw_force: float = 2.5
 
-@export_group("Death Body")
+@export_group("Death Body", "death_body_")
 @export var death_body_enabled: bool = true
 @export_range(0.2, 8.0, 0.1) var death_body_lifetime: float = 2.6
 @export var death_body_center_height: float = 0.95
@@ -98,7 +112,7 @@ enum EnemyState {
 @export_flags_3d_physics var death_body_collision_layer: int = 0
 @export_flags_3d_physics var death_body_collision_mask: int = 1
 
-@export_group("Death Weapon")
+@export_group("Death Weapon", "death_weapon_")
 @export var death_weapon_enabled: bool = true
 @export_range(0.2, 8.0, 0.1) var death_weapon_lifetime: float = 2.8
 @export var death_weapon_impulse_force: float = 3.6
@@ -138,6 +152,13 @@ var _visual_root_base_position: Vector3 = Vector3.ZERO
 var _visual_root_base_scale: Vector3 = Vector3.ONE
 var _visual_root_base_rotation: Vector3 = Vector3.ZERO
 
+static var _enemy_spatial_grid: Dictionary = {}
+
+var _scan_frame_offset: int = 0
+var _enemy_grid_cell: Vector2i = Vector2i(2147483647, 2147483647)
+var _registered_in_enemy_grid: bool = false
+var _enemy_separation_velocity: Vector3 = Vector3.ZERO
+
 var vehicle_impact_timer: float = 0.0
 var vehicle_impact_velocity: Vector3 = Vector3.ZERO
 var vehicle_impact_source: Node = null
@@ -152,6 +173,9 @@ var replicated_state: int = EnemyState.IDLE
 func _ready() -> void:
 	add_to_group("enemy")
 	add_to_group("enemies")
+	_configure_scan_schedule()
+	if multiplayer.is_server():
+		_update_enemy_grid_registration(true)
 	
 	health = max_health
 	_origin_position = global_position
@@ -166,6 +190,12 @@ func _ready() -> void:
 	_setup_navigation_agent()
 	_connect_detection_signals()
 	_debug("ready, melee=%s, range=%.2f, projectile=%s, origin=%s, dispersion=%.2f" % [str(is_melee_attack), attack_range, str(projectile_scene != null), str(_origin_position), aim_dispersion_deg])
+
+
+func _exit_tree() -> void:
+	if _registered_in_enemy_grid:
+		_unregister_enemy_from_grid(_enemy_grid_cell)
+		_registered_in_enemy_grid = false
 
 
 func _physics_process(delta: float) -> void:
@@ -189,12 +219,15 @@ func _server_update(delta: float) -> void:
 		_send_server_state(delta)
 		return
 
-	_cleanup_detected_targets()
+	var should_run_scheduled_scan: bool = _should_run_scheduled_scan()
+	if should_run_scheduled_scan:
+		_run_scheduled_scans()
+
 	_validate_current_target()
 	_update_last_known_target_position()
 
 	if current_target == null:
-		_acquire_target()
+		_acquire_target(should_run_scheduled_scan)
 
 	if current_target == null:
 		_handle_no_target_state()
@@ -212,8 +245,191 @@ func _server_update(delta: float) -> void:
 				_debug("new combat target: %s" % combat_target.name)
 			_handle_combat_state(combat_target)
 
+	_apply_enemy_separation(delta)
 	move_and_slide()
 	_send_server_state(delta)
+
+
+
+func _configure_scan_schedule() -> void:
+	var interval: int = max(scan_interval_frames, 1)
+	if randomize_scan_frame:
+		_scan_frame_offset = randi() % interval
+	else:
+		_scan_frame_offset = int(get_instance_id()) % interval
+
+
+func _should_run_scheduled_scan() -> bool:
+	var interval: int = max(scan_interval_frames, 1)
+	var frame: int = int(Engine.get_physics_frames())
+	return frame % interval == _scan_frame_offset % interval
+
+
+func _run_scheduled_scans() -> void:
+	_cleanup_detected_targets()
+	_update_enemy_grid_registration(false)
+	_scan_enemy_separation()
+
+
+func _can_refresh_path_target() -> bool:
+	if not throttle_path_target_updates:
+		return true
+	if not _has_nav_target:
+		return true
+	return _should_run_scheduled_scan()
+
+
+func _apply_enemy_separation(delta: float) -> void:
+	if not enemy_separation_enabled:
+		_enemy_separation_velocity = Vector3.ZERO
+		return
+
+	if _enemy_separation_velocity.length_squared() <= 0.0001:
+		_enemy_separation_velocity = Vector3.ZERO
+		return
+
+	velocity.x += _enemy_separation_velocity.x
+	velocity.z += _enemy_separation_velocity.z
+
+	var horizontal_velocity: Vector3 = Vector3(velocity.x, 0.0, velocity.z)
+	var max_horizontal_speed: float = move_speed + enemy_separation_max_velocity
+	if horizontal_velocity.length() > max_horizontal_speed:
+		horizontal_velocity = horizontal_velocity.normalized() * max_horizontal_speed
+		velocity.x = horizontal_velocity.x
+		velocity.z = horizontal_velocity.z
+
+	_enemy_separation_velocity = _enemy_separation_velocity.move_toward(Vector3.ZERO, enemy_separation_decay * delta)
+
+
+func _add_enemy_separation_velocity(push_velocity: Vector3) -> void:
+	if _dying or not enemy_separation_enabled:
+		return
+
+	push_velocity.y = 0.0
+	if push_velocity.length_squared() <= 0.0001:
+		return
+
+	_enemy_separation_velocity += push_velocity
+	if _enemy_separation_velocity.length() > enemy_separation_max_velocity:
+		_enemy_separation_velocity = _enemy_separation_velocity.normalized() * enemy_separation_max_velocity
+
+
+func _scan_enemy_separation() -> void:
+	if not enemy_separation_enabled or _dying:
+		return
+
+	var nearby_enemies: Array = _get_enemy_grid_neighbors(global_position)
+	var separation_radius: float = maxf(enemy_separation_radius, 0.05)
+	var separation_radius_squared: float = separation_radius * separation_radius
+
+	for item in nearby_enemies:
+		if item == self:
+			continue
+		if item == null or not is_instance_valid(item):
+			continue
+		if not (item is NetworkEnemy):
+			continue
+
+		var other_enemy: NetworkEnemy = item as NetworkEnemy
+		if not other_enemy._can_receive_enemy_separation():
+			continue
+
+		var offset: Vector3 = global_position - other_enemy.global_position
+		if absf(offset.y) > enemy_separation_y_tolerance:
+			continue
+		offset.y = 0.0
+
+		var distance_squared: float = offset.length_squared()
+		if distance_squared >= separation_radius_squared:
+			continue
+
+		if distance_squared <= 0.0001:
+			offset = Vector3(randf_range(-1.0, 1.0), 0.0, randf_range(-1.0, 1.0))
+			if offset.length_squared() <= 0.0001:
+				offset = Vector3.RIGHT
+			distance_squared = 0.0001
+
+		var distance: float = sqrt(distance_squared)
+		var closeness: float = 1.0 - clampf(distance / separation_radius, 0.0, 1.0)
+		var push: Vector3 = offset.normalized() * enemy_separation_strength * closeness
+
+		_add_enemy_separation_velocity(push)
+		other_enemy._add_enemy_separation_velocity(-push)
+
+
+func _can_receive_enemy_separation() -> bool:
+	return enemy_separation_enabled and not _dying and is_inside_tree()
+
+
+func _update_enemy_grid_registration(force: bool = false) -> void:
+	if not enemy_separation_enabled or _dying:
+		return
+
+	var new_cell: Vector2i = _get_enemy_grid_cell(global_position)
+	if force or not _registered_in_enemy_grid:
+		_enemy_grid_cell = new_cell
+		_register_enemy_in_grid(new_cell)
+		_registered_in_enemy_grid = true
+		return
+
+	if new_cell == _enemy_grid_cell:
+		return
+
+	_unregister_enemy_from_grid(_enemy_grid_cell)
+	_enemy_grid_cell = new_cell
+	_register_enemy_in_grid(new_cell)
+
+
+func _get_enemy_grid_cell(world_position: Vector3) -> Vector2i:
+	var safe_cell_size: float = maxf(enemy_grid_cell_size, 0.1)
+	return Vector2i(floori(world_position.x / safe_cell_size), floori(world_position.z / safe_cell_size))
+
+
+func _register_enemy_in_grid(cell: Vector2i) -> void:
+	var cell_enemies: Array = []
+	if _enemy_spatial_grid.has(cell):
+		cell_enemies = _enemy_spatial_grid[cell]
+
+	if not cell_enemies.has(self):
+		cell_enemies.append(self)
+
+	_enemy_spatial_grid[cell] = cell_enemies
+
+
+func _unregister_enemy_from_grid(cell: Vector2i) -> void:
+	if not _enemy_spatial_grid.has(cell):
+		return
+
+	var cell_enemies: Array = _enemy_spatial_grid[cell]
+	if cell_enemies.has(self):
+		cell_enemies.erase(self)
+
+	if cell_enemies.is_empty():
+		_enemy_spatial_grid.erase(cell)
+	else:
+		_enemy_spatial_grid[cell] = cell_enemies
+
+
+func _get_enemy_grid_neighbors(world_position: Vector3) -> Array:
+	var result: Array = []
+	var center_cell: Vector2i = _get_enemy_grid_cell(world_position)
+	var safe_cell_size: float = maxf(enemy_grid_cell_size, 0.1)
+	var cell_range: int = max(1, ceili(enemy_separation_radius / safe_cell_size))
+
+	for x_offset in range(-cell_range, cell_range + 1):
+		for z_offset in range(-cell_range, cell_range + 1):
+			var cell: Vector2i = Vector2i(center_cell.x + x_offset, center_cell.y + z_offset)
+			if not _enemy_spatial_grid.has(cell):
+				continue
+
+			var cell_enemies: Array = _enemy_spatial_grid[cell]
+			for item in cell_enemies:
+				if item == null or not is_instance_valid(item):
+					continue
+				if not result.has(item):
+					result.append(item)
+
+	return result
 
 
 func apply_vehicle_push(push_velocity: Vector3, source: Node = null) -> void:
@@ -365,7 +581,8 @@ func _move_towards(target_position: Vector3, stop_distance: float = 0.0) -> void
 		_move_towards_direct(flat_target)
 		return
 
-	if not _has_nav_target or _last_nav_target.distance_to(flat_target) > repath_distance:
+	var needs_new_path: bool = not _has_nav_target or _last_nav_target.distance_to(flat_target) > repath_distance
+	if needs_new_path and _can_refresh_path_target():
 		navigation_agent.target_position = flat_target
 		_last_nav_target = flat_target
 		_has_nav_target = true
@@ -469,7 +686,7 @@ func _spawn_attack_projectile_local(spawn_position: Vector3, direction: Vector3)
 		_attack_debug("projectile has no fire() and is not Node3D")
 
 
-func _acquire_target() -> void:
+func _acquire_target(allow_global_scan: bool = true) -> void:
 	var best_target: Node3D = null
 	var best_distance := INF
 
@@ -482,7 +699,7 @@ func _acquire_target() -> void:
 			best_distance = dist
 			best_target = target
 
-	if best_target == null and forced_alert:
+	if best_target == null and forced_alert and allow_global_scan:
 		best_target = _find_nearest_target(max_target_distance)
 
 	current_target = best_target
@@ -585,14 +802,28 @@ func _is_valid_target(node: Node) -> bool:
 		return false
 	if not (node is Node3D):
 		return false
+	if _is_target_dead(node):
+		return false
 
 	if node.is_in_group("player"):
-		if node.has_method("is_alive") and not node.is_alive():
-			return false
 		return true
 
 	if node.is_in_group("vehicle") or node.is_in_group("vehicles"):
 		return true
+
+	return false
+
+
+func _is_target_dead(node: Node) -> bool:
+	if node == null or not is_instance_valid(node):
+		return true
+
+	if node.has_method("is_alive") and not node.is_alive():
+		return true
+
+	var dead_value: Variant = _safe_get_property(node, "is_dead")
+	if dead_value is bool:
+		return dead_value
 
 	return false
 
@@ -674,7 +905,7 @@ func _belongs_to_node(candidate: Node, root_target: Node) -> bool:
 
 
 func _get_combat_target(target: Node3D) -> Node3D:
-	if target == null:
+	if target == null or not _is_valid_target(target):
 		return null
 
 	if target.is_in_group("vehicle") or target.is_in_group("vehicles"):
@@ -682,7 +913,9 @@ func _get_combat_target(target: Node3D) -> Node3D:
 
 	var vehicle := _get_vehicle_from_player(target)
 	if vehicle != null and vehicle is Node3D and is_instance_valid(vehicle):
-		return vehicle
+		var vehicle_node: Node3D = vehicle as Node3D
+		if _is_valid_target(vehicle_node):
+			return vehicle_node
 
 	return target
 

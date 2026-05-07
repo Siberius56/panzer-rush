@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cw03lircn47m2"
-path="res://.godot/imported/Turret_AntiAir.glb-cdd25313f01e98d1bc45a7db3f6a05e8.scn"
+path="res://.godot/imported/Turret_AntiAir.glb-d809ae3b817f4798a315ed982a7cea7c.scn"
 
 [deps]
 
-source_file="res://asset/Turret/Turret_AntiAir.glb"
-dest_files=["res://.godot/imported/Turret_AntiAir.glb-cdd25313f01e98d1bc45a7db3f6a05e8.scn"]
+source_file="res://asset/turret/Turret_AntiAir.glb"
+dest_files=["res://.godot/imported/Turret_AntiAir.glb-d809ae3b817f4798a315ed982a7cea7c.scn"]
 
 [params]
 

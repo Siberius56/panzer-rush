@@ -1,9 +1,11 @@
 [gd_scene format=3 uid="uid://q654pbgk6xhk"]
 
 [ext_resource type="Script" uid="uid://cp786xiv1ceq1" path="res://scenes/ui/PlayerHUD.gd" id="1_playerhud"]
+[ext_resource type="Texture2D" uid="uid://bau64is7q1n3" path="res://icon.svg" id="2_rq211"]
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=1032802562]
 script = ExtResource("1_playerhud")
+name_marker_margin = 64.0
 
 [node name="Root" type="Control" parent="." unique_id=675732997]
 layout_mode = 3
@@ -23,34 +25,9 @@ offset_bottom = 320.0
 mouse_filter = 2
 
 [node name="LeftVBox" type="VBoxContainer" parent="Root/LeftMargin" unique_id=85744788]
+custom_minimum_size = Vector2(384, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
-
-[node name="CommonPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1010767737]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 0)
-layout_mode = 2
-
-[node name="CommonMargin" type="MarginContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel" unique_id=490244285]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="CommonVBox" type="VBoxContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin" unique_id=988903530]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="CommonTitle" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=502112993]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Statut"
-
-[node name="HPLabel" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=769256348]
-unique_name_in_owner = true
-layout_mode = 2
-text = "PV : 0 / 0"
 
 [node name="OnFootPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1033469617]
 unique_name_in_owner = true
@@ -69,12 +46,13 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="OnFootTitle" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=941591861]
-unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "À pied"
 
 [node name="EquippedWeaponLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1247367780]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Arme équipée : Aucune"
 
@@ -95,10 +73,119 @@ text = "Munitions : 0 / 0"
 
 [node name="ReserveLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2019493005]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
-text = "Munitions : 0 / 0"
+text = "Reserve: 9MM  117 RIF 90  SFL 24"
 
-[node name="MoneyLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1784108769]
+[node name="HBoxContainer" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1444087852]
+layout_mode = 2
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=175318749]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer1" unique_id=1135135614]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_rq211")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_9MM" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer1" unique_id=1141463442]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+text = "9999"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=1403177930]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer2" unique_id=1441584356]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_rq211")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Rifle" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer2" unique_id=1803308345]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "9999"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=1896070760]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer3" unique_id=658292548]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_rq211")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Shell" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer3" unique_id=758314505]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "9999"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=1154646707]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer4" unique_id=1498049713]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_rq211")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Rocket" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer4" unique_id=1136285043]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "9999"
+
+[node name="CommonPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1010767737]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="CommonMargin" type="MarginContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel" unique_id=490244285]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HealthProgressBar" type="ProgressBar" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin" unique_id=190024948]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CommonVBox" type="VBoxContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin" unique_id=988903530]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CommonTitle" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=502112993]
+layout_mode = 2
+text = "Statut"
+
+[node name="HPLabel" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=769256348]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PV : 0 / 0"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox" unique_id=2018452760]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/HBoxContainer" unique_id=1514308955]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+texture = ExtResource("2_rq211")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MoneyLabel" type="Label" parent="Root/LeftMargin/LeftVBox/HBoxContainer" unique_id=1784108769]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Argent : 0"
@@ -224,6 +311,58 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Tourelle : aucune"
 
+[node name="PlayerNameLayer" type="Control" parent="Root" unique_id=1968841001]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_lock_ = true
+
+[node name="RevivePanel" type="PanelContainer" parent="Root" unique_id=1968841002]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -128.0
+offset_right = 180.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="ReviveMargin" type="MarginContainer" parent="Root/RevivePanel" unique_id=1968841003]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="ReviveVBox" type="VBoxContainer" parent="Root/RevivePanel/ReviveMargin" unique_id=1968841004]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ReviveLabel" type="Label" parent="Root/RevivePanel/ReviveMargin/ReviveVBox" unique_id=1968841005]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Réanimation"
+horizontal_alignment = 1
+
+[node name="ReviveProgress" type="ProgressBar" parent="Root/RevivePanel/ReviveMargin/ReviveVBox" unique_id=1968841006]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+show_percentage = false
+
 [node name="DeathOverlay" type="Control" parent="Root" unique_id=1480259341]
 unique_name_in_owner = true
 visible = false
@@ -279,6 +418,26 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Vos armes ont été lâchées au sol."
 horizontal_alignment = 1
+
+[node name="RespawnCountdownLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841007]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Respawn disponible dans 5.0s"
+horizontal_alignment = 1
+
+[node name="DeathReviveLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841008]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Réanimation"
+horizontal_alignment = 1
+
+[node name="DeathReviveProgress" type="ProgressBar" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841009]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+show_percentage = false
 
 [node name="RespawnButton" type="Button" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=469228994]
 unique_name_in_owner = true

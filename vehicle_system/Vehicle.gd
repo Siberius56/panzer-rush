@@ -68,7 +68,7 @@ var replicated_brake: float = 0.0
 @export var max_health: int = 600
 @export var armor_rating: int = 0
 var health := 0
-var is_destroyed := false
+var is_dead := false
 
 @export_group("Impact Damage")
 @export var impact_damage_enabled: bool = true
@@ -213,7 +213,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 
 func _server_physics(delta: float) -> void:
-	if is_destroyed:
+	if is_dead:
 		steer_input = 0.0
 		drive_input = 0.0
 		engine_force = 0.0
@@ -639,7 +639,7 @@ func apply_damage(amount: int) -> void:
 	if not multiplayer.is_server():
 		return
 
-	if is_destroyed:
+	if is_dead:
 		return
 
 	health = max(health - amount, 0)
@@ -651,10 +651,10 @@ func apply_damage(amount: int) -> void:
 
 
 func _server_destroy_vehicle() -> void:
-	if is_destroyed:
+	if is_dead:
 		return
 
-	is_destroyed = true
+	is_dead = true
 	health = 0
 	steer_input = 0.0
 	drive_input = 0.0
@@ -1038,7 +1038,7 @@ func _try_call_damage_method(target: Node, method_name: StringName, candidate_ar
 
 
 func is_available() -> bool:
-	if is_destroyed:
+	if is_dead:
 		return false
 	return _get_first_available_seat_index() != -1 and not bool(get_meta("upgrade_station_locked", false))
 
@@ -1187,7 +1187,7 @@ func request_enter() -> void:
 	if not multiplayer.is_server():
 		return
 
-	if is_destroyed:
+	if is_dead:
 		return
 	
 	print("[VEHICLE] request_enter | sender= x", " | locked=", get_meta("upgrade_station_locked", false), " | seats=", seat_occupants)
@@ -1276,7 +1276,7 @@ func server_open_loadout_for_host() -> void:
 
 
 func _server_try_enter(peer_id: int) -> void:
-	if is_destroyed:
+	if is_dead:
 		return
 
 	if bool(get_meta("upgrade_station_locked", false)):
@@ -1556,7 +1556,7 @@ func _sync_vehicle_health(new_health: int) -> void:
 
 @rpc("call_local", "reliable")
 func _sync_vehicle_destroyed() -> void:
-	is_destroyed = true
+	is_dead = true
 	health = 0
 	steer_input = 0.0
 	drive_input = 0.0

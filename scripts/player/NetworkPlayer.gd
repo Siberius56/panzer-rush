@@ -33,7 +33,18 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export_range(0.0, 20.0, 0.1) var death_body_angular_damp: float = 5.0
 @export var death_body_lock_yaw_rotation: bool = true
 @export_flags_3d_physics var death_body_collision_layer: int = 0
-@export_flags_3d_physics var death_body_collision_mask: int = 1
+@export_flags_3d_physics var death_body_collision_mask: int = 14
+@export var death_body_use_player_collision_mask: bool = true
+
+@export_group("Respawn")
+@export var respawn_delay_seconds: float = 5.0
+
+@export_group("Revive")
+@export var revive_action: StringName = &"heal"
+@export var revive_range: float = 2.8
+@export var revive_duration: float = 3.0
+@export_range(0.01, 1.0, 0.01) var revive_health_ratio: float = 0.2
+@export var revive_name_height: float = 2.1
 
 @export_group("Weapons")
 @export var projectile_team: int = 1
@@ -97,6 +108,18 @@ const PLAYER_HUD_SCENE = preload("uid://q654pbgk6xhk")
 var hud: PlayerHUD = null
 var death_body_node: RigidBody3D = null
 
+var death_elapsed_time: float = 0.0
+var _server_death_msec: int = 0
+var _local_revive_button_down: bool = false
+var _server_revive_target: Node = null
+var _server_revive_progress: float = 0.0
+
+var revive_active: bool = false
+var revive_role: int = 0 # 0 = aucun, 1 = réanimateur, 2 = réanimé
+var revive_other_player_id: int = 0
+var revive_other_player_name: String = ""
+var revive_progress: float = 0.0
+
 
 func set_ui_input_blocked(active: bool) -> void:
 	ui_input_blocked = active
@@ -121,13 +144,15 @@ func _ready() -> void:
 	replicated_aim_rotation = aim_root.rotation
 	replicated_visual_y = visual_root.rotation.y
 	update_name_label()
+	name_label.visible = false
 	camera.current = is_multiplayer_authority()
-	if is_multiplayer_authority():
-		name_label.visible = false
 	_refresh_weapon_nodes()
 	emit_signal("health_changed", health, max_health)
 
 func _exit_tree() -> void:
+	if multiplayer.is_server():
+		_server_cancel_revive(false)
+		_server_cancel_revives_targeting(self)
 	_clear_death_body()
 	if hud != null and is_instance_valid(hud):
 		hud.queue_free()
@@ -163,17 +188,31 @@ func _sync_to_vehicle_seat() -> void:
 		vehicle_interactor._sync_body_to_vehicle()
 
 func _physics_process(delta: float) -> void:
+	if is_dead:
+		death_elapsed_time += delta
+	else:
+		death_elapsed_time = 0.0
+
 	if multiplayer.is_server():
 		_server_weapon_tick(delta)
+		_server_revive_tick(delta)
 
 	if is_multiplayer_authority():
 		_local_weapon_tick(delta)
+		_update_revive_input()
 
 	if ui_input_blocked:
 		velocity.x = 0.0
 		velocity.z = 0.0
 		if is_multiplayer_authority():
 			_send_state_if_needed(delta)
+		return
+
+	# Mort : le vrai CharacterBody3D reste immobile, invisible et sans collision.
+	# Seule la copie RigidBody3D visible sert de corps physique au sol.
+	if is_multiplayer_authority() and is_dead:
+		velocity = Vector3.ZERO
+		_send_state_if_needed(delta)
 		return
 
 	var driving := is_in_vehicle()
@@ -1170,6 +1209,7 @@ func apply_damage(amount: int, damage_source: Node = null) -> void:
 	if amount <= 0:
 		return
 
+	_server_cancel_revive(true)
 	health = max(health - amount, 0)
 
 	if health <= 0:
@@ -1201,6 +1241,8 @@ func apply_projectile_damage(
 func request_respawn() -> void:
 	if not is_dead:
 		return
+	if death_elapsed_time < respawn_delay_seconds and not multiplayer.is_server():
+		return
 
 	if multiplayer.is_server():
 		_server_respawn_player()
@@ -1220,6 +1262,9 @@ func _server_die(damage_source: Node = null) -> void:
 	var impulse_direction := _get_death_impulse_direction(damage_source)
 
 	health = 0
+	_server_death_msec = Time.get_ticks_msec()
+	_server_cancel_revive(true)
+	_server_cancel_revives_targeting(self)
 	_server_drop_all_weapons_for_death(impulse_direction)
 	_apply_death_state(health, death_transform, impulse_direction)
 	_receive_player_death_state.rpc(health, death_transform, impulse_direction)
@@ -1300,6 +1345,8 @@ func _apply_death_state(value: int, death_transform: Transform3D, impulse_direct
 
 	health = clampi(value, 0, max_health)
 	is_dead = true
+	death_elapsed_time = 0.0
+	_apply_revive_progress_state(false, 0, 0, "", 0.0)
 	velocity = Vector3.ZERO
 	replicated_position = death_transform.origin
 	replicated_velocity = Vector3.ZERO
@@ -1336,14 +1383,16 @@ func _spawn_death_body(death_transform: Transform3D, impulse_direction: Vector3)
 	body.name = "PlayerDeathBody_%s" % player_id
 	body.mass = max(death_body_mass, 0.1)
 	body.collision_layer = death_body_collision_layer
-	body.collision_mask = death_body_collision_mask
+	body.collision_mask = collision_mask if death_body_use_player_collision_mask else death_body_collision_mask
 	body.linear_damp = death_body_linear_damp
 	body.angular_damp = death_body_angular_damp
 	body.can_sleep = true
 	body.axis_lock_angular_y = death_body_lock_yaw_rotation
 
 	parent.add_child(body)
-	body.global_transform = death_transform
+	var body_transform := death_transform
+	body_transform.origin += Vector3.UP * 0.05
+	body.global_transform = body_transform
 	death_body_node = body
 
 	var visual_copy := visual_root.duplicate()
@@ -1407,7 +1456,10 @@ func _server_respawn_player() -> void:
 		return
 	if not is_dead:
 		return
+	if not _server_can_respawn_now():
+		return
 
+	_server_cancel_revives_targeting(self)
 	var spawn_transform := _get_respawn_transform_from_main()
 
 	health = max_health
@@ -1458,6 +1510,8 @@ func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> vo
 
 	health = clampi(health_value, 1, max_health)
 	is_dead = false
+	death_elapsed_time = 0.0
+	_apply_revive_progress_state(false, 0, 0, "", 0.0)
 	velocity = Vector3.ZERO
 	replicated_position = spawn_transform.origin
 	replicated_velocity = Vector3.ZERO
@@ -1482,6 +1536,254 @@ func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> vo
 	emit_signal("health_changed", health, max_health)
 
 
+func _update_revive_input() -> void:
+	if not _revive_input_action_exists():
+		return
+
+	if is_dead or is_in_vehicle() or ui_input_blocked:
+		if _local_revive_button_down:
+			_local_revive_button_down = false
+			_request_cancel_revive()
+		return
+
+	if Input.is_action_just_pressed(revive_action):
+		_local_revive_button_down = true
+		_request_start_revive()
+	elif Input.is_action_just_released(revive_action):
+		_local_revive_button_down = false
+		_request_cancel_revive()
+
+func _revive_input_action_exists() -> bool:
+	var action_name := String(revive_action)
+	return not action_name.is_empty() and InputMap.has_action(action_name)
+
+func _request_start_revive() -> void:
+	if is_dead:
+		return
+
+	if multiplayer.is_server():
+		_server_start_revive_nearest()
+	else:
+		_request_start_revive_rpc.rpc_id(1)
+
+func _request_cancel_revive() -> void:
+	if multiplayer.is_server():
+		_server_cancel_revive(true)
+	else:
+		_request_cancel_revive_rpc.rpc_id(1)
+
+func _server_start_revive_nearest() -> void:
+	if not multiplayer.is_server():
+		return
+	if is_dead or is_in_vehicle():
+		_server_cancel_revive(true)
+		return
+
+	var target := _server_find_nearest_revive_target()
+	if target == null:
+		_server_cancel_revive(true)
+		return
+
+	if _server_revive_target == target:
+		return
+
+	_server_cancel_revive(false)
+	_server_revive_target = target
+	_server_revive_progress = 0.0
+	_server_sync_revive_pair(target, 0.0)
+
+func _server_find_nearest_revive_target() -> Node:
+	var closest: Node = null
+	var closest_distance := INF
+
+	for node in get_tree().get_nodes_in_group("players"):
+		if node == self:
+			continue
+		if not (node is Node3D):
+			continue
+		if not is_instance_valid(node):
+			continue
+		if not bool(node.get("is_dead")):
+			continue
+
+		var target_position := Vector3.ZERO
+		if node.has_method("get_current_physical_body_position"):
+			target_position = node.call("get_current_physical_body_position")
+		else:
+			target_position = (node as Node3D).global_position
+
+		var distance := global_position.distance_to(target_position)
+		if distance > revive_range:
+			continue
+		if distance < closest_distance:
+			closest_distance = distance
+			closest = node
+
+	return closest
+
+func _server_revive_tick(delta: float) -> void:
+	if _server_revive_target == null:
+		return
+
+	if not _server_can_continue_revive(_server_revive_target):
+		_server_cancel_revive(true)
+		return
+
+	_server_revive_progress = min(_server_revive_progress + delta, max(revive_duration, 0.01))
+	var normalized_progress :float = clamp(_server_revive_progress / max(revive_duration, 0.01), 0.0, 1.0)
+	_server_sync_revive_pair(_server_revive_target, normalized_progress)
+
+	if normalized_progress >= 1.0:
+		_server_finish_revive(_server_revive_target)
+
+func _server_can_continue_revive(target: Node) -> bool:
+	if not multiplayer.is_server():
+		return false
+	if is_dead or is_in_vehicle():
+		return false
+	if target == null or not is_instance_valid(target):
+		return false
+	if not bool(target.get("is_dead")):
+		return false
+
+	var target_position := Vector3.ZERO
+	if target.has_method("get_current_physical_body_position"):
+		target_position = target.call("get_current_physical_body_position")
+	elif target is Node3D:
+		target_position = (target as Node3D).global_position
+	else:
+		return false
+
+	return global_position.distance_to(target_position) <= revive_range
+
+func _server_finish_revive(target: Node) -> void:
+	if not multiplayer.is_server():
+		return
+	if target == null or not is_instance_valid(target):
+		_server_cancel_revive(true)
+		return
+
+	var revived_health := 1
+	var target_max_health := int(target.get("max_health"))
+	if target_max_health > 0:
+		revived_health = max(1, int(ceil(float(target_max_health) * revive_health_ratio)))
+
+	_server_revive_target = null
+	_server_revive_progress = 0.0
+	_server_sync_single_revive_state(false, 0, null, 0.0)
+
+	if target.has_method("_server_sync_single_revive_state"):
+		target.call("_server_sync_single_revive_state", false, 0, null, 0.0)
+	if target.has_method("_server_revive_from_physical_body"):
+		target.call("_server_revive_from_physical_body", revived_health)
+
+func _server_cancel_revive(sync_state: bool = true) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var old_target := _server_revive_target
+	_server_revive_target = null
+	_server_revive_progress = 0.0
+
+	if sync_state:
+		_server_sync_single_revive_state(false, 0, null, 0.0)
+		if old_target != null and is_instance_valid(old_target) and old_target.has_method("_server_sync_single_revive_state"):
+			old_target.call("_server_sync_single_revive_state", false, 0, null, 0.0)
+
+func _server_cancel_revives_targeting(target: Node) -> void:
+	if not multiplayer.is_server():
+		return
+
+	for node in get_tree().get_nodes_in_group("players"):
+		if node == null or not is_instance_valid(node):
+			continue
+		if not node.has_method("_server_get_revive_target"):
+			continue
+		var current_target = node.call("_server_get_revive_target")
+		if current_target == target and node.has_method("_server_cancel_revive"):
+			node.call("_server_cancel_revive", true)
+
+func _server_get_revive_target() -> Node:
+	return _server_revive_target
+
+func _server_sync_revive_pair(target: Node, progress_value: float) -> void:
+	_server_sync_single_revive_state(true, 1, target, progress_value)
+	if target != null and is_instance_valid(target) and target.has_method("_server_sync_single_revive_state"):
+		target.call("_server_sync_single_revive_state", true, 2, self, progress_value)
+
+func _server_sync_single_revive_state(active: bool, role: int, other_player: Node, progress_value: float) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var other_id := 0
+	var other_name := ""
+	if other_player != null and is_instance_valid(other_player):
+		other_id = int(other_player.get("player_id"))
+		other_name = str(other_player.get("player_name"))
+
+	_apply_revive_progress_state(active, role, other_id, other_name, progress_value)
+	_receive_revive_progress_state.rpc(active, role, other_id, other_name, progress_value)
+
+func _apply_revive_progress_state(active: bool, role: int, other_id: int, other_name: String, progress_value: float) -> void:
+	revive_active = active
+	revive_role = role if active else 0
+	revive_other_player_id = other_id if active else 0
+	revive_other_player_name = other_name if active else ""
+	revive_progress = clamp(progress_value, 0.0, 1.0) if active else 0.0
+
+func _server_revive_from_physical_body(health_value: int) -> void:
+	if not multiplayer.is_server():
+		return
+	if not is_dead:
+		return
+
+	_server_cancel_revives_targeting(self)
+	#var revive_transform := get_current_physical_body_transform()
+	var revive_transform: Transform3D = get_current_physical_body_transform()
+	var revive_position: Vector3 = revive_transform.origin
+	revive_transform = Transform3D(Basis.IDENTITY, revive_position)
+
+	health = clampi(health_value, 1, max_health)
+	is_dead = false
+	velocity = Vector3.ZERO
+	current_weapon_slot = 0
+	weapon_slots[0] = {}
+	weapon_slots[1] = {}
+
+	_cancel_server_reload()
+	_cancel_local_reload()
+	_sync_weapon_inventory_to_peers()
+
+	_apply_respawn_state(revive_transform, health)
+	_receive_respawn_state.rpc(revive_transform, health)
+
+func _server_can_respawn_now() -> bool:
+	if _server_death_msec <= 0:
+		return death_elapsed_time >= respawn_delay_seconds
+
+	var elapsed := float(Time.get_ticks_msec() - _server_death_msec) / 1000.0
+	return elapsed >= respawn_delay_seconds
+
+func get_current_physical_body_position() -> Vector3:
+	if death_body_node != null and is_instance_valid(death_body_node):
+		return death_body_node.global_position
+	return global_position
+
+func get_current_physical_body_transform() -> Transform3D:
+	var result := global_transform
+	if death_body_node != null and is_instance_valid(death_body_node):
+		result.origin = death_body_node.global_position
+		var yaw := death_body_node.global_transform.basis.get_euler().y
+		result.basis = Basis(Vector3.UP, yaw)
+	return result
+
+func get_hud_name_marker_position() -> Vector3:
+	return get_current_physical_body_position() + Vector3.UP * revive_name_height
+
+func get_hud_camera() -> Camera3D:
+	return camera
+
+
 func get_hud_data() -> Dictionary:
 	var vehicle := _get_current_vehicle_for_hud()
 	var to_equipped_weapon := get_equipped_weapon()
@@ -1492,6 +1794,15 @@ func get_hud_data() -> Dictionary:
 		"hp": health,
 		"is_dead": is_dead,
 		"max_hp": max_health,
+		"respawn_delay": respawn_delay_seconds,
+		"death_elapsed": death_elapsed_time,
+		"respawn_remaining": max(respawn_delay_seconds - death_elapsed_time, 0.0),
+		"respawn_available": death_elapsed_time >= respawn_delay_seconds,
+		"revive_active": revive_active,
+		"revive_role": revive_role,
+		"revive_other_player_id": revive_other_player_id,
+		"revive_other_player_name": revive_other_player_name,
+		"revive_progress": revive_progress,
 		"money": carried_money,
 		"in_vehicle": vehicle != null or is_in_vehicle(),
 		"vehicle": vehicle,
@@ -1742,6 +2053,27 @@ func _despawn_world_weapon_remote(net_id: int, node_path: NodePath) -> void:
 	else:
 		print("[WEAPON_NET] despawn requested but weapon not found on client net_id=", net_id, " path=", node_path)
 
+
+@rpc("any_peer", "reliable")
+func _request_start_revive_rpc() -> void:
+	if not _is_valid_owner_request("start_revive"):
+		return
+
+	_server_start_revive_nearest()
+
+@rpc("any_peer", "reliable")
+func _request_cancel_revive_rpc() -> void:
+	if not _is_valid_owner_request("cancel_revive"):
+		return
+
+	_server_cancel_revive(true)
+
+@rpc("any_peer", "call_remote", "unreliable_ordered")
+func _receive_revive_progress_state(active: bool, role: int, other_id: int, other_name: String, progress_value: float) -> void:
+	if not multiplayer.is_server() and multiplayer.get_remote_sender_id() != 1:
+		return
+
+	_apply_revive_progress_state(active, role, other_id, other_name, progress_value)
 
 @rpc("any_peer", "reliable")
 func _request_respawn_rpc() -> void:

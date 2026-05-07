@@ -46,7 +46,7 @@ func _ready() -> void:
 			_disabled_nodes.append(node)
 
 func _is_valid_vehicle_ref(vehicle: Vehicle) -> bool:
-	return vehicle != null and is_instance_valid(vehicle) and not bool(vehicle.get("is_destroyed"))
+	return vehicle != null and is_instance_valid(vehicle) and not bool(vehicle.get("is_dead"))
 
 
 func _clear_invalid_vehicle_refs() -> void:

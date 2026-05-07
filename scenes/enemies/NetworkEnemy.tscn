@@ -37,6 +37,7 @@ albedo_color = Color(0.11304883, 0.11304883, 0.11304883, 1)
 collision_layer = 2
 collision_mask = 9
 script = ExtResource("1_enemy")
+enemy_separation_radius = 3.0
 projectile_scene = ExtResource("2_3cldk")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1023561533]

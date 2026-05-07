@@ -115,6 +115,14 @@ collision_mask = 0
 size = Vector3(8, 1, 19)
 material = SubResource("StandardMaterial3D_kwhn4")
 
+[node name="Floor_02_Road_Corridor2" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Floors" unique_id=163791321]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -22.888607, -0.1, -0.037736177)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(8, 1, 19)
+material = SubResource("StandardMaterial3D_kwhn4")
+
 [node name="Floor_00_Jonction" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Floors" unique_id=1695068344]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 54.141613)
 use_collision = true
@@ -156,7 +164,15 @@ size = Vector3(34, 1, 26)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Floor_03B_DetourBonusAmmo" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Floors" unique_id=806347475]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -0.1, 41)
+transform = Transform3D(0.99998105, -0.0008238426, -0.006103277, 0.00082487846, 0.99999964, 0.00016742265, 0.0061031375, -0.0001724474, 0.9999814, 25, -0.1, 41)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(12, 1, 14)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_03B_DetourBonusAmmo2" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Floors" unique_id=158080307]
+transform = Transform3D(0.99998105, -0.0008238426, -0.006103277, 0.00082487846, 0.99999964, 0.00016742265, 0.0061031375, -0.0001724474, 0.9999814, -38.023983, -0.09799355, 0.92675865)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -238,6 +254,22 @@ collision_mask = 0
 size = Vector3(10.168823, 3, 1)
 material = SubResource("StandardMaterial3D_353k1")
 
+[node name="Wall_Spawn_Back4" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=1956881372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.47089, 1.5, 4.431408)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(18.603088, 3, 1)
+material = SubResource("StandardMaterial3D_353k1")
+
+[node name="Wall_Spawn_Back5" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=1027907847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.47089, 1.5, -4.4125214)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(18.603088, 3, 1)
+material = SubResource("StandardMaterial3D_353k1")
+
 [node name="Wall_Spawn_Back3" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=1062965069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.912004, 1.5, 8.5)
 use_collision = true
@@ -247,11 +279,19 @@ size = Vector3(9.7099, 3, 1)
 material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Spawn_Left" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=1925999549]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.048066, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.048066, 1.5, -5.6516724)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(1, 3, 16)
+size = Vector3(1, 3, 4.6966553)
+material = SubResource("StandardMaterial3D_353k1")
+
+[node name="Wall_Spawn_Left2" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=41494131]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.048066, 1.5, 5.641371)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(1, 3, 5.054199)
 material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Spawn_Right" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=541802941]
@@ -352,6 +392,30 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Bottom" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=959337257]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 1.5, 33.5)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(12, 3, 1)
+material = SubResource("StandardMaterial3D_353k1")
+
+[node name="Wall_Detour_Right2" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=1203884322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43.783752, 1.5000038, 0.9119415)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(1, 3, 14)
+material = SubResource("StandardMaterial3D_353k1")
+
+[node name="Wall_Detour_Top2" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=729280062]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.023937, 1.5000038, 8.411942)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(12, 3, 1)
+material = SubResource("StandardMaterial3D_353k1")
+
+[node name="Wall_Detour_Bottom2" type="CSGBox3D" parent="NavigationRegion3D/Geometry/Walls" unique_id=682987403]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.023937, 1.5000038, -6.5880585)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
