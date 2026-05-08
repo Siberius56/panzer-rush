@@ -45,7 +45,7 @@ func fire(
 	if impact_scene_override != null:
 		hit_effect_scene = impact_scene_override
 	
-	_debug("fire pos=%s dir=%s speed=%.2f team=%d damage=%d shooter=%s" % [str(global_position), str(direction), speed, team, damage, shooter.name if shooter != null else "null"])
+	#_debug("fire pos=%s dir=%s speed=%.2f team=%d damage=%d shooter=%s" % [str(global_position), str(direction), speed, team, damage, shooter.name if shooter != null else "null"])
 
 
 func setup(start_pos: Vector3, dir: Vector3) -> void:

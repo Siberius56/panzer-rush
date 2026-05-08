@@ -2,8 +2,10 @@
 
 [ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1"]
 [ext_resource type="Script" uid="uid://kbgpa64k8p2e" path="res://vehicle_system/turrets/VehicleTurretMount.gd" id="2"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_leosy"]
 [ext_resource type="PackedScene" uid="uid://bkdesvqe68ejn" path="res://vehicle_system/turrets/Turret_Driver.tscn" id="3"]
-[ext_resource type="PackedScene" uid="uid://c86fgqm2ybhqi" path="res://vehicle_system/turrets/Turret_Artillery.tscn" id="4_cojh2"]
+[ext_resource type="PackedScene" uid="uid://cmy1o1eijb6di" path="res://vehicle_system/turrets/Turret_Medium.tscn" id="4_cojh2"]
+[ext_resource type="PackedScene" uid="uid://dtikh1ho4v06s" path="res://asset/tank/box_bevel2.glb" id="5_2cffi"]
 
 [sub_resource type="PhysicsMaterial" id="1"]
 friction = 0.2
@@ -55,10 +57,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_pjsru")
 
-[sub_resource type="StandardMaterial3D" id="4"]
-albedo_color = Color(0.18, 0.18, 0.2, 1)
-roughness = 0.72
-
 [sub_resource type="CylinderMesh" id="5"]
 top_radius = 0.36
 bottom_radius = 0.36
@@ -103,15 +101,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 [node name="Hull" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=1365876633]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1, 0)
 mesh = SubResource("ArrayMesh_2cffi")
-surface_material_override/0 = SubResource("4")
+surface_material_override/0 = ExtResource("2_leosy")
 
 [node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=698609727]
 
 [node name="Seat1Driver" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=399830459]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 1)
-
-[node name="Seat2Passenger" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=1021805121]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, -0.25, 1.08)
 
 [node name="Seat3Turret" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=1862692382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, -0.25)
@@ -122,18 +117,42 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.15, -1.32)
 [node name="TurretMounts" type="Node3D" parent="BodyVisualRoot" unique_id=1932784541]
 
 [node name="Seat1DriverMount" type="Node3D" parent="BodyVisualRoot/TurretMounts" unique_id=668099357 groups=["vehicle_turret_mount"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 1.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 1.3)
 script = ExtResource("2")
 seat_label = "Pilote"
 turret_size = 1
 driver_turret = true
 turret_scene = ExtResource("3")
 
-[node name="Seat2PassengerMount" type="Node3D" parent="BodyVisualRoot/TurretMounts" unique_id=2026051920 groups=["vehicle_turret_mount"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.45, 1.1)
-script = ExtResource("2")
-seat_index = 2
-seat_label = "Passager"
+[node name="box_bevel2" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount" unique_id=76553973 instance=ExtResource("5_2cffi")]
+transform = Transform3D(-2.1855694e-08, 0, 0.25, 0, 0.3, 0, -0.5, 0, -1.0927847e-08, -1.15, -0.097889066, -2.1)
+
+[node name="Cube" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel2" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("2_leosy")
+
+[node name="box_bevel3" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount" unique_id=558760662 instance=ExtResource("5_2cffi")]
+transform = Transform3D(-2.1855694e-08, 0, 0.25, 0, 0.3, 0, -0.5, 0, -1.0927847e-08, -1.158, -0.097889066, -0.8074485)
+
+[node name="Cube" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel3" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("2_leosy")
+
+[node name="box_bevel5" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount" unique_id=1000244667 instance=ExtResource("5_2cffi")]
+transform = Transform3D(-2.1855694e-08, 0, 0.25, 0, 0.3, 0, -0.5, 0, -1.0927847e-08, 1.15, -0.097889066, -0.807)
+
+[node name="Cube" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel5" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("2_leosy")
+
+[node name="box_bevel4" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount" unique_id=191242431 instance=ExtResource("5_2cffi")]
+transform = Transform3D(-2.1855694e-08, 0, 0.25, 0, 0.3, 0, -0.5, 0, -1.0927847e-08, 1.15, -0.097889066, -2.1)
+
+[node name="Cube" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel4" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("2_leosy")
+
+[node name="box_bevel6" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount" unique_id=1564067019 instance=ExtResource("5_2cffi")]
+transform = Transform3D(-0.5, 0, -2.1855694e-08, 0, 0.3, 0, 4.371139e-08, 0, -0.25, 0, 0, -2.9)
+
+[node name="Cube" parent="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel6" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("2_leosy")
 
 [node name="Seat3TurretMount" type="Node3D" parent="BodyVisualRoot/TurretMounts" unique_id=280772707 groups=["vehicle_turret_mount"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.25)
@@ -246,3 +265,9 @@ debug_color = Color(0.7607843, 0, 0.72156864, 0.69803923)
 
 [connection signal="body_entered" from="UseArea" to="." method="_on_use_area_body_entered"]
 [connection signal="body_exited" from="UseArea" to="." method="_on_use_area_body_exited"]
+
+[editable path="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel2"]
+[editable path="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel3"]
+[editable path="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel5"]
+[editable path="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel4"]
+[editable path="BodyVisualRoot/TurretMounts/Seat1DriverMount/box_bevel6"]

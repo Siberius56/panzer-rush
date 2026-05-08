@@ -15,14 +15,6 @@ size = Vector3(2.6552887, 1.4, 3.250058)
 albedo_color = Color(0.18, 0.18, 0.2, 1)
 roughness = 0.72
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_skmyr"]
-blend_mode = 4
-cull_mode = 1
-shading_mode = 0
-albedo_color = Color(0, 0, 0, 1)
-grow = true
-grow_amount = 0.04
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k6q16"]
 resource_name = "MasterMat"
 transparency = 2
@@ -116,7 +108,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 [node name="Body" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=734452507]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
 material_override = SubResource("4")
-material_overlay = SubResource("StandardMaterial3D_skmyr")
 mesh = SubResource("ArrayMesh_k1qjj")
 
 [node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=1468659701]

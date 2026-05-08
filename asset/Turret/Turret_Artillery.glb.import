@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dylg6v7p2ht5e"
-path="res://.godot/imported/Turret_Artillery.glb-8ce3747bbe2a7ab2d13c7ac7d81a06b6.scn"
+path="res://.godot/imported/Turret_Artillery.glb-32d20ee18664d4701293f98422a3136b.scn"
 
 [deps]
 
-source_file="res://asset/turret/Turret_Artillery.glb"
-dest_files=["res://.godot/imported/Turret_Artillery.glb-8ce3747bbe2a7ab2d13c7ac7d81a06b6.scn"]
+source_file="res://asset/Turret/Turret_Artillery.glb"
+dest_files=["res://.godot/imported/Turret_Artillery.glb-32d20ee18664d4701293f98422a3136b.scn"]
 
 [params]
 

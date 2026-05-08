@@ -1,8 +1,470 @@
 [gd_scene format=3 uid="uid://ccv88msvp1esx"]
 
 [ext_resource type="Script" uid="uid://bb30nt354apuh" path="res://scripts/lobby/Lobby.gd" id="1_lobby"]
+[ext_resource type="PackedScene" uid="uid://cjv7arc0wkfhi" path="res://asset/map/factory/building-k.glb" id="2_opc5t"]
+[ext_resource type="PackedScene" uid="uid://bk741csbv6524" path="res://asset/map/factory/building-q.glb" id="3_pbg2n"]
+[ext_resource type="PackedScene" uid="uid://bi8rfru842h6q" path="res://vehicle_system/chassis/Tank_Light.tscn" id="4_xyfku"]
+[ext_resource type="PackedScene" uid="uid://cx00hjgvjdfgk" path="res://vehicle_system/chassis/Tank_Medium.tscn" id="5_wp0hx"]
+[ext_resource type="PackedScene" uid="uid://dks54llxvcjhi" path="res://asset/map/misc-2/indicator-special-lines.glb" id="6_lukr2"]
+[ext_resource type="PackedScene" uid="uid://dbn7h5u2r4c67" path="res://asset/map/misc-1/barrel_002.glb" id="6_sqemm"]
+[ext_resource type="PackedScene" uid="uid://cs4cla08bi1t4" path="res://asset/map/misc-1/barrel_003.glb" id="7_v3mhk"]
+[ext_resource type="PackedScene" uid="uid://gs021houev1p" path="res://asset/weapon/crate-small.glb" id="8_s8luf"]
+[ext_resource type="PackedScene" uid="uid://qvga6kqmd8f1" path="res://asset/weapon/crate-wide.glb" id="9_mq6cd"]
+[ext_resource type="PackedScene" uid="uid://bdx2ftuivfewd" path="res://asset/map/misc-1/table_001.glb" id="10_2wvlb"]
+[ext_resource type="PackedScene" uid="uid://bicdkqelvgpxi" path="res://asset/map/factory/chimney-medium.glb" id="11_uuuet"]
+[ext_resource type="PackedScene" uid="uid://cuawdsptfumqs" path="res://asset/map/factory/detail-tank.glb" id="12_bf3dp"]
+[ext_resource type="PackedScene" uid="uid://biynj8ou1rl3x" path="res://asset/weapon/grenade-b.glb" id="13_ngadt"]
+[ext_resource type="PackedScene" uid="uid://df17p84dts7kp" path="res://asset/weapon/blaster-b.glb" id="14_lukr2"]
+[ext_resource type="PackedScene" uid="uid://brxh216eqb145" path="res://asset/weapon/blaster-c.glb" id="15_yo5dp"]
+[ext_resource type="PackedScene" uid="uid://dgniwfvqmskhg" path="res://asset/weapon/blaster-e.glb" id="16_xw0bu"]
+[ext_resource type="PackedScene" uid="uid://bjdbe3mlq88fa" path="res://asset/map/misc-1/fan.glb" id="17_lnwx7"]
+[ext_resource type="PackedScene" uid="uid://b3gx3pmjhvnsa" path="res://asset/weapon/target-large.glb" id="18_xyfku"]
+[ext_resource type="PackedScene" uid="uid://c6tok7nqohwfk" path="res://asset/weapon/target-fragment-large.glb" id="19_wp0hx"]
+[ext_resource type="PackedScene" uid="uid://06y4cggo6nde" path="res://asset/weapon/clip-large.glb" id="20_v3mhk"]
+[ext_resource type="PackedScene" uid="uid://p4urelfbgkqb" path="res://asset/weapon/clip-small.glb" id="21_s8luf"]
+[ext_resource type="PackedScene" uid="uid://dxijtajpn1fhh" path="res://asset/weapon/bullet-foam-tip-thick.glb" id="22_mq6cd"]
+[ext_resource type="PackedScene" uid="uid://d1s5vpeyevq5f" path="res://asset/map/misc-2/warning-traffic.glb" id="23_2wvlb"]
+[ext_resource type="PackedScene" uid="uid://bkoplgm7tujn8" path="res://asset/map/misc-2/pipe-large-long.glb" id="24_uuuet"]
+[ext_resource type="PackedScene" uid="uid://c2gyeutonu7py" path="res://asset/map/misc-2/pipe-large.glb" id="25_bf3dp"]
+[ext_resource type="PackedScene" uid="uid://c4nxd06ghh0fu" path="res://asset/map/misc-2/indicator-special-area.glb" id="27_yo5dp"]
+[ext_resource type="PackedScene" uid="uid://ddwu7klxnc2vg" path="res://asset/map/misc-2/indicator-special-arrow.glb" id="28_xw0bu"]
+[ext_resource type="PackedScene" uid="uid://c23d4w2brqi2u" path="res://asset/map/misc-2/indicator-special-cross.glb" id="29_lnwx7"]
+[ext_resource type="Shader" uid="uid://bw7em2y0vcrr2" path="res://scenes/lobby/Lobby.gdshader" id="30_k6twf"]
+[ext_resource type="Texture2D" uid="uid://dhvnlevxicjye" path="res://asset/texture/BckOcean.png" id="31_0bd5a"]
+[ext_resource type="Texture2D" uid="uid://wnats2ojeuoy" path="res://asset/texture/Echilea.png" id="32_f7fkk"]
+[ext_resource type="FontFile" uid="uid://42ggr75p60l5" path="res://asset/font/Bungee-Regular.ttf" id="33_lro3v"]
 
-[node name="Lobby" type="Control" unique_id=667272118]
+[sub_resource type="PlaneMesh" id="PlaneMesh_k6twf"]
+size = Vector2(40, 40)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0bd5a"]
+albedo_color = Color(0.23137255, 0.23137255, 0.28627452, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f7fkk"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lro3v"]
+size = Vector3(10, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grwrp"]
+albedo_color = Color(0.3864, 0.39621332, 0.46, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dbwma"]
+size = Vector3(10, 3.67, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lukr2"]
+albedo_color = Color(0.9118, 0.9306, 0.94, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yo5dp"]
+albedo_color = Color(0.9118, 0.9306, 0.94, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pp31k"]
+size = Vector3(25, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xkoyv"]
+albedo_color = Color(0.41599998, 0.442, 0.52, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0gnwl"]
+size = Vector3(25, 2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kkmbi"]
+albedo_color = Color(0.28440002, 0.3159, 0.36, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0fn8k"]
+size = Vector3(25, 15, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c1qbm"]
+albedo_color = Color(0.1975, 0.219375, 0.25, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tw0ie"]
+size = Vector3(3, 2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3aano"]
+size = Vector3(20, 2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sbrd3"]
+size = Vector3(40, 3.67, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_crj23"]
+size = Vector3(40, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3yd5m"]
+size = Vector3(1.7, 3.67, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fw8ve"]
+albedo_color = Color(0.84705883, 0.6784314, 0.54901963, 1)
+
+[sub_resource type="Animation" id="Animation_gyar5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fan_2:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.7853982, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Fan_1:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_emam8"]
+resource_name = "fan"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fan_2:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.7853982, 0, 0), Vector3(7.0685835, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Fan_1:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(6.2831855, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_c3hvi"]
+_data = {
+&"RESET": SubResource("Animation_gyar5"),
+&"fan": SubResource("Animation_emam8")
+}
+
+[sub_resource type="QuadMesh" id="QuadMesh_0sadd"]
+size = Vector2(20, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uauk8"]
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 10.0
+
+[sub_resource type="Environment" id="Environment_g1j5f"]
+ssao_enabled = true
+ssil_enabled = true
+glow_enabled = true
+glow_bloom = 0.2
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.01
+adjustment_enabled = true
+adjustment_brightness = 0.95
+
+[sub_resource type="Curve" id="Curve_q3sor"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.50335574, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_rkyym"]
+curve = SubResource("Curve_q3sor")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_j7bbn"]
+emission_shape_scale = Vector3(7, 2, 3)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+spread = 180.0
+initial_velocity_min = 0.29999998
+initial_velocity_max = 0.5
+gravity = Vector3(0, 0, 0)
+scale_min = 0.06
+scale_max = 0.099999994
+scale_curve = SubResource("CurveTexture_rkyym")
+
+[sub_resource type="Gradient" id="Gradient_smvud"]
+offsets = PackedFloat32Array(0, 0.25396827, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.48015875, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ldavn"]
+gradient = SubResource("Gradient_smvud")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vwp6r"]
+transparency = 1
+albedo_texture = SubResource("GradientTexture2D_ldavn")
+
+[sub_resource type="QuadMesh" id="QuadMesh_u660g"]
+material = SubResource("StandardMaterial3D_vwp6r")
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_34cp8"]
+dof_blur_far_enabled = true
+dof_blur_far_distance = 6.0
+dof_blur_far_transition = 2.0
+
+[sub_resource type="Animation" id="Animation_rkyym"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.17453292, -1.5707964, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-6, 3.5, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CanvasLayer/BlackFade_Intro:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Camera3D:attributes")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [SubResource("CameraAttributesPractical_34cp8")]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Camera3D:attributes:dof_blur_far_distance")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [6.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("CanvasLayer/BlackFade_Intro:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_opc5t"]
+resource_name = "start"
+length = 1.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.050000012, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-0.17453292, -1.5707964, 0), Vector3(-0.7853982, -1.5707964, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-6, 3.5, 0), Vector3(-2, 2.75, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CanvasLayer/BlackFade_Intro:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Camera3D:attributes")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [SubResource("CameraAttributesPractical_34cp8")]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Camera3D:attributes:dof_blur_far_distance")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [11.0, 6.0]
+}
+
+[sub_resource type="Animation" id="Animation_smvud"]
+resource_name = "start_lobby"
+length = 1.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1, 1.5),
+"transitions": PackedFloat32Array(0.8, 1),
+"update": 0,
+"values": [Vector3(-0.43633232, -1.5707964, 0), Vector3(-0.17453292, -1.5707964, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.1, 1.5),
+"transitions": PackedFloat32Array(0.8, 1),
+"update": 0,
+"values": [Vector3(-8, 5, 0), Vector3(-6, 3.5, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CanvasLayer/BlackFade_Intro:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.05, 0.45000002),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Camera3D:attributes:dof_blur_far_distance")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.1),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [11.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CanvasLayer/BlackFade_Intro:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2sfbi"]
+_data = {
+&"RESET": SubResource("Animation_rkyym"),
+&"select_mission": SubResource("Animation_opc5t"),
+&"start_lobby": SubResource("Animation_smvud")
+}
+
+[sub_resource type="Gradient" id="Gradient_lukr2"]
+offsets = PackedFloat32Array(0, 0.063432835, 0.6044776, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.6865672, 1, 1, 1, 0.07545717, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_yo5dp"]
+gradient = SubResource("Gradient_lukr2")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xw0bu"]
+transparency = 1
+shading_mode = 0
+albedo_texture = SubResource("GradientTexture2D_yo5dp")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_lnwx7"]
+lightmap_size_hint = Vector2i(32, 9)
+size = Vector2(6, 1.48)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_grwrp"]
+shader = ExtResource("30_k6twf")
+shader_parameter/tile_texture = ExtResource("31_0bd5a")
+shader_parameter/rect_size_px = Vector2(512, 512)
+shader_parameter/tile_size_px = Vector2(8, 8)
+shader_parameter/scroll_speed_px = Vector2(2, -2)
+shader_parameter/tint = Color(1, 1, 1, 1)
+shader_parameter/alpha = 1.0
+
+[sub_resource type="FontVariation" id="FontVariation_dbwma"]
+base_font = ExtResource("33_lro3v")
+spacing_glyph = 2
+
+[sub_resource type="FontVariation" id="FontVariation_fw8ve"]
+base_font = ExtResource("33_lro3v")
+variation_transform = Transform2D(1.55, 0, 0, 0.84, 0, 0)
+spacing_glyph = 13
+
+[sub_resource type="FontVariation" id="FontVariation_pp31k"]
+base_font = ExtResource("33_lro3v")
+spacing_top = -10
+
+[node name="Lobby" type="Control" unique_id=1459659771]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,17 +472,593 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lobby")
+map_min_zoom = 0.75
+map_max_zoom = 1.5
+map_zoom_step = 0.1
+map_max_pan_offset = Vector2(1200, 450)
 
-[node name="Background" type="ColorRect" parent="." unique_id=946130747]
+[node name="Node3D" type="Node3D" parent="." unique_id=1407460585]
+
+[node name="Ground" type="MeshInstance3D" parent="Node3D" unique_id=494595378]
+mesh = SubResource("PlaneMesh_k6twf")
+surface_material_override/0 = SubResource("StandardMaterial3D_0bd5a")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Node3D" unique_id=902603586]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody3D" unique_id=2023173002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51477194, 0)
+shape = SubResource("BoxShape3D_f7fkk")
+
+[node name="Wall" type="Node3D" parent="Node3D" unique_id=1342788224]
+
+[node name="building-k2" parent="Node3D/Wall" unique_id=641040858 instance=ExtResource("2_opc5t")]
+transform = Transform3D(-4.371139e-07, 0, 10, 0, 10, 0, -10, 0, -4.371139e-07, -0.046111345, 2.3841858e-07, -16.270073)
+
+[node name="building-k3" parent="Node3D/Wall" unique_id=1859749732 instance=ExtResource("2_opc5t")]
+transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, 0.6872593, 2.3841858e-07, 15.6503525)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1067520303]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7453527, 0, -10.501839)
+mesh = SubResource("BoxMesh_lro3v")
+surface_material_override/0 = SubResource("StandardMaterial3D_grwrp")
+
+[node name="MeshInstance3D7" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1387705979]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.400603, 2.1643429, -10.701182)
+mesh = SubResource("BoxMesh_dbwma")
+surface_material_override/0 = SubResource("StandardMaterial3D_lukr2")
+
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="Node3D/Wall" unique_id=446155092]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.569523, 2.1643429, -10.697845)
+mesh = SubResource("BoxMesh_dbwma")
+surface_material_override/0 = SubResource("StandardMaterial3D_yo5dp")
+
+[node name="MeshInstance3D10" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1740345522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.400603, 2.1643429, 10.077432)
+mesh = SubResource("BoxMesh_dbwma")
+surface_material_override/0 = SubResource("StandardMaterial3D_lukr2")
+
+[node name="MeshInstance3D12" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1873847046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08475876, 4.4925413, 10.077432)
+mesh = SubResource("BoxMesh_pp31k")
+surface_material_override/0 = SubResource("StandardMaterial3D_xkoyv")
+
+[node name="MeshInstance3D13" type="MeshInstance3D" parent="Node3D/Wall" unique_id=2000478302]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08475876, 4.4925413, -10.684886)
+mesh = SubResource("BoxMesh_pp31k")
+surface_material_override/0 = SubResource("StandardMaterial3D_xkoyv")
+
+[node name="MeshInstance3D15" type="MeshInstance3D" parent="Node3D/Wall" unique_id=872429574]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08475876, 5.966459, -10.685227)
+mesh = SubResource("BoxMesh_0gnwl")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D22" type="MeshInstance3D" parent="Node3D/Wall" unique_id=626165605]
+transform = Transform3D(1, 0, 0, 0, 0.42261824, -0.9063078, 0, 0.9063078, 0.42261824, 0.08475876, 7.4221177, -10.243526)
+mesh = SubResource("BoxMesh_0fn8k")
+surface_material_override/0 = SubResource("StandardMaterial3D_c1qbm")
+
+[node name="MeshInstance3D23" type="MeshInstance3D" parent="Node3D/Wall" unique_id=921489014]
+transform = Transform3D(-1, -7.9231945e-08, -3.694646e-08, 0, 0.42261824, -0.9063078, 8.742278e-08, -0.9063078, -0.42261824, 0.08475876, 7.4221177, 9.81068)
+mesh = SubResource("BoxMesh_0fn8k")
+surface_material_override/0 = SubResource("StandardMaterial3D_c1qbm")
+
+[node name="MeshInstance3D24" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1659495343]
+transform = Transform3D(-1, 8.742278e-08, -3.821371e-15, 0, -4.371139e-08, -1, -8.742278e-08, -1, 4.371139e-08, 0.085, 9, -0.326)
+mesh = SubResource("BoxMesh_0fn8k")
+surface_material_override/0 = SubResource("StandardMaterial3D_c1qbm")
+
+[node name="MeshInstance3D16" type="MeshInstance3D" parent="Node3D/Wall" unique_id=149860787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08475876, 5.966459, 10.078357)
+mesh = SubResource("BoxMesh_0gnwl")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D17" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1097812660]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.9716, 5.966, 0)
+mesh = SubResource("BoxMesh_tw0ie")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D25" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1570742957]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.9716, 7.9210753, -0.3037498)
+mesh = SubResource("BoxMesh_3aano")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D19" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1423343225]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.971139, 5.966, -4.5)
+mesh = SubResource("BoxMesh_tw0ie")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D21" type="MeshInstance3D" parent="Node3D/Wall" unique_id=990114079]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.971139, 5.966, -9)
+mesh = SubResource("BoxMesh_tw0ie")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D18" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1229636859]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.971139, 5.966, 4.5)
+mesh = SubResource("BoxMesh_tw0ie")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D20" type="MeshInstance3D" parent="Node3D/Wall" unique_id=2045627477]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.971139, 5.966, 9)
+mesh = SubResource("BoxMesh_tw0ie")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkmbi")
+
+[node name="MeshInstance3D14" type="MeshInstance3D" parent="Node3D/Wall" unique_id=541736926]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.956644, 4.4925413, 0.040040135)
+mesh = SubResource("BoxMesh_pp31k")
+surface_material_override/0 = SubResource("StandardMaterial3D_xkoyv")
+
+[node name="MeshInstance3D11" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1569657934]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.20542, 2.1643429, 10.077432)
+mesh = SubResource("BoxMesh_dbwma")
+surface_material_override/0 = SubResource("StandardMaterial3D_lukr2")
+
+[node name="MeshInstance3D9" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1155209933]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.945578, 2.164341, 0.63745975)
+mesh = SubResource("BoxMesh_sbrd3")
+surface_material_override/0 = SubResource("StandardMaterial3D_lukr2")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Node3D/Wall" unique_id=2130582315]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.753186, 0, -10.501839)
+mesh = SubResource("BoxMesh_lro3v")
+surface_material_override/0 = SubResource("StandardMaterial3D_grwrp")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1205421561]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 8.3865, 0, 9.882119)
+mesh = SubResource("BoxMesh_lro3v")
+surface_material_override/0 = SubResource("StandardMaterial3D_grwrp")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="Node3D/Wall" unique_id=1067510899]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -8.112039, 0, 9.882117)
+mesh = SubResource("BoxMesh_lro3v")
+surface_material_override/0 = SubResource("StandardMaterial3D_grwrp")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Node3D/Wall" unique_id=442431965]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.753186, 0, 2.5687423)
+mesh = SubResource("BoxMesh_crj23")
+surface_material_override/0 = SubResource("StandardMaterial3D_grwrp")
+
+[node name="building-q2" parent="Node3D/Wall" unique_id=1826340063 instance=ExtResource("3_pbg2n")]
+transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, 7.883732, -0.014771938, 21.611084)
+
+[node name="Tank_Light" parent="Node3D" unique_id=1286101069 instance=ExtResource("4_xyfku")]
+transform = Transform3D(0.6510525, 0, -0.7590327, 0, 1, 0, 0.7590327, 0, 0.6510525, 2.5917954, 0, -3.4480114)
+
+[node name="Tank_Medium" parent="Node3D" unique_id=982500783 instance=ExtResource("5_wp0hx")]
+transform = Transform3D(-0.56124586, 0, -0.82764924, 0, 1, 0, 0.82764924, 0, -0.56124586, 2.5626078, 0.025935411, 3.4035752)
+
+[node name="Stroke" type="Node3D" parent="Node3D" unique_id=1184972900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0)
+
+[node name="MeshInstance3D16" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=1206011044]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, 9)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="MeshInstance3D18" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=1202837807]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, 6)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="MeshInstance3D17" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=588100777]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, 3)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="MeshInstance3D12" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=2028790534]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, 0)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="MeshInstance3D13" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=1272140030]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, -3)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="MeshInstance3D14" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=1487047632]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, -6)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="MeshInstance3D15" type="MeshInstance3D" parent="Node3D/Stroke" unique_id=759444434]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1.835, -9)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3yd5m")
+surface_material_override/0 = SubResource("StandardMaterial3D_fw8ve")
+
+[node name="indicator-special-lines2" parent="Node3D/Stroke" unique_id=1518633966 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6499202, 0.0012883415, -9.4275)
+
+[node name="indicator-special-lines4" parent="Node3D/Stroke" unique_id=781325129 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7991843, 0.0012883415, -9.4275)
+
+[node name="indicator-special-lines5" parent="Node3D/Stroke" unique_id=656239697 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9912946, 0.0012883415, -9.4275)
+
+[node name="indicator-special-lines6" parent="Node3D/Stroke" unique_id=809645019 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8420305, 0.0012883415, -9.4275)
+
+[node name="indicator-special-lines3" parent="Node3D/Stroke" unique_id=220903320 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.703399, 0.0012883415, 8.776747)
+
+[node name="indicator-special-lines10" parent="Node3D/Stroke" unique_id=1209467278 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.264932, 0.0012883415, 8.776747)
+
+[node name="indicator-special-lines7" parent="Node3D/Stroke" unique_id=1679978195 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85266304, 0.0012883415, 8.776747)
+
+[node name="indicator-special-lines8" parent="Node3D/Stroke" unique_id=275100073 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9378159, 0.0012883415, 8.776747)
+
+[node name="indicator-special-lines9" parent="Node3D/Stroke" unique_id=1925107260 instance=ExtResource("6_lukr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7885518, 0.0012883415, 8.776747)
+
+[node name="Props" type="Node3D" parent="Node3D" unique_id=36702111]
+
+[node name="barrel_0022" parent="Node3D/Props" unique_id=79970892 instance=ExtResource("6_sqemm")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 7.521746, 4.7683716e-07, 2.7340262)
+
+[node name="barrel_0023" parent="Node3D/Props" unique_id=1767651989 instance=ExtResource("6_sqemm")]
+transform = Transform3D(1.4999963, 0.0021028696, 0.0025712484, -0.0021090037, 1.4999943, 0.003594581, -0.0025662193, -0.0035981731, 1.4999934, 6.5590997, 0, -1.1066375)
+
+[node name="barrel_0032" parent="Node3D/Props" unique_id=1343256185 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 7.32208, 0.002724409, 0.7653743)
+
+[node name="barrel_0033" parent="Node3D/Props" unique_id=1382549279 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6.5498896, -0.015422106, 0.3140403)
+
+[node name="barrel_0041" parent="Node3D/Props" unique_id=2025570701 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 7.5975895, -0.015422106, -1.77028)
+
+[node name="barrel_0042" parent="Node3D/Props" unique_id=831349840 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(1.1679385, -0.8464133, 0.4117086, 0.49868613, -2.9802322e-08, -1.4146774, 0.7982679, 1.2383797, 0.28139636, 3.2091913, 0.3859625, -9.844504)
+
+[node name="barrel_0034" parent="Node3D/Props" unique_id=393159444 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 7.6314354, -0.015422583, -0.24172753)
+
+[node name="barrel_0035" parent="Node3D/Props" unique_id=1539814132 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(0.72299755, 0, 1.3142582, 0, 1.5, 0, -1.3142582, 0, 0.72299755, -2.5298066, -0.001827836, 8.797804)
+
+[node name="barrel_0038" parent="Node3D/Props" unique_id=2103502991 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(0.72299755, 0, 1.3142582, 0, 1.5, 0, -1.3142582, 0, 0.72299755, 7.4641814, -0.001827836, 1.454379)
+
+[node name="barrel_0039" parent="Node3D/Props" unique_id=1972383808 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(0.72299755, 0, 1.3142582, 0, 1.5, 0, -1.3142582, 0, 0.72299755, 7.293389, 1.2303854, 0.5484873)
+
+[node name="barrel_0040" parent="Node3D/Props" unique_id=566744156 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(0.72299755, 0, 1.3142582, 0, 1.5, 0, -1.3142582, 0, 0.72299755, 7.9545336, 0.8384205, 0.9819859)
+
+[node name="barrel_0036" parent="Node3D/Props" unique_id=2082893864 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(0.72299755, 0, 1.3142582, 0, 1.5, 0, -1.3142582, 0, 0.72299755, 4.91366, -0.015422583, 8.739355)
+
+[node name="barrel_0037" parent="Node3D/Props" unique_id=114677153 instance=ExtResource("7_v3mhk")]
+transform = Transform3D(-0.069535136, 0, 1.4983876, 0, 1.4999999, 0, -1.4983876, 0, -0.069535136, 6.36304, -0.015422583, 1.1798828)
+
+[node name="crate-small2" parent="Node3D/Props" unique_id=453684812 instance=ExtResource("8_s8luf")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 7.6589866, 4.7683716e-07, -3.190394)
+
+[node name="crate-small4" parent="Node3D/Props" unique_id=2037117386 instance=ExtResource("8_s8luf")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -0.36386108, 4.7683716e-07, -0.02129364)
+
+[node name="crate-small3" parent="Node3D/Props" unique_id=491100213 instance=ExtResource("8_s8luf")]
+transform = Transform3D(1.490011, 0, 0.17282182, 0, 1.5, 0, -0.17282182, 0, 1.490011, 7.5495644, 4.7683716e-07, -4.7003126)
+
+[node name="crate-wide2" parent="Node3D/Props" unique_id=293644643 instance=ExtResource("9_mq6cd")]
+transform = Transform3D(0.87845045, 0, 0.47783348, 0, 1, 0, -0.47783348, 0, 0.87845045, -0.86234164, 0, 1.3734587)
+
+[node name="table_0012" parent="Node3D/Props" unique_id=211283769 instance=ExtResource("10_2wvlb")]
+transform = Transform3D(-4.5896957e-08, 0, -1.05, 0, 1.05, 0, 1.05, 0, -4.5896957e-08, -0.09321952, 0, -0.023688555)
+
+[node name="chimney-medium2" parent="Node3D/Props" unique_id=1495563145 instance=ExtResource("11_uuuet")]
+transform = Transform3D(-2.1855695e-07, -5, 0, 5, -2.1855695e-07, 0, 0, 0, 5, 17.617691, 2.8427196, -6.732461)
+
+[node name="chimney-medium3" parent="Node3D/Props" unique_id=1916475073 instance=ExtResource("11_uuuet")]
+transform = Transform3D(-2.1855695e-07, -5, 0, 5, -2.1855695e-07, 0, 0, 0, 5, 17.617691, 2.8427196, -8.852198)
+
+[node name="detail-tank2" parent="Node3D/Props" unique_id=1557499875 instance=ExtResource("12_bf3dp")]
+transform = Transform3D(-2.2948478e-07, -4, 0, 5.25, -1.7484555e-07, 0, 0, 0, 4, 8.501359, 1.1398275, 7.7887344)
+
+[node name="detail-tank4" parent="Node3D/Props" unique_id=1534761794 instance=ExtResource("12_bf3dp")]
+transform = Transform3D(-2.2948478e-07, -4, 0, 5.25, -1.7484555e-07, 0, 0, 0, 4, 8.501359, 1.1398275, 5.553718)
+
+[node name="detail-tank3" parent="Node3D/Props" unique_id=1688284035 instance=ExtResource("12_bf3dp")]
+transform = Transform3D(5.25, 0, 0, 0, 5.25, 0, 0, 0, 5.25, 5.315691, -0.17155671, -8.558453)
+
+[node name="grenade-b2" parent="Node3D/Props" unique_id=37719693 instance=ExtResource("13_ngadt")]
+transform = Transform3D(0.888839, 0.124585964, -0.44095767, -0.13881013, 0.990319, 0, 0.43668875, 0.06120939, 0.89752793, -1.2569282, -0.014772415, 0.8171355)
+
+[node name="grenade-b3" parent="Node3D/Props" unique_id=550441409 instance=ExtResource("13_ngadt")]
+transform = Transform3D(0.27003813, -0.94705087, 0.17370602, 0.88141716, 0.1705317, -0.44047996, 0.38753465, 0.2720539, 0.8807971, -1.318048, 0.002375245, 0.88046247)
+
+[node name="blaster-b2" parent="Node3D/Props" unique_id=1723594667 instance=ExtResource("14_lukr2")]
+transform = Transform3D(0.8672162, 0.39653474, 0.30115807, -0.49070725, 0.78325355, 0.38173324, -0.084512636, -0.47882575, 0.8738326, -0.96691525, 0.13865322, 1.9393232)
+
+[node name="blaster-c2" parent="Node3D/Props" unique_id=250861064 instance=ExtResource("15_yo5dp")]
+transform = Transform3D(-0.010471806, 0.9999452, 0, -0.9999452, -0.010471806, 0, 0, 0, 1, -0.9227121, 0.39130765, 1.2893617)
+
+[node name="blaster-e2" parent="Node3D/Props" unique_id=267820665 instance=ExtResource("16_xw0bu")]
+transform = Transform3D(-0.9615546, 0.21910568, 0.16554607, -0.10242762, 0.27317554, -0.95649546, -0.2547967, -0.9366791, -0.24023077, -0.6235013, 1.223136, -1.0173295)
+
+[node name="Fan_1" type="Node3D" parent="Node3D/Props" unique_id=1977807214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1, 2.845, -8.856)
+
+[node name="fan2" parent="Node3D/Props/Fan_1" unique_id=763025576 instance=ExtResource("17_lnwx7")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.0660151, -1.2570648, 0)
+
+[node name="Fan_2" type="Node3D" parent="Node3D/Props" unique_id=1249872905]
+transform = Transform3D(1, 0, 0, 0, 0.7071067, -0.7071067, 0, 0.7071067, 0.7071067, 8.1, 2.845, -6.734)
+
+[node name="fan2" parent="Node3D/Props/Fan_2" unique_id=176271008 instance=ExtResource("17_lnwx7")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.0660151, -1.2570648, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Node3D/Props" unique_id=752231485]
+libraries/ = SubResource("AnimationLibrary_c3hvi")
+autoplay = &"fan"
+
+[node name="target-large2" parent="Node3D/Props" unique_id=313641949 instance=ExtResource("18_xyfku")]
+transform = Transform3D(0.9072587, 0.28125298, -0.31269538, -0.26590273, 0.95963365, 0.09164592, 0.3258487, 0, 0.94542193, -0.741742, 0.15522806, -0.9745148)
+
+[node name="target-fragment-large2" parent="Node3D/Props" unique_id=640795073 instance=ExtResource("19_wp0hx")]
+transform = Transform3D(-1.261718e-08, 0.28864744, 0.9574354, -1, -4.371139e-08, 0, 4.1850832e-08, -0.9574354, 0.28864744, -0.59966946, 0.027299844, -1.1608762)
+
+[node name="clip-large2" parent="Node3D/Props" unique_id=737366139 instance=ExtResource("20_v3mhk")]
+transform = Transform3D(0.7761785, 0, 0.63051325, 0, 1, 0, -0.63051325, 0, 0.7761785, -1.3456099, -0.0147720575, 1.1802143)
+
+[node name="clip-large3" parent="Node3D/Props" unique_id=1048523373 instance=ExtResource("20_v3mhk")]
+transform = Transform3D(-2.9802322e-08, 0.10385153, 0.9945928, 1, -1.7484451e-08, 1.0850417e-08, 0, 0.9945928, -0.10385147, -1.5245239, 0.034638643, 1.0547496)
+
+[node name="clip-small2" parent="Node3D/Props" unique_id=1899646213 instance=ExtResource("21_s8luf")]
+transform = Transform3D(-4.371139e-08, -0.9146848, -0.40416798, -1, 3.998214e-08, 1.7666743e-08, 0, 0.40416798, -0.9146848, -0.430228, 0.8204784, 0.6909528)
+
+[node name="clip-small3" parent="Node3D/Props" unique_id=1021629912 instance=ExtResource("21_s8luf")]
+transform = Transform3D(-0.31927857, -0.77554977, 0.54459524, -0.92470556, 0.38068312, -1.4901161e-08, -0.20731816, -0.50359017, -0.8386991, -0.45723224, 0.8204784, 0.89037323)
+
+[node name="bullet-foam-tip-thick2" parent="Node3D/Props" unique_id=1148281844 instance=ExtResource("22_mq6cd")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -0.65353084, 0.8051304, 0.7368657)
+
+[node name="bullet-foam-tip-thick3" parent="Node3D/Props" unique_id=1153929062 instance=ExtResource("22_mq6cd")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -0.69687706, 0.8051304, 0.7722934)
+
+[node name="bullet-foam-tip-thick4" parent="Node3D/Props" unique_id=1270512170 instance=ExtResource("22_mq6cd")]
+transform = Transform3D(0.94449, -0.74022883, 3.2356432e-08, 0, -5.2453668e-08, -1.2, 0.74022883, 0.94449, -4.128497e-08, -0.663464, 0.8145884, 0.79253113)
+
+[node name="bullet-foam-tip-thick6" parent="Node3D/Props" unique_id=2114364144 instance=ExtResource("22_mq6cd")]
+transform = Transform3D(0.73803437, -0.9462058, 4.1359968e-08, 0, -5.2453668e-08, -1.2, 0.9462058, 0.73803437, -3.226051e-08, -0.6594843, 0.8145884, 0.8473374)
+
+[node name="bullet-foam-tip-thick5" parent="Node3D/Props" unique_id=1839271162 instance=ExtResource("22_mq6cd")]
+transform = Transform3D(1.199647, 0.02910916, -1.2724019e-09, 0, -5.2453668e-08, -1.2, -0.02910916, 1.199647, -5.243823e-08, -0.6370722, 0.8145884, 0.7768003)
+
+[node name="warning-traffic2" parent="Node3D/Props" unique_id=1378412680 instance=ExtResource("23_2wvlb")]
+transform = Transform3D(1, 0, 0, 0, -3.4969112e-08, -1, 0, 0.8, -4.371139e-08, 2.989139, 2.613265, -10.741741)
+
+[node name="warning-traffic3" parent="Node3D/Props" unique_id=1579819606 instance=ExtResource("23_2wvlb")]
+transform = Transform3D(-1, -6.9938224e-08, 3.821371e-15, 0, -3.4969112e-08, -1, 8.742278e-08, -0.8, 4.371139e-08, 3.6829684, 2.613266, 10.076943)
+
+[node name="Pipe" type="Node3D" parent="Node3D/Props" unique_id=2033075364]
+transform = Transform3D(-3.4969112e-08, 0.8, -3.496911e-08, 0, -3.4969112e-08, -0.8, -0.8, -3.4969112e-08, 0, 7.615448, 4.4880953, -9.410845)
+visible = false
+
+[node name="pipe-large-long2" parent="Node3D/Props/Pipe" unique_id=1672147043 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -0.04437447, 0.42275786, -3.8427005)
+
+[node name="pipe-large2" parent="Node3D/Props/Pipe" unique_id=857863698 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -1.5010996, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long3" parent="Node3D/Props/Pipe" unique_id=1159785119 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -3.009694, 0.4227569, -3.8427005)
+
+[node name="pipe-large3" parent="Node3D/Props/Pipe" unique_id=1270636620 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -4.4664207, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long4" parent="Node3D/Props/Pipe" unique_id=334142863 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -5.8956957, 0.42275786, -3.8427005)
+
+[node name="pipe-large4" parent="Node3D/Props/Pipe" unique_id=1660106395 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -7.352421, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long5" parent="Node3D/Props/Pipe" unique_id=2038625671 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -8.861015, 0.4227569, -3.8427005)
+
+[node name="pipe-large5" parent="Node3D/Props/Pipe" unique_id=1695979333 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -10.317741, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long6" parent="Node3D/Props/Pipe" unique_id=514457636 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -11.828533, 0.42275786, -3.8427005)
+
+[node name="pipe-large6" parent="Node3D/Props/Pipe" unique_id=947941477 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -13.285258, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long7" parent="Node3D/Props/Pipe" unique_id=339730688 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -14.793853, 0.4227569, -3.8427005)
+
+[node name="pipe-large7" parent="Node3D/Props/Pipe" unique_id=313466673 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -16.25058, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long8" parent="Node3D/Props/Pipe" unique_id=440135887 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -17.679853, 0.42275786, -3.8427005)
+
+[node name="pipe-large8" parent="Node3D/Props/Pipe" unique_id=97818819 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -19.13658, 0.41984725, -3.8427014)
+
+[node name="pipe-large-long9" parent="Node3D/Props/Pipe" unique_id=226250074 instance=ExtResource("24_uuuet")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -20.645174, 0.4227569, -3.8427005)
+
+[node name="pipe-large9" parent="Node3D/Props/Pipe" unique_id=1261532066 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -22.1019, 0.41984725, -3.8427014)
+
+[node name="pipe-large10" parent="Node3D/Props/Pipe" unique_id=625441464 instance=ExtResource("25_bf3dp")]
+transform = Transform3D(1, 0, -2.1175824e-22, 0, 1, 0, -2.1175824e-22, -8.3518724e-23, 1, -23.106758, 0.41984725, -3.8427014)
+
+[node name="Light" type="Node3D" parent="Node3D" unique_id=317999902]
+
+[node name="SpotLight3D_center" type="SpotLight3D" parent="Node3D/Light" unique_id=1931960568]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 6, 0)
+light_energy = 10.0
+shadow_enabled = true
+shadow_bias = 0.02
+spot_range = 25.0
+spot_angle = 35.0
+spot_angle_attenuation = 0.5
+
+[node name="SpotLight3D2" type="SpotLight3D" parent="Node3D/Light" unique_id=1763075168]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 6, 6)
+light_energy = 4.0
+shadow_enabled = true
+shadow_bias = 0.02
+spot_range = 25.0
+spot_angle = 35.0
+spot_angle_attenuation = 0.5
+
+[node name="SpotLight3D3" type="SpotLight3D" parent="Node3D/Light" unique_id=1890091208]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 6, -6)
+light_energy = 4.0
+shadow_enabled = true
+shadow_bias = 0.02
+spot_range = 25.0
+spot_angle = 35.0
+spot_angle_attenuation = 0.5
+
+[node name="Behind" type="Node3D" parent="Node3D/Light" unique_id=1913587357]
+
+[node name="SpotLight3D4" type="SpotLight3D" parent="Node3D/Light/Behind" unique_id=50509191]
+transform = Transform3D(-3.7855173e-08, -0.5, 0.8660254, -2.1855694e-08, 0.8660254, 0.5, -1, 0, -4.371139e-08, 10.851375, 6.4333267, 2.2584412)
+light_energy = 2.037
+shadow_enabled = true
+spot_range = 108.863
+spot_angle = 31.67
+
+[node name="SpotLight3D5" type="SpotLight3D" parent="Node3D/Light/Behind" unique_id=1119024409]
+transform = Transform3D(-3.7855173e-08, -0.5, 0.8660254, -2.1855694e-08, 0.8660254, 0.5, -1, 0, -4.371139e-08, 10.851375, 6.4333267, 6.8539677)
+light_energy = 2.037
+shadow_enabled = true
+spot_range = 108.863
+spot_angle = 31.67
+
+[node name="SpotLight3D6" type="SpotLight3D" parent="Node3D/Light/Behind" unique_id=899297815]
+transform = Transform3D(-3.7855173e-08, -0.5, 0.8660254, -2.1855694e-08, 0.8660254, 0.5, -1, 0, -4.371139e-08, 10.851375, 6.4333267, -2.370707)
+light_energy = 2.037
+shadow_enabled = true
+spot_range = 108.863
+spot_angle = 31.67
+
+[node name="SpotLight3D7" type="SpotLight3D" parent="Node3D/Light/Behind" unique_id=1278686079]
+transform = Transform3D(-3.7855173e-08, -0.5, 0.8660254, -2.1855694e-08, 0.8660254, 0.5, -1, 0, -4.371139e-08, 10.851375, 6.4333267, -6.62972)
+light_energy = 2.037
+shadow_enabled = true
+spot_range = 108.863
+spot_angle = 31.67
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Light" unique_id=365642]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 9.845413, 5.776363, 0)
+mesh = SubResource("QuadMesh_0sadd")
+surface_material_override/0 = SubResource("StandardMaterial3D_uauk8")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Node3D/Light" unique_id=286358468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0026455, 0)
+shadow_enabled = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node3D/Light" unique_id=1769283020]
+transform = Transform3D(1, 0, 0, 0, 0.6937539, 0.72021216, 0, -0.72021216, 0.6937539, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Node3D" unique_id=2031632801]
+environment = SubResource("Environment_g1j5f")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Node3D" unique_id=977003466]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1, 3, 0)
+amount = 28
+lifetime = 6.0
+preprocess = 6.0
+process_material = SubResource("ParticleProcessMaterial_j7bbn")
+draw_pass_1 = SubResource("QuadMesh_u660g")
+
+[node name="Camera3D" type="Camera3D" parent="Node3D" unique_id=1203080746]
+transform = Transform3D(-4.371139e-08, 0.17364813, -0.9848075, 0, 0.9848075, 0.17364813, 1, 7.590401e-09, -4.30473e-08, -6, 3.5, 0)
+attributes = SubResource("CameraAttributesPractical_34cp8")
+current = true
+fov = 60.0
+
+[node name="AnimationPlayer_Hangar" type="AnimationPlayer" parent="Node3D" unique_id=389254288]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_2sfbi")
+autoplay = &"start_lobby"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Node3D" unique_id=192340200]
+
+[node name="BlackFade_Intro" type="ColorRect" parent="Node3D/CanvasLayer" unique_id=1926690354]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="indicator-special-area2" parent="Node3D" unique_id=1700644003 instance=ExtResource("27_yo5dp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2288613, 0.0029587746, -7.512165)
+
+[node name="indicator-special-arrow2" parent="Node3D" unique_id=1375977409 instance=ExtResource("28_xw0bu")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.2323873, 0.00044739246, -6.611792)
+
+[node name="indicator-special-cross2" parent="Node3D" unique_id=335567688 instance=ExtResource("29_lnwx7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.098385, 0.108121395, 0.58153164)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D" unique_id=1299624810]
+transform = Transform3D(-0.8047902, -0.5935594, -7.0357e-08, -0.5935594, 0.8047902, -5.189061e-08, 8.742278e-08, 0, -1, 7.519114, 4.3220425, 2.2438989)
+material_override = SubResource("StandardMaterial3D_xw0bu")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_lnwx7")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Node3D" unique_id=1857820890]
+transform = Transform3D(-0.8047902, -0.5935594, -7.0357e-08, -0.5935594, 0.8047902, -5.189061e-08, 8.742278e-08, 0, -1, 7.519114, 4.3220425, 6.767579)
+material_override = SubResource("StandardMaterial3D_xw0bu")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_lnwx7")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Node3D" unique_id=1522598969]
+transform = Transform3D(-0.8047902, -0.5935594, -7.0357e-08, -0.5935594, 0.8047902, -5.189061e-08, 8.742278e-08, 0, -1, 7.519114, 4.3220425, -2.2539945)
+material_override = SubResource("StandardMaterial3D_xw0bu")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_lnwx7")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Node3D" unique_id=1248153445]
+transform = Transform3D(-0.8047902, -0.5935594, -7.0357e-08, -0.5935594, 0.8047902, -5.189061e-08, 8.742278e-08, 0, -1, 7.519114, 4.3220425, -6.733947)
+material_override = SubResource("StandardMaterial3D_xw0bu")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_lnwx7")
+
+[node name="BackgroundDim" type="ColorRect" parent="." unique_id=2127274467]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0470588, 0.054902, 0.0862745, 1)
+mouse_filter = 2
+color = Color(0, 0, 0, 0.42)
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1610432145]
+[node name="LobbyLayer" type="Control" parent="." unique_id=1572930154]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="LobbyLayer" unique_id=631789627]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,69 +1066,354 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1480428387]
-custom_minimum_size = Vector2(560, 0)
+[node name="PanelContainer" type="PanelContainer" parent="LobbyLayer/CenterContainer" unique_id=313288389]
+custom_minimum_size = Vector2(620, 0)
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=2004820423]
+[node name="MarginContainer" type="MarginContainer" parent="LobbyLayer/CenterContainer/PanelContainer" unique_id=1683026922]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1998633629]
+[node name="VBoxContainer" type="VBoxContainer" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer" unique_id=2027278609]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=253663536]
+[node name="InfoLabel" type="Label" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1109879270]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Lobby coop"
+theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
+uppercase = true
 
-[node name="InfoLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1589219910]
+[node name="LobbyIdRow" type="HBoxContainer" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=444939179]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(272, 0)
 layout_mode = 2
-horizontal_alignment = 1
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="PlayersTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=509818284]
+[node name="LobbyIdLineEdit" type="LineEdit" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/LobbyIdRow" unique_id=1854727337]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "ID du lobby Steam"
+editable = false
+select_all_on_focus = true
+
+[node name="CopyLobbyIdButton" type="Button" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/LobbyIdRow" unique_id=1316876918]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Copier"
+
+[node name="PlayersTitle" type="Label" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1541274939]
 layout_mode = 2
 text = "Joueurs connectés"
 
-[node name="PlayersPanel" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1111110359]
+[node name="PlayersPanel" type="PanelContainer" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1430838194]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 
-[node name="PlayersList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayersPanel" unique_id=1620842480]
+[node name="MarginContainer" type="MarginContainer" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayersPanel" unique_id=1094222948]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="PlayersList" type="VBoxContainer" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayersPanel/MarginContainer" unique_id=472205767]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Buttons" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=852949942]
+[node name="Buttons" type="HBoxContainer" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1211567247]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="ReadyButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1267450842]
+[node name="ReadyButton" type="Button" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1423575236]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Se déclarer prêt"
 
-[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1439525338]
+[node name="StartButton" type="Button" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=892878842]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Lancer la partie"
+text = "Choisir une mission"
 
-[node name="InviteFriendButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1357913579]
+[node name="InviteFriendButton" type="Button" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=1363722028]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Inviter un ami Steam"
 
-[node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=2024873518]
+[node name="BackButton" type="Button" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons" unique_id=766569766]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Retour"
 
-[node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=432007954]
+[node name="StatusLabel" type="Label" parent="LobbyLayer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=101614078]
+unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/ReadyButton" to="." method="_on_ready_button_pressed"]
-[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/StartButton" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/InviteFriendButton" to="." method="_on_invite_friend_pressed"]
-[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Buttons/BackButton" to="." method="_on_back_button_pressed"]
+[node name="MissionLayer" type="Control" parent="." unique_id=1613629722]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_top = 80.0
+offset_right = -80.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainContainer" type="HBoxContainer" parent="MissionLayer" unique_id=356040311]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_top = 0.08
+anchor_right = 0.96
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+
+[node name="MissionMapPanel" type="PanelContainer" parent="MissionLayer/MainContainer" unique_id=587686012]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MissionLayer/MainContainer/MissionMapPanel" unique_id=1997582835]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer" unique_id=1493114004]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MissionTitleLabel" type="Label" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer" unique_id=1263089679]
+layout_mode = 2
+text = "Carte de conquête"
+horizontal_alignment = 1
+
+[node name="MissionHelpLabel" type="Label" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer" unique_id=507254333]
+layout_mode = 2
+text = "L'hôte sélectionne une mission. Tous les joueurs voient le pin actif avant le lancement."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="MissionMask" type="ColorRect" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer" unique_id=1968903582]
+unique_name_in_owner = true
+clip_children = 1
+custom_minimum_size = Vector2(1200, 640)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MapControl" type="Control" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask" unique_id=2055318391]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset_ratio = Vector2(0.5, 0.5)
+mouse_filter = 2
+
+[node name="Ocean" type="ColorRect" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask/MapControl" unique_id=1488512149]
+material = SubResource("ShaderMaterial_grwrp")
+custom_minimum_size = Vector2(1280, 1280)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2596.0
+offset_top = -2479.6003
+offset_right = -595.9999
+offset_bottom = -479.60034
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2.5, 2.5)
+mouse_filter = 2
+
+[node name="World" type="TextureRect" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask/MapControl" unique_id=219286678]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1300.0
+offset_top = -720.0
+offset_right = 1300.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset_ratio = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("32_f7fkk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MissionMapArea" type="Control" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask/MapControl" unique_id=1396712495]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="MapTitle" type="VBoxContainer" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask" unique_id=181176463]
+modulate = Color(1, 1, 1, 0.84313726)
+layout_mode = 0
+offset_left = 8.0
+offset_right = 208.0
+offset_bottom = 149.0
+scale = Vector2(1.25, 1.25)
+mouse_filter = 2
+theme_override_constants/separation = -18
+
+[node name="Label1" type="Label" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask/MapTitle" unique_id=1789618040]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_dbwma")
+theme_override_font_sizes/font_size = 32
+text = "TACTICAL"
+
+[node name="Label2" type="Label" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask/MapTitle" unique_id=986681273]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_fw8ve")
+theme_override_font_sizes/font_size = 32
+text = "WORLD"
+
+[node name="Label3" type="Label" parent="MissionLayer/MainContainer/MissionMapPanel/MarginContainer/VBoxContainer/MissionMask/MapTitle" unique_id=2088638187]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_pp31k")
+theme_override_font_sizes/font_size = 82
+text = "MAP"
+
+[node name="MissionDetailsPanel" type="PanelContainer" parent="MissionLayer/MainContainer" unique_id=1376606886]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MissionLayer/MainContainer/MissionDetailsPanel" unique_id=144559763]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer" unique_id=1893382460]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="DetailsTitleLabel" type="Label" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer" unique_id=492458179]
+layout_mode = 2
+text = "Mission sélectionnée"
+horizontal_alignment = 1
+
+[node name="MissionNameLabel" type="Label" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer" unique_id=1509426642]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Aucune mission sélectionnée"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="MissionDescriptionLabel" type="Label" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer" unique_id=759760872]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sélectionnez une mission sur la carte. Les autres joueurs verront le même choix."
+autowrap_mode = 3
+
+[node name="MissionDifficultyLabel" type="Label" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer" unique_id=717261208]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="MissionSelectedStatusLabel" type="Label" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer" unique_id=861789167]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sélectionnez une mission pour déverrouiller le lancement."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="MissionButtons" type="VBoxContainer" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer" unique_id=581851841]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="LaunchMissionButton" type="Button" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer/MissionButtons" unique_id=1968853614]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Lancer la partie"
+
+[node name="BackToLobbyButton" type="Button" parent="MissionLayer/MainContainer/MissionDetailsPanel/MarginContainer/VBoxContainer/MissionButtons" unique_id=77128604]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Retour au lobby"
+
+[node name="CountdownLayer" type="Control" parent="." unique_id=794665702]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="CountdownLayer" unique_id=95432982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CountdownLayer/CenterContainer" unique_id=140127868]
+custom_minimum_size = Vector2(360, 120)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CountdownLayer/CenterContainer/PanelContainer" unique_id=51396973]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 28
+
+[node name="CountdownLabel" type="Label" parent="CountdownLayer/CenterContainer/PanelContainer/MarginContainer" unique_id=1284330608]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Lancement dans 3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Debug_Start" type="Button" parent="." unique_id=1408829858]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = 159.0
+offset_bottom = 52.0
+text = "start"
+
+[connection signal="button_up" from="Debug_Start" to="." method="_on_debug_start_button_up"]

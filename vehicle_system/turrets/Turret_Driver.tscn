@@ -119,14 +119,19 @@ muzzle_path = NodePath("Body/Canon_1/TurretMuzzle")
 projectile_team = 1
 
 [node name="Cabin" type="MeshInstance3D" parent="." unique_id=1344547192]
-transform = Transform3D(0.75, 0, 0, 0, 0.6, 0, 0, 0, 0.75, 0, -1.0859828, 0.29914463)
+transform = Transform3D(0.75, 0, 0, 0, 0.6, 0, 0, 0, 0.75, 0, -1.1286249, 0.29914463)
+mesh = SubResource("ArrayMesh_gv5m3")
+surface_material_override/0 = SubResource("StandardMaterial3D_ydlwb")
+
+[node name="Cabin2" type="MeshInstance3D" parent="." unique_id=1499962126]
+transform = Transform3D(0.75, 0, 0, 0, -0.6, 0, 0, 0, 0.75, 0, 0.925, 0.299)
 mesh = SubResource("ArrayMesh_gv5m3")
 surface_material_override/0 = SubResource("StandardMaterial3D_ydlwb")
 
 [node name="Body" type="Node3D" parent="." unique_id=2018287729]
 
 [node name="Canon_1" type="Node3D" parent="Body" unique_id=738200464]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03778235, 0.15786728)
 
 [node name="TurretMesh" type="MeshInstance3D" parent="Body/Canon_1" unique_id=650815492]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.7027172, -1.6678325)

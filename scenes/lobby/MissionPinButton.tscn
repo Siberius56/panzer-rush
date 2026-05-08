@@ -1,0 +1,216 @@
+[gd_scene format=3 uid="uid://vwyc3iay7o37"]
+
+[ext_resource type="Texture2D" uid="uid://bjfybrgqp51ha" path="res://asset/ui/target.png" id="1_d6cal"]
+[ext_resource type="Script" uid="uid://ba24v2fvma4s" path="res://scripts/lobby/MissionPinButton.gd" id="1_script"]
+[ext_resource type="FontVariation" uid="uid://snjmhbrkrx38" path="res://asset/font/title_font.tres" id="2_brmcl"]
+[ext_resource type="Texture2D" uid="uid://qel3hmbrs2q5" path="res://asset/ui/star.png" id="3_n4sma"]
+[ext_resource type="Texture2D" uid="uid://cduvl7gqjmilo" path="res://asset/ui/right.png" id="5_dpyac"]
+
+[sub_resource type="Animation" id="Animation_meaqg"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect1:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-101, -50)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TextureRect2:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(2, -50)]
+}
+
+[sub_resource type="Animation" id="Animation_jhdh5"]
+resource_name = "idle"
+length = 1.4
+loop_mode = 1
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect1:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(-101, -50), Vector2(-131, -50), Vector2(-101, -50)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TextureRect2:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(2, -50), Vector2(32, -50), Vector2(2, -50)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ljrb8"]
+_data = {
+&"RESET": SubResource("Animation_meaqg"),
+&"idle": SubResource("Animation_jhdh5")
+}
+
+[node name="MissionPinButton" type="TextureButton" unique_id=375328047]
+custom_minimum_size = Vector2(64, 64)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -51.0
+offset_right = 48.0
+offset_bottom = 49.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+toggle_mode = true
+texture_normal = ExtResource("1_d6cal")
+script = ExtResource("1_script")
+
+[node name="Content" type="VBoxContainer" parent="." unique_id=600796424]
+custom_minimum_size = Vector2(128, 64)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -96.0
+offset_top = -112.0
+offset_right = 96.0
+offset_bottom = 16.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/separation = -8
+alignment = 2
+
+[node name="NameLabel" type="Label" parent="Content" unique_id=129141373]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_brmcl")
+theme_override_font_sizes/font_size = 24
+text = "de la Mission"
+horizontal_alignment = 1
+vertical_alignment = 2
+autowrap_mode = 3
+
+[node name="DifficultyLabel" type="Label" parent="Content" unique_id=741469257]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Difficulté"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="StarContainer" type="HBoxContainer" parent="Content" unique_id=1751879166]
+unique_name_in_owner = true
+modulate = Color(1, 0.8000001, 0, 1)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = -10
+alignment = 1
+
+[node name="TextureRect1" type="TextureRect" parent="Content/StarContainer" unique_id=1867672016]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_n4sma")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Content/StarContainer" unique_id=1794233159]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_n4sma")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect3" type="TextureRect" parent="Content/StarContainer" unique_id=928334724]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_n4sma")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect4" type="TextureRect" parent="Content/StarContainer" unique_id=989494827]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_n4sma")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect5" type="TextureRect" parent="Content/StarContainer" unique_id=1655908785]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_n4sma")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NodeSelected" type="Control" parent="." unique_id=1881797958]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TextureRect1" type="TextureRect" parent="NodeSelected" unique_id=168571944]
+layout_mode = 0
+offset_left = -131.0
+offset_top = -50.0
+offset_right = -31.0
+offset_bottom = 50.0
+scale = Vector2(0.5, 0.5)
+pivot_offset_ratio = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("5_dpyac")
+
+[node name="TextureRect2" type="TextureRect" parent="NodeSelected" unique_id=1459945004]
+layout_mode = 0
+offset_left = 32.0
+offset_top = -50.0
+offset_right = 132.00012
+offset_bottom = 50.0
+scale = Vector2(0.5, 0.5)
+pivot_offset_ratio = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("5_dpyac")
+flip_h = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="NodeSelected" unique_id=1088383261]
+libraries/ = SubResource("AnimationLibrary_ljrb8")
+autoplay = &"idle"

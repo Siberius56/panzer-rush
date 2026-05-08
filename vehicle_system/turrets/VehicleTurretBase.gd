@@ -450,7 +450,7 @@ func is_automatic_fire_enabled() -> bool:
 	return automatic_fire
 
 
-func _try_fire(peer_id: int) -> void:
+func _try_fire(_peer_id: int) -> void:
 	if not _can_fire():
 		return
 
