@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvppjv5g8wa6h" path="res://vehicle_system/turrets/VehicleTurretBase.gd" id="1_enh68"]
 [ext_resource type="PackedScene" uid="uid://c3xwrtxdr2ryw" path="res://scenes/weapons/88Bullet.tscn" id="2_enh68"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="3_wvnox"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tygrk"]
 resource_name = "MasterMat"
@@ -45,10 +46,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_7j7l5")
 
-[sub_resource type="StandardMaterial3D" id="5"]
-albedo_color = Color(0.16, 0.16, 0.18, 1)
-roughness = 0.82
-
 [sub_resource type="ArrayMesh" id="ArrayMesh_qo1u4"]
 _surfaces = [{
 "aabb": AABB(-0.296875, 2.1891322, 0.37500006, 0.596875, 0.59375, 0.65000004),
@@ -83,10 +80,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_qo1u4")
 
-[sub_resource type="StandardMaterial3D" id="4"]
-albedo_color = Color(0.28, 0.28, 0.3, 1)
-roughness = 0.58
-
 [node name="Turret_Heavy" type="Node3D" unique_id=309238089]
 script = ExtResource("1_enh68")
 turret_id = "turret_heavy"
@@ -110,7 +103,7 @@ projectile_team = 1
 [node name="Cabin" type="MeshInstance3D" parent="Body" unique_id=127800183]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1.9772022, 0.49505913)
 mesh = SubResource("ArrayMesh_jmfls")
-surface_material_override/0 = SubResource("5")
+surface_material_override/0 = ExtResource("3_wvnox")
 
 [node name="Canon_1" type="Node3D" parent="Body" unique_id=1303567362]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8043461, 1.4715155)
@@ -118,7 +111,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8043461, 1.4715155)
 [node name="TurretMesh" type="MeshInstance3D" parent="Body/Canon_1" unique_id=193358026]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -4.8494797, -0.7666477)
 mesh = SubResource("ArrayMesh_wvnox")
-surface_material_override/0 = SubResource("4")
+surface_material_override/0 = ExtResource("3_wvnox")
 
 [node name="TurretMuzzle" type="Marker3D" parent="Body/Canon_1" unique_id=654624459]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.050000012, 1.4393877)

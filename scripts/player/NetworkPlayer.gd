@@ -164,6 +164,61 @@ func update_name_label() -> void:
 	else:
 		name_label.text = player_name
 
+
+func build_session_state() -> Dictionary:
+	return {
+		"player_id": player_id,
+		"player_name": player_name,
+		"max_health": max_health,
+		"health": health,
+		"is_dead": is_dead,
+		"carried_money": carried_money,
+		"weapon_slots": weapon_slots.duplicate(true),
+		"current_weapon_slot": current_weapon_slot,
+		"ammo_reserve": ammo_reserve.duplicate(true),
+		"ammo_reserve_max": ammo_reserve_max.duplicate(true)
+	}
+
+
+func apply_session_state(state: Dictionary, force_alive: bool = true) -> void:
+	player_name = String(state.get("player_name", player_name))
+	max_health = int(state.get("max_health", max_health))
+
+	var restored_health: int = int(state.get("health", max_health))
+	var restored_dead: bool = bool(state.get("is_dead", false))
+
+	if force_alive:
+		restored_dead = false
+		restored_health = max(restored_health, 1)
+
+	health = clampi(restored_health, 0, max_health)
+	is_dead = restored_dead
+	carried_money = max(int(state.get("carried_money", carried_money)), 0)
+
+	var restored_ammo_reserve = state.get("ammo_reserve", ammo_reserve)
+	if restored_ammo_reserve is Dictionary:
+		ammo_reserve = restored_ammo_reserve.duplicate(true)
+
+	var restored_ammo_reserve_max = state.get("ammo_reserve_max", ammo_reserve_max)
+	if restored_ammo_reserve_max is Dictionary:
+		ammo_reserve_max = restored_ammo_reserve_max.duplicate(true)
+
+	var restored_weapon_slots = state.get("weapon_slots", weapon_slots)
+	if restored_weapon_slots is Array:
+		weapon_slots = [{}, {}]
+		if restored_weapon_slots.size() > 0 and restored_weapon_slots[0] is Dictionary:
+			weapon_slots[0] = restored_weapon_slots[0].duplicate(true)
+		if restored_weapon_slots.size() > 1 and restored_weapon_slots[1] is Dictionary:
+			weapon_slots[1] = restored_weapon_slots[1].duplicate(true)
+
+	current_weapon_slot = clampi(int(state.get("current_weapon_slot", current_weapon_slot)), 0, 1)
+	_cancel_local_reload()
+	_cancel_server_reload()
+	_clear_death_body()
+	_refresh_weapon_nodes()
+	_apply_health_state(health, is_dead)
+	_sync_carried_money(carried_money)
+
 func is_alive() -> bool:
 	return not is_dead
 

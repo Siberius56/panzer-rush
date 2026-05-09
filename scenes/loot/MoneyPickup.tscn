@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d2xh1lt8ew0om"]
 
-[ext_resource type="Script" path="res://scripts/loot/LootPickup.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cb147hg0lgj7e" path="res://scripts/loot/LootPickup.gd" id="1_script"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_body"]
 radius = 0.22
@@ -18,12 +18,11 @@ height = 0.08
 radial_segments = 24
 rings = 1
 
-[node name="MoneyPickup" type="RigidBody3D"]
+[node name="MoneyPickup" type="RigidBody3D" unique_id=638920037]
 collision_layer = 16
-collision_mask = 1
+collision_mask = 12
 mass = 0.4
 script = ExtResource("1_script")
-loot_type = 0
 amount = 25
 pickup_delay = 0.35
 lifetime = 90.0
@@ -31,19 +30,18 @@ freeze_after_seconds = 0.8
 linear_damp_override = 2.0
 angular_damp_override = 2.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=913419650]
 shape = SubResource("SphereShape3D_body")
 
-[node name="PickupArea3D" type="Area3D" parent="."]
+[node name="PickupArea3D" type="Area3D" parent="." unique_id=1223373827]
 collision_mask = 4294967295
-monitoring = true
 monitorable = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea3D" unique_id=1495933262]
 shape = SubResource("SphereShape3D_pickup")
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1169607680]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot" unique_id=1121046459]
 material_override = SubResource("StandardMaterial3D_money")
 mesh = SubResource("CylinderMesh_money")

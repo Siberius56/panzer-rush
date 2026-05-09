@@ -20,6 +20,8 @@
 [ext_resource type="PackedScene" uid="uid://dw6ksxd75mcm7" path="res://vehicle_system/TurretAmmoRefill/TurretAmmoRefillArea.tscn" id="19_353k1"]
 [ext_resource type="PackedScene" uid="uid://c4ujwh5k3g1xk" path="res://asset/map/misc-2/tree.glb" id="19_mhaih"]
 [ext_resource type="PackedScene" uid="uid://cht7tbf0cdn2a" path="res://asset/map/misc-2/tree-tall.glb" id="20_wg2r1"]
+[ext_resource type="PackedScene" uid="uid://de28p2htwgvqs" path="res://scenes/trigger/PassageGate.tscn" id="21_wg2r1"]
+[ext_resource type="PackedScene" uid="uid://c5rbfou01tacv" path="res://scenes/trigger/MissionExitZone.tscn" id="22_q6l4v"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
@@ -71,6 +73,7 @@ roughness = 0.65
 
 [node name="NetworkMain" type="Node3D" unique_id=794037046]
 script = ExtResource("1_main")
+default_vehicle_scene = ExtResource("7_edvck")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1822661109]
 environment = SubResource("Environment_1")
@@ -901,8 +904,48 @@ modulate = Color(0.75, 0.75, 0.8, 1)
 text = "Ajuste les largeurs selon le rayon de braquage et la taille du tank."
 font_size = 128
 
-[node name="EnemyTankVehicle" parent="." unique_id=945805932 instance=ExtResource("9_va004")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4042416, 1.3281004, -103.87648)
+[node name="tree2" parent="NavigationRegion3D" unique_id=1965849457 instance=ExtResource("19_mhaih")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 2.6602836, 0.3999977, -9.9970455)
+
+[node name="tree-tall2" parent="NavigationRegion3D" unique_id=1727590900 instance=ExtResource("20_wg2r1")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 3.240019, 0.39999962, -10.720636)
+
+[node name="tree3" parent="NavigationRegion3D" unique_id=1167196672 instance=ExtResource("19_mhaih")]
+transform = Transform3D(1.5668707, 0, 2.5583034, 0, 3, 0, -2.5583034, 0, 1.5668707, -2.8927162, 0.3999977, -9.9226885)
+
+[node name="tree4" parent="NavigationRegion3D" unique_id=818181559 instance=ExtResource("19_mhaih")]
+transform = Transform3D(1.5668707, 0, 2.5583034, 0, 3, 0, -2.5583034, 0, 1.5668707, -3.2531292, 0.3999977, -17.467926)
+
+[node name="tree5" parent="NavigationRegion3D" unique_id=274618517 instance=ExtResource("19_mhaih")]
+transform = Transform3D(-1.9518851, 0, 2.2781887, 0, 3, 0, -2.2781887, 0, -1.9518851, -4.642976, 0.3999977, -7.4404507)
+
+[node name="tree-tall3" parent="NavigationRegion3D" unique_id=164626284 instance=ExtResource("20_wg2r1")]
+transform = Transform3D(1.5668707, 0, 2.5583034, 0, 3, 0, -2.5583034, 0, 1.5668707, -3.206981, 0.39999962, -10.794992)
+
+[node name="trigger" type="Node3D" parent="." unique_id=985045625]
+
+[node name="PassageGate" parent="trigger" unique_id=205045320 instance=ExtResource("21_wg2r1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13.613998)
+
+[node name="TurretAmmoRefillArea" parent="trigger" unique_id=2007283422 instance=ExtResource("19_353k1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.872131, 0.4999981, -41.03252)
+
+[node name="TurretAmmoRefillArea2" parent="trigger" unique_id=360724074 instance=ExtResource("19_353k1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36471176, 0.4999981, -129.54297)
+
+[node name="VehicleUpgradeStation" parent="trigger" unique_id=127582380 instance=ExtResource("4_e3e5m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.913207, 0.6500019, -3.615202)
+
+[node name="VehicleUpgradeStation2" parent="trigger" unique_id=1731693252 instance=ExtResource("4_e3e5m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25308418, 0.6500019, -61.69671)
+
+[node name="MissionExitZone" parent="trigger" unique_id=1085147818 instance=ExtResource("22_q6l4v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.28576, 0.40000153, 5.135698)
+completion_mode = 1
+next_level_scene_path = "uid://bovruv6g1ny2v"
+
+[node name="MissionExitZone2" parent="trigger" unique_id=471519185 instance=ExtResource("22_q6l4v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.875954, 0.40000153, -1.2236009)
 
 [node name="Props" type="Node3D" parent="." unique_id=218366779]
 
@@ -943,10 +986,10 @@ transform = Transform3D(0.46495017, 0, -0.8853369, 0, 1, 0, 0.8853369, 0, 0.4649
 transform = Transform3D(0.46495017, 0, -0.8853369, 0, 1, 0, 0.8853369, 0, 0.46495017, -6.845046, 2.9250522, -37.665504)
 
 [node name="Sandbag" parent="Props" unique_id=309813788 instance=ExtResource("7_mhaih")]
-transform = Transform3D(0.9999914, -0.0026270987, 0.0032091672, 0.0026299467, 0.9999962, -0.00088282546, -0.0032068337, 0.00089126406, 0.99999446, -2.0448723, 1.275, -13.339962)
+transform = Transform3D(-0.0032068775, 0.00089126406, 0.99999446, 0.002629947, 0.9999963, -0.0008828256, -0.9999914, 0.0026270987, -0.003209211, -19.886078, 1.2750019, 2.3837347)
 
 [node name="Sandbag2" parent="Props" unique_id=1147109045 instance=ExtResource("7_mhaih")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2994583, 1.274999, -17.40623)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -23.952347, 1.2750009, -1.960595)
 
 [node name="Sandbag3" parent="Props" unique_id=1846648871 instance=ExtResource("7_mhaih")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8725204, 1.275, -22.619286)
@@ -1059,6 +1102,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, -3)
 [node name="SpawnD" type="Marker3D" parent="SpawnPoints" unique_id=1809863145]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, -5)
 
+[node name="VehicleSpawns" type="Node3D" parent="." unique_id=1089131327]
+
+[node name="SpawnA" type="Marker3D" parent="VehicleSpawns" unique_id=1356902959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.10281, 2, 0.93300104)
+
+[node name="SpawnB" type="Marker3D" parent="VehicleSpawns" unique_id=642084212]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42661333, 2, 0.83806515)
+
+[node name="SpawnC" type="Marker3D" parent="VehicleSpawns" unique_id=1680178547]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1191282, 2, 0.69261694)
+
+[node name="SpawnD" type="Marker3D" parent="VehicleSpawns" unique_id=1007199597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.844467, 2, 0.39751196)
+
 [node name="EnemySpawns" type="Node3D" parent="." unique_id=192012146]
 
 [node name="EnemySpawnA" type="Marker3D" parent="EnemySpawns" unique_id=1168140664]
@@ -1073,58 +1130,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -14)
 [node name="EnemySpawnD" type="Marker3D" parent="EnemySpawns" unique_id=640572855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, -14)
 
-[node name="Tank_Light" parent="." unique_id=2007170384 instance=ExtResource("7_edvck")]
-transform = Transform3D(-0.9980638, 0, 0.062198196, 0, 1, 0, -0.062198196, 0, -0.9980638, 0.3735385, 0.49999905, -6.1983614)
+[node name="EnemyTankVehicle" parent="." unique_id=945805932 instance=ExtResource("9_va004")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4042416, 1.3281004, -103.87648)
 
-[node name="Tank_Armor" parent="." unique_id=1286101069 instance=ExtResource("12_q02x1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.45582, 0.43179774, 2.6460123)
+[node name="Tank_Light" parent="." unique_id=2007170384 instance=ExtResource("7_edvck")]
+transform = Transform3D(0.044822417, 0, 0.99899507, 0, 1, 0, -0.99899507, 0, 0.044822417, -40.345966, 0.50000095, -1.0799274)
 
 [node name="VehicleMedium" parent="." unique_id=1646427506 instance=ExtResource("14_va004")]
-transform = Transform3D(-0.117416024, 0, 0.9930828, 0, 1, 0, -0.9930828, 0, -0.117416024, 9.498846, 0.49999905, 0.071573496)
+transform = Transform3D(-0.117416024, 0, 0.9930828, 0, 1, 0, -0.9930828, 0, -0.117416024, -39.806156, 0.49999714, 3.6580133)
 
 [node name="Tank_Armor2" parent="." unique_id=1035743853 instance=ExtResource("12_q02x1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.54418, 0.43179774, -2.3539877)
-
-[node name="VehicleMedium2" parent="." unique_id=982500783 instance=ExtResource("14_va004")]
-transform = Transform3D(-0.117416024, 0, 0.9930828, 0, 1, 0, -0.9930828, 0, -0.117416024, -34.501152, 0.49999905, -4.9284267)
+transform = Transform3D(0.41046423, 0, 0.9118767, 0, 1, 0, -0.9118767, 0, 0.41046423, -39.572895, 0.43179774, -4.84565)
 
 [node name="VehicleHeavy" parent="." unique_id=2007258676 instance=ExtResource("12_1jxn0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.079105, 0.49999905, -3.831359)
 
-[node name="TurretAmmoRefillArea" parent="." unique_id=2007283422 instance=ExtResource("19_353k1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.872131, 0.4999981, -41.03252)
-
-[node name="TurretAmmoRefillArea2" parent="." unique_id=360724074 instance=ExtResource("19_353k1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36471176, 0.4999981, -129.54297)
-
-[node name="VehicleUpgradeStation" parent="." unique_id=127582380 instance=ExtResource("4_e3e5m")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.913207, 0.6500019, -3.615202)
-
-[node name="VehicleUpgradeStation2" parent="." unique_id=1731693252 instance=ExtResource("4_e3e5m")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25308418, 0.6500019, -61.69671)
-
-[node name="SpawnTimer" type="Timer" parent="." unique_id=920974840]
-wait_time = 2.0
-autostart = true
-
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1361244026]
 
 [node name="NetworkHUD" parent="CanvasLayer" unique_id=1913491278 instance=ExtResource("2_hud")]
-
-[node name="tree2" parent="." unique_id=1965849457 instance=ExtResource("19_mhaih")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 2.6602836, 0.3999977, -9.9970455)
-
-[node name="tree-tall2" parent="." unique_id=1727590900 instance=ExtResource("20_wg2r1")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 3.240019, 0.39999962, -10.720636)
-
-[node name="tree3" parent="." unique_id=1167196672 instance=ExtResource("19_mhaih")]
-transform = Transform3D(1.5668707, 0, 2.5583034, 0, 3, 0, -2.5583034, 0, 1.5668707, -2.8927162, 0.3999977, -9.9226885)
-
-[node name="tree4" parent="." unique_id=818181559 instance=ExtResource("19_mhaih")]
-transform = Transform3D(1.5668707, 0, 2.5583034, 0, 3, 0, -2.5583034, 0, 1.5668707, -3.2991984, 0.3999977, -8.440451)
-
-[node name="tree5" parent="." unique_id=274618517 instance=ExtResource("19_mhaih")]
-transform = Transform3D(-1.9518851, 0, 2.2781887, 0, 3, 0, -2.2781887, 0, -1.9518851, -4.642976, 0.3999977, -7.4404507)
-
-[node name="tree-tall3" parent="." unique_id=164626284 instance=ExtResource("20_wg2r1")]
-transform = Transform3D(1.5668707, 0, 2.5583034, 0, 3, 0, -2.5583034, 0, 1.5668707, -3.206981, 0.39999962, -10.794992)

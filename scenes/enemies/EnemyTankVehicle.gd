@@ -964,7 +964,7 @@ func _rpc_set_health(synced_health: int) -> void:
 	health_changed.emit(current_health, max_health)
 
 
-func _die(attacker: Variant = null, hit_position: Vector3 = Vector3.ZERO) -> void:
+func _die(_attacker: Variant = null, _hit_position: Vector3 = Vector3.ZERO) -> void:
 	if _dead:
 		return
 

@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 SteamManager="*uid://ktkeb6lt5rdi"
 SteamLobbyManager="*uid://cud2hrf3sd4ag"
 NetworkManager="*uid://djkp71gxfypan"
+GameSessionState="*uid://b5unhn5nkiovy"
 
 [display]
 

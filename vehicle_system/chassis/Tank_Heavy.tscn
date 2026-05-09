@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_57oh2"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_guo3c"]
 [ext_resource type="PackedScene" uid="uid://bkdesvqe68ejn" path="res://vehicle_system/turrets/Turret_Driver.tscn" id="3_hjq30"]
 [ext_resource type="PackedScene" uid="uid://cto5b5qs3p0eu" path="res://vehicle_system/turrets/Turret_Heavy.tscn" id="5_d1dmn"]
 [ext_resource type="PackedScene" uid="uid://c3kpi687gtclf" path="res://vehicle_system/turrets/Turret_Light.tscn" id="5_guo3c"]
@@ -56,10 +57,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_e6x3u")
 
-[sub_resource type="StandardMaterial3D" id="4"]
-albedo_color = Color(0.18, 0.18, 0.2, 1)
-roughness = 0.72
-
 [sub_resource type="CylinderMesh" id="5"]
 top_radius = 0.42
 bottom_radius = 0.42
@@ -104,7 +101,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 [node name="Hull" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=1446710439]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2.5, 0, -1, 0)
 mesh = SubResource("ArrayMesh_hjq30")
-surface_material_override/0 = SubResource("4")
+surface_material_override/0 = ExtResource("2_guo3c")
 
 [node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=2044495125]
 

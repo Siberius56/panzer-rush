@@ -48,13 +48,18 @@ var _seat_labels: Array[RichTextLabel] = []
 @onready var revive_label: Label = %ReviveLabel
 @onready var revive_progress_bar: ProgressBar = %ReviveProgress
 @onready var player_name_layer: Control = %PlayerNameLayer
+@onready var passage_panel: PanelContainer = %PassagePanel
+@onready var passage_label: Label = %PassageLabel
+@onready var passage_progress: ProgressBar = %PassageProgress
 var respawn_pending: bool = false
 var _name_marker_labels: Dictionary = {}
+var _passage_prompt_owner_id: int = 0
 
 const SELF_COLOR := "#7CFF7C"
 const EMPTY_SEAT_TEXT := "Libre"
 
 func _ready() -> void:
+	add_to_group("player_huds")
 	layer = 1
 	_seat_labels = [
 		seat_1_label,
@@ -77,6 +82,7 @@ func _ready() -> void:
 	death_revive_label.visible = false
 	death_revive_progress.visible = false
 	revive_panel.visible = false
+	hide_passage_prompt()
 	_refresh_all()
 
 func _process(_delta: float) -> void:
@@ -86,6 +92,50 @@ func _process(_delta: float) -> void:
 func set_player(p_player: Node) -> void:
 	player = p_player
 	_refresh_all()
+
+func get_player() -> Node:
+	return player
+
+func show_passage_prompt(message: String, progress: float = -1.0, owner_node: Node = null) -> void:
+	if passage_panel == null or passage_label == null:
+		return
+
+	if owner_node != null and is_instance_valid(owner_node):
+		_passage_prompt_owner_id = owner_node.get_instance_id()
+	else:
+		_passage_prompt_owner_id = 0
+
+	passage_panel.visible = true
+	passage_panel.modulate.a = 1.0
+	passage_label.visible = true
+	passage_label.text = message
+
+	if passage_progress == null:
+		return
+
+	if progress >= 0.0:
+		passage_progress.visible = true
+		passage_progress.value = clamp(progress, 0.0, 1.0) * 100.0
+	else:
+		passage_progress.visible = false
+		passage_progress.value = 0.0
+
+
+func hide_passage_prompt(owner_node: Node = null) -> void:
+	if owner_node != null and is_instance_valid(owner_node):
+		var owner_id: int = owner_node.get_instance_id()
+		if _passage_prompt_owner_id != 0 and _passage_prompt_owner_id != owner_id:
+			return
+
+	_passage_prompt_owner_id = 0
+
+	if passage_panel != null:
+		passage_panel.visible = false
+	if passage_label != null:
+		passage_label.text = ""
+	if passage_progress != null:
+		passage_progress.visible = false
+		passage_progress.value = 0.0
 
 func _refresh_all() -> void:
 	if not is_instance_valid(player):

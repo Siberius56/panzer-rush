@@ -790,7 +790,9 @@ func _rpc_cancel_launch_countdown(message: String) -> void:
 
 func _network_start_game(scene_path: String) -> void:
 	var method_list: Array = NetworkManager.get_method_list()
-
+	
+	GameSessionState.reset_run_state()
+	
 	for method_data: Dictionary in method_list:
 		if str(method_data.get("name", "")) != "start_game":
 			continue

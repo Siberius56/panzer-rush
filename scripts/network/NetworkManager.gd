@@ -196,6 +196,9 @@ func leave_game(emit_update: bool = true) -> void:
 	is_host_session = false
 	players.clear()
 
+	if has_node("/root/GameSessionState"):
+		GameSessionState.reset_run_state()
+
 	if emit_update:
 		player_list_changed.emit()
 
@@ -398,6 +401,8 @@ func _set_ready_state(to_ready: bool) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _load_game_scene() -> void:
+	if has_node("/root/GameSessionState"):
+		GameSessionState.reset_run_state()
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 

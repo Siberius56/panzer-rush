@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://dh5wsyhjgouon"]
 
 [ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1_ukxq2"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_nh32u"]
 [ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_skmyr"]
 [ext_resource type="PackedScene" uid="uid://bkdesvqe68ejn" path="res://vehicle_system/turrets/Turret_Driver.tscn" id="3_qi570"]
 [ext_resource type="PackedScene" uid="uid://bcfhqdmggyd8i" path="res://vehicle_system/turrets/Turret_Gunner.tscn" id="4_skmyr"]
@@ -10,10 +11,6 @@ friction = 0.2
 
 [sub_resource type="BoxShape3D" id="2"]
 size = Vector3(2.6552887, 1.4, 3.250058)
-
-[sub_resource type="StandardMaterial3D" id="4"]
-albedo_color = Color(0.18, 0.18, 0.2, 1)
-roughness = 0.72
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k6q16"]
 resource_name = "MasterMat"
@@ -107,7 +104,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="Body" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=734452507]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
-material_override = SubResource("4")
+material_override = ExtResource("2_nh32u")
 mesh = SubResource("ArrayMesh_k1qjj")
 
 [node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=1468659701]

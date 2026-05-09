@@ -181,6 +181,55 @@ func _ready() -> void:
 		_broadcast_seat_layout()
 		_broadcast_loadout_state()
 
+func build_session_state() -> Dictionary:
+	var config: Array[Dictionary] = []
+	for mount in turret_mounts:
+		config.append({
+			"seat_index": mount.seat_index,
+			"turret_scene_path": mount.get_turret_scene_path()
+		})
+
+	return {
+		"scene_path": _get_session_scene_path(),
+		"vehicle_display_name": vehicle_display_name,
+		"chassis_id": chassis_id,
+		"max_health": max_health,
+		"health": health,
+		"is_dead": is_dead,
+		"shop_money": shop_money,
+		"turret_config": config
+	}
+
+
+func apply_session_state(state: Dictionary) -> void:
+	vehicle_display_name = String(state.get("vehicle_display_name", vehicle_display_name))
+	chassis_id = String(state.get("chassis_id", chassis_id))
+	max_health = int(state.get("max_health", max_health))
+	shop_money = int(state.get("shop_money", shop_money))
+
+	var restored_health: int = int(state.get("health", max_health))
+	health = clampi(restored_health, 0, max_health)
+	is_dead = bool(state.get("is_dead", false)) or health <= 0
+
+	var turret_config = state.get("turret_config", [])
+	if turret_config is Array:
+		_sync_loadout_state(shop_money, turret_config)
+
+	if is_dead:
+		_sync_vehicle_destroyed()
+	else:
+		freeze = false
+		sleeping = false
+		set_use_area_enabled(not bool(get_meta("upgrade_station_locked", false)))
+		_sync_vehicle_health(health)
+
+
+func _get_session_scene_path() -> String:
+	if not scene_file_path.is_empty():
+		return scene_file_path
+	return ""
+
+
 func set_use_area_enabled(enabled: bool) -> void:
 	if use_area == null:
 		print("[VEHICLE] set_use_area_enabled FAIL: no UseArea on ", name)
@@ -1053,6 +1102,78 @@ func get_seat_occupant(seat_index: int) -> int:
 	if seat_index < 1 or seat_index > seat_count:
 		return -1
 	return seat_occupants[seat_index - 1]
+
+func get_driver() -> Node:
+	return _get_player_node_from_peer_id(get_driver_peer_id())
+
+
+func get_driver_player() -> Node:
+	return get_driver()
+
+
+func get_current_driver() -> Node:
+	return get_driver()
+
+
+func get_occupants() -> Array[Node]:
+	var result: Array[Node] = []
+
+	for peer_id_value in seat_occupants:
+		var peer_id: int = int(peer_id_value)
+		var player_node: Node = _get_player_node_from_peer_id(peer_id)
+		if player_node == null:
+			continue
+		if result.has(player_node):
+			continue
+		result.append(player_node)
+
+	return result
+
+
+func get_players_inside() -> Array[Node]:
+	return get_occupants()
+
+
+func get_passenger_players() -> Array[Node]:
+	return get_occupants()
+
+
+func get_passengers() -> Array[Node]:
+	return get_occupants()
+
+
+func get_seat_occupants() -> Array[Node]:
+	return get_occupants()
+
+
+func _get_player_node_from_peer_id(peer_id: int) -> Node:
+	if peer_id <= 0:
+		return null
+
+	var player_node: Node = get_player_node_by_peer_id(peer_id)
+	if player_node != null:
+		return player_node
+
+	player_node = _find_player_by_peer_id(peer_id)
+	if player_node != null:
+		return player_node
+
+	for candidate in get_tree().get_nodes_in_group("players"):
+		if candidate == null or not is_instance_valid(candidate):
+			continue
+		if not (candidate is Node):
+			continue
+
+		var candidate_node: Node = candidate as Node
+		if candidate_node.get_multiplayer_authority() == peer_id:
+			return candidate_node
+
+		var player_id_value = candidate_node.get("player_id")
+		if player_id_value != null and int(player_id_value) == peer_id:
+			return candidate_node
+
+	return null
+
 
 
 func get_seat_index_for_peer(peer_id: int) -> int:
