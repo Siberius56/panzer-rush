@@ -1,0 +1,170 @@
+[gd_scene format=3 uid="uid://djviymtwcyugr"]
+
+[ext_resource type="Script" uid="uid://ckkfifb7hji6h" path="res://scenes/player/Player_Walker.gd" id="1_io1by"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tl0qy"]
+radius = 0.30615234
+height = 1.5544434
+
+[sub_resource type="BoxMesh" id="Mesh_Body"]
+size = Vector3(0.5, 0.72, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Body"]
+albedo_color = Color(0.65, 0.46, 0.35, 1)
+
+[sub_resource type="SphereMesh" id="Mesh_Head"]
+radius = 0.22
+height = 0.44
+
+[sub_resource type="StandardMaterial3D" id="Mat_Head"]
+albedo_color = Color(0.92, 0.76, 0.58, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Weapon"]
+size = Vector3(0.16, 0.16, 0.72)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Dark"]
+albedo_color = Color(0.08, 0.07, 0.07, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Foot"]
+size = Vector3(0.2, 0.08, 0.34)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Foot"]
+albedo_color = Color(0.1, 0.1, 0.12, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_tl0qy"]
+radius = 0.09
+height = 1.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_Limb"]
+albedo_color = Color(0.22, 0.22, 0.28, 1)
+
+[sub_resource type="CylinderMesh" id="Mesh_Aim"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 0.025
+radial_segments = 32
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aim"]
+albedo_color = Color(0.1, 1, 0.45, 1)
+emission_enabled = true
+emission = Color(0.1, 1, 0.45, 1)
+emission_energy_multiplier = 1.8
+
+[node name="Player" type="CharacterBody3D" unique_id=1893229279]
+floor_constant_speed = true
+floor_max_angle = 1.3962634
+script = ExtResource("1_io1by")
+stance_width = 0.22
+max_stair_step_up = 0.0
+max_stair_step_down = 1.0
+gait_frequency = 11.0
+max_leg_reach = 1.0
+weapon_local_position = Vector3(0.22, 1.25, -0.5)
+aim_target_height_offset = 1.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1413766183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.76311034, 0)
+shape = SubResource("CapsuleShape3D_tl0qy")
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1911315497]
+
+[node name="Body" type="MeshInstance3D" parent="VisualRoot" unique_id=326363010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("Mesh_Body")
+surface_material_override/0 = SubResource("Mat_Body")
+
+[node name="Head" type="MeshInstance3D" parent="VisualRoot" unique_id=400775580]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.608015, 0.0045579392)
+mesh = SubResource("Mesh_Head")
+surface_material_override/0 = SubResource("Mat_Head")
+
+[node name="Weapon" type="MeshInstance3D" parent="VisualRoot" unique_id=1309287827]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 1.1, -0.5)
+mesh = SubResource("Mesh_Weapon")
+surface_material_override/0 = SubResource("Mat_Dark")
+
+[node name="LeftGrip" type="Node3D" parent="VisualRoot/Weapon" unique_id=1321041182]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09027201, 0, -0.19419277)
+
+[node name="RightGrip" type="Node3D" parent="VisualRoot/Weapon" unique_id=259499365]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08351433, 0, 0.16)
+
+[node name="LeftHip" type="Node3D" parent="VisualRoot" unique_id=1482622134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14, 0.84, 0.02)
+
+[node name="RightHip" type="Node3D" parent="VisualRoot" unique_id=543259987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 0.84, 0.02)
+
+[node name="LeftShoulder" type="Node3D" parent="VisualRoot" unique_id=1268329734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2524564, 1.3, -0.05)
+
+[node name="RightShoulder" type="Node3D" parent="VisualRoot" unique_id=1013553554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24591902, 1.3, -0.05)
+
+[node name="FootProbeRoot" type="Node3D" parent="." unique_id=1691957170]
+
+[node name="LeftFootProbe" type="RayCast3D" parent="FootProbeRoot" unique_id=495486438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1.38, 0)
+target_position = Vector3(0, -3, 0)
+
+[node name="RightFootProbe" type="RayCast3D" parent="FootProbeRoot" unique_id=1470663108]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 1.38, 0)
+target_position = Vector3(0, -3, 0)
+
+[node name="Feet" type="Node3D" parent="." unique_id=1328242274]
+
+[node name="LeftFoot" type="MeshInstance3D" parent="Feet" unique_id=1255470452]
+visible = false
+mesh = SubResource("Mesh_Foot")
+surface_material_override/0 = SubResource("Mat_Foot")
+
+[node name="RightFoot" type="MeshInstance3D" parent="Feet" unique_id=144345973]
+visible = false
+mesh = SubResource("Mesh_Foot")
+surface_material_override/0 = SubResource("Mat_Foot")
+
+[node name="Limbs" type="Node3D" parent="." unique_id=288020421]
+
+[node name="LeftUpperLeg" type="MeshInstance3D" parent="Limbs" unique_id=1942639945]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="LeftLowerLeg" type="MeshInstance3D" parent="Limbs" unique_id=309857610]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="RightUpperLeg" type="MeshInstance3D" parent="Limbs" unique_id=709119576]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="RightLowerLeg" type="MeshInstance3D" parent="Limbs" unique_id=682107125]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="LeftUpperArm" type="MeshInstance3D" parent="Limbs" unique_id=1766613434]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="LeftLowerArm" type="MeshInstance3D" parent="Limbs" unique_id=1079263817]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="RightUpperArm" type="MeshInstance3D" parent="Limbs" unique_id=1786122952]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="RightLowerArm" type="MeshInstance3D" parent="Limbs" unique_id=1459889714]
+mesh = SubResource("CapsuleMesh_tl0qy")
+surface_material_override/0 = SubResource("Mat_Limb")
+
+[node name="AimCursor" type="MeshInstance3D" parent="." unique_id=1330291407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -2)
+mesh = SubResource("Mesh_Aim")
+surface_material_override/0 = SubResource("Mat_Aim")
+
+[node name="CameraRig" type="Node3D" parent="." unique_id=281091610]
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1895304300]
+transform = Transform3D(1, 0, 0, 0, 0.7071069, 0.70710665, 0, -0.70710665, 0.7071069, 0, 6.8, 7.2)
+fov = 55.0

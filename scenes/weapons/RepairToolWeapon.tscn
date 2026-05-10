@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://cofmp6s0ce18y"]
+
+[ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="1_dark_mat"]
+albedo_color = Color(0.08, 0.08, 0.085, 1)
+
+[sub_resource type="BoxMesh" id="1_handle_mesh"]
+size = Vector3(0.16, 0.18, 0.55)
+
+[sub_resource type="BoxMesh" id="2_body_mesh"]
+size = Vector3(0.22, 0.18, 0.36)
+
+[sub_resource type="StandardMaterial3D" id="3_energy_mat"]
+albedo_color = Color(0.2, 0.75, 1, 1)
+emission_enabled = true
+emission = Color(0.2, 0.75, 1, 1)
+emission_energy_multiplier = 0.7
+
+[sub_resource type="SphereMesh" id="4_core_mesh"]
+radius = 0.09
+height = 0.18
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="2_copper_mat"]
+albedo_color = Color(0.95, 0.48, 0.16, 1)
+emission_enabled = true
+emission = Color(1, 0.35, 0.08, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="CylinderMesh" id="3_tip_mesh"]
+top_radius = 0.035
+bottom_radius = 0.055
+height = 0.55
+radial_segments = 12
+
+[node name="RepairToolWeapon" type="Node3D" unique_id=1307311025]
+script = ExtResource("1_script")
+weapon_id = "repair_tool"
+weapon_label = "Repair Tool"
+weapon_behavior = "repair_tool"
+magazine_size = 30
+reload_duration = 1.35
+automatic_fire = true
+fire_cooldown = 0.16
+hitscan_range = 2.8
+projectile_damage = 4
+hand_position = Vector3(0.08, -0.04, -0.08)
+back_position = Vector3(0.18, 0, 0.08)
+back_rotation_deg = Vector3(-85, 0, 12)
+
+[node name="Handle" type="MeshInstance3D" parent="." unique_id=829970881]
+transform = Transform3D(1, 0, 0, 0, 0.573576, -0.819152, 0, 0.819152, 0.573576, 0, -0.13, 0.1)
+material_override = SubResource("1_dark_mat")
+mesh = SubResource("1_handle_mesh")
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=740639686]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.16)
+material_override = SubResource("1_dark_mat")
+mesh = SubResource("2_body_mesh")
+
+[node name="EnergyCore" type="MeshInstance3D" parent="." unique_id=2052263273]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.145, -0.16)
+material_override = SubResource("3_energy_mat")
+mesh = SubResource("4_core_mesh")
+
+[node name="Tip" type="MeshInstance3D" parent="." unique_id=1503179527]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.02, -0.58)
+material_override = SubResource("2_copper_mat")
+mesh = SubResource("3_tip_mesh")
+
+[node name="Muzzle" type="Marker3D" parent="." unique_id=494756204]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.88)
+
+[node name="LeftGrip" type="Node3D" parent="." unique_id=1110125589]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09027201, 0, -0.19419277)
+
+[node name="RightGrip" type="Node3D" parent="." unique_id=41485244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08351433, 0, 0.16)

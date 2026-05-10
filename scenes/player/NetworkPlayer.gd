@@ -8,6 +8,7 @@ const WORLD_WEAPON_SCENE := preload("uid://dha7qfqc5vywa") #preload("res://weapo
 const PISTOL_SCENE := preload("uid://dd33dmmqhjkul") #preload("res://weapons/PistolWeapon.tscn")
 const SMG_SCENE := preload("uid://nykf7fy7m5jg") #preload("res://weapons/SMGWeapon.tscn")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm") #preload("res://weapons/RifleWeapon.tscn")
+const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
 
 static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 
@@ -423,13 +424,15 @@ func _server_weapon_tick(delta: float) -> void:
 var ammo_reserve := {
 	"9mm": 120,
 	"shell": 24,
-	"rifle": 90
+	"rifle": 90,
+	"energy": 90
 }
 
 var ammo_reserve_max := {
 	"9mm": 120,
 	"shell": 24,
-	"rifle": 90
+	"rifle": 90,
+	"energy": 90
 }
 
 
@@ -469,7 +472,7 @@ func get_ammo_max(ammo_type: String) -> int:
 	return int(ammo_reserve_max.get(ammo_type.to_lower(), 0))
 
 func pickup_loot(kind: String, amount: int, _pickup: Node = null) -> bool:
-	match kind:
+	match kind.to_lower():
 		"money":
 			return add_carried_money(amount)
 
@@ -484,6 +487,12 @@ func pickup_loot(kind: String, amount: int, _pickup: Node = null) -> bool:
 
 		"shell":
 			return add_ammo("shell", amount)
+
+		"energy":
+			return add_ammo("energy", amount)
+
+		"repair_tool":
+			return add_ammo("energy", amount)
 
 	return false
 
@@ -596,6 +605,8 @@ func _get_ammo_type_for_weapon(weapon: WeaponInstance3D) -> String:
 			return "rifle"
 		"shotgun":
 			return "shell"
+		"repair_tool":
+			return "energy"
 		_:
 			return ""
 
@@ -659,10 +670,15 @@ func _try_fire_local() -> void:
 	var muzzle_transform := weapon.get_muzzle_transform()
 	var shot_origin := muzzle_transform.origin
 	var shot_direction := _get_shot_direction_from_weapon(weapon)
+	var uses_repair_tool := _is_repair_tool_weapon(weapon)
+
+	if uses_repair_tool:
+		_update_local_repair_target_hud(shot_origin, shot_direction, weapon)
 
 	# Prédiction visuelle uniquement côté client.
 	# Le serveur spawn la vraie balle dans _server_fire_weapon().
-	if not multiplayer.is_server():
+	# Le repair tool n'utilise pas de projectile.
+	if not multiplayer.is_server() and not uses_repair_tool:
 		_spawn_visual_bullet_from_weapon(weapon, shot_origin, shot_direction)
 
 	if multiplayer.is_server():
@@ -1074,12 +1090,15 @@ func _server_fire_weapon(slot_index: int, shot_origin: Vector3, shot_direction: 
 
 	server_fire_cooldown = weapon.fire_cooldown
 
-	# Balle serveur.
-	# C'est elle qui applique les dégâts réels.
-	_spawn_visual_bullet_from_weapon(weapon, shot_origin, shot_direction)
+	if _is_repair_tool_weapon(weapon):
+		_process_server_repair_tool(shot_origin, shot_direction, weapon)
+	else:
+		# Balle serveur.
+		# C'est elle qui applique les dégâts réels.
+		_spawn_visual_bullet_from_weapon(weapon, shot_origin, shot_direction)
 
-	# Effet visuel pour les autres clients.
-	_spawn_bullet_fx.rpc(shot_origin, shot_direction, slot_index)
+		# Effet visuel pour les autres clients.
+		_spawn_bullet_fx.rpc(shot_origin, shot_direction, slot_index)
 
 	# Désactivé.
 	# Ancien système hitscan instantané.
@@ -1120,6 +1139,161 @@ func _process_server_shot(shot_origin: Vector3, shot_direction: Vector3, weapon:
 		#print("BAM 2  ?!")
 		collider.apply_damage(weapon.projectile_damage)
 
+
+func _is_repair_tool_weapon(weapon: WeaponInstance3D) -> bool:
+	if weapon == null:
+		return false
+
+	if "weapon_behavior" in weapon and str(weapon.weapon_behavior).to_lower() == "repair_tool":
+		return true
+
+	if "weapon_id" in weapon and str(weapon.weapon_id).to_lower() == "repair_tool":
+		return true
+
+	return false
+
+
+func _process_server_repair_tool(shot_origin: Vector3, shot_direction: Vector3, weapon: WeaponInstance3D) -> void:
+	if weapon == null:
+		return
+	if not multiplayer.is_server():
+		return
+
+	var direction := shot_direction.normalized()
+	if direction.length_squared() <= 0.0001:
+		direction = -aim_root.global_basis.z.normalized()
+
+	var range_value: float = max(weapon.repair_range, 0.1)
+	var ray_end := shot_origin + direction * range_value
+
+	var query := PhysicsRayQueryParameters3D.create(shot_origin, ray_end)
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	query.collision_mask = weapon.repair_collision_mask
+	query.hit_from_inside = true
+
+	var exclude: Array = []
+	_collect_repair_tool_exclude_rids(self, exclude)
+	query.exclude = exclude
+
+	var result := get_world_3d().direct_space_state.intersect_ray(query)
+	if result.is_empty():
+		return
+
+	var collider_value = result.get("collider", null)
+	if not (collider_value is Node):
+		return
+
+	var target := _find_repair_tool_target(collider_value as Node)
+	if target == null:
+		return
+
+	if target.has_method("apply_repair"):
+		if not weapon.repair_revive_dead_vehicle and "is_dead" in target and bool(target.is_dead):
+			return
+		target.apply_repair(weapon.repair_amount)
+		return
+
+	_apply_repair_tool_damage(target, weapon)
+
+
+func _update_local_repair_target_hud(shot_origin: Vector3, shot_direction: Vector3, weapon: WeaponInstance3D) -> void:
+	if hud == null or not is_instance_valid(hud):
+		return
+	if weapon == null:
+		return
+
+	var direction := shot_direction.normalized()
+	if direction.length_squared() <= 0.0001:
+		direction = -aim_root.global_basis.z.normalized()
+
+	var range_value: float = max(weapon.repair_range, 0.1)
+	var ray_end := shot_origin + direction * range_value
+
+	var query := PhysicsRayQueryParameters3D.create(shot_origin, ray_end)
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	query.collision_mask = weapon.repair_collision_mask
+	query.hit_from_inside = true
+
+	var exclude: Array = []
+	_collect_repair_tool_exclude_rids(self, exclude)
+	query.exclude = exclude
+
+	var result := get_world_3d().direct_space_state.intersect_ray(query)
+	if result.is_empty():
+		return
+
+	var collider_value = result.get("collider", null)
+	if not (collider_value is Node):
+		return
+
+	var target := _find_repair_tool_target(collider_value as Node)
+	if target == null or not target.has_method("apply_repair"):
+		return
+
+	if not weapon.repair_revive_dead_vehicle and "is_dead" in target and bool(target.is_dead):
+		return
+
+	if hud.has_method("show_repair_target"):
+		hud.show_repair_target(target)
+
+
+func _find_repair_tool_target(node: Node) -> Node:
+	if node == null:
+		return null
+
+	var current: Node = node
+	while current != null:
+		if current == self:
+			return null
+		if current.has_method("apply_repair"):
+			return current
+		current = current.get_parent()
+
+	current = node
+	while current != null:
+		if current == self:
+			return null
+		if current.has_method("apply_projectile_damage") or current.has_method("apply_damage"):
+			return current
+		current = current.get_parent()
+
+	return null
+
+
+func _apply_repair_tool_damage(target: Node, weapon: WeaponInstance3D) -> void:
+	if target == null or weapon == null:
+		return
+
+	var damage_amount: int = max(weapon.repair_damage, 0)
+	if damage_amount <= 0:
+		return
+
+	if target.has_method("apply_projectile_damage"):
+		target.apply_projectile_damage(
+			damage_amount,
+			weapon.projectile_penetration,
+			projectile_team,
+			weapon.projectile_tk,
+			self
+		)
+	elif target.has_method("apply_damage"):
+		target.apply_damage(damage_amount)
+
+
+func _collect_repair_tool_exclude_rids(node: Node, output: Array) -> void:
+	if node == null or not is_instance_valid(node):
+		return
+
+	if node is CollisionObject3D:
+		var rid := (node as CollisionObject3D).get_rid()
+		if not output.has(rid):
+			output.append(rid)
+
+	for child in node.get_children():
+		_collect_repair_tool_exclude_rids(child, output)
+
 func _get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 	match weapon_id:
 		"pistol":
@@ -1128,6 +1302,8 @@ func _get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return SMG_SCENE
 		"rifle":
 			return RIFLE_SCENE
+		"repair_tool":
+			return REPAIR_TOOL_SCENE
 		_:
 			return null
 
@@ -2016,6 +2192,11 @@ func _spawn_bullet_fx(shot_origin: Vector3, shot_direction: Vector3, slot_index:
 
 	var weapon := scene.instantiate() as WeaponInstance3D
 	if weapon == null:
+		return
+
+	weapon.apply_runtime_state(slot_state)
+	if _is_repair_tool_weapon(weapon):
+		weapon.free()
 		return
 
 	_spawn_visual_bullet_from_weapon(weapon, shot_origin, shot_direction)

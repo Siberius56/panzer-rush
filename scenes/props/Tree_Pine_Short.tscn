@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://c5ygqspl4bdcl"]
+
+[ext_resource type="Script" uid="uid://kudcif4er04y" path="res://scenes/props/props_master.gd" id="1_fa5g6"]
+[ext_resource type="PackedScene" uid="uid://c4ujwh5k3g1xk" path="res://asset/map/misc-2/tree.glb" id="1_tnln7"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1niyt"]
+height = 4.0
+radius = 1.0
+
+[node name="Tree_Pine_Short" type="StaticBody3D" unique_id=49958975]
+script = ExtResource("1_fa5g6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1461689295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("CylinderShape3D_1niyt")
+
+[node name="tree2" parent="." unique_id=1965849457 instance=ExtResource("1_tnln7")]
+transform = Transform3D(4, 0, 0, 0, 3.5, 0, 0, 0, 4, 0, 0, 0)
+
+[editable path="tree2"]

@@ -6,8 +6,8 @@
 
 [resource]
 albedo_color = Color(0.58, 0.26042, 0.24939999, 1)
-metallic_specular = 0.4
-roughness = 0.45
+metallic_specular = 0.3
+roughness = 0.7
 normal_texture = ExtResource("2_d1iut")
 rim_enabled = true
 rim_texture = ExtResource("3_in23y")

@@ -38,6 +38,7 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export var state_send_interval: float = 0.033
 @export var align_to_vehicle_when_idle: bool = false
 @export var idle_aim_distance: float = 20.0
+@export var aim_point_offset: Vector3 = Vector3(0.0, -0.5, 0.0)
 
 @export_group("Paths")
 @export var body_path: NodePath = NodePath("Body")
@@ -224,7 +225,7 @@ func preview_local_aim_target(aim_world: Vector3) -> void:
 	# Sert uniquement à mettre à jour la cible locale.
 	# On ne force plus la rotation instantanément, sinon rotation_speed_deg et
 	# elevation_speed_deg sont contournés côté joueur local.
-	target_aim_world = _clamp_aim_world(aim_world)
+	target_aim_world = _clamp_aim_world(_apply_aim_point_offset(aim_world))
 
 
 func apply_host_input(peer_id: int, aim_world: Vector3, wants_fire: bool) -> void:
@@ -234,7 +235,7 @@ func apply_host_input(peer_id: int, aim_world: Vector3, wants_fire: bool) -> voi
 	if mount == null or not mount.can_peer_operate(peer_id):
 		return
 
-	target_aim_world = _clamp_aim_world(aim_world)
+	target_aim_world = _clamp_aim_world(_apply_aim_point_offset(aim_world))
 
 	var should_fire := _should_fire_from_trigger(wants_fire)
 	trigger_was_pressed = wants_fire
@@ -467,7 +468,9 @@ func _try_fire(_peer_id: int) -> void:
 	_spawn_bullet_fx(shot_origin, shot_direction)
 	_spawn_bullet_fx.rpc(shot_origin, shot_direction)
 
-	#_process_shot(peer_id, shot_origin, shot_direction)
+	if magazine_ammo < ammo_per_shot:
+		if reserve_ammo > 0:
+			reload_turret()
 
 
 func _sanitize_ammo_values() -> void:
@@ -868,3 +871,7 @@ func spawn_projectile(
 			source_node,
 			impact_scene
 		)
+
+func _apply_aim_point_offset(raw_aim_world: Vector3) -> Vector3:
+	return raw_aim_world + aim_point_offset
+	

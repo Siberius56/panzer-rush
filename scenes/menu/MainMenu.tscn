@@ -1,6 +1,39 @@
 [gd_scene format=3 uid="uid://teynokkfjcf7"]
 
 [ext_resource type="Script" uid="uid://cieexldrxg2nt" path="res://scripts/menu/MainMenu.gd" id="1_main_menu"]
+[ext_resource type="Shader" uid="uid://bw7em2y0vcrr2" path="res://scenes/lobby/Lobby.gdshader" id="2_uwj7d"]
+[ext_resource type="Texture2D" uid="uid://eoua0ospa71e" path="res://asset/ui/Bck_Pattern.png" id="3_2nud1"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iv2fv"]
+shader = ExtResource("2_uwj7d")
+shader_parameter/tile_texture = ExtResource("3_2nud1")
+shader_parameter/rect_size_px = Vector2(512, 512)
+shader_parameter/tile_size_px = Vector2(64, 64)
+shader_parameter/scroll_speed_px = Vector2(4, -4)
+shader_parameter/tint = Color(0.18, 0.18, 0.18, 1)
+shader_parameter/alpha = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uwj7d"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.28485027, 0.2848503, 0.28485018, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2nud1"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.28485027, 0.2848503, 0.28485018, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="MainMenu" type="Control" unique_id=1175622331]
 layout_mode = 3
@@ -20,6 +53,19 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0470588, 0.054902, 0.0862745, 1)
 
+[node name="Bck_Shader" type="ColorRect" parent="." unique_id=2064311011]
+material = SubResource("ShaderMaterial_iv2fv")
+custom_minimum_size = Vector2(1920, 1920)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -420.0
+offset_bottom = 420.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1891891473]
 layout_mode = 1
 anchors_preset = 15
@@ -33,6 +79,7 @@ layout_mode = 2
 theme_override_constants/separation = 20
 
 [node name="Panel" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=210730782]
+visible = false
 layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer/Panel" unique_id=1459143640]
@@ -104,6 +151,7 @@ uri = "https://whatismyipaddress.com/fr/mon-ip"
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=1318859786]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uwj7d")
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer/PanelContainer" unique_id=1328690585]
 layout_mode = 2
@@ -185,13 +233,14 @@ autowrap_mode = 3
 
 [node name="PanelSteam" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=383328140]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2nud1")
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer/PanelSteam" unique_id=2132054026]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/PanelSteam/MarginContainer" unique_id=914627929]
 layout_mode = 2

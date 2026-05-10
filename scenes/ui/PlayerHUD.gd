@@ -3,9 +3,17 @@ class_name PlayerHUD
 
 signal respawn_requested
 
+#const PLAYER_NAME_MARKER_SCENE: PackedScene = preload("res://scenes/ui/PlayerNameMarker.tscn")
+
 @export var refresh_every_frame: bool = true
 @export var show_local_player_name_marker: bool = false
 @export var name_marker_margin: float = 24.0
+@export var name_marker_scene: PackedScene #= PLAYER_NAME_MARKER_SCENE
+
+@export_group("Repair Target Bar")
+@export var repair_bar_screen_offset: Vector2 = Vector2(0.0, -84.0)
+@export var repair_bar_world_height: float = 2.4
+@export var repair_bar_hide_delay: float = 1.0
 
 @onready var common_panel: PanelContainer = %CommonPanel #$Root/LeftMargin/LeftVBox/CommonPanel
 @onready var hp_label: Label = %HPLabel #$Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox/HPLabel
@@ -14,26 +22,30 @@ signal respawn_requested
 @onready var ammo_rifle: Label = %Ammo_Rifle
 @onready var ammo_shell: Label = %Ammo_Shell
 @onready var ammo_rocket: Label = %Ammo_Rocket
+@onready var ammo_energy := %Ammo_Energy
 
-@onready var on_foot_panel: PanelContainer = %OnFootPanel #$Root/LeftMargin/LeftVBox/OnFootPanel
-@onready var equipped_weapon_label: Label = %EquippedWeaponLabel #$Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/EquippedWeaponLabel
-@onready var weapon_1_label: Label = %Weapon1Label #$Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Weapon1Label
-@onready var weapon_2_label: Label = %Weapon2Label #$Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Weapon2Label
-@onready var ammo_label: Label = %AmmoLabel #$Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/AmmoLabel
-@onready var money_label: Label = %MoneyLabel #$Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/MoneyLabel
+@onready var on_foot_panel: PanelContainer = %OnFootPanel
+@onready var equipped_weapon_label: Label = %EquippedWeaponLabel
+@onready var weapon_1_label: Label = %Weapon1Label
+@onready var weapon_2_label: Label = %Weapon2Label
+@onready var ammo_label: Label = %AmmoLabel
+@onready var money_label: Label = %MoneyLabel
 @onready var reserve_label: Label = %ReserveLabel
+@onready var reload_panel: PanelContainer = %ReloadPanel
+@onready var reload_label: Label = %ReloadLabel
+@onready var reload_progress_bar: ProgressBar = %ReloadProgress
 
-@onready var vehicle_panel: PanelContainer = %VehiclePanel #$Root/RightMargin/VehiclePanel
-@onready var vehicle_name_label: Label = %VehicleNameLabel #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/VehicleNameLabel
+@onready var vehicle_panel: PanelContainer = %VehiclePanel
+@onready var vehicle_name_label: Label = %VehicleNameLabel
 @onready var vehicle_health_label = %VehicleHealthLabel
-@onready var current_seat_label: Label = %CurrentSeatLabel #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/CurrentSeatLabel
-@onready var seat_1_label: RichTextLabel = %Seat1Label #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox/Seat1Label
-@onready var seat_2_label: RichTextLabel = %Seat2Label #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox/Seat2Label
-@onready var seat_3_label: RichTextLabel = %Seat3Label #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox/Seat3Label
-@onready var seat_4_label: RichTextLabel = %Seat4Label #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox/Seat4Label
-@onready var seat_5_label: RichTextLabel = %Seat5Label #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox/Seat5Label
-@onready var seat_6_label: RichTextLabel = %Seat6Label #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/SeatsVBox/Seat6Label
-@onready var turret_label: Label = %TurretLabel #$Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/TurretLabel
+@onready var current_seat_label: Label = %CurrentSeatLabel
+@onready var seat_1_label: RichTextLabel = %Seat1Label
+@onready var seat_2_label: RichTextLabel = %Seat2Label
+@onready var seat_3_label: RichTextLabel = %Seat3Label
+@onready var seat_4_label: RichTextLabel = %Seat4Label
+@onready var seat_5_label: RichTextLabel = %Seat5Label
+@onready var seat_6_label: RichTextLabel = %Seat6Label
+@onready var turret_label: Label = %TurretLabel
 @onready var turret_ammo_label: Label = %TurretAmmo
 
 var player: Node = null
@@ -51,9 +63,14 @@ var _seat_labels: Array[RichTextLabel] = []
 @onready var passage_panel: PanelContainer = %PassagePanel
 @onready var passage_label: Label = %PassageLabel
 @onready var passage_progress: ProgressBar = %PassageProgress
+@onready var repair_target_panel: PanelContainer = %RepairTargetPanel
+@onready var repair_target_label: Label = %RepairTargetLabel
+@onready var repair_target_progress: ProgressBar = %RepairTargetProgress
 var respawn_pending: bool = false
 var _name_marker_labels: Dictionary = {}
 var _passage_prompt_owner_id: int = 0
+var _repair_target: Node = null
+var _repair_target_hide_timer: float = 0.0
 
 const SELF_COLOR := "#7CFF7C"
 const EMPTY_SEAT_TEXT := "Libre"
@@ -83,11 +100,15 @@ func _ready() -> void:
 	death_revive_progress.visible = false
 	revive_panel.visible = false
 	hide_passage_prompt()
+	hide_repair_target(true)
+	hide_reload_progress()
 	_refresh_all()
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if refresh_every_frame:
 		_refresh_all()
+
+	_update_repair_target_bar(delta)
 
 func set_player(p_player: Node) -> void:
 	player = p_player
@@ -141,6 +162,8 @@ func _refresh_all() -> void:
 	if not is_instance_valid(player):
 		visible = false
 		_clear_name_markers()
+		hide_repair_target(true)
+		hide_reload_progress()
 		return
 
 	visible = true
@@ -155,6 +178,8 @@ func _refresh_all() -> void:
 		common_panel.visible = false
 		on_foot_panel.visible = false
 		vehicle_panel.visible = false
+		hide_repair_target(true)
+		hide_reload_progress()
 		_show_death_overlay(player_data)
 		_refresh_revive_panel(player_data)
 		return
@@ -162,6 +187,7 @@ func _refresh_all() -> void:
 	_hide_death_overlay()
 	_refresh_common(player_data)
 	_refresh_on_foot(player_data)
+	_refresh_reload_progress(player_data)
 	_refresh_vehicle(player_data)
 	_refresh_revive_panel(player_data)
 
@@ -239,16 +265,150 @@ func _refresh_revive_panel(player_data: Dictionary) -> void:
 	revive_label.text = "Réanimation de %s" % other_name
 	revive_progress_bar.value = progress_value * 100.0
 
+func show_repair_target(target: Node) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+
+	_repair_target = target
+	_repair_target_hide_timer = max(repair_bar_hide_delay, 0.0)
+
+	if repair_target_panel != null:
+		repair_target_panel.visible = true
+		repair_target_panel.modulate.a = 1.0
+
+	_update_repair_target_bar(0.0)
+
+
+func hide_repair_target(force: bool = false) -> void:
+	if force:
+		_repair_target = null
+		_repair_target_hide_timer = 0.0
+		if repair_target_panel != null:
+			repair_target_panel.visible = false
+		return
+
+	_repair_target_hide_timer = min(_repair_target_hide_timer, repair_bar_hide_delay)
+
+
+func _update_repair_target_bar(delta: float) -> void:
+	if repair_target_panel == null:
+		return
+
+	if _repair_target_hide_timer > 0.0:
+		_repair_target_hide_timer = max(_repair_target_hide_timer - delta, 0.0)
+
+	if _repair_target == null or not is_instance_valid(_repair_target):
+		hide_repair_target(true)
+		return
+
+	if _repair_target_hide_timer <= 0.0:
+		hide_repair_target(true)
+		return
+
+	var data := _get_repair_target_data(_repair_target)
+	var current_hp: int = int(data.get("health", 0))
+	var max_hp: int = max(int(data.get("max_health", 0)), 1)
+	var target_name: String = str(data.get("name", "Tank"))
+
+	repair_target_label.text = "%s : %d / %d" % [target_name, current_hp, max_hp]
+	repair_target_progress.min_value = 0.0
+	repair_target_progress.max_value = float(max_hp)
+	repair_target_progress.value = float(clampi(current_hp, 0, max_hp))
+
+	_update_repair_target_screen_position(_repair_target)
+	repair_target_panel.visible = true
+
+
+func _get_repair_target_data(target: Node) -> Dictionary:
+	if target == null or not is_instance_valid(target):
+		return {}
+
+	if target.has_method("get_hud_data_for_player"):
+		var hud_data = target.call("get_hud_data_for_player", player)
+		if hud_data is Dictionary:
+			return {
+				"name": str(hud_data.get("vehicle_name", target.name)),
+				"health": int(hud_data.get("health", 0)),
+				"max_health": int(hud_data.get("max_health", 1)),
+			}
+
+	var out := {
+		"name": _read_repair_target_name(target),
+		"health": _read_repair_target_int(target, ["health", "current_health", "hp"], 0),
+		"max_health": _read_repair_target_int(target, ["max_health", "maximum_health", "max_hp"], 1),
+	}
+	return out
+
+
+func _read_repair_target_name(target: Node) -> String:
+	if target == null or not is_instance_valid(target):
+		return "Tank"
+
+	for property_name in ["vehicle_display_name", "display_name", "hud_name"]:
+		var value = target.get(property_name)
+		if value != null and not str(value).is_empty():
+			return str(value)
+
+	return target.name
+
+
+func _read_repair_target_int(target: Node, property_names: Array, fallback: int) -> int:
+	if target == null or not is_instance_valid(target):
+		return fallback
+
+	for property_name in property_names:
+		var getter_name := "get_%s" % str(property_name)
+		if target.has_method(getter_name):
+			return int(target.call(getter_name))
+
+		var value = target.get(str(property_name))
+		if value != null:
+			return int(value)
+
+	return fallback
+
+
+func _update_repair_target_screen_position(target: Node) -> void:
+	var camera := _get_hud_camera()
+	if camera == null or repair_target_panel == null:
+		return
+
+	var world_position := _get_repair_target_world_position(target)
+	if camera.is_position_behind(world_position):
+		repair_target_panel.visible = false
+		return
+
+	var screen_position := camera.unproject_position(world_position) + repair_bar_screen_offset
+	var panel_size := repair_target_panel.get_combined_minimum_size()
+	if panel_size.x <= 0.0 or panel_size.y <= 0.0:
+		panel_size = repair_target_panel.size
+
+	repair_target_panel.size = panel_size
+	repair_target_panel.position = screen_position - panel_size * 0.5
+
+
+func _get_repair_target_world_position(target: Node) -> Vector3:
+	if target != null and target.has_method("get_repair_hud_world_position"):
+		var value = target.call("get_repair_hud_world_position")
+		if value is Vector3:
+			return value
+
+	if target is Node3D:
+		return (target as Node3D).global_position + Vector3.UP * repair_bar_world_height
+
+	return Vector3.ZERO
+
+
 func _refresh_player_name_markers() -> void:
 	if player_name_layer == null:
 		return
 
-	var camera := _get_hud_camera()
+	var camera: Camera3D = _get_hud_camera()
 	if camera == null:
 		_clear_name_markers()
 		return
 
-	var active_keys := {}
+	var active_keys: Dictionary = {}
 	for target in get_tree().get_nodes_in_group("players"):
 		if target == null or not is_instance_valid(target):
 			continue
@@ -257,44 +417,61 @@ func _refresh_player_name_markers() -> void:
 		if not (target is Node3D):
 			continue
 
-		var key := str(target.get_instance_id())
+		var key: String = str(target.get_instance_id())
 		active_keys[key] = true
-		var label := _get_or_create_name_marker(key)
-		label.text = _get_player_marker_text(target)
-		var world_position := _get_player_marker_world_position(target)
-		var screen_data := _world_position_to_clamped_screen(camera, world_position)
-		var label_size := label.get_combined_minimum_size()
-		label.size = label_size
-		label.position = Vector2(screen_data.get("x", 0.0), screen_data.get("y", 0.0)) - label_size * 0.5
-		label.visible = true
+		var marker: Control = _get_or_create_name_marker(key)
+		if marker == null:
+			continue
+
+		_set_name_marker_text(marker, _get_player_marker_text(target))
+		var world_position: Vector3 = _get_player_marker_world_position(target)
+		var screen_data: Dictionary = _world_position_to_clamped_screen(camera, world_position)
+		var marker_size: Vector2 = marker.get_combined_minimum_size()
+		marker.size = marker_size
+		marker.position = Vector2(screen_data.get("x", 0.0), screen_data.get("y", 0.0)) - marker_size * 0.5
+		marker.visible = true
 
 	for key in _name_marker_labels.keys():
 		if active_keys.has(key):
 			continue
-		var stale_label = _name_marker_labels.get(key)
-		if stale_label != null and is_instance_valid(stale_label):
-			stale_label.queue_free()
+		var stale_marker = _name_marker_labels.get(key)
+		if stale_marker != null and is_instance_valid(stale_marker):
+			stale_marker.queue_free()
 		_name_marker_labels.erase(key)
 
-func _get_or_create_name_marker(key: String) -> Label:
+func _get_or_create_name_marker(key: String) -> Control:
 	var existing = _name_marker_labels.get(key, null)
 	if existing != null and is_instance_valid(existing):
-		return existing as Label
+		return existing as Control
 
-	var label := Label.new()
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_size_override("font_size", 18)
-	player_name_layer.add_child(label)
-	_name_marker_labels[key] = label
-	return label
+	if name_marker_scene == null:
+		push_error("PlayerHUD.name_marker_scene est vide.")
+		return null
+
+	var marker: Control = name_marker_scene.instantiate() as Control
+	if marker == null:
+		push_error("La scène de marqueur de nom doit hériter de Control.")
+		return null
+
+	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	player_name_layer.add_child(marker)
+	_name_marker_labels[key] = marker
+	return marker
+
+func _set_name_marker_text(marker: Control, text: String) -> void:
+	if marker.has_method("set_marker_text"):
+		marker.call("set_marker_text", text)
+		return
+
+	var label: Label = marker.get_node_or_null("NameLabel") as Label
+	if label != null:
+		label.text = text
 
 func _clear_name_markers() -> void:
 	for key in _name_marker_labels.keys():
-		var label = _name_marker_labels.get(key)
-		if label != null and is_instance_valid(label):
-			label.queue_free()
+		var marker = _name_marker_labels.get(key)
+		if marker != null and is_instance_valid(marker):
+			marker.queue_free()
 	_name_marker_labels.clear()
 
 func _get_hud_camera() -> Camera3D:
@@ -385,6 +562,37 @@ func _refresh_on_foot(player_data: Dictionary) -> void:
 	
 	#reserve_label.text = _build_reserve_text(player_data)
 	money_label.text = str(money) #"Argent : %d" % money
+
+func _refresh_reload_progress(player_data: Dictionary) -> void:
+	var reload_active: bool = bool(player_data.get("reload_active", false))
+	var reload_duration: float = max(float(player_data.get("reload_duration", 0.0)), 0.0)
+	var reload_remaining: float = max(float(player_data.get("reload_remaining", 0.0)), 0.0)
+
+	if not reload_active or reload_duration <= 0.0:
+		hide_reload_progress()
+		return
+
+	var normalized_progress: float = 1.0 - (reload_remaining / reload_duration)
+	show_reload_progress(normalized_progress)
+
+func show_reload_progress(progress: float) -> void:
+	if reload_panel == null or reload_progress_bar == null:
+		return
+
+	var normalized_progress: float = clamp(progress, 0.0, 1.0)
+	reload_panel.visible = true
+	reload_progress_bar.min_value = 0.0
+	reload_progress_bar.max_value = 100.0
+	reload_progress_bar.value = normalized_progress * 100.0
+
+	if reload_label != null:
+		reload_label.text = "Rechargement : %d s" % normalized_progress  #roundi(normalized_progress * 100.0)
+
+func hide_reload_progress() -> void:
+	if reload_panel != null:
+		reload_panel.visible = false
+	if reload_progress_bar != null:
+		reload_progress_bar.value = 0.0
 
 func _refresh_vehicle(player_data: Dictionary) -> void:
 	var vehicle_data: Dictionary = _get_vehicle_hud_data(player_data)
@@ -557,19 +765,23 @@ func _build_reserve_ui(player_data: Dictionary) -> void:
 		
 	if reserves.has("rifle"):
 		ammo_rifle.text = str(int(reserves.get("rifle", 0)))
-		if equipped_ammo_type == "9mm":
+		if equipped_ammo_type == "rifle":
 			ammo_rifle.text = "> "+ammo_rifle.text
 	
 	if reserves.has("shell"):
 		ammo_shell.text = str(int(reserves.get("shell", 0)))
-		if equipped_ammo_type == "9mm":
+		if equipped_ammo_type == "shell":
 			ammo_shell.text = "> "+ammo_shell.text
-		
+	
 	if reserves.has("rocket"):
 		ammo_rocket.text = str(int(reserves.get("rocket", 0)))
-		if equipped_ammo_type == "9mm":
+		if equipped_ammo_type == "rocket":
 			ammo_rocket.text = "> "+ammo_rocket.text
-
+	
+	if reserves.has("energy"):
+		ammo_energy.text = str(int(reserves.get("energy", 0)))
+		if equipped_ammo_type == "energy":
+			ammo_energy.text = "> "+ammo_energy.text
 
 #func _build_reserve_text(player_data: Dictionary) -> String:
 	#var reserves: Dictionary = player_data.get("ammo_reserve_data", {})

@@ -52,6 +52,7 @@ enum EnemyState {
 @export_group("Detection")
 @export var detection_radius: float = 12.0
 @export var damage_retarget_max_distance: float = 18.0
+@export var ally_death_alert_radius: float = 14.0
 @export_flags_3d_physics var line_of_sight_mask: int = 0xFFFFFFFF
 
 @export_group("Performance Scans")
@@ -465,6 +466,8 @@ func apply_vehicle_push(push_velocity: Vector3, source: Node = null) -> void:
 
 	_debug("vehicle push: velocity=%s source=%s" % [str(vehicle_impact_velocity), source.name if source != null else "null"])
 
+func apply_vehicle_impact_damage(amount: int, source: Node = null) -> void:
+	apply_damage(amount, source)
 
 func _process_vehicle_impact_stun(delta: float) -> bool:
 	var horizontal_impact = Vector3(vehicle_impact_velocity.x, 0.0, vehicle_impact_velocity.z)
@@ -542,12 +545,12 @@ func _handle_return_to_origin_or_idle() -> void:
 
 
 func _handle_combat_state(combat_target: Node3D) -> void:
-	var target_point := _get_target_aim_point(combat_target)
-	var distance := global_position.distance_to(combat_target.global_position)
-	var has_los := true
+	var target_point: Vector3 = _get_target_aim_point(combat_target)
+	var distance: float = global_position.distance_to(combat_target.global_position)
+	var has_los: bool = true
 	if attack_requires_line_of_sight:
 		has_los = _has_line_of_sight(combat_target, target_point)
-	var desired_attack_range := attack_range if not is_melee_attack else minf(attack_range, 1.8)
+	var desired_attack_range: float = attack_range if not is_melee_attack else minf(attack_range, 1.8)
 
 	_face_target(target_point)
 
@@ -558,10 +561,14 @@ func _handle_combat_state(combat_target: Node3D) -> void:
 		_clear_navigation_target()
 		_try_attack(combat_target, target_point)
 	else:
-		if not has_los and distance <= desired_attack_range:
-			_attack_debug("attack blocked by line of sight, moving toward target=%s distance=%.2f range=%.2f" % [combat_target.name, distance, desired_attack_range])
+		var stop_distance: float = maxf(desired_attack_range - chase_stop_distance, 0.2)
+		if not has_los:
+			stop_distance = maxf(chase_stop_distance, 0.2)
+			if distance <= desired_attack_range:
+				_attack_debug("attack blocked by line of sight, keep moving toward target=%s distance=%.2f range=%.2f" % [combat_target.name, distance, desired_attack_range])
+
 		_set_state(EnemyState.CHASE)
-		_move_towards(combat_target.global_position, maxf(desired_attack_range - chase_stop_distance, 0.2))
+		_move_towards(combat_target.global_position, stop_distance)
 
 
 func _move_towards(target_position: Vector3, stop_distance: float = 0.0) -> void:
@@ -963,16 +970,17 @@ func _safe_get_property(object: Object, property_name: String) -> Variant:
 func apply_damage(amount: int, damage_source: Node = null) -> void:
 	if not multiplayer.is_server() or _dying:
 		return
-	
-	print("take a damage ?!")
-	
+
 	health = max(health - amount, 0)
 	_debug("apply_damage: %d -> health=%d" % [amount, health])
 	if health <= 0:
 		_die(damage_source)
 		return
 
-	var hit_direction := _get_damage_push_direction(damage_source)
+	if current_state == EnemyState.IDLE:
+		_try_retarget_from_damage_source(damage_source)
+
+	var hit_direction: Vector3 = _get_damage_push_direction(damage_source)
 	_play_damage_feedback_local(hit_direction)
 	_play_damage_feedback_remote.rpc(hit_direction)
 	_receive_state.rpc(global_position, velocity, rotation.y, health, int(current_state))
@@ -993,46 +1001,121 @@ func apply_projectile_damage(
 	if final_damage <= 0:
 		return
 
-	_try_retarget_from_damage_source(_source)
-	
-	print("here ?!")
 	apply_damage(final_damage, _source)
 
 
 func _try_retarget_from_damage_source(source: Node) -> void:
-	var target_player := _extract_player_from_source(source)
-	if not _is_valid_target(target_player):
+	var attacker: Node3D = _extract_target_from_damage_source(source)
+	if not _is_valid_target(attacker):
 		return
 
-	if global_position.distance_to(target_player.global_position) > damage_retarget_max_distance:
+	if global_position.distance_to(attacker.global_position) > damage_retarget_max_distance:
 		return
 
-	current_target = target_player
+	_force_alert_target(attacker)
+	_debug("retarget from damage source: %s" % attacker.name)
+
+
+func _force_alert_target(target: Node3D) -> void:
+	if not _is_valid_target(target):
+		return
+
+	current_target = target
 	forced_alert = true
-	_last_known_target_position = target_player.global_position
+	_last_known_target_position = target.global_position
 	_has_last_known_target_position = true
-	_debug("retarget from damage source: %s" % target_player.name)
+	_clear_navigation_target()
+	_set_state(EnemyState.CHASE)
 
 
-func _extract_player_from_source(source: Node) -> Node3D:
+func _extract_target_from_damage_source(source: Node) -> Node3D:
 	if source == null or not is_instance_valid(source):
 		return null
 
-	if source.is_in_group("player"):
-		return source as Node3D
+	var direct_target: Node3D = _resolve_target_candidate(source)
+	if direct_target != null:
+		return direct_target
 
-	if source.has_method("get_driver"):
-		var driver = source.get_driver()
-		if driver != null and driver is Node3D and driver.is_in_group("player"):
-			return driver
+	for method_name in ["get_attacker", "get_shooter", "get_owner", "get_source", "get_damage_source", "get_driver"]:
+		if source.has_method(method_name):
+			var method_value = source.call(method_name)
+			var method_target: Node3D = _resolve_target_candidate(method_value)
+			if method_target != null:
+				return method_target
 
-	for property_name in ["driver", "owner_player", "player_owner", "controlling_player"]:
-		var value = _safe_get_property(source, property_name)
-		if value != null and value is Node3D and value.is_in_group("player"):
-			return value
+	for property_name in ["attacker", "shooter", "source", "damage_source", "owner_player", "player_owner", "controlling_player", "driver", "owner", "instigator"]:
+		var property_value = _safe_get_property(source, property_name)
+		var property_target: Node3D = _resolve_target_candidate(property_value)
+		if property_target != null:
+			return property_target
 
 	return null
 
+
+func _resolve_target_candidate(candidate: Variant) -> Node3D:
+	if candidate == null:
+		return null
+	if not (candidate is Node):
+		return null
+
+	var candidate_node: Node = candidate as Node
+	if not is_instance_valid(candidate_node):
+		return null
+	if _is_valid_target(candidate_node):
+		return candidate_node as Node3D
+
+	var vehicle: Node = _get_vehicle_from_player(candidate_node)
+	if vehicle != null and vehicle is Node3D:
+		var vehicle_node: Node3D = vehicle as Node3D
+		if _is_valid_target(vehicle_node):
+			return vehicle_node
+
+	return null
+
+
+func _extract_player_from_source(source: Node) -> Node3D:
+	return _extract_target_from_damage_source(source)
+
+
+
+func _notify_nearby_allies_about_death(damage_source: Node = null) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var attacker: Node3D = _extract_target_from_damage_source(damage_source)
+	if not _is_valid_target(attacker):
+		return
+
+	for node in get_tree().get_nodes_in_group("enemy"):
+		if node == self:
+			continue
+		if node == null or not is_instance_valid(node):
+			continue
+		if not (node is NetworkEnemy):
+			continue
+
+		var ally: NetworkEnemy = node as NetworkEnemy
+		ally._on_ally_death_reported(self, attacker)
+
+
+func _on_ally_death_reported(dead_ally: NetworkEnemy, attacker: Node3D) -> void:
+	if not multiplayer.is_server() or _dying:
+		return
+	if current_state != EnemyState.IDLE:
+		return
+	if dead_ally == null or not is_instance_valid(dead_ally):
+		return
+	if dead_ally.team_id != team_id:
+		return
+	if not _is_valid_target(attacker):
+		return
+
+	var max_alert_distance: float = maxf(ally_death_alert_radius, 0.0)
+	if max_alert_distance > 0.0 and global_position.distance_to(dead_ally.global_position) > max_alert_distance:
+		return
+
+	_force_alert_target(attacker)
+	_debug("ally killed, alert target: %s" % attacker.name)
 
 
 func _cache_visual_root_base_transform() -> void:
@@ -1146,6 +1229,7 @@ func _die(damage_source: Node = null) -> void:
 	_spawn_death_weapon_local(weapon_impulse)
 	_spawn_death_weapon_remote.rpc(weapon_impulse)
 
+	_notify_nearby_allies_about_death(damage_source)
 	_drop_loot()
 	emit_signal("died", enemy_id)
 	_remote_die.rpc()

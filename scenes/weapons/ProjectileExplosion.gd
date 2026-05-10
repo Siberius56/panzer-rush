@@ -119,10 +119,14 @@ func _try_damage_from_collider(collider: Node) -> void:
 
 	_damaged_targets.append(target)
 
+	var safe_shooter: Node = null
+	if shooter != null and is_instance_valid(shooter):
+		safe_shooter = shooter
+
 	if target.has_method("apply_projectile_damage"):
-		target.apply_projectile_damage(damage, penetration, team, tk, shooter)
+		target.apply_projectile_damage(damage, penetration, team, tk, safe_shooter)
 	elif target.has_method("apply_damage"):
-		target.apply_damage(damage)#, shooter.global_position)
+		_call_apply_damage(target, damage, safe_shooter)
 
 
 func _has_line_of_sight_to_target(target: Node) -> bool:
@@ -224,6 +228,34 @@ func _find_damage_target(node: Node) -> Node:
 		current = current.get_parent()
 
 	return null
+
+
+func _call_apply_damage(target: Node, amount: int, source: Node = null) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+
+	if _method_accepts_argument_count(target, "apply_damage", 2):
+		target.apply_damage(amount, source)
+	else:
+		target.apply_damage(amount)
+
+
+func _method_accepts_argument_count(object: Object, method_name: String, argument_count: int) -> bool:
+	if object == null:
+		return false
+
+	for method_data in object.get_method_list():
+		if String(method_data.name) != method_name:
+			continue
+
+		var args: Array = method_data.get("args", [])
+		var default_args: Array = method_data.get("default_args", [])
+		var min_arg_count: int = maxi(args.size() - default_args.size(), 0)
+		var max_arg_count: int = args.size()
+
+		return argument_count >= min_arg_count and argument_count <= max_arg_count
+
+	return false
 
 
 func _safe_get_property(object: Object, property_name: String) -> Variant:

@@ -12,8 +12,8 @@ radius = 1.15
 albedo_color = Color(0.95, 0.78, 0.15, 1)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_money"]
-top_radius = 0.18
-bottom_radius = 0.18
+top_radius = 0.25
+bottom_radius = 0.25
 height = 0.08
 radial_segments = 24
 rings = 1

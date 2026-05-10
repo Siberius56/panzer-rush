@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://q654pbgk6xhk"]
 
 [ext_resource type="Script" uid="uid://cp786xiv1ceq1" path="res://scenes/ui/PlayerHUD.gd" id="1_playerhud"]
+[ext_resource type="PackedScene" uid="uid://h63fhlav7giv" path="res://scenes/ui/PlayerNameMarker.tscn" id="2_0741g"]
 [ext_resource type="Texture2D" uid="uid://bau64is7q1n3" path="res://icon.svg" id="2_rq211"]
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=1032802562]
 script = ExtResource("1_playerhud")
 name_marker_margin = 64.0
+name_marker_scene = ExtResource("2_0741g")
 
 [node name="Root" type="Control" parent="." unique_id=675732997]
 layout_mode = 3
@@ -140,6 +142,22 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Ammo_Rocket" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer4" unique_id=1136285043]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "9999"
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=406956642]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer5" unique_id=697740943]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_rq211")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Energy" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer5" unique_id=424266764]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
@@ -322,8 +340,40 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
+[node name="RepairTargetPanel" type="PanelContainer" parent="Root" unique_id=2121900204]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 1
+offset_left = -130.0
+offset_top = -44.0
+offset_right = 130.0
+mouse_filter = 2
 
-[node name="PassagePanel" type="PanelContainer" parent="Root"]
+[node name="RepairTargetMargin" type="MarginContainer" parent="Root/RepairTargetPanel" unique_id=2145714058]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="RepairTargetVBox" type="VBoxContainer" parent="Root/RepairTargetPanel/RepairTargetMargin" unique_id=1154588561]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RepairTargetLabel" type="Label" parent="Root/RepairTargetPanel/RepairTargetMargin/RepairTargetVBox" unique_id=1830680717]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tank : 0 / 0"
+horizontal_alignment = 1
+
+[node name="RepairTargetProgress" type="ProgressBar" parent="Root/RepairTargetPanel/RepairTargetMargin/RepairTargetVBox" unique_id=1946783050]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+show_percentage = false
+
+[node name="PassagePanel" type="PanelContainer" parent="Root" unique_id=1216488325]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(460, 0)
@@ -341,27 +391,67 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="PassageMargin" type="MarginContainer" parent="Root/PassagePanel"]
+[node name="PassageMargin" type="MarginContainer" parent="Root/PassagePanel" unique_id=1899952761]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 12
 
-[node name="PassageVBox" type="VBoxContainer" parent="Root/PassagePanel/PassageMargin"]
+[node name="PassageVBox" type="VBoxContainer" parent="Root/PassagePanel/PassageMargin" unique_id=1677153559]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PassageLabel" type="Label" parent="Root/PassagePanel/PassageMargin/PassageVBox"]
+[node name="PassageLabel" type="Label" parent="Root/PassagePanel/PassageMargin/PassageVBox" unique_id=631110463]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Point de passage"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="PassageProgress" type="ProgressBar" parent="Root/PassagePanel/PassageMargin/PassageVBox"]
+[node name="PassageProgress" type="ProgressBar" parent="Root/PassagePanel/PassageMargin/PassageVBox" unique_id=2021912896]
 unique_name_in_owner = true
 visible = false
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+show_percentage = false
+
+[node name="ReloadPanel" type="PanelContainer" parent="Root" unique_id=1324680352]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -230.0
+offset_top = -210.0
+offset_right = 230.0
+offset_bottom = -130.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="PassageMargin" type="MarginContainer" parent="Root/ReloadPanel" unique_id=218759934]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="ReloadPanel" type="VBoxContainer" parent="Root/ReloadPanel/PassageMargin" unique_id=277548469]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ReloadLabel" type="Label" parent="Root/ReloadPanel/PassageMargin/ReloadPanel" unique_id=318550348]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Rechargement : 0 %"
+horizontal_alignment = 1
+
+[node name="ReloadProgress" type="ProgressBar" parent="Root/ReloadPanel/PassageMargin/ReloadPanel" unique_id=2147451624]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 show_percentage = false

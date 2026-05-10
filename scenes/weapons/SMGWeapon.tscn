@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://nykf7fy7m5jg"]
 
-[ext_resource type="PackedScene" path="res://scenes/weapons/WeaponVisualBase.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_8h87y"]
+[ext_resource type="PackedScene" uid="uid://dk7oq8ajhecnw" path="res://asset/weapon/blaster-m.glb" id="2_q2wlv"]
 
 [sub_resource type="StandardMaterial3D" id="1_mat"]
 albedo_color = Color(0.16, 0.16, 0.16, 1)
@@ -14,33 +15,51 @@ size = Vector3(0.14, 0.16, 0.91)
 [sub_resource type="BoxMesh" id="BoxMesh_pxxu8"]
 size = Vector3(0.14, 0.16, 0.3)
 
-[node name="SMGWeapon" unique_id=756254549 instance=ExtResource("1_base")]
+[node name="SMGWeapon" type="Node3D" unique_id=756254549]
+script = ExtResource("1_8h87y")
 weapon_id = "smg"
 weapon_label = "smg"
+weapon_local_position = Vector3(0.22, 1.25, -0.2)
 magazine_size = 20
+reload_duration = 1.2
 automatic_fire = true
 fire_cooldown = 0.09
 shot_dispersion_degrees = 6.0
 
-[node name="WeaponMesh" parent="." index="0"]
+[node name="WeaponMesh" type="MeshInstance3D" parent="." unique_id=1203303020]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.28)
+visible = false
 material_override = SubResource("1_mat")
 mesh = SubResource("1_mesh")
 
-[node name="WeaponMesh4" type="MeshInstance3D" parent="." index="1" unique_id=1078120938]
+[node name="WeaponMesh4" type="MeshInstance3D" parent="." unique_id=1078120938]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08727509, -0.3984268)
+visible = false
 material_override = SubResource("1_mat")
 mesh = SubResource("BoxMesh_8h87y")
 
-[node name="WeaponMesh3" type="MeshInstance3D" parent="." index="2" unique_id=1498441904]
+[node name="WeaponMesh3" type="MeshInstance3D" parent="." unique_id=1498441904]
 transform = Transform3D(1, 0, 0, 0, 0.9136235, -0.40656126, 0, 0.40656126, 0.9136235, 0, -0.085274965, 0.1671302)
+visible = false
 material_override = SubResource("1_mat")
 mesh = SubResource("BoxMesh_pxxu8")
 
-[node name="WeaponMesh2" type="MeshInstance3D" parent="." index="3" unique_id=1800260594]
+[node name="WeaponMesh2" type="MeshInstance3D" parent="." unique_id=1800260594]
 transform = Transform3D(1, 0, 0, 0, -0.22481503, -0.9744015, 0, 0.9744015, -0.22481503, 2.3841858e-07, -0.21749061, -0.41748005)
+visible = false
 material_override = SubResource("1_mat")
 mesh = SubResource("1_mesh")
 
-[node name="Muzzle" parent="." index="4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07573971, -0.93855333)
+[node name="Body" type="Node3D" parent="." unique_id=549457264]
+
+[node name="blaster-m2" parent="Body" unique_id=25116775 instance=ExtResource("2_q2wlv")]
+transform = Transform3D(1.7, 0, 0, 0, 1.7, 0, 0, 0, 1.7, 0, 0.024105072, -0.28403807)
+
+[node name="Muzzle" type="Marker3D" parent="." unique_id=661691855]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12709579, -0.8945471)
+
+[node name="LeftGrip" type="Node3D" parent="." unique_id=2116676436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.078692734, -0.07827324, -0.38172066)
+
+[node name="RightGrip" type="Node3D" parent="." unique_id=828302147]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08351433, -0.04702282, -0.08533028)

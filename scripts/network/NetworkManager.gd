@@ -5,7 +5,8 @@ signal connection_failed(message: String)
 signal connection_closed(message: String)
 signal player_list_changed
 
-const GAME_SCENE_PATH := "res://scenes/game/NetworkMain.tscn"
+const DEFAULT_GAME_SCENE_PATH: String = "res://scenes/game/NetworkMain.tscn"
+var GAME_SCENE_PATH: String = DEFAULT_GAME_SCENE_PATH
 const STEAM_VIRTUAL_PORT := 0
 const SERVER_PEER_ID := 1
 
@@ -194,6 +195,7 @@ func leave_game(emit_update: bool = true) -> void:
 	steam_host_id = 0
 	network_mode = NetworkMode.NONE
 	is_host_session = false
+	GAME_SCENE_PATH = DEFAULT_GAME_SCENE_PATH
 	players.clear()
 
 	if has_node("/root/GameSessionState"):
@@ -240,14 +242,24 @@ func can_start_game() -> bool:
 	return true
 
 
-func start_game() -> void:
+func start_game(new_path: String = "") -> void:
 	if not is_host_session:
 		print("[NET] start_game ignored. Not host session.")
 		return
+
 	if not can_start_game():
 		print("[NET] start_game ignored. Not everyone ready.")
 		return
-	_load_game_scene.rpc()
+
+	var scene_path: String = new_path.strip_edges()
+	if scene_path.is_empty():
+		scene_path = GAME_SCENE_PATH.strip_edges()
+	if scene_path.is_empty():
+		scene_path = DEFAULT_GAME_SCENE_PATH
+
+	GAME_SCENE_PATH = scene_path
+	print("[NET] start_game scene_path=", scene_path)
+	_load_game_scene.rpc(scene_path)
 
 
 func get_player_display_name(peer_id: int) -> String:
@@ -400,10 +412,22 @@ func _set_ready_state(to_ready: bool) -> void:
 
 
 @rpc("authority", "call_local", "reliable")
-func _load_game_scene() -> void:
+func _load_game_scene(scene_path: String = "") -> void:
+	var resolved_scene_path: String = scene_path.strip_edges()
+	if resolved_scene_path.is_empty():
+		resolved_scene_path = GAME_SCENE_PATH.strip_edges()
+	if resolved_scene_path.is_empty():
+		resolved_scene_path = DEFAULT_GAME_SCENE_PATH
+
+	GAME_SCENE_PATH = resolved_scene_path
+
 	if has_node("/root/GameSessionState"):
 		GameSessionState.reset_run_state()
-	get_tree().change_scene_to_file(GAME_SCENE_PATH)
+
+	print("[NET] load_game_scene unique_id=", multiplayer.get_unique_id(), " scene_path=", resolved_scene_path)
+	var error: int = get_tree().change_scene_to_file(resolved_scene_path)
+	if error != OK:
+		push_error("Impossible de charger la scène réseau: %s. Code %s." % [resolved_scene_path, error])
 
 
 @rpc("authority", "call_local", "reliable")

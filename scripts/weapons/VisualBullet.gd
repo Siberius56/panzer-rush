@@ -244,11 +244,20 @@ func _spawn_hit_effect(hit_position: Vector3, hit_normal: Vector3) -> void:
 	if fx == null:
 		return
 
+	var safe_shooter: Node = null
+	if shooter != null and is_instance_valid(shooter):
+		safe_shooter = shooter
+
+	# Important si le hit effect est une explosion qui applique aussi des dégâts.
+	# Sans cela, ProjectileExplosion.shooter reste null et les ennemis ne savent pas qui les a touchés.
+	if fx.has_method("configure_from_projectile"):
+		fx.configure_from_projectile(damage, penetration, team, tk, safe_shooter)
+
 	get_tree().current_scene.add_child(fx)
 
 	if fx is Node3D:
 		(fx as Node3D).global_position = hit_position
-		var normal := hit_normal.normalized()
+		var normal: Vector3 = hit_normal.normalized()
 		if normal.length_squared() > 0.0001:
 			(fx as Node3D).look_at(hit_position + normal, Vector3.UP)
 

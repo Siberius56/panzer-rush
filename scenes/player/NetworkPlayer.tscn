@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://djofqk0vvu0gl"]
 
-[ext_resource type="Script" uid="uid://cruyvid54k3qy" path="res://scripts/player/NetworkPlayer.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://cruyvid54k3qy" path="res://scenes/player/NetworkPlayer.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://dlkubd5uv6v6j" path="res://vehicle_system/VehicleInteractor.gd" id="2_vehicle"]
 [ext_resource type="Script" uid="uid://ikcacsw88nek" path="res://upgrade_station/UpgradeStationInteractor.gd" id="3_upgrade"]
 

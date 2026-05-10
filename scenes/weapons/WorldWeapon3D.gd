@@ -4,10 +4,11 @@ class_name WorldWeapon3D
 const PISTOL_SCENE := preload("uid://dd33dmmqhjkul")
 const SMG_SCENE := preload("uid://nykf7fy7m5jg")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm")
+const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
 
 @export var state_send_interval: float = 0.05
 
-@export_enum("pistol", "smg", "rifle") var editor_weapon_id: String = "pistol"
+@export_enum("pistol", "smg", "rifle", "repair_tool") var editor_weapon_id: String = "pistol"
 @export var editor_ammo_in_magazine: int = 12
 @export var editor_reserve_ammo: int = 36
 @export var editor_spawn_on_ready: bool = true
@@ -28,6 +29,8 @@ static func get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return SMG_SCENE
 		"rifle":
 			return RIFLE_SCENE
+		"repair_tool":
+			return REPAIR_TOOL_SCENE
 		_:
 			return null
 

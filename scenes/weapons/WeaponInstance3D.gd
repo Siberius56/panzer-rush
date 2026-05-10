@@ -6,6 +6,10 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export_group("Meta")
 @export var weapon_id: String = "pistol"
 @export var weapon_label: String = "Pistol"
+@export var weapon_local_position: Vector3 = Vector3(0.22, 1.25, -0.5)
+
+@export_group("Behaviour")
+@export_enum("projectile", "repair_tool") var weapon_behavior: String = "projectile"
 
 @export_group("Ammo")
 @export var magazine_size: int = 12
@@ -22,6 +26,13 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export var projectile_tk: bool = false
 @export var projectile_scene: PackedScene = DEFAULT_VISUAL_BULLET_SCENE
 @export var projectile_impact_scene: PackedScene
+
+@export_group("Repair Tool")
+@export var repair_amount: int = 8
+@export var repair_damage: int = 4
+@export var repair_range: float = 2.8
+@export var repair_revive_dead_vehicle: bool = true
+@export_flags_3d_physics var repair_collision_mask: int = 0xFFFFFFFF
 
 @export_group("Hold")
 @export var hand_position: Vector3 = Vector3.ZERO

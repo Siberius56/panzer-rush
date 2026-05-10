@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dcjlkduw3fqua"]
+
+[ext_resource type="Script" uid="uid://kudcif4er04y" path="res://scenes/props/props_master.gd" id="1_a3ptl"]
+[ext_resource type="PackedScene" uid="uid://cht7tbf0cdn2a" path="res://asset/map/misc-2/tree-tall.glb" id="2_2tfvx"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1niyt"]
+height = 4.0
+radius = 0.6
+
+[node name="Tree_Pine_Tall" type="StaticBody3D" unique_id=49958975]
+script = ExtResource("1_a3ptl")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1461689295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("CylinderShape3D_1niyt")
+
+[node name="tree-tall2" parent="." unique_id=1727590900 instance=ExtResource("2_2tfvx")]
+transform = Transform3D(4, 0, 0, 0, 4.5, 0, 0, 0, 4, 0, 0, 0)

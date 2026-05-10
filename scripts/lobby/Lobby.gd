@@ -10,7 +10,7 @@ const MISSIONS: Array[Dictionary] = [
 		"name": "Defend the Coast",
 		"description": "Mission prototype. Les joueurs entrent dans le hangar et doivent survivre aux premières vagues ennemies.",
 		"difficulty": 1,
-		"scene_path": "res://scenes/game/NetworkMain.tscn",
+		"scene_path": "res://scenes/game/Mission_01_Attack_A.tscn",
 		"position": Vector2(780.0, 270.0)
 	},
 	{
@@ -18,7 +18,7 @@ const MISSIONS: Array[Dictionary] = [
 		"name": "Force Landing",
 		"description": "Mission prototype 2. Les joueurs entrent dans le hangar et doivent survivre aux premières vagues ennemies.",
 		"difficulty": 3,
-		"scene_path": "res://scenes/game/NetworkMain.tscn",
+		"scene_path": "res://scenes/game/Mission_01_Attack_A.tscn",
 		"position": Vector2(650.0, 400.0)
 	}
 ]
@@ -748,7 +748,13 @@ func _rpc_start_launch_countdown(mission_index: int) -> void:
 	_refresh_ui()
 
 	var mission: Dictionary = MISSIONS[mission_index]
-	var scene_path: String = str(mission.get("scene_path", ""))
+	var scene_path: String = str(mission.get("scene_path", "")).strip_edges()
+	if scene_path.is_empty():
+		if _is_local_host():
+			_rpc_cancel_launch_countdown.rpc("Chemin de mission invalide.")
+		return
+
+	NetworkManager.GAME_SCENE_PATH = scene_path
 	_run_launch_countdown(scene_path)
 
 
@@ -789,26 +795,16 @@ func _rpc_cancel_launch_countdown(message: String) -> void:
 
 
 func _network_start_game(scene_path: String) -> void:
-	var method_list: Array = NetworkManager.get_method_list()
-	
-	GameSessionState.reset_run_state()
-	
-	for method_data: Dictionary in method_list:
-		if str(method_data.get("name", "")) != "start_game":
-			continue
-
-		var argument_count: int = 0
-		if method_data.has("args") and method_data["args"] is Array:
-			var args: Array = method_data["args"] as Array
-			argument_count = args.size()
-
-		if argument_count >= 1:
-			NetworkManager.call("start_game", scene_path)
-		else:
-			NetworkManager.call("start_game")
+	var resolved_scene_path: String = scene_path.strip_edges()
+	if resolved_scene_path.is_empty():
+		_rpc_cancel_launch_countdown.rpc("Chemin de mission invalide.")
 		return
 
-	_rpc_cancel_launch_countdown.rpc("NetworkManager.start_game() est introuvable.")
+	if not NetworkManager.has_method("start_game"):
+		_rpc_cancel_launch_countdown.rpc("NetworkManager.start_game() est introuvable.")
+		return
+
+	NetworkManager.call("start_game", resolved_scene_path)
 
 
 func _on_back_button_pressed() -> void:
@@ -863,4 +859,4 @@ func _on_debug_start_button_up():
 	NetworkManager.set_local_ready(not NetworkManager.is_local_player_ready())
 	
 	if _is_local_host():
-		_network_start_game("res://scenes/game/NetworkMain.tscn")
+		_network_start_game("res://scenes/game/Mission_01_Attack_A.tscn")

@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://2nuue7olxchy"]
+
+[ext_resource type="Script" uid="uid://dg5hjth6ecm3d" path="res://scenes/weapons/weapon_empty.gd" id="1_empty_weapon"]
+
+[node name="weapon_empty" type="Node3D" unique_id=1962344132]
+script = ExtResource("1_empty_weapon")
+weapon_local_position = Vector3(0, 1, -0.4)
+
+[node name="LeftGrip" type="Node3D" parent="." unique_id=282814633]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -0.2, 0.15602867)
+
+[node name="RightGrip" type="Node3D" parent="." unique_id=365164352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.15, 0.106028676)

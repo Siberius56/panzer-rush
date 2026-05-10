@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dxg6ye53rg5gu"]
+
+[ext_resource type="PackedScene" uid="uid://dj2npe35gf15h" path="res://asset/map/road/construction-cone.glb" id="1_jmg0u"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v6s7g"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[node name="RigidBody3D" type="RigidBody3D" unique_id=1144813020]
+collision_layer = 0
+collision_mask = 15
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1968510641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46904534, 0)
+shape = SubResource("BoxShape3D_v6s7g")
+
+[node name="construction-cone2" parent="." unique_id=1366536073 instance=ExtResource("1_jmg0u")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)

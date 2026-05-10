@@ -72,7 +72,7 @@ var is_dead := false
 
 @export_group("Impact Damage")
 @export var impact_damage_enabled: bool = true
-@export var impact_min_speed: float = 2.0
+@export var impact_min_speed: float = 1.0
 @export var impact_damage_at_min_speed: int = 5
 @export var impact_damage_per_speed: float = 2.0
 @export var impact_max_damage: int = 40
@@ -95,13 +95,12 @@ var is_dead := false
 @export_group("Enemy Soft Collision")
 @export var enemy_soft_collision_enabled: bool = true
 @export var enemy_soft_impact_area_path: NodePath = ^"EnemySoftImpactArea"
-@export_range(1, 32, 1) var enemy_soft_collision_layer_bit: int = 3
 @export var enemy_soft_collision_groups: Array[StringName] = [
 	&"enemy",
 	&"enemies",
 ]
-@export var enemy_soft_push_velocity: float = 8.0
-@export var enemy_soft_push_upward_velocity: float = .75
+@export var enemy_soft_push_velocity: float = 18.0 # 8
+@export var enemy_soft_push_upward_velocity: float = 1.75 # .75
 @export var enemy_soft_position_nudge: float = 0.18
 @export var enemy_soft_push_rigidbody_impulse_multiplier: float = 2.0
 
@@ -699,6 +698,37 @@ func apply_damage(amount: int) -> void:
 	_sync_vehicle_health.rpc(health)
 
 
+func apply_repair(amount: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	if amount <= 0:
+		return
+
+	if health >= max_health and not is_dead:
+		return
+
+	health = clampi(health + amount, 0, max_health)
+
+	if is_dead and health > 0:
+		_server_revive_vehicle()
+		return
+
+	_sync_vehicle_health.rpc(health)
+
+
+func _server_revive_vehicle() -> void:
+	if not multiplayer.is_server():
+		return
+
+	if health <= 0:
+		health = 1
+
+	_sync_vehicle_revived.rpc(health)
+	_broadcast_seat_layout()
+	state_timer = 0.0
+
+
 func _server_destroy_vehicle() -> void:
 	if is_dead:
 		return
@@ -752,8 +782,6 @@ func _setup_enemy_soft_impact_area() -> void:
 		return
 
 	_enemy_soft_impact_area = area_node as Area3D
-	#_enemy_soft_impact_area.collision_layer = 0
-	#_enemy_soft_impact_area.collision_mask = _with_collision_layer_bit(0, enemy_soft_collision_layer_bit)
 	_enemy_soft_impact_area.monitoring = true
 	_enemy_soft_impact_area.monitorable = false
 
@@ -786,7 +814,8 @@ func _try_enemy_soft_impact(body: Node, speed: float, delta: float) -> void:
 	var target := _get_enemy_soft_impact_target(body)
 	if target == null:
 		return
-
+	
+	print("tank push")
 	_apply_enemy_soft_push(target, speed, delta)
 
 	if _is_impact_target_on_cooldown(target):
@@ -795,7 +824,8 @@ func _try_enemy_soft_impact(body: Node, speed: float, delta: float) -> void:
 	var damage := _get_impact_damage_from_speed(speed)
 	if damage <= 0:
 		return
-
+	
+	print("tank damage")
 	_register_impact_hit(target)
 	_apply_impact_damage_to_target(target, damage)
 
@@ -803,16 +833,41 @@ func _try_enemy_soft_impact(body: Node, speed: float, delta: float) -> void:
 		print("[VEHICLE SOFT IMPACT] ", name, " hit ", target.name, " | speed=", speed, " | damage=", damage)
 
 
+#func _get_enemy_soft_impact_target(body: Node) -> Node:
+	#if body == null or body == self:
+		#return null
+#
+	#if body.is_in_group(&"vehicle") or body.is_in_group(&"vehicles"):
+		#return null
+#
+	#for group_name in enemy_soft_collision_groups:
+		#if body.is_in_group(group_name):
+			#return body
+#
+	#return null
+
+
 func _get_enemy_soft_impact_target(body: Node) -> Node:
 	if body == null or body == self:
 		return null
 
-	if body.is_in_group(&"vehicle") or body.is_in_group(&"vehicles"):
-		return null
+	var current: Node = body
 
-	for group_name in enemy_soft_collision_groups:
-		if body.is_in_group(group_name):
-			return body
+	while current != null:
+		if current == self:
+			return null
+
+		if current.is_in_group(&"vehicle") or current.is_in_group(&"vehicles"):
+			return null
+
+		for group_name in enemy_soft_collision_groups:
+			if current.is_in_group(group_name):
+				return current
+
+		if current.has_method(&"apply_vehicle_push"):
+			return current
+
+		current = current.get_parent()
 
 	return null
 
@@ -989,7 +1044,12 @@ func _has_impact_damage_method(target: Node) -> bool:
 	if target == null:
 		return false
 
-	return target.has_method(&"apply_damage") or target.has_method(&"take_damage") or target.has_method(&"apply_projectile_damage")
+	return (
+		target.has_method(&"apply_vehicle_impact_damage")
+		or target.has_method(&"apply_damage")
+		or target.has_method(&"take_damage")
+		or target.has_method(&"apply_projectile_damage")
+	)
 
 
 func _is_player_impact_target(target: Node) -> bool:
@@ -1041,9 +1101,15 @@ func _apply_impact_damage_to_target(target: Node, amount: int) -> void:
 
 	var impulse := Vector3.ZERO
 	if linear_velocity.length_squared() > 0.0:
-		# Impulsion volontairement moderee. Les degats restent la vraie consequence.
 		impulse = linear_velocity.normalized() * float(amount)
 
+	if _try_call_damage_method(target, &"apply_vehicle_impact_damage", [amount, self]):
+		print("apply damage from vehicle")
+		apply_projectile_damage(5)
+		return
+	else:
+		print("no apply damage vehicle")
+	
 	if _try_call_damage_method(target, &"apply_damage", [amount, hit_position, impulse]):
 		apply_projectile_damage(5)
 		return
@@ -1673,6 +1739,28 @@ func sync_exit(peer_id: int, exit_pos: Vector3) -> void:
 @rpc("call_local", "reliable")
 func _sync_vehicle_health(new_health: int) -> void:
 	health = clampi(new_health, 0, max_health)
+	if health > 0 and is_dead:
+		_apply_vehicle_revived_state(health)
+
+
+func _apply_vehicle_revived_state(new_health: int) -> void:
+	is_dead = false
+	health = clampi(max(new_health, 1), 1, max_health)
+	steer_input = 0.0
+	drive_input = 0.0
+	engine_force = 0.0
+	brake = idle_brake_force
+	freeze = false
+	sleeping = false
+	client_has_target_transform = false
+
+	set_use_area_enabled(not bool(get_meta("upgrade_station_locked", false)))
+	emit_signal("seat_layout_changed")
+
+
+@rpc("call_local", "reliable")
+func _sync_vehicle_revived(new_health: int) -> void:
+	_apply_vehicle_revived_state(new_health)
 
 
 @rpc("call_local", "reliable")

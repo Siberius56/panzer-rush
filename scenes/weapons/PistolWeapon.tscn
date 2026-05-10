@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dd33dmmqhjkul"]
 
-[ext_resource type="PackedScene" path="res://scenes/weapons/WeaponVisualBase.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_1cyvt"]
+[ext_resource type="PackedScene" uid="uid://df17p84dts7kp" path="res://asset/weapon/blaster-b.glb" id="2_fb1su"]
 
 [sub_resource type="StandardMaterial3D" id="1_mat"]
 albedo_color = Color(0.18, 0.18, 0.18, 1)
@@ -8,18 +9,36 @@ albedo_color = Color(0.18, 0.18, 0.18, 1)
 [sub_resource type="BoxMesh" id="1_mesh"]
 size = Vector3(0.12, 0.14, 0.45)
 
-[node name="PistolWeapon" unique_id=1884597630 instance=ExtResource("1_base")]
+[node name="PistolWeapon" type="Node3D" unique_id=1884597630]
+script = ExtResource("1_1cyvt")
+weapon_local_position = Vector3(0.05, 1.25, -0.5)
+reload_duration = 1.0
 shot_dispersion_degrees = 4.0
 
-[node name="WeaponMesh" parent="." index="0"]
+[node name="WeaponMesh" type="MeshInstance3D" parent="." unique_id=1362880811]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.18)
+visible = false
 material_override = SubResource("1_mat")
 mesh = SubResource("1_mesh")
 
-[node name="WeaponMesh2" type="MeshInstance3D" parent="." index="1" unique_id=1627489867]
+[node name="WeaponMesh2" type="MeshInstance3D" parent="." unique_id=1627489867]
 transform = Transform3D(1, 0, 0, 0, 0.38174793, -0.92426646, 0, 0.92426646, 0.38174793, -2.3841858e-07, -0.18054295, 0.060610563)
+visible = false
 material_override = SubResource("1_mat")
 mesh = SubResource("1_mesh")
 
-[node name="Muzzle" parent="." index="2"]
+[node name="Body" type="Node3D" parent="." unique_id=669026699]
+
+[node name="blaster-b2" parent="Body" unique_id=1723594667 instance=ExtResource("2_fb1su")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, -0.06687462)
+
+[node name="Muzzle" type="Marker3D" parent="." unique_id=1836584705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.46378955)
+
+[node name="LeftGrip" type="Node3D" parent="." unique_id=143408305]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09027201, 0, -0.14089882)
+
+[node name="RightGrip" type="Node3D" parent="." unique_id=1244236421]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06391257, -0.13459611, 0.031237572)
+
+[editable path="Body/blaster-b2"]

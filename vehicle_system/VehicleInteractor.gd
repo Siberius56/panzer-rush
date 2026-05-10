@@ -13,7 +13,7 @@ class_name VehicleInteractor
 @export var move_backward_action: StringName = &"move_backward"
 @export var move_left_action: StringName = &"move_left"
 @export var move_right_action: StringName = &"move_right"
-@export var hide_visuals_when_driving: bool = false
+@export var hide_visuals_when_driving: bool = true
 @export var disable_collision_when_driving: bool = true
 @export var sync_player_to_seat: bool = true
 @export var rotate_player_with_vehicle: bool = false #true
@@ -39,6 +39,17 @@ func _ready() -> void:
 
 	if not player_body.is_in_group("players"):
 		player_body.add_to_group("players")
+
+	if player_visuals == null:
+		player_visuals = player_body.get_node_or_null("VisualRoot") as Node3D
+
+	if player_collision == null:
+		player_collision = player_body.get_node_or_null("CollisionShape3D") as CollisionShape3D
+
+	if player_camera == null:
+		player_camera = player_body.get_node_or_null("CameraRig/SpringArm3D/Camera3D") as Camera3D
+		if player_camera == null:
+			player_camera = player_body.get_node_or_null("CameraRig/Camera3D") as Camera3D
 
 	for path in extra_nodes_to_disable_when_driving:
 		var node := get_node_or_null(path)
@@ -308,6 +319,9 @@ func exit_vehicle(exit_pos: Vector3) -> void:
 
 		if player_body.has_method("set_vehicle_mode"):
 			player_body.set_vehicle_mode(false)
+
+		if player_body.has_method("on_exited_vehicle"):
+			player_body.on_exited_vehicle()
 
 
 func _sync_body_to_vehicle() -> void:
