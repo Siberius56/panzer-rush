@@ -478,8 +478,9 @@ func _on_host_button_pressed() -> void:
 		_set_buttons_enabled(true)
 		return
 
-	status_label.text = "Serveur lancé sur le port %s. Écoute UDP attendue sur ce port." % port
-	_change_scene_safely(LOBBY_SCENE_PATH)
+	if not steam_scene_change_started:
+		status_label.text = "Serveur lancé sur le port %s. Écoute UDP attendue sur ce port." % port
+		_go_to_lobby_scene_once("lan_host_created")
 
 
 func _on_join_button_pressed() -> void:
@@ -540,9 +541,13 @@ func _get_port_value() -> int:
 func _set_buttons_enabled(enabled: bool) -> void:
 	host_button.disabled = not enabled
 	join_button.disabled = not enabled
+	host_steam_button.disabled = not enabled
+	invite_friend_button.disabled = not enabled
+	join_lobby_id_button.disabled = not enabled
 	ip_edit.editable = enabled
 	port_edit.editable = enabled
 	player_name_edit.editable = enabled
+	join_lobby_id_edit.editable = enabled
 
 
 func _change_scene_safely(scene_path: String) -> void:
@@ -559,14 +564,24 @@ func _change_scene_safely(scene_path: String) -> void:
 	tree.call_deferred("change_scene_to_file", scene_path)
 
 
+func _go_to_lobby_scene_once(reason: String) -> void:
+	if steam_scene_change_started:
+		debug_log("Lobby scene change ignored. Already started. reason=%s" % reason)
+		return
+
+	steam_scene_change_started = true
+	status_label.text = "Connexion réussie. Ouverture du lobby..."
+	debug_log("Opening lobby scene. reason=%s" % reason)
+	_change_scene_safely(LOBBY_SCENE_PATH)
+
+
 func _on_connection_succeeded() -> void:
 	if not is_inside_tree():
 		return
 
 	join_attempt_id += 1
 	debug_log("SIGNAL connection_succeeded. %s" % get_connection_debug_state())
-	status_label.text = "Connexion réussie. Ouverture du lobby..."
-	_change_scene_safely(LOBBY_SCENE_PATH)
+	_go_to_lobby_scene_once("connection_succeeded")
 
 
 func _on_connection_failed(message: String = "Connexion impossible.") -> void:
@@ -574,6 +589,7 @@ func _on_connection_failed(message: String = "Connexion impossible.") -> void:
 		return
 
 	join_attempt_id += 1
+	steam_scene_change_started = false
 	debug_log("SIGNAL connection_failed. message=%s state=%s" % [message, get_connection_debug_state()])
 	status_label.text = "%s Vérifie IP, port, pare-feu macOS, réseau invité et isolation Wi-Fi." % message
 	_set_buttons_enabled(true)
@@ -584,6 +600,7 @@ func _on_connection_closed(message: String = "Connexion fermée.") -> void:
 		return
 
 	join_attempt_id += 1
+	steam_scene_change_started = false
 	debug_log("SIGNAL connection_closed. message=%s state=%s" % [message, get_connection_debug_state()])
 	status_label.text = message
 	_set_buttons_enabled(true)
@@ -623,6 +640,9 @@ func _on_join_timeout(attempt_id: int, ip: String, port: int) -> void:
 
 
 func _on_host_steam_button_pressed() -> void:
+	join_attempt_id += 1
+	steam_scene_change_started = false
+	_set_buttons_enabled(false)
 	status_label.text = "Création du lobby Steam..."
 	print("[MAIN_MENU_STEAM] Host Steam Lobby pressed")
 
@@ -649,16 +669,16 @@ func _on_steam_lobby_created(lobby_id: int) -> void:
 	var result := NetworkManager.host_steam(player_name_edit.text)
 
 	if result != OK:
+		steam_scene_change_started = false
 		status_label.text = NetworkManager.last_message
+		_set_buttons_enabled(true)
 		print("[MAIN_MENU_STEAM] host_steam failed: ", NetworkManager.last_message)
 		return
-
-	steam_scene_change_started = true
 
 	if not is_inside_tree():
 		return
 
-	_change_scene_safely(LOBBY_SCENE_PATH)
+	_go_to_lobby_scene_once("steam_lobby_created")
 
 
 func _on_steam_lobby_joined(lobby_id: int) -> void:
@@ -681,16 +701,20 @@ func _on_steam_lobby_joined(lobby_id: int) -> void:
 	var result := NetworkManager.join_steam(host_steam_id, player_name_edit.text)
 
 	if result != OK:
+		steam_scene_change_started = false
 		status_label.text = NetworkManager.last_message
+		_set_buttons_enabled(true)
 		print("[MAIN_MENU_STEAM] join_steam failed: ", NetworkManager.last_message)
 		return
 
 	status_label.text = "Connexion Steam en cours..."
-	print("[MAIN_MENU_STEAM] join_steam started.")
+	print("[MAIN_MENU_STEAM] join_steam started. ", get_connection_debug_state())
 
 
 func _on_steam_lobby_failed(message: String) -> void:
+	steam_scene_change_started = false
 	status_label.text = message
+	_set_buttons_enabled(true)
 	print("[MAIN_MENU_STEAM] Steam lobby failed: ", message)
 
 
@@ -705,14 +729,21 @@ func _on_join_lobby_id_button_pressed() -> void:
 	var text := join_lobby_id_edit.text.strip_edges()
 
 	if text.is_empty():
+		status_label.text = "ID de lobby vide."
 		print("[STEAM_LOBBY] Lobby ID vide.")
 		return
 
 	if not text.is_valid_int():
+		status_label.text = "ID de lobby invalide."
 		print("[STEAM_LOBBY] Lobby ID invalide: ", text)
 		return
 
 	var lobby_id := int(text)
+
+	join_attempt_id += 1
+	steam_scene_change_started = false
+	_set_buttons_enabled(false)
+	status_label.text = "Connexion au lobby Steam %s..." % lobby_id
 
 	print("[STEAM_LOBBY] Manual join lobby: ", lobby_id)
 	SteamLobbyManager.join_lobby(lobby_id)

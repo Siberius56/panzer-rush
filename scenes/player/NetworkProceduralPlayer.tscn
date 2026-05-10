@@ -238,7 +238,8 @@ emission_energy_multiplier = 1.8
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_6qof4"]
 dof_blur_far_enabled = true
-dof_blur_near_enabled = true
+dof_blur_far_distance = 16.0
+dof_blur_amount = 0.2
 
 [node name="NetworkProceduralPlayer" type="CharacterBody3D" unique_id=1893229279 groups=["ally"]]
 collision_mask = 15

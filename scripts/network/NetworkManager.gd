@@ -9,6 +9,8 @@ const DEFAULT_GAME_SCENE_PATH: String = "res://scenes/game/NetworkMain.tscn"
 var GAME_SCENE_PATH: String = DEFAULT_GAME_SCENE_PATH
 const STEAM_VIRTUAL_PORT := 0
 const SERVER_PEER_ID := 1
+const STEAM_CLIENT_CONNECTION_TIMEOUT_SECONDS: float = 10.0
+const STEAM_CLIENT_DISCONNECTED_GRACE_SECONDS: float = 1.0
 
 enum NetworkMode {
 	NONE,
@@ -25,6 +27,12 @@ var last_message: String = ""
 var network_mode: NetworkMode = NetworkMode.NONE
 var steam_host_id: int = 0
 var steam_peer: MultiplayerPeer = null
+var pending_steam_client_connection: bool = false
+var pending_steam_client_elapsed: float = 0.0
+var client_registered_with_server: bool = false
+var connection_success_emitted: bool = false
+var pending_steam_client_last_status: int = -1
+var pending_steam_client_next_debug_time: float = 0.0
 
 # Important : on ne se fie pas uniquement à multiplayer.is_server().
 # Avec SteamMultiplayerPeer, certains états peuvent être ambigus pendant le prototype.
@@ -46,6 +54,12 @@ func _ready() -> void:
 
 	if not multiplayer.server_disconnected.is_connected(_on_server_disconnected):
 		multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+
+func _process(delta: float) -> void:
+	if pending_steam_client_connection:
+		pending_steam_client_elapsed += delta
+		_check_pending_steam_client_connection()
 
 
 func host_game(port: int, player_name: String, desired_max_clients: int = 4) -> int:
@@ -72,7 +86,7 @@ func host_game(port: int, player_name: String, desired_max_clients: int = 4) -> 
 	multiplayer.multiplayer_peer = peer
 	_add_or_update_local_host_player(0)
 	_broadcast_player_list()
-	connection_succeeded.emit()
+	_emit_connection_succeeded_once()
 	return OK
 
 
@@ -140,7 +154,7 @@ func host_steam(player_name: String) -> int:
 	last_message = "Host Steam actif."
 	print("[NET_STEAM] Host ready. unique_id=", multiplayer.get_unique_id(), " steam_id=", _get_local_steam_id(), " is_server=", multiplayer.is_server())
 
-	connection_succeeded.emit()
+	_emit_connection_succeeded_once()
 	return OK
 
 
@@ -181,8 +195,15 @@ func join_steam(host_steam_id: int, player_name: String) -> int:
 
 	steam_peer = peer
 	multiplayer.multiplayer_peer = steam_peer
+	pending_steam_client_connection = true
+	pending_steam_client_elapsed = 0.0
+	client_registered_with_server = false
+	connection_success_emitted = false
+	pending_steam_client_last_status = -1
+	pending_steam_client_next_debug_time = 0.0
 	last_message = "Connexion Steam en cours..."
-	print("[NET_STEAM] Client peer created. local unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
+	print("[NET_STEAM] Client peer created. local unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server(), " status=", _connection_status_to_text(steam_peer.get_connection_status()))
+	call_deferred("_check_pending_steam_client_connection")
 	return OK
 
 
@@ -193,6 +214,12 @@ func leave_game(emit_update: bool = true) -> void:
 	multiplayer.multiplayer_peer = null
 	steam_peer = null
 	steam_host_id = 0
+	pending_steam_client_connection = false
+	pending_steam_client_elapsed = 0.0
+	client_registered_with_server = false
+	connection_success_emitted = false
+	pending_steam_client_last_status = -1
+	pending_steam_client_next_debug_time = 0.0
 	network_mode = NetworkMode.NONE
 	is_host_session = false
 	GAME_SCENE_PATH = DEFAULT_GAME_SCENE_PATH
@@ -331,20 +358,13 @@ func _on_peer_disconnected(id: int) -> void:
 
 
 func _on_connected_to_server() -> void:
-	print("[NET] connected_to_server mode=", NetworkMode.keys()[network_mode], " unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
-
-	_register_player.rpc_id(SERVER_PEER_ID, {
-		"name": local_player_name,
-		"ready": false,
-		"steam_id": _get_local_steam_id() if network_mode == NetworkMode.STEAM else 0
-	})
-
-	connection_succeeded.emit()
+	_handle_client_connected_to_server("connected_to_server_signal")
 
 
 func _on_connection_failed() -> void:
 	last_message = "Connexion au serveur impossible."
 	print("[NET] connection_failed mode=", NetworkMode.keys()[network_mode])
+	pending_steam_client_connection = false
 	leave_game()
 	connection_failed.emit(last_message)
 
@@ -352,8 +372,100 @@ func _on_connection_failed() -> void:
 func _on_server_disconnected() -> void:
 	last_message = "La session a été fermée par l'hôte."
 	print("[NET] server_disconnected mode=", NetworkMode.keys()[network_mode])
+	pending_steam_client_connection = false
 	leave_game()
 	connection_closed.emit(last_message)
+
+
+func _handle_client_connected_to_server(source: String) -> void:
+	pending_steam_client_connection = false
+
+	print("[NET] connected_to_server source=", source, " mode=", NetworkMode.keys()[network_mode], " unique_id=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
+	_register_local_player_with_host_once()
+	_emit_connection_succeeded_once()
+
+
+func _register_local_player_with_host_once() -> void:
+	if is_host_session:
+		return
+
+	if client_registered_with_server:
+		return
+
+	if multiplayer.multiplayer_peer == null:
+		print("[NET] register local player ignored. No multiplayer peer.")
+		return
+
+	client_registered_with_server = true
+
+	_register_player.rpc_id(SERVER_PEER_ID, {
+		"name": local_player_name,
+		"ready": false,
+		"steam_id": _get_local_steam_id() if network_mode == NetworkMode.STEAM else 0
+	})
+
+
+func _emit_connection_succeeded_once() -> void:
+	if connection_success_emitted:
+		print("[NET] connection_succeeded ignored. Already emitted.")
+		return
+
+	connection_success_emitted = true
+	connection_succeeded.emit()
+
+
+func _check_pending_steam_client_connection() -> void:
+	if not pending_steam_client_connection:
+		return
+
+	if network_mode != NetworkMode.STEAM or is_host_session:
+		pending_steam_client_connection = false
+		return
+
+	var peer: MultiplayerPeer = multiplayer.multiplayer_peer
+	if peer == null:
+		_fail_pending_steam_client_connection("Connexion Steam impossible. Aucun peer Steam actif.")
+		return
+
+	var status: int = peer.get_connection_status()
+	if status != pending_steam_client_last_status or pending_steam_client_elapsed >= pending_steam_client_next_debug_time:
+		print("[NET_STEAM] Client connection check status=", _connection_status_to_text(status), " elapsed=", pending_steam_client_elapsed)
+		pending_steam_client_last_status = status
+		pending_steam_client_next_debug_time = pending_steam_client_elapsed + 1.0
+
+	if status == MultiplayerPeer.CONNECTION_CONNECTED:
+		_handle_client_connected_to_server("steam_peer_status")
+		return
+
+	if status == MultiplayerPeer.CONNECTION_DISCONNECTED and pending_steam_client_elapsed >= STEAM_CLIENT_DISCONNECTED_GRACE_SECONDS:
+		_fail_pending_steam_client_connection("Connexion Steam interrompue avant établissement.")
+		return
+
+	if pending_steam_client_elapsed >= STEAM_CLIENT_CONNECTION_TIMEOUT_SECONDS:
+		_fail_pending_steam_client_connection("Connexion Steam impossible. Le lobby Steam est rejoint, mais SteamMultiplayerPeer ne se connecte pas.")
+
+
+func _fail_pending_steam_client_connection(message: String) -> void:
+	if not pending_steam_client_connection:
+		return
+
+	last_message = message
+	print("[NET_STEAM] ", message)
+	pending_steam_client_connection = false
+	leave_game(false)
+	connection_failed.emit(last_message)
+
+
+func _connection_status_to_text(status: int) -> String:
+	match status:
+		MultiplayerPeer.CONNECTION_DISCONNECTED:
+			return "DISCONNECTED"
+		MultiplayerPeer.CONNECTION_CONNECTING:
+			return "CONNECTING"
+		MultiplayerPeer.CONNECTION_CONNECTED:
+			return "CONNECTED"
+		_:
+			return "UNKNOWN_%s" % status
 
 
 func _is_steam_ready() -> bool:
