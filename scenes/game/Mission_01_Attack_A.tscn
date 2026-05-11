@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://doo6u62srmmdm" path="res://upgrade_station/VehicleUpgradeStation.tscn" id="7_p6k03"]
 [ext_resource type="PackedScene" uid="uid://c5rbfou01tacv" path="res://scenes/trigger/MissionExitZone.tscn" id="8_h7tsv"]
 [ext_resource type="Texture2D" uid="uid://c56oytkp3ohe7" path="res://asset/ocean_shader_00001.png" id="8_nw4jy"]
+[ext_resource type="PackedScene" uid="uid://cw10ump4t4hnf" path="res://asset/plane_noise.glb" id="9_ng107"]
 [ext_resource type="PackedScene" uid="uid://h8v8os25dggj" path="res://scenes/trigger/SlidingHangarDoor.tscn" id="9_uliw3"]
 [ext_resource type="ArrayMesh" uid="uid://bn2lx5ye6vput" path="res://scenes/props/grass-large.obj" id="10_a60k3"]
 [ext_resource type="PackedScene" uid="uid://bmxi1yqjht6ej" path="res://asset/map/misc-2/patch-grass-large.glb" id="10_h7tsv"]
@@ -34,8 +35,10 @@
 [ext_resource type="ArrayMesh" uid="uid://drt7qx6psabkp" path="res://scenes/props/tree.obj" id="22_tq13h"]
 [ext_resource type="Texture2D" uid="uid://xeo5jn7pwyn7" path="res://asset/map/misc-2/Textures/colormap.png" id="23_tq13h"]
 [ext_resource type="PackedScene" uid="uid://bbo6apchi6rgm" path="res://asset/map/road/bridge-pillar-wide.glb" id="23_ug7yg"]
-[ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://Pack/pastel_vignette.gdshader" id="24_jytmi"]
+[ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://asset/pastel_vignette.gdshader" id="24_jytmi"]
 [ext_resource type="PackedScene" uid="uid://npi3yjore66q" path="res://scenes/props/Building/Building_A.tscn" id="31_rlgun"]
+[ext_resource type="PackedScene" uid="uid://c14ka1406vt20" path="res://asset/map/nature/modified/cliff_top_rock.tscn" id="39_nw4jy"]
+[ext_resource type="PackedScene" uid="uid://c25af1lrqfywc" path="res://asset/map/nature/cliff_corner_rock.glb" id="39_qwgmg"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_td8tl"]
 
@@ -91,7 +94,7 @@ shader = ExtResource("4_2l6dh")
 shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
 shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
 shader_parameter/foam_color = Color(1, 1, 1, 1)
-shader_parameter/depth_size = 6.0
+shader_parameter/depth_size = 5.0
 shader_parameter/surface_roughness = 0.05
 shader_parameter/foam_roughness = 0.05
 shader_parameter/caustics_texture = ExtResource("5_67hxh")
@@ -119,6 +122,21 @@ material = SubResource("ShaderMaterial_fgnw7")
 size = Vector3(60, 10, 25)
 subdivide_width = 30
 subdivide_height = 30
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ng107"]
+size = Vector3(60, 20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1cjlt"]
+size = Vector3(5, 20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nw4jy"]
+size = Vector3(5, 20, 30.923706)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qwgmg"]
+size = Vector3(5, 20, 24.73877)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4omr8"]
+size = Vector3(5, 20, 72.229004)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rlgun"]
 albedo_color = Color(0.1632472, 0.5388858, 0.4057284, 1)
@@ -267,30 +285,30 @@ default_vehicle_scene = ExtResource("2_ug7yg")
 [node name="SpawnPoints" type="Node3D" parent="." unique_id=1832967375]
 
 [node name="SpawnA" type="Marker3D" parent="SpawnPoints" unique_id=789447208]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4024081, 2.999998, 20.528276)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4024081, 0, 20.528276)
 
 [node name="SpawnB" type="Marker3D" parent="SpawnPoints" unique_id=1093883691]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4537992, 3, 22.555626)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4537992, 0, 22.555626)
 
 [node name="SpawnC" type="Marker3D" parent="SpawnPoints" unique_id=1874501327]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.016435623, 3, 22.48808)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.016435623, 0, 22.48808)
 
 [node name="SpawnD" type="Marker3D" parent="SpawnPoints" unique_id=1809863145]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9835644, 3, 20.48808)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9835644, 0, 20.48808)
 
 [node name="VehicleSpawns" type="Node3D" parent="." unique_id=1089131327]
 
 [node name="SpawnA" type="Marker3D" parent="VehicleSpawns" unique_id=1356902959]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 4.2792525, 2, 21.806915)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 4.2792525, 0, 21.806915)
 
 [node name="SpawnB" type="Marker3D" parent="VehicleSpawns" unique_id=642084212]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7.751032, 2, 21.025372)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7.751032, 0, 21.025372)
 
 [node name="SpawnC" type="Marker3D" parent="VehicleSpawns" unique_id=1680178547]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 5.320621, 2, 19.910437)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 5.320621, 0, 19.910437)
 
 [node name="SpawnD" type="Marker3D" parent="VehicleSpawns" unique_id=1007199597]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 2.1638496, 2, 20.645342)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 2.1638496, 0, 20.645342)
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1594897149]
 navigation_mesh = SubResource("NavigationMesh_td8tl")
@@ -334,7 +352,7 @@ light_volumetric_fog_energy = 0.0
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Floor_01_Spawn_RouteDepart15" type="CSGBox3D" parent="NavigationRegion3D/Floors" unique_id=50605280]
-transform = Transform3D(1, -2.0229606e-08, 7.549791e-08, -2.0229592e-08, 0.86602545, 0.50000006, -7.549791e-08, -0.50000006, 0.86602545, -0.21817821, 3.592459, 15.345997)
+transform = Transform3D(1, -2.0229606e-08, 7.549791e-08, -2.0229592e-08, 0.86602545, 0.50000006, -7.549791e-08, -0.50000006, 0.86602545, -0.21817818, 3.7180808, 15.390129)
 layers = 8
 use_collision = true
 collision_layer = 8
@@ -486,15 +504,6 @@ collision_layer = 8
 collision_mask = 0
 size = Vector3(7.8254395, 1, 10.428192)
 material = SubResource("StandardMaterial3D_kwhn4")
-
-[node name="Floor_01_Spawn_RouteDepart12" type="CSGBox3D" parent="NavigationRegion3D/Floors" unique_id=155250450]
-transform = Transform3D(1, -3.5780658e-09, 3.2676326e-08, -3.5780658e-09, 0.9763036, 0.21640553, -3.2676326e-08, -0.21640553, 0.9763036, 1.6683621, 6.604071, 18.209675)
-layers = 8
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(96.95442, 7.140747, 18.692383)
-material = SubResource("StandardMaterial3D_46sg2")
 
 [node name="Floor_01_Spawn_RouteDepart13" type="CSGBox3D" parent="NavigationRegion3D/Floors" unique_id=1263442164]
 transform = Transform3D(1, -2.2483988e-08, 7.927449e-08, -2.2483988e-08, 0.85109526, 0.52501124, -7.92745e-08, -0.52501124, 0.85109526, 1.6683632, 13.037392, 34.103233)
@@ -650,51 +659,6 @@ use_collision = true
 collision_layer = 8
 collision_mask = 0
 size = Vector3(1, 3, 9.967957)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Spawn_Right2" type="CSGBox3D" parent="NavigationRegion3D/Walls" unique_id=2118238706]
-transform = Transform3D(0.97073746, 4.418524e-09, -0.24014333, 4.418524e-09, 1, 3.6260634e-08, 0.24014333, -3.6260634e-08, 0.97073746, 13.954712, 1.584195, 22.860971)
-visible = false
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 3, 16)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Spawn_Right5" type="CSGBox3D" parent="NavigationRegion3D/Walls" unique_id=1110631251]
-transform = Transform3D(0.86122143, 2.0955e-08, 0.50823003, 2.0954985e-08, 1, -7.67406e-08, -0.50823003, 7.674059e-08, 0.86122143, 15.735886, 1.5841948, 21.948662)
-visible = false
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 3, 16)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Spawn_Right4" type="CSGBox3D" parent="NavigationRegion3D/Walls" unique_id=1648444489]
-transform = Transform3D(-4.3711367e-08, 1.509958e-07, -1, 1.509958e-07, 1, 1.509958e-07, 1, -1.509958e-07, -4.371139e-08, -0.37884927, 1.5841991, 30.706322)
-visible = false
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 3, 28.181519)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Spawn_Right3" type="CSGBox3D" parent="NavigationRegion3D/Walls" unique_id=600625155]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.989761, 1.1751484, 22.889935)
-visible = false
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 3, 16)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Spawn_Right6" type="CSGBox3D" parent="NavigationRegion3D/Walls" unique_id=1768007419]
-transform = Transform3D(0.96947104, 4.6097455e-09, -0.24520586, 4.6097455e-09, 1, 3.7025057e-08, 0.24520586, -3.7025057e-08, 0.96947104, -14.395229, 1.1751484, 22.774086)
-visible = false
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 3, 16)
 material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Right6" type="CSGBox3D" parent="NavigationRegion3D/Walls" unique_id=869928231]
@@ -1207,8 +1171,50 @@ material = SubResource("StandardMaterial3D_mhaih")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.381322, 28.66426)
 mesh = SubResource("BoxMesh_cgyej")
 
+[node name="StaticBody3D_Beach" type="StaticBody3D" parent="NavigationRegion3D/01_Beach" unique_id=254732637]
+transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, -3.573034, -5.3589387, 27.151169)
+collision_layer = 136
+collision_mask = 0
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="NavigationRegion3D/01_Beach/StaticBody3D_Beach" unique_id=505344623]
+transform = Transform3D(1, 0, 0, 0, 1.0000001, 0, 0, 0, 1, 7.755023, -10.499301, -18.934479)
+shape = SubResource("BoxShape3D_ng107")
+debug_color = Color(0.6588335, 0, 0.67, 1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/01_Beach/StaticBody3D_Beach" unique_id=1519859824]
+transform = Transform3D(0.8652127, 0, -0.50140506, 0, 1, 0, 0.50140506, 0, 0.8652127, -20.68689, -6.3106418e-06, -19.254835)
+shape = SubResource("BoxShape3D_1cjlt")
+debug_color = Color(0.6588335, 0, 0.67, 1)
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="NavigationRegion3D/01_Beach/StaticBody3D_Beach" unique_id=259641685]
+transform = Transform3D(0.96634465, 0, 0.25725085, 0, 1.0000012, -2.9802322e-08, -0.257251, 0, 0.96634716, -19.658522, -9.536743e-06, 1.0222282)
+shape = SubResource("BoxShape3D_nw4jy")
+debug_color = Color(0.6588335, 0, 0.67, 1)
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="NavigationRegion3D/01_Beach/StaticBody3D_Beach" unique_id=2042642896]
+transform = Transform3D(0.96634465, 0, 0.25725085, 0, 1, 0, -0.25725085, 0, 0.96634465, 35.87821, -1.087971e-05, -18.226034)
+shape = SubResource("BoxShape3D_1cjlt")
+debug_color = Color(0.6588335, 0, 0.67, 1)
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="NavigationRegion3D/01_Beach/StaticBody3D_Beach" unique_id=2131831404]
+transform = Transform3D(0.9655044, 0, -0.2603866, 0, 1.0000012, 2.9802322e-08, 0.2603867, 0, 0.9655069, 33.404648, -1.1444092e-05, 3.5800018)
+shape = SubResource("BoxShape3D_qwgmg")
+debug_color = Color(0.6588335, 0, 0.67, 1)
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="NavigationRegion3D/01_Beach/StaticBody3D_Beach" unique_id=100874229]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1.0000012, -5.3290705e-15, -1.0000012, 0, -4.3711413e-08, 8.528807, -8.583069e-06, 6.541992)
+shape = SubResource("BoxShape3D_4omr8")
+debug_color = Color(0.6588335, 0, 0.67, 1)
+
+[node name="plane_noise" parent="NavigationRegion3D/01_Beach" unique_id=1042071214 instance=ExtResource("9_ng107")]
+transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, -3.573034, -5.3589387, 27.151169)
+
+[node name="Plane" parent="NavigationRegion3D/01_Beach/plane_noise" index="0" unique_id=1280437093]
+transform = Transform3D(11, 0, 0, 0, 3, 0, 0, 0, 6, 2, 0, 0)
+surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
+
 [node name="Floor_Outside1" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=588941350]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -29.411764, -1.750737, -1.6070948)
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -32.411766, -1.750737, -1.6070948)
 layers = 136
 collision_layer = 8
 collision_mask = 0
@@ -1216,7 +1222,7 @@ size = Vector3(42.006, 4.5, 9.842224)
 material = SubResource("StandardMaterial3D_rlgun")
 
 [node name="Floor_Outside2" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=1202593571]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 27.90311, -1.7507282, -1.6070948)
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 28.90311, -1.7507282, -1.6070948)
 layers = 136
 collision_layer = 8
 collision_mask = 0
@@ -1251,12 +1257,12 @@ size = Vector3(97.637, 4.5, 5.914551)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Floor_02" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=293560802]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0.05312538, -1.7507325, -1.6285648)
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -0.44687462, -1.7507328, -1.6285648)
 layers = 136
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(16.923777, 4.5, 9.8654785)
+size = Vector3(20, 4.5, 9.8)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="bridge-pillar-wide2" parent="NavigationRegion3D/01_Beach" unique_id=341947094 instance=ExtResource("23_ug7yg")]
@@ -1275,7 +1281,7 @@ transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 5.5, 0.5, 3.5)
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 13.5, 0.5, 3.5)
 
 [node name="bridge-pillar-wide15" parent="NavigationRegion3D/01_Beach" unique_id=236798049 instance=ExtResource("23_ug7yg")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 8.5, 0.5, 3.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 9.5, 0.5, 3.5)
 
 [node name="bridge-pillar-wide5" parent="NavigationRegion3D/01_Beach" unique_id=905894310 instance=ExtResource("23_ug7yg")]
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 23.5, 0.5, 3.5)
@@ -1298,6 +1304,7 @@ collision_layer = 8
 collision_mask = 0
 
 [node name="Wall_Left3" type="MeshInstance3D" parent="NavigationRegion3D/01_Beach/StaticBody3D4" unique_id=1650702242]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1920929e-07, 0, -2)
 mesh = SubResource("BoxMesh_jytmi")
 surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
 
@@ -1310,6 +1317,7 @@ collision_layer = 8
 collision_mask = 0
 
 [node name="Wall_Right3" type="MeshInstance3D" parent="NavigationRegion3D/01_Beach/StaticBody3D2" unique_id=573626594]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 mesh = SubResource("BoxMesh_jytmi")
 surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
 
@@ -1332,10 +1340,10 @@ shape = SubResource("BoxShape3D_tq13h")
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -5.5, 0.5, -6.5)
 
 [node name="bridge-pillar-wide16" parent="NavigationRegion3D/01_Beach" unique_id=839960879 instance=ExtResource("23_ug7yg")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -8.5, 0.5, 3.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -10.5, 0.5, 3.5)
 
 [node name="bridge-pillar-wide17" parent="NavigationRegion3D/01_Beach" unique_id=1169625226 instance=ExtResource("23_ug7yg")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -8.5, 0.5, -6.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -10.5, 0.5, -6.5)
 
 [node name="bridge-pillar-wide9" parent="NavigationRegion3D/01_Beach" unique_id=1371181906 instance=ExtResource("23_ug7yg")]
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -13.5, 0.5, -6.5)
@@ -1350,7 +1358,7 @@ transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 5.5, 0.5, -6.5)
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 13.5, 0.5, -6.5)
 
 [node name="bridge-pillar-wide14" parent="NavigationRegion3D/01_Beach" unique_id=69777068 instance=ExtResource("23_ug7yg")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 8.5, 0.5, -6.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 9.5, 0.5, -6.5)
 
 [node name="bridge-pillar-wide13" parent="NavigationRegion3D/01_Beach" unique_id=596722236 instance=ExtResource("23_ug7yg")]
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 23.5, 0.5, -6.5)
@@ -1380,7 +1388,7 @@ mesh = SubResource("BoxMesh_ug7yg")
 surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
 
 [node name="MultiMesh1" type="Node3D" parent="NavigationRegion3D/01_Beach" unique_id=1489446408]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.166311, -1.9073486e-06, -2.604372)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.166311, -1.9073486e-06, -2.604372)
 script = ExtResource("21_rlbbb")
 tree_mesh = ExtResource("22_tq13h")
 material_override = SubResource("StandardMaterial3D_p6k03")
@@ -1394,7 +1402,7 @@ material_override = SubResource("StandardMaterial3D_p6k03")
 multimesh = SubResource("MultiMesh_1cjlt")
 
 [node name="MultiMesh2" type="Node3D" parent="NavigationRegion3D/01_Beach" unique_id=304115005]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.166311, -1.9073486e-06, -2.604372)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.166311, -1.9073486e-06, -2.604372)
 script = ExtResource("21_rlbbb")
 tree_mesh = ExtResource("22_tq13h")
 material_override = SubResource("StandardMaterial3D_p6k03")
@@ -1471,7 +1479,7 @@ material_override = SubResource("StandardMaterial3D_p6k03")
 multimesh = SubResource("MultiMesh_2l6dh")
 
 [node name="patch-grass-large2" parent="NavigationRegion3D/01_Beach" unique_id=1111814565 instance=ExtResource("10_h7tsv")]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 17.49655, 0.51, 9.158483)
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 17.49655, 0.51, 8.922809)
 
 [node name="patch-grass2" parent="NavigationRegion3D/01_Beach" unique_id=1750662390 instance=ExtResource("11_a60k3")]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -11.828568, 0.51, 7.9999)
@@ -1567,7 +1575,6 @@ transform = Transform3D(38, 0, 0, 0, 6, 0, 2.2737368e-13, 0, 6, -22, 0.5, -36)
 
 [node name="Wall_Spawn_Back4" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1956881372]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.86461, 1.2156217, -31.967327)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1576,7 +1583,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Spawn_Back5" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1027907847]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.86461, 1.2156217, -40.811256)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1585,7 +1591,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Right3" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1234215581]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 28.139637, 1.2156209, -19.797428)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1594,7 +1599,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Right4" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1087080424]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 28.139637, 1.2156209, -52.498947)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1603,7 +1607,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Bottom2" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=682987403]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 51.417656, 1.21562, -44.788174)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1612,7 +1615,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Top2" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=729280062]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 51.417656, 1.21562, -27.986794)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1621,7 +1623,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Detour_Right2" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1203884322]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 57.17747, 1.2156209, -36.790504)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1630,7 +1631,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Spawn_Left" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1925999549]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 45.644802, 1.2156241, -29.835476)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1639,7 +1639,6 @@ material = SubResource("StandardMaterial3D_353k1")
 
 [node name="Wall_Spawn_Left3" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=2064979644]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 45.644802, 1.2156241, -42.63065)
-visible = false
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1864,34 +1863,6 @@ transform = Transform3D(0.06639573, 0, -0.9977933, 0, 1, 0, 0.9977933, 0, 0.0663
 [node name="NetworkProceduralEnemy16" parent="Enemies" unique_id=170743608 instance=ExtResource("14_46sg2")]
 transform = Transform3D(0.06639573, 0, -0.9977933, 0, 1, 0, 0.9977933, 0, 0.06639573, -40.26387, 1.1499981, -34.659836)
 
-[node name="trigger" type="Node3D" parent="." unique_id=985045625]
-
-[node name="Killzone" parent="trigger" unique_id=9460405 instance=ExtResource("5_pqman")]
-transform = Transform3D(30, 0, 0, 0, 1, 0, 0, 0, 30, -19.707, -6, -51.941)
-
-[node name="PassageGate1" parent="trigger" unique_id=205045320 instance=ExtResource("5_rlbbb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
-
-[node name="PassageGate2" parent="trigger" unique_id=691636036 instance=ExtResource("5_rlbbb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21699691, 0, -68.75733)
-
-[node name="PassageGate3" parent="trigger" unique_id=2008017202 instance=ExtResource("5_rlbbb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56.783005, 0, -94.07735)
-
-[node name="TurretAmmoRefillArea1" parent="trigger" unique_id=2007283422 instance=ExtResource("6_tq13h")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.88552, 0.4999981, -43.210808)
-
-[node name="TurretAmmoRefillArea2" parent="trigger" unique_id=360724074 instance=ExtResource("6_tq13h")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.862484, 0.4999981, -54.811344)
-
-[node name="VehicleUpgradeStation1" parent="trigger" unique_id=1731693252 instance=ExtResource("7_p6k03")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.84182, 0.6500019, -111.26923)
-
-[node name="MissionExitZone1" parent="trigger" unique_id=1085147818 instance=ExtResource("8_h7tsv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.744, 0.13746643, -173.786)
-completion_mode = 1
-next_level_scene_path = "uid://bovruv6g1ny2v"
-
 [node name="Props" type="Node3D" parent="." unique_id=218366779]
 
 [node name="SlidingHangarDoor1" parent="Props" unique_id=889991856 instance=ExtResource("9_uliw3")]
@@ -1989,6 +1960,37 @@ transform = Transform3D(2.264718, 0, -5.5561724, 0, 6.000001, 0, 5.5561724, 0, 2
 [node name="road-end2" parent="Props/01_Beach" unique_id=1346696842 instance=ExtResource("21_ug7yg")]
 transform = Transform3D(-2.6226832e-07, 0, 6, 0, 6, 0, -6, 0, -2.6226832e-07, 0, 0.5, 5.4240737)
 
+[node name="Trigger" type="Node3D" parent="." unique_id=985045625]
+
+[node name="Killzone" parent="Trigger" unique_id=9460405 instance=ExtResource("5_pqman")]
+transform = Transform3D(30, 0, 0, 0, 1, 0, 0, 0, 30, -19.707, -6, -51.941)
+
+[node name="PassageGate1" parent="Trigger" unique_id=205045320 instance=ExtResource("5_rlbbb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
+tank_tp_path = NodePath("Tank_TP")
+
+[node name="PassageGate2" parent="Trigger" unique_id=691636036 instance=ExtResource("5_rlbbb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21699691, 0, -68.75733)
+tank_tp_path = NodePath("Tank_TP")
+
+[node name="PassageGate3" parent="Trigger" unique_id=2008017202 instance=ExtResource("5_rlbbb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56.783005, 0, -94.07735)
+tank_tp_path = NodePath("Tank_TP")
+
+[node name="TurretAmmoRefillArea1" parent="Trigger" unique_id=2007283422 instance=ExtResource("6_tq13h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.88552, 0.4999981, -43.210808)
+
+[node name="TurretAmmoRefillArea2" parent="Trigger" unique_id=360724074 instance=ExtResource("6_tq13h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.862484, 0.4999981, -54.811344)
+
+[node name="VehicleUpgradeStation1" parent="Trigger" unique_id=1731693252 instance=ExtResource("7_p6k03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.84182, 0.6500019, -111.26923)
+
+[node name="MissionExitZone1" parent="Trigger" unique_id=1085147818 instance=ExtResource("8_h7tsv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.744, 0.13746643, -173.786)
+completion_mode = 1
+next_level_scene_path = "uid://bovruv6g1ny2v"
+
 [node name="Items" type="Node3D" parent="." unique_id=839176017]
 
 [node name="WorldWeapon3D" parent="Items" unique_id=2144849267 instance=ExtResource("12_fgnw7")]
@@ -2063,3 +2065,61 @@ grow_vertical = 2
 
 [node name="Building" parent="." unique_id=455294865 instance=ExtResource("31_rlgun")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.003764, 0.5000008, -31.246353)
+
+[node name="cliff_corner_rock2" parent="." unique_id=501427062 instance=ExtResource("39_qwgmg")]
+transform = Transform3D(-1.3113416e-07, 0, -2, 0, 4, 0, 3, 0, -8.742278e-08, -2.4937046, -3.250924, 16.128372)
+visible = false
+
+[node name="cliff_corner_rock3" parent="." unique_id=1318910033 instance=ExtResource("39_qwgmg")]
+transform = Transform3D(-1.3113416e-07, 0, 3, 0, 4, 0, 3, 0, 1.3113416e-07, 2.5817325, -3.250924, 16.192614)
+visible = false
+
+[node name="cliff_top_rock7" parent="." unique_id=711536249 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4635615, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock8" parent="." unique_id=920645573 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -3.5316672, -3.4441223, 13.216491)
+
+[node name="cliff_top_rock16" parent="." unique_id=1604476635 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -3.5316672, -3.4441223, 9.218715)
+
+[node name="cliff_top_rock17" parent="." unique_id=1794584424 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.0651217, -3.4441223, 9.218715)
+
+[node name="cliff_top_rock18" parent="." unique_id=610688135 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.0651207, -3.4441223, 13.216491)
+
+[node name="cliff_top_rock9" parent="." unique_id=2094439429 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.458897, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock10" parent="." unique_id=1626113706 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.459147, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock11" parent="." unique_id=2124370907 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.454483, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock12" parent="." unique_id=2142285358 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.450851, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock13" parent="." unique_id=439320496 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.446188, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock14" parent="." unique_id=2062746448 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.020128, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock15" parent="." unique_id=913173473 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.024794, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock20" parent="." unique_id=1151376266 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.024544, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock21" parent="." unique_id=1061726046 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.029207, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock22" parent="." unique_id=17680984 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.032839, -3.4441233, 14.536111)
+
+[node name="cliff_top_rock23" parent="." unique_id=1296649601 instance=ExtResource("39_nw4jy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0375023, -3.4441233, 14.536111)
+
+[editable path="NavigationRegion3D/01_Beach/plane_noise"]

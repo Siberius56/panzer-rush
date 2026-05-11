@@ -1,8 +1,10 @@
 extends Node3D
+class_name NetworkMainRespawnPatch
+
+# Nouvelle version pour contourner le cache Godot de l’ancien script.
 
 const MENU_SCENE_PATH := "res://scenes/menu/MainMenu.tscn"
 const PLAYER_SCENE := preload("res://scenes/player/NetworkProceduralPlayer.tscn")
-#const ENEMY_SCENE := preload("res://scenes/enemies/NetworkEnemy.tscn")
 
 @export var debug_disable_enemy_spawn: bool = true
 @export var initial_enemy_count: int = 4
@@ -13,6 +15,9 @@ const PLAYER_SCENE := preload("res://scenes/player/NetworkProceduralPlayer.tscn"
 @export var mission_vehicle_scenes: Array[PackedScene] = []
 @export var force_players_alive_on_level_load: bool = true
 
+@export_group("Respawn")
+@export var trigger_root_path: NodePath = ^"Trigger"
+
 @onready var enemies_root: Node3D = $Enemies
 @onready var spawn_points_root: Node3D = $SpawnPoints
 @onready var vehicle_spawns_root: Node3D = $VehicleSpawns
@@ -21,6 +26,8 @@ const PLAYER_SCENE := preload("res://scenes/player/NetworkProceduralPlayer.tscn"
 var players_root: Node3D = null
 var vehicles_root: Node3D = null
 var next_enemy_id: int = 1
+var active_respawn_passage: Node3D = null
+var active_respawn_passage_path: NodePath = NodePath("")
 
 
 func _ready() -> void:
@@ -28,6 +35,7 @@ func _ready() -> void:
 		get_tree().change_scene_to_file(MENU_SCENE_PATH)
 		return
 	
+	add_to_group("network_main")
 	_ensure_players_root()
 	_ensure_vehicles_root()
 	
@@ -230,15 +238,127 @@ func _change_level_to_file_remote(
 	get_tree().change_scene_to_file(scene_path)
 
 
+func set_active_respawn_passage(passage_gate: Node) -> void:
+	if passage_gate == null or not is_instance_valid(passage_gate):
+		return
+	if not passage_gate.is_inside_tree():
+		return
+
+	var passage_path: NodePath = _get_network_relative_passage_path(passage_gate)
+	if String(passage_path).is_empty():
+		return
+
+	if multiplayer.multiplayer_peer == null:
+		_set_active_respawn_passage_from_path(passage_path)
+		return
+
+	if multiplayer.is_server():
+		_set_active_respawn_passage_remote.rpc(passage_path)
+		return
+
+	_request_active_respawn_passage.rpc_id(NetworkManager.SERVER_PEER_ID, passage_path)
+	_set_active_respawn_passage_from_path(passage_path)
+
+
+@rpc("any_peer", "reliable")
+func _request_active_respawn_passage(passage_path: NodePath) -> void:
+	if multiplayer.multiplayer_peer != null and not multiplayer.is_server():
+		return
+
+	_set_active_respawn_passage_remote.rpc(passage_path)
+
+
+@rpc("authority", "call_local", "reliable")
+func _set_active_respawn_passage_remote(passage_path: NodePath) -> void:
+	_set_active_respawn_passage_from_path(passage_path)
+
+
+func _set_active_respawn_passage_from_path(passage_path: NodePath) -> void:
+	var passage_node: Node = _resolve_respawn_passage_from_path(passage_path)
+	if passage_node == null or not is_instance_valid(passage_node):
+		push_warning("[NetworkMain] Point de passage introuvable : %s" % String(passage_path))
+		return
+	if not (passage_node is Node3D):
+		return
+
+	active_respawn_passage = passage_node as Node3D
+	active_respawn_passage_path = _get_network_relative_passage_path(passage_node)
+	print("[NetworkMain] Point de respawn actif : ", active_respawn_passage_path)
+
+
+func _get_network_relative_passage_path(passage_gate: Node) -> NodePath:
+	if passage_gate == null or not is_instance_valid(passage_gate):
+		return NodePath("")
+	if not passage_gate.is_inside_tree():
+		return NodePath("")
+
+	if is_ancestor_of(passage_gate):
+		return get_path_to(passage_gate)
+
+	return passage_gate.get_path()
+
+
+func _resolve_respawn_passage_from_path(passage_path: NodePath) -> Node:
+	if String(passage_path).is_empty():
+		return null
+
+	var passage_node: Node = get_node_or_null(passage_path)
+	if passage_node != null and is_instance_valid(passage_node):
+		return passage_node
+
+	var current_scene: Node = get_tree().current_scene
+	if current_scene != null and current_scene != self:
+		passage_node = current_scene.get_node_or_null(passage_path)
+		if passage_node != null and is_instance_valid(passage_node):
+			return passage_node
+
+	var trigger_root: Node = get_node_or_null(trigger_root_path)
+	if trigger_root != null and is_instance_valid(trigger_root):
+		passage_node = _find_respawn_passage_by_name(trigger_root, String(passage_path.get_name(passage_path.get_name_count() - 1)))
+		if passage_node != null and is_instance_valid(passage_node):
+			return passage_node
+
+	for candidate in get_tree().get_nodes_in_group("passage_gates"):
+		if candidate == null or not is_instance_valid(candidate):
+			continue
+		if String(candidate.name) == String(passage_path.get_name(passage_path.get_name_count() - 1)):
+			return candidate
+
+	return null
+
+
+func _find_respawn_passage_by_name(root: Node, passage_name: String) -> Node:
+	if root == null or not is_instance_valid(root):
+		return null
+	if passage_name.is_empty():
+		return null
+
+	if String(root.name) == passage_name and root.has_method("get_respawn_spawn_points"):
+		return root
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+
+		if String(child.name) == passage_name and child.has_method("get_respawn_spawn_points"):
+			return child
+
+		var found: Node = _find_respawn_passage_by_name(child, passage_name)
+		if found != null and is_instance_valid(found):
+			return found
+
+	return null
+
+
 func get_respawn_transform_for_player(_peer_id: int) -> Transform3D:
-	var spawn_points: Array = spawn_points_root.get_children()
+	var spawn_points: Array[Node3D] = _get_respawn_spawn_points()
 	if spawn_points.is_empty():
 		return Transform3D(Basis(), Vector3.ZERO)
 
 	var spawn_index: int = randi() % spawn_points.size()
-	var spawn_point = spawn_points[spawn_index]
-	if spawn_point is Node3D:
-		return (spawn_point as Node3D).global_transform
+	var spawn_point: Node3D = spawn_points[spawn_index]
+	if spawn_point != null and is_instance_valid(spawn_point):
+		return spawn_point.global_transform
 
 	return Transform3D(Basis(), Vector3.ZERO)
 
@@ -246,6 +366,69 @@ func get_respawn_transform_for_player(_peer_id: int) -> Transform3D:
 func get_respawn_position_for_player(peer_id: int) -> Vector3:
 	return get_respawn_transform_for_player(peer_id).origin
 
+
+func _get_respawn_spawn_points() -> Array[Node3D]:
+	var active_spawn_points: Array[Node3D] = _get_active_respawn_spawn_points()
+	if not active_spawn_points.is_empty():
+		return active_spawn_points
+
+	return _collect_spawn_points_from_root(spawn_points_root)
+
+
+func _get_active_respawn_spawn_points() -> Array[Node3D]:
+	if active_respawn_passage != null and not is_instance_valid(active_respawn_passage):
+		active_respawn_passage = null
+
+	if active_respawn_passage == null and not String(active_respawn_passage_path).is_empty():
+		var passage_node: Node = _resolve_respawn_passage_from_path(active_respawn_passage_path)
+		if passage_node is Node3D:
+			active_respawn_passage = passage_node as Node3D
+
+	if active_respawn_passage == null or not is_instance_valid(active_respawn_passage):
+		var empty_spawn_points: Array[Node3D] = []
+		return empty_spawn_points
+
+	if active_respawn_passage.has_method("get_respawn_spawn_points"):
+		var custom_spawn_points: Variant = active_respawn_passage.call("get_respawn_spawn_points")
+		return _collect_spawn_points_from_value(custom_spawn_points)
+
+	var active_spawn_root: Node3D = active_respawn_passage.get_node_or_null("SpawnPoints") as Node3D
+	return _collect_spawn_points_from_root(active_spawn_root)
+
+
+func _collect_spawn_points_from_root(root: Node3D) -> Array[Node3D]:
+	var result: Array[Node3D] = []
+	if root == null or not is_instance_valid(root):
+		return result
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		if child is Node3D:
+			result.append(child as Node3D)
+
+	return result
+
+
+func _collect_spawn_points_from_value(value: Variant) -> Array[Node3D]:
+	var result: Array[Node3D] = []
+	if value == null:
+		return result
+
+	if value is Node3D:
+		result.append(value as Node3D)
+		return result
+
+	if value is Array:
+		for item in value:
+			if not (item is Node3D):
+				continue
+			var spawn_point: Node3D = item as Node3D
+			if spawn_point == null or not is_instance_valid(spawn_point):
+				continue
+			result.append(spawn_point)
+
+	return result
 
 
 func _on_leave_requested() -> void:

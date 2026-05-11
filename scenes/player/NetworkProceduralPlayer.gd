@@ -41,6 +41,7 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 
 @export_group("Respawn")
 @export var respawn_delay_seconds: float = 5.0
+@export var respawn_damage_grace_seconds: float = 0.25
 
 @export_group("Revive")
 @export var revive_action: StringName = &"heal"
@@ -219,7 +220,9 @@ var hud: PlayerHUD = null
 var death_body_node: RigidBody3D = null
 
 var death_elapsed_time: float = 0.0
+var last_death_was_killzone: bool = false
 var _server_death_msec: int = 0
+var _server_respawn_protection_until_msec: int = 0
 var _local_revive_button_down: bool = false
 var _server_revive_target: Node = null
 var _server_revive_progress: float = 0.0
@@ -1856,6 +1859,8 @@ func apply_damage(amount: int, damage_source: Node = null) -> void:
 		return
 	if amount <= 0:
 		return
+	if _is_server_respawn_protected():
+		return
 
 	_server_cancel_revive(true)
 	health = max(health - amount, 0)
@@ -1908,6 +1913,8 @@ func _server_die(damage_source: Node = null) -> void:
 
 	var death_transform := global_transform
 	var impulse_direction := _get_death_impulse_direction(damage_source)
+	last_death_was_killzone = _is_killzone_damage_source(damage_source)
+	_server_respawn_protection_until_msec = 0
 
 	health = 0
 	_server_death_msec = Time.get_ticks_msec()
@@ -1960,6 +1967,43 @@ func _server_drop_slot_weapon_for_death(slot_index: int, impulse_direction: Vect
 
 	_server_spawn_world_weapon(slot_state, drop_position, drop_forward)
 	weapon_slots[slot_index] = {}
+
+func _is_killzone_damage_source(damage_source: Node = null) -> bool:
+	if damage_source == null or not is_instance_valid(damage_source):
+		return false
+
+	if damage_source.is_in_group("killzone") or damage_source.is_in_group("KillZone") or damage_source.is_in_group("killzones"):
+		return true
+
+	var source_name: String = String(damage_source.name).to_lower()
+	if source_name.contains("killzone") or source_name.contains("kill_zone"):
+		return true
+
+	var parent: Node = damage_source.get_parent()
+	while parent != null and is_instance_valid(parent):
+		if parent.is_in_group("killzone") or parent.is_in_group("KillZone") or parent.is_in_group("killzones"):
+			return true
+
+		var parent_name: String = String(parent.name).to_lower()
+		if parent_name.contains("killzone") or parent_name.contains("kill_zone"):
+			return true
+
+		parent = parent.get_parent()
+
+	return false
+
+func _is_server_respawn_protected() -> bool:
+	if not multiplayer.is_server():
+		return false
+	if _server_respawn_protection_until_msec <= 0:
+		return false
+
+	var current_msec: int = Time.get_ticks_msec()
+	if current_msec <= _server_respawn_protection_until_msec:
+		return true
+
+	_server_respawn_protection_until_msec = 0
+	return false
 
 func _get_death_impulse_direction(damage_source: Node = null) -> Vector3:
 	var direction := Vector3.ZERO
@@ -2109,10 +2153,9 @@ func _server_respawn_player() -> void:
 		return
 
 	_server_cancel_revives_targeting(self)
-	var spawn_transform := _get_respawn_transform_from_main()
+	var spawn_transform: Transform3D = _get_respawn_transform_from_main()
+	var respawn_health: int = max_health
 
-	health = max_health
-	is_dead = false
 	velocity = Vector3.ZERO
 	current_weapon_slot = 0
 	weapon_slots[0] = {}
@@ -2122,8 +2165,8 @@ func _server_respawn_player() -> void:
 	_cancel_local_reload()
 	_sync_weapon_inventory_to_peers()
 
-	_apply_respawn_state(spawn_transform, health)
-	_receive_respawn_state.rpc(spawn_transform, health)
+	_apply_respawn_state(spawn_transform, respawn_health)
+	_receive_respawn_state.rpc(spawn_transform, respawn_health)
 
 func _get_respawn_transform_from_main() -> Transform3D:
 	var fallback := global_transform
@@ -2156,10 +2199,8 @@ func _get_respawn_transform_from_main() -> Transform3D:
 
 func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> void:
 	_clear_death_body()
+	_set_body_collision_enabled(false)
 
-	health = clampi(health_value, 1, max_health)
-	is_dead = false
-	death_elapsed_time = 0.0
 	_apply_revive_progress_state(false, 0, 0, "", 0.0)
 	velocity = Vector3.ZERO
 	replicated_position = spawn_transform.origin
@@ -2187,9 +2228,18 @@ func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> vo
 
 	_cancel_local_reload()
 	_cancel_server_reload()
-	_set_body_collision_enabled(true)
 	_set_procedural_visible(true)
 	_reset_procedural_pose()
+
+	health = clampi(health_value, 1, max_health)
+	is_dead = false
+	death_elapsed_time = 0.0
+	last_death_was_killzone = false
+	if multiplayer.is_server():
+		var grace_duration_msec: int = int(max(respawn_damage_grace_seconds, 0.0) * 1000.0)
+		_server_respawn_protection_until_msec = Time.get_ticks_msec() + grace_duration_msec
+
+	_set_body_collision_enabled(true)
 	if camera != null:
 		camera.current = is_multiplayer_authority()
 	emit_signal("health_changed", health, max_health)
@@ -2396,13 +2446,17 @@ func _server_revive_from_physical_body(health_value: int) -> void:
 		return
 
 	_server_cancel_revives_targeting(self)
-	#var revive_transform := get_current_physical_body_transform()
-	var revive_transform: Transform3D = get_current_physical_body_transform()
-	var revive_position: Vector3 = revive_transform.origin
-	revive_transform = Transform3D(Basis.IDENTITY, revive_position)
 
-	health = clampi(health_value, 1, max_health)
-	is_dead = false
+	var revive_transform: Transform3D = Transform3D.IDENTITY
+	if last_death_was_killzone:
+		revive_transform = _get_respawn_transform_from_main()
+	else:
+		revive_transform = get_current_physical_body_transform()
+		var revive_position: Vector3 = revive_transform.origin
+		revive_transform = Transform3D(Basis.IDENTITY, revive_position)
+
+	var revived_health: int = clampi(health_value, 1, max_health)
+
 	velocity = Vector3.ZERO
 	current_weapon_slot = 0
 	weapon_slots[0] = {}
@@ -2412,8 +2466,8 @@ func _server_revive_from_physical_body(health_value: int) -> void:
 	_cancel_local_reload()
 	_sync_weapon_inventory_to_peers()
 
-	_apply_respawn_state(revive_transform, health)
-	_receive_respawn_state.rpc(revive_transform, health)
+	_apply_respawn_state(revive_transform, revived_health)
+	_receive_respawn_state.rpc(revive_transform, revived_health)
 
 func _server_can_respawn_now() -> bool:
 	if _server_death_msec <= 0:

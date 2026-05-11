@@ -252,6 +252,7 @@ aim_collision_mask = 4278190208
 camera_on_foot_spring_length = 12.0
 camera_vehicle_spring_length = 18.0
 camera_spring_length_tween_duration = 0.65
+camera_vehicle_dof_far_distance = 24.0
 
 [node name="VehicleInteractor" type="Node" parent="." unique_id=255124886]
 script = ExtResource("2_vehicle")
@@ -280,7 +281,7 @@ mesh = SubResource("Mesh_Body")
 surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
 
 [node name="BackPack" type="MeshInstance3D" parent="VisualRoot" unique_id=2001925600]
-transform = Transform3D(-0.5, 0, -9.814727e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.65, -0.016130686, 0.7696781, -0.19704309)
+transform = Transform3D(-0.5, 0, -1.509958e-07, 0, 0.5, 0, 7.54979e-08, 0, -1, -0.022907257, 0.7696781, -0.3797442)
 mesh = SubResource("ArrayMesh_g4ltw")
 surface_material_override/0 = SubResource("StandardMaterial3D_yqvj3")
 
