@@ -4,12 +4,17 @@
 [ext_resource type="PackedScene" uid="uid://bi8rfru842h6q" path="res://vehicle_system/chassis/Tank_Light.tscn" id="2_ug7yg"]
 [ext_resource type="PackedScene" uid="uid://dxg6ye53rg5gu" path="res://scenes/props/Construction_Cone.tscn" id="3_2oy76"]
 [ext_resource type="PackedScene" uid="uid://dp4jt1qet3xpi" path="res://asset/map/road/road-intersection-line.glb" id="3_7gd3h"]
+[ext_resource type="Shader" uid="uid://bout2ybxk10m" path="res://asset/shader_ocean.gdshader" id="4_2l6dh"]
 [ext_resource type="PackedScene" uid="uid://gepa08i4mciw" path="res://asset/map/road/road-straight.glb" id="4_2oy76"]
+[ext_resource type="Texture2D" uid="uid://bqo4kmjisxvgp" path="res://asset/ocean_shader_00003.png" id="5_67hxh"]
 [ext_resource type="PackedScene" uid="uid://0lv7orsfam4y" path="res://scenes/trigger/Killzone.tscn" id="5_pqman"]
 [ext_resource type="PackedScene" uid="uid://de28p2htwgvqs" path="res://scenes/trigger/PassageGate.tscn" id="5_rlbbb"]
+[ext_resource type="Texture2D" uid="uid://xp74i6j2lrks" path="res://asset/ocean_shader_00004.png" id="6_ng107"]
 [ext_resource type="PackedScene" uid="uid://dw6ksxd75mcm7" path="res://vehicle_system/TurretAmmoRefill/TurretAmmoRefillArea.tscn" id="6_tq13h"]
+[ext_resource type="Texture2D" uid="uid://sdmsa2eafwhe" path="res://asset/ocean_shader_00002.png" id="7_1cjlt"]
 [ext_resource type="PackedScene" uid="uid://doo6u62srmmdm" path="res://upgrade_station/VehicleUpgradeStation.tscn" id="7_p6k03"]
 [ext_resource type="PackedScene" uid="uid://c5rbfou01tacv" path="res://scenes/trigger/MissionExitZone.tscn" id="8_h7tsv"]
+[ext_resource type="Texture2D" uid="uid://c56oytkp3ohe7" path="res://asset/ocean_shader_00001.png" id="8_nw4jy"]
 [ext_resource type="PackedScene" uid="uid://h8v8os25dggj" path="res://scenes/trigger/SlidingHangarDoor.tscn" id="9_uliw3"]
 [ext_resource type="ArrayMesh" uid="uid://bn2lx5ye6vput" path="res://scenes/props/grass-large.obj" id="10_a60k3"]
 [ext_resource type="PackedScene" uid="uid://bmxi1yqjht6ej" path="res://asset/map/misc-2/patch-grass-large.glb" id="10_h7tsv"]
@@ -30,14 +35,27 @@
 [ext_resource type="Texture2D" uid="uid://xeo5jn7pwyn7" path="res://asset/map/misc-2/Textures/colormap.png" id="23_tq13h"]
 [ext_resource type="PackedScene" uid="uid://bbo6apchi6rgm" path="res://asset/map/road/bridge-pillar-wide.glb" id="23_ug7yg"]
 [ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://Pack/pastel_vignette.gdshader" id="24_jytmi"]
+[ext_resource type="PackedScene" uid="uid://npi3yjore66q" path="res://scenes/props/Building/Building_A.tscn" id="31_rlgun"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_td8tl"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
 background_color = Color(0.0470588, 0.054902, 0.0862745, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.35, 0.38, 0.45, 1)
-
-[sub_resource type="NavigationMesh" id="NavigationMesh_td8tl"]
+tonemap_mode = 3
+tonemap_exposure = 0.7
+glow_enabled = true
+glow_bloom = 0.4
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.7764706, 1, 1, 1)
+fog_density = 1.0
+fog_depth_begin = 14.0
+fog_depth_end = 60.0
+adjustment_enabled = true
+adjustment_contrast = 1.1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d16ra"]
 albedo_color = Color(0.46, 0.30053335, 0.16100001, 1)
@@ -66,6 +84,41 @@ roughness = 0.8
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mhaih"]
 albedo_color = Color(0.78, 0.43, 0.14, 1)
 roughness = 0.75
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fgnw7"]
+render_priority = 0
+shader = ExtResource("4_2l6dh")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 6.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("5_67hxh")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("8_nw4jy")
+shader_parameter/wave_normal_texture = ExtResource("7_1cjlt")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0.02, 0.02)
+shader_parameter/foam_texture = ExtResource("6_ng107")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_cgyej"]
+material = SubResource("ShaderMaterial_fgnw7")
+size = Vector3(60, 10, 25)
+subdivide_width = 30
+subdivide_height = 30
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rlgun"]
 albedo_color = Color(0.1632472, 0.5388858, 0.4057284, 1)
@@ -239,9 +292,6 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 5.32
 [node name="SpawnD" type="Marker3D" parent="VehicleSpawns" unique_id=1007199597]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 2.1638496, 2, 20.645342)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1822661109]
-environment = SubResource("Environment_1")
-
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1594897149]
 navigation_mesh = SubResource("NavigationMesh_td8tl")
 
@@ -253,29 +303,30 @@ size = 180.0
 [node name="Lighting" type="Node3D" parent="NavigationRegion3D" unique_id=1259765438]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0, 0, 0)
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="NavigationRegion3D/Lighting" unique_id=1822661109]
+environment = SubResource("Environment_1")
+
 [node name="Sun" type="DirectionalLight3D" parent="NavigationRegion3D/Lighting" unique_id=495220588]
 transform = Transform3D(0.81915206, 0.4262504, 0.38379753, 0, 0.66913056, -0.74314487, -0.57357645, 0.6087487, 0.54811966, 0, 7, 0)
-light_color = Color(1, 0.8745098, 0.627451, 1)
-light_energy = 1.35
+light_color = Color(1, 0.93333334, 0.8, 1)
+light_energy = 1.25
 light_indirect_energy = 0.6
 light_volumetric_fog_energy = 0.35
 light_angular_distance = 2.2
 shadow_enabled = true
-shadow_bias = 0.06
-shadow_normal_bias = 1.2
-shadow_opacity = 0.52
 shadow_blur = 2.5
+directional_shadow_mode = 0
 directional_shadow_split_1 = 0.08
 directional_shadow_split_2 = 0.22
 directional_shadow_split_3 = 0.48
 directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.72
-directional_shadow_max_distance = 80.0
+directional_shadow_max_distance = 32.0
 
 [node name="SoftBlueFill" type="DirectionalLight3D" parent="NavigationRegion3D/Lighting" unique_id=134726987]
 transform = Transform3D(0.7071068, -0.45451915, -0.5416752, 0, 0.76604384, -0.6427875, 0.70710707, 0.454519, 0.54167503, 0, 7, 0)
-light_color = Color(0.78431374, 0.8509804, 1, 1)
-light_energy = 0.22
+light_color = Color(0.5616322, 0.69139177, 1, 1)
+light_energy = 0.5
 light_indirect_energy = 0.2
 light_volumetric_fog_energy = 0.0
 
@@ -437,12 +488,21 @@ size = Vector3(7.8254395, 1, 10.428192)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Floor_01_Spawn_RouteDepart12" type="CSGBox3D" parent="NavigationRegion3D/Floors" unique_id=155250450]
-transform = Transform3D(1, -1.07093e-10, 5.6857923e-09, -1.07093e-10, 0.99929076, 0.0376553, -5.6857923e-09, -0.0376553, 0.99929076, 1.6683623, 3.6012301, 20.059656)
+transform = Transform3D(1, -3.5780658e-09, 3.2676326e-08, -3.5780658e-09, 0.9763036, 0.21640553, -3.2676326e-08, -0.21640553, 0.9763036, 1.6683621, 6.604071, 18.209675)
 layers = 8
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(96.95442, 1, 22.163574)
+size = Vector3(96.95442, 7.140747, 18.692383)
+material = SubResource("StandardMaterial3D_46sg2")
+
+[node name="Floor_01_Spawn_RouteDepart13" type="CSGBox3D" parent="NavigationRegion3D/Floors" unique_id=1263442164]
+transform = Transform3D(1, -2.2483988e-08, 7.927449e-08, -2.2483988e-08, 0.85109526, 0.52501124, -7.92745e-08, -0.52501124, 0.85109526, 1.6683632, 13.037392, 34.103233)
+layers = 8
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(96.95442, 7.140747, 18.692383)
 material = SubResource("StandardMaterial3D_46sg2")
 
 [node name="Rivers" type="Node3D" parent="NavigationRegion3D" unique_id=1126854866]
@@ -463,6 +523,7 @@ material = SubResource("StandardMaterial3D_bug7x")
 
 [node name="Depot_Container_C_RightCover33" type="CSGBox3D" parent="NavigationRegion3D/Rivers" unique_id=93094539]
 transform = Transform3D(4.371139e-08, 0, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -1.1464628, -5.714509, 42.84664)
+visible = false
 collision_layer = 8
 collision_mask = 0
 size = Vector3(36.360123, 5, 98.07553)
@@ -1138,160 +1199,17 @@ collision_mask = 0
 size = Vector3(4, 5, 20.42395)
 material = SubResource("StandardMaterial3D_mhaih")
 
-[node name="Building" type="Node3D" parent="NavigationRegion3D" unique_id=724141653]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.204674, 0, -31.758736)
-
-[node name="Wall_Detour_Right11" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=722291042]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -3.6680565, 2.4608107, 1.9700165)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 10.15535)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right25" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=2061323689]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -3.6680565, 2.4608107, -7.2480087)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 3.5445938)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right12" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=1047713471]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -1.3833961, 2.4608107, 6.5521793)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 5.560341)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right21" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=1898478561]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 2.657899, 1.0526686, 6.5521793)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right22" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=1380134385]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 2.657899, 3.8159804, 6.5521793)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right26" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=937382085]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 5.9382076, 3.8159804, 0.5606766)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right28" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=1072997933]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -0.0965271, 3.8159804, 0.5606766)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right27" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=56884284]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -0.63208294, 3.8159804, -9.113964)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right23" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=1533684014]
-transform = Transform3D(1, -1.509958e-07, -8.742278e-08, -1.509958e-07, -1, 0, -8.742278e-08, 1.3200472e-14, -1, -3.7042913, 1.0526686, -4.5709)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right24" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=829263210]
-transform = Transform3D(1, -1.509958e-07, -8.742278e-08, -1.509958e-07, -1, 0, -8.742278e-08, 1.3200472e-14, -1, -3.7042913, 3.8159804, -4.5709)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 1.1837158, 3.066965)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right20" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=890925857]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 7.228153, 2.4608107, 6.5521793)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 6.30558)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right13" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=351459245]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 2.9577389, 2.4608107, 0.55217934)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 4.5548286)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right19" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=259000071]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -2.731038, 2.4608107, 0.55217934)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 2.7443333)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right14" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=734277292]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 8.57729, 2.4608107, 0.55217934)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 3.607563)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right17" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=836744291]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -2.8765955, 2.4608107, -9.053001)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 2.6544895)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right18" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=232801724]
-transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 1.5668192, 2.4608107, -9.053001)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 2.6489964)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right15" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=711210935]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 9.892284, 2.4608107, 3.5460052)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 5.4787083)
-material = SubResource("StandardMaterial3D_353k1")
-
-[node name="Wall_Detour_Right16" type="CSGBox3D" parent="NavigationRegion3D/Building" unique_id=769857479]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 2.3644161, 2.4608107, -4.2441063)
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(1, 4, 9.166796)
-material = SubResource("StandardMaterial3D_353k1")
-
 [node name="Road" type="Node3D" parent="NavigationRegion3D" unique_id=512749052]
 
 [node name="01_Beach" type="Node3D" parent="NavigationRegion3D" unique_id=1378300776]
 
+[node name="OCEAN" type="MeshInstance3D" parent="NavigationRegion3D/01_Beach" unique_id=945517609]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.381322, 28.66426)
+mesh = SubResource("BoxMesh_cgyej")
+
 [node name="Floor_Outside1" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=588941350]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -29.411764, -1.750737, -1.6070948)
-layers = 8
+layers = 136
 collision_layer = 8
 collision_mask = 0
 size = Vector3(42.006, 4.5, 9.842224)
@@ -1299,7 +1217,7 @@ material = SubResource("StandardMaterial3D_rlgun")
 
 [node name="Floor_Outside2" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=1202593571]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 27.90311, -1.7507282, -1.6070948)
-layers = 8
+layers = 136
 collision_layer = 8
 collision_mask = 0
 size = Vector3(38.638252, 4.5, 9.842224)
@@ -1307,25 +1225,25 @@ material = SubResource("StandardMaterial3D_rlgun")
 
 [node name="Floor_01_A" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=673168947]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -25.57633, -1.7507364, 11.980625)
-layers = 8
+layers = 136
 use_collision = true
-collision_layer = 8
+collision_layer = 136
 collision_mask = 0
 size = Vector3(44.092487, 4.501465, 5.875)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Floor_01_B" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=172095717]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 20.256716, -1.7507327, 11.980625)
-layers = 8
+layers = 136
 use_collision = true
-collision_layer = 8
+collision_layer = 136
 collision_mask = 0
 size = Vector3(32.60079, 4.501465, 5.875)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Floor_01" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=242887050]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -1.5962639, -1.7507328, 6.1771765)
-layers = 8
+layers = 136
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1334,7 +1252,7 @@ material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Floor_02" type="CSGBox3D" parent="NavigationRegion3D/01_Beach" unique_id=293560802]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0.05312538, -1.7507325, -1.6285648)
-layers = 8
+layers = 136
 use_collision = true
 collision_layer = 8
 collision_mask = 0
@@ -1562,11 +1480,77 @@ transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -11.828568, 0.51, 7.9999)
 
 [node name="Floor_01" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=798683781]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -6, -9.0597484e-07, -35)
-layers = 8
+layers = 136
 use_collision = true
 collision_layer = 8
 collision_mask = 0
 size = Vector3(66.54019, 1, 56.845215)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_Outside1" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1166012783]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -73.68282, -1.750739, -17.681618)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(69.33845, 4.5, 22.321503)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside2" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1147387640]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 61.300064, -1.750739, -17.066914)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(69.33845, 4.5, 21.092094)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside3" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1912641180]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 61.300064, -1.750739, -55.258728)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(69.33845, 4.5, 21.092094)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside6" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=987608670]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 91.7448, -1.750739, -36.343605)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(69.33845, 4.5, 21.092094)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside4" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1570042736]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.81524, -1.7507427, -42.61029)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(20.368792, 4.5, 4.3736095)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside5" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1425411518]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.771538, -1.7507427, -29.995525)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(20.28139, 4.5, 4.883338)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_03_B_Bonus" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=158080307]
+transform = Transform3D(-1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0, 1, 52.174248, -4.7858983e-05, -36.174294)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(10.47937, 1, 17.239136)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_03_A_Bonus" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=163791321]
+transform = Transform3D(4.371139e-08, 1.509958e-07, 1, 6.600236e-15, -1, 1.509958e-07, 1, 0, -4.371139e-08, 36.894855, 5.5709684e-06, -36.436)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(8, 1, 20.225708)
 material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="road-intersection-line2" parent="NavigationRegion3D/02_Farm" unique_id=745380943 instance=ExtResource("3_7gd3h")]
@@ -1580,72 +1564,6 @@ transform = Transform3D(-1.6610328e-06, 0, -6, 0, 6, 0, 38, 0, -2.6226832e-07, 0
 
 [node name="road-straight4" parent="NavigationRegion3D/02_Farm" unique_id=1188778159 instance=ExtResource("4_2oy76")]
 transform = Transform3D(38, 0, 0, 0, 6, 0, 2.2737368e-13, 0, 6, -22, 0.5, -36)
-
-[node name="Floor_Outside1" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1166012783]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -73.68282, -1.750739, -17.681618)
-layers = 8
-collision_layer = 8
-collision_mask = 0
-size = Vector3(69.33845, 4.5, 22.321503)
-material = SubResource("StandardMaterial3D_rlgun")
-
-[node name="Floor_Outside2" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1147387640]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 61.300064, -1.750739, -17.066914)
-layers = 8
-collision_layer = 8
-collision_mask = 0
-size = Vector3(69.33845, 4.5, 21.092094)
-material = SubResource("StandardMaterial3D_rlgun")
-
-[node name="Floor_Outside3" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1912641180]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 61.300064, -1.750739, -55.258728)
-layers = 8
-collision_layer = 8
-collision_mask = 0
-size = Vector3(69.33845, 4.5, 21.092094)
-material = SubResource("StandardMaterial3D_rlgun")
-
-[node name="Floor_Outside6" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=987608670]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 91.7448, -1.750739, -36.343605)
-layers = 8
-collision_layer = 8
-collision_mask = 0
-size = Vector3(69.33845, 4.5, 21.092094)
-material = SubResource("StandardMaterial3D_rlgun")
-
-[node name="Floor_Outside4" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1570042736]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.81524, -1.7507427, -42.61029)
-layers = 8
-collision_layer = 8
-collision_mask = 0
-size = Vector3(20.368792, 4.5, 4.3736095)
-material = SubResource("StandardMaterial3D_rlgun")
-
-[node name="Floor_Outside5" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1425411518]
-transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.771538, -1.7507427, -29.995525)
-layers = 8
-collision_layer = 8
-collision_mask = 0
-size = Vector3(20.28139, 4.5, 4.883338)
-material = SubResource("StandardMaterial3D_rlgun")
-
-[node name="Floor_03_B_Bonus" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=158080307]
-transform = Transform3D(-1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0, 1, 52.174248, -4.7858983e-05, -36.174294)
-layers = 8
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(10.47937, 1, 17.239136)
-material = SubResource("StandardMaterial3D_kwhn4")
-
-[node name="Floor_03_A_Bonus" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=163791321]
-transform = Transform3D(4.371139e-08, 1.509958e-07, 1, 6.600236e-15, -1, 1.509958e-07, 1, 0, -4.371139e-08, 36.894855, 5.5709684e-06, -36.436)
-layers = 8
-use_collision = true
-collision_layer = 8
-collision_mask = 0
-size = Vector3(8, 1, 20.225708)
-material = SubResource("StandardMaterial3D_kwhn4")
 
 [node name="Wall_Spawn_Back4" type="CSGBox3D" parent="NavigationRegion3D/02_Farm" unique_id=1956881372]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 36.86461, 1.2156217, -31.967327)
@@ -1961,7 +1879,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21699691, 0, -68.75733)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56.783005, 0, -94.07735)
 
 [node name="TurretAmmoRefillArea1" parent="trigger" unique_id=2007283422 instance=ExtResource("6_tq13h")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.591244, 0.4999981, -34.969917)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.88552, 0.4999981, -43.210808)
 
 [node name="TurretAmmoRefillArea2" parent="trigger" unique_id=360724074 instance=ExtResource("6_tq13h")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.862484, 0.4999981, -54.811344)
@@ -2054,7 +1972,7 @@ transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -14.982138, -3.1408763, 18.17
 transform = Transform3D(1.5529144, 0, 5.795555, 0, 6, 0, -5.795555, 0, 1.5529144, -14.631823, -3.1408763, 21.560406)
 
 [node name="rock-sand-c3" parent="Props/01_Beach" unique_id=709251821 instance=ExtResource("18_70g3y")]
-transform = Transform3D(-0.74950576, 0, 5.9530025, 0, 6, 0, -5.9530025, 0, -0.74950576, -13.602992, -3.679358, 24.957489)
+transform = Transform3D(-0.7495056, 0, 5.953003, 0, 8, 0, -5.953003, 0, -0.7495056, -13.602992, -4.5522532, 24.957489)
 
 [node name="rock-sand-a3" parent="Props/01_Beach" unique_id=1790427920 instance=ExtResource("16_54q8m")]
 transform = Transform3D(-5.795555, 0, -1.5529149, 0, 6, 0, 1.5529149, 0, -5.795555, 13.869802, -3.454698, 26.28717)
@@ -2142,3 +2060,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Building" parent="." unique_id=455294865 instance=ExtResource("31_rlgun")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.003764, 0.5000008, -31.246353)

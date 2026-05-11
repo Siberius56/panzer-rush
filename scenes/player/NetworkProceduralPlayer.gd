@@ -65,6 +65,8 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export var camera_on_foot_spring_length: float = 7.0
 @export var camera_vehicle_spring_length: float = 16.0
 @export var camera_spring_length_tween_duration: float = 0.35
+@export var camera_on_foot_dof_far_distance: float = 16.0
+@export var camera_vehicle_dof_far_distance: float = 20.0
 
 @export_group("Vehicle Visuals")
 @export var hide_player_visuals_when_in_vehicle: bool = true
@@ -165,6 +167,8 @@ var landing_squash: float = 0.0
 var procedural_nodes_ready: bool = false
 var camera_spring_length_target: float = 7.0
 var camera_spring_length_tween: Tween = null
+var camera_dof_far_distance_target: float = 16.0
+var camera_dof_far_distance_tween: Tween = null
 
 var current_vehicle: Node = null
 var weapon_slot_1: Node = null
@@ -295,6 +299,7 @@ func _ready() -> void:
 		camera.current = is_multiplayer_authority()
 
 	_apply_camera_spring_length_for_vehicle_mode(vehicle_mode, true)
+	_apply_camera_dof_for_vehicle_mode(vehicle_mode, true)
 	_apply_vehicle_visual_state()
 
 	_refresh_weapon_nodes()
@@ -387,6 +392,7 @@ func set_vehicle_mode(active: bool) -> void:
 
 	_apply_vehicle_visual_state()
 	_apply_camera_spring_length_for_vehicle_mode(active, false)
+	_apply_camera_dof_for_vehicle_mode(active, false)
 
 func _sync_to_vehicle_seat() -> void:
 	if vehicle_interactor == null:
@@ -2598,6 +2604,62 @@ func _apply_camera_spring_length_for_vehicle_mode(in_vehicle: bool, instant: boo
 	camera_spring_length_tween.set_trans(Tween.TRANS_CUBIC)
 	camera_spring_length_tween.set_ease(Tween.EASE_OUT)
 	camera_spring_length_tween.tween_property(camera_spring_arm, "spring_length", camera_spring_length_target, camera_spring_length_tween_duration)
+
+
+func _apply_camera_dof_for_vehicle_mode(in_vehicle: bool, instant: bool = false) -> void:
+	camera_dof_far_distance_target = camera_vehicle_dof_far_distance if in_vehicle else camera_on_foot_dof_far_distance
+
+	var attributes: CameraAttributes = _get_camera_dof_attributes()
+	if attributes == null:
+		return
+
+	if not _object_has_property(attributes, &"dof_blur_far_distance"):
+		return
+
+	if camera_dof_far_distance_tween != null and camera_dof_far_distance_tween.is_valid():
+		camera_dof_far_distance_tween.kill()
+		camera_dof_far_distance_tween = null
+
+	if instant or camera_spring_length_tween_duration <= 0.0:
+		attributes.set("dof_blur_far_distance", camera_dof_far_distance_target)
+		return
+
+	camera_dof_far_distance_tween = create_tween()
+	camera_dof_far_distance_tween.set_trans(Tween.TRANS_CUBIC)
+	camera_dof_far_distance_tween.set_ease(Tween.EASE_OUT)
+	camera_dof_far_distance_tween.tween_property(attributes, "dof_blur_far_distance", camera_dof_far_distance_target, camera_spring_length_tween_duration)
+
+
+func _get_camera_dof_attributes() -> CameraAttributes:
+	if camera == null:
+		camera = _find_camera()
+
+	if camera == null:
+		return null
+
+	var attributes: CameraAttributes = camera.attributes
+	if attributes == null:
+		return null
+
+	if not attributes.resource_local_to_scene:
+		var unique_attributes: CameraAttributes = attributes.duplicate(true) as CameraAttributes
+		if unique_attributes != null:
+			unique_attributes.resource_local_to_scene = true
+			camera.attributes = unique_attributes
+			attributes = unique_attributes
+
+	return attributes
+
+
+func _object_has_property(target: Object, property_name: StringName) -> bool:
+	if target == null:
+		return false
+
+	for property_data in target.get_property_list():
+		if StringName(property_data.get("name", "")) == property_name:
+			return true
+
+	return false
 
 
 func _find_camera_spring_arm() -> SpringArm3D:

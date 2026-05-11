@@ -33,7 +33,7 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export var elevation_speed_deg: float = 180.0
 @export var min_elevation_deg: float = -10.0
 @export var max_elevation_deg: float = 75.0
-@export var collision_mask: int = 2
+@export var collision_mask: int = 128
 @export var bullet_scene: PackedScene
 @export var state_send_interval: float = 0.033
 @export var align_to_vehicle_when_idle: bool = false

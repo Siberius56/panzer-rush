@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_7af67"]
 [ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_be308"]
 [ext_resource type="PackedScene" uid="uid://dtikh1ho4v06s" path="res://asset/tank/box_bevel2.glb" id="3_13c08"]
+[ext_resource type="PackedScene" uid="uid://85fhv522s8eo" path="res://asset/map/misc-2/barrel.glb" id="3_bshfi"]
 [ext_resource type="PackedScene" uid="uid://cy3mff60d638u" path="res://asset/map/misc-2/metal-panel-screws-half.glb" id="3_hqdy5"]
 [ext_resource type="PackedScene" uid="uid://c3kpi687gtclf" path="res://vehicle_system/turrets/Turret_Light.tscn" id="4_3ojlu"]
 [ext_resource type="PackedScene" uid="uid://ccjv38408lp72" path="res://asset/map/misc-2/metal-panel-screws-narrow.glb" id="4_6gy5a"]
@@ -108,34 +109,50 @@ transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
 mesh = SubResource("ArrayMesh_785wl")
 surface_material_override/0 = ExtResource("2_be308")
 
+[node name="barrel2" parent="BodyVisualRoot" unique_id=1258258365 instance=ExtResource("3_bshfi")]
+transform = Transform3D(2.25, -9.835063e-08, -9.8350625e-08, -9.835063e-08, -9.835062e-08, -2.25, 9.8350625e-08, 2.25, -9.8350625e-08, 1.34, 0.60118103, -0.9233247)
+
+[node name="barrel3" parent="BodyVisualRoot" unique_id=824926015 instance=ExtResource("3_bshfi")]
+transform = Transform3D(2.25, -9.835063e-08, -9.8350625e-08, -9.835063e-08, -9.835062e-08, -2.25, 9.8350625e-08, 2.25, -9.8350625e-08, 1.34, 0.60118103, 0.04262662)
+
+[node name="barrel4" parent="BodyVisualRoot" unique_id=1040396634 instance=ExtResource("3_bshfi")]
+transform = Transform3D(-2.25, 9.8350625e-08, -9.8350625e-08, -9.835062e-08, 9.835061e-08, 2.25, 9.835062e-08, 2.25, -9.835062e-08, -1.34, 0.60118103, -0.9233247)
+
+[node name="barrel5" parent="BodyVisualRoot" unique_id=1663058580 instance=ExtResource("3_bshfi")]
+transform = Transform3D(-2.25, 9.8350625e-08, -9.8350625e-08, -9.835062e-08, 9.835061e-08, 2.25, 9.835062e-08, 2.25, -9.835062e-08, -1.34, 0.60118103, 0.04262662)
+
 [node name="barrel_0032" parent="BodyVisualRoot" unique_id=1343256185 instance=ExtResource("7_6gy5a")]
 transform = Transform3D(0.93969256, 9.825314e-09, 0.34202012, 0.34202012, -5.5722158e-08, -0.93969256, 9.825313e-09, 1, -5.5722154e-08, 1.337355, 0.59000707, -0.9641681)
+visible = false
 
 [node name="barrel_0033" parent="BodyVisualRoot" unique_id=841918474 instance=ExtResource("7_6gy5a")]
 transform = Transform3D(0.93969256, 9.825314e-09, 0.34202012, 0.34202012, -5.5722158e-08, -0.93969256, 9.825313e-09, 1, -5.5722154e-08, 1.337355, 0.59000707, 0.03583193)
+visible = false
 
 [node name="barrel_0034" parent="BodyVisualRoot" unique_id=1276249989 instance=ExtResource("7_6gy5a")]
 transform = Transform3D(0.93969256, -9.825314e-09, -0.34202012, -0.34202012, -5.5722158e-08, -0.93969256, -9.825313e-09, 1, -5.5722154e-08, -1.34623, 0.59000707, -0.9641681)
+visible = false
 
 [node name="barrel_0035" parent="BodyVisualRoot" unique_id=842258631 instance=ExtResource("7_6gy5a")]
 transform = Transform3D(0.93969256, -9.825314e-09, -0.34202012, -0.34202012, -5.5722158e-08, -0.93969256, -9.825313e-09, 1, -5.5722154e-08, -1.34623, 0.59000707, 0.03583193)
+visible = false
 
 [node name="box_bevel2" parent="BodyVisualRoot" unique_id=76553973 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.35, 0, 0, 0, 0.3, 0, 0, 0, 0.25, 0.45, 0.838, -0.844)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel2" index="0" unique_id=1933577301]
+[node name="Cube" parent="BodyVisualRoot/box_bevel2" index="0" unique_id=531334882]
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="box_bevel3" parent="BodyVisualRoot" unique_id=898445028 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.35, 0, 0, 0, 0.3, 0, 0, 0, 0.25, -0.45, 0.838, -0.844)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel3" index="0" unique_id=1933577301]
+[node name="Cube" parent="BodyVisualRoot/box_bevel3" index="0" unique_id=531334882]
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="box_bevel4" parent="BodyVisualRoot" unique_id=1851600694 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.5, 0, 0, 0, 0.11820162, 0.09234923, 0, -0.09234923, 0.11820162, 1.1920929e-07, 0.7407563, 1.0903177)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel4" index="0" unique_id=1933577301]
+[node name="Cube" parent="BodyVisualRoot/box_bevel4" index="0" unique_id=531334882]
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="metal-panel-screws-half2" parent="BodyVisualRoot" unique_id=674114915 instance=ExtResource("3_hqdy5")]
