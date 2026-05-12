@@ -1,5 +1,5 @@
 extends Node3D
-class_name DestructibleProp
+#class_name DestructibleProp
 
 ## Script commun pour des props physiques destructibles.
 ## Godot 4.x.
@@ -340,6 +340,7 @@ func _activate_debris(damage_origin: Vector3, has_damage_origin: bool, base_tran
 
 		body.collision_layer = debris_collision_layer
 		body.collision_mask = _get_physics_mask_with_enemy_rule(debris_collision_mask)
+
 		_set_collision_shapes_enabled(body, true)
 
 		body.freeze = false
@@ -349,8 +350,6 @@ func _activate_debris(damage_origin: Vector3, has_damage_origin: bool, base_tran
 		_apply_debris_impulse(body, base_transform.origin, damage_origin, has_damage_origin)
 		_activated_debris.append(body)
 
-	_start_final_cleanup_timer(debris_lifetime_seconds)
-
 
 func _force_rigidbody_transform(body: RigidBody3D, target_transform: Transform3D) -> void:
 	body.global_transform = target_transform
@@ -359,12 +358,12 @@ func _force_rigidbody_transform(body: RigidBody3D, target_transform: Transform3D
 	PhysicsServer3D.body_set_state(body.get_rid(), PhysicsServer3D.BODY_STATE_ANGULAR_VELOCITY, Vector3.ZERO)
 
 
-func _set_collision_shapes_enabled(root: Node, disabled: bool) -> void:
+func _set_collision_shapes_enabled(root: Node, enabled: bool) -> void:
 	if root is CollisionShape3D:
-		(root as CollisionShape3D).set_deferred("disabled", disabled)
+		(root as CollisionShape3D).set_deferred("disabled", not enabled)
 
 	for child in root.get_children():
-		_set_collision_shapes_enabled(child, disabled)
+		_set_collision_shapes_enabled(child, enabled)
 
 
 func _apply_debris_impulse(body: RigidBody3D, base_position: Vector3, damage_origin: Vector3, has_damage_origin: bool) -> void:

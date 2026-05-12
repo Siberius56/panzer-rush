@@ -232,7 +232,7 @@ transform = Transform3D(1, 0, -4.7683716e-07, 0, 1, 0, 2.3841858e-07, 0, 2, -0.4
 transform = Transform3D(1.9470718e-07, 0, 2.5, 0, 1, 0, -1, 0, 4.8676793e-07, -0.44500035, 0, 0.20000029)
 
 [node name="wall-half9" parent="Floor_1" unique_id=1092001662 instance=ExtResource("7_41cu3")]
-transform = Transform3D(1.9470718e-07, 0, 1, 0, 1, 0, -1, 0, 1.9470718e-07, -3.8000007, 0, 0.20000029)
+transform = Transform3D(1.9470718e-07, 0, 1, 0, 1, 0, -1, 0, 1.9470718e-07, -3.7867534, 0, 0.20000029)
 
 [node name="wall-half6" parent="Floor_1" unique_id=1248548917 instance=ExtResource("7_41cu3")]
 transform = Transform3D(1, 0, -1.907191e-07, 0, 1, 0, 6.3573026e-08, 0, 3, -0.42169604, 0, -5.328)

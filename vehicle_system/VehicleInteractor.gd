@@ -9,6 +9,15 @@ class_name VehicleInteractor
 @export var switch_seat_action: StringName = &"switch_seat"
 @export var fire_action: StringName = &"fire"
 @export var reload_turret_action: StringName = &"reload_weapon"
+@export_group("Vehicle Mods")
+@export var mod_use_1_action: StringName = &"mod_use_1"
+@export var mod_use_2_action: StringName = &"mod_use_2"
+@export var mod_use_3_action: StringName = &"mod_use_3"
+@export var mod_use_4_action: StringName = &"mod_use_4"
+@export var mod_use_5_action: StringName = &"mod_use_5"
+@export var mod_use_6_action: StringName = &"mod_use_6"
+@export var accept_legacy_mode_use_typo: bool = true
+@export_group("Movement")
 @export var move_forward_action: StringName = &"move_forward"
 @export var move_backward_action: StringName = &"move_backward"
 @export var move_left_action: StringName = &"move_left"
@@ -77,6 +86,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	_clear_invalid_vehicle_refs()
 
 	if not _is_local_player():
+		return
+
+	if current_vehicle != null and _try_use_vehicle_mod_from_input(event):
+		get_viewport().set_input_as_handled()
 		return
 
 	if current_vehicle != null and event.is_action_pressed(switch_seat_action):
@@ -152,6 +165,58 @@ func _physics_process(_delta: float) -> void:
 		else:
 			mount.send_turret_input.rpc_id(1, aim_world, wants_fire)
 
+
+
+func _try_use_vehicle_mod_from_input(event: InputEvent) -> bool:
+	if current_vehicle == null:
+		return false
+
+	var my_peer_id: int = multiplayer.get_unique_id()
+	if current_vehicle.get_driver_peer_id() != my_peer_id:
+		return false
+
+	for mod_use_id in range(1, 7):
+		if not _is_mod_use_action_pressed(event, mod_use_id):
+			continue
+
+		if multiplayer.is_server():
+			current_vehicle.server_try_use_mod_from_host(mod_use_id)
+		else:
+			current_vehicle.request_use_mod.rpc_id(1, mod_use_id)
+		return true
+
+	return false
+
+
+func _is_mod_use_action_pressed(event: InputEvent, mod_use_id: int) -> bool:
+	var action_name: StringName = _get_mod_use_action_name(mod_use_id)
+	if event.is_action_pressed(action_name):
+		return true
+
+	if accept_legacy_mode_use_typo:
+		var legacy_action: StringName = StringName("mode_use_%d" % mod_use_id)
+		if event.is_action_pressed(legacy_action):
+			return true
+
+	return false
+
+
+func _get_mod_use_action_name(mod_use_id: int) -> StringName:
+	match mod_use_id:
+		1:
+			return mod_use_1_action
+		2:
+			return mod_use_2_action
+		3:
+			return mod_use_3_action
+		4:
+			return mod_use_4_action
+		5:
+			return mod_use_5_action
+		6:
+			return mod_use_6_action
+		_:
+			return &""
 
 
 func _try_reload_current_turret() -> void:

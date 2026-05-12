@@ -4,6 +4,7 @@ signal snapshot_changed
 
 var players: Dictionary = {}
 var vehicles: Dictionary = {}
+var pending_lobby_vehicle_state: Dictionary = {}
 var player_snapshot_active: bool = false
 var vehicle_snapshot_active: bool = false
 
@@ -23,6 +24,7 @@ func apply_snapshot(new_players: Dictionary, new_vehicles: Dictionary) -> void:
 	
 	players = new_players.duplicate(true)
 	vehicles = new_vehicles.duplicate(true)
+	pending_lobby_vehicle_state.clear()
 	player_snapshot_active = true
 	vehicle_snapshot_active = true
 	snapshot_changed.emit()
@@ -30,6 +32,26 @@ func apply_snapshot(new_players: Dictionary, new_vehicles: Dictionary) -> void:
 	print("> after")
 	print("players: ", players)
 	print("vehicles: ", vehicles)
+
+func set_pending_lobby_vehicle_state(state: Dictionary) -> void:
+	pending_lobby_vehicle_state = state.duplicate(true)
+	vehicles[0] = pending_lobby_vehicle_state.duplicate(true)
+	vehicle_snapshot_active = true
+	snapshot_changed.emit()
+
+
+func clear_pending_lobby_vehicle_state() -> void:
+	pending_lobby_vehicle_state.clear()
+	snapshot_changed.emit()
+
+
+func has_pending_lobby_vehicle_state() -> bool:
+	return not pending_lobby_vehicle_state.is_empty()
+
+
+func get_pending_lobby_vehicle_state() -> Dictionary:
+	return pending_lobby_vehicle_state.duplicate(true)
+
 
 func capture_scene_state(players_root: Node, vehicles_root: Node) -> void:
 	capture_players(players_root)
@@ -101,6 +123,9 @@ func capture_vehicles(vehicles_root: Node) -> void:
 		capture_vehicle(vehicle_index, child)
 		vehicle_index += 1
 
+	if not vehicles.is_empty():
+		pending_lobby_vehicle_state.clear()
+
 
 func capture_vehicle(vehicle_index: int, vehicle: Node) -> void:
 	if vehicle == null or not is_instance_valid(vehicle):
@@ -115,29 +140,37 @@ func capture_vehicle(vehicle_index: int, vehicle: Node) -> void:
 
 
 func has_vehicle_snapshot() -> bool:
-	return vehicle_snapshot_active
+	return vehicle_snapshot_active or not pending_lobby_vehicle_state.is_empty()
 
 
 func has_vehicle_state(vehicle_index: int) -> bool:
-	return vehicle_snapshot_active and vehicles.has(vehicle_index)
+	if vehicle_snapshot_active and vehicles.has(vehicle_index):
+		return true
+	return vehicle_index == 0 and not pending_lobby_vehicle_state.is_empty()
 
 
 func get_vehicle_state(vehicle_index: int) -> Dictionary:
-	if not vehicles.has(vehicle_index):
-		return {}
-	return vehicles[vehicle_index].duplicate(true)
+	if vehicles.has(vehicle_index):
+		return vehicles[vehicle_index].duplicate(true)
+	if vehicle_index == 0 and not pending_lobby_vehicle_state.is_empty():
+		return pending_lobby_vehicle_state.duplicate(true)
+	return {}
 
 
 func get_vehicle_count() -> int:
-	if not vehicle_snapshot_active:
-		return 0
-	return vehicles.size()
+	if vehicle_snapshot_active:
+		return vehicles.size()
+	if not pending_lobby_vehicle_state.is_empty():
+		return 1
+	return 0
 
 
 func get_vehicle_indexes() -> Array[int]:
 	var result: Array[int] = []
 	for key in vehicles.keys():
 		result.append(int(key))
+	if result.is_empty() and not pending_lobby_vehicle_state.is_empty():
+		result.append(0)
 	result.sort()
 	return result
 

@@ -3,11 +3,13 @@
 [ext_resource type="Script" uid="uid://cp786xiv1ceq1" path="res://scenes/ui/PlayerHUD.gd" id="1_playerhud"]
 [ext_resource type="PackedScene" uid="uid://h63fhlav7giv" path="res://scenes/ui/PlayerNameMarker.tscn" id="2_0741g"]
 [ext_resource type="Texture2D" uid="uid://bau64is7q1n3" path="res://icon.svg" id="2_rq211"]
+[ext_resource type="PackedScene" path="res://scenes/ui/VehicleNameMarker.tscn" id="3_vehicle_marker"]
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=1032802562]
 script = ExtResource("1_playerhud")
 name_marker_margin = 64.0
 name_marker_scene = ExtResource("2_0741g")
+vehicle_name_marker_scene = ExtResource("3_vehicle_marker")
 
 [node name="Root" type="Control" parent="." unique_id=675732997]
 layout_mode = 3
@@ -248,8 +250,32 @@ text = "Véhicule"
 
 [node name="VehicleHealthLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=1621358853]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "1000/1000"
+
+[node name="VehicleFuelProgress" type="ProgressBar" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+show_percentage = false
+
+[node name="VehicleFuelValueLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/VehicleFuelProgress"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Essence 0/0  |  Conso 0/s"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CurrentSeatLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=975744003]
 unique_name_in_owner = true
@@ -329,6 +355,42 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Tourelle : aucune"
 
+[node name="VehicleModsPanel" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -128.0
+offset_right = 600.0
+offset_bottom = -24.0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="VehicleModsMargin" type="MarginContainer" parent="Root/VehicleModsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VehicleModsVBox" type="VBoxContainer" parent="Root/VehicleModsPanel/VehicleModsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="VehicleModsTitle" type="Label" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox"]
+layout_mode = 2
+text = "Modules"
+
+[node name="VehicleModsGrid" type="GridContainer" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 6
+
 [node name="PlayerNameLayer" type="Control" parent="Root" unique_id=1968841001]
 unique_name_in_owner = true
 layout_mode = 1
@@ -339,6 +401,74 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
+
+[node name="VehicleNameLayer" type="Control" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_lock_ = true
+
+[node name="TankHealthPanel" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -230.0
+offset_top = -96.0
+offset_right = 230.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="TankHealthMargin" type="MarginContainer" parent="Root/TankHealthPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="TankHealthVBox" type="VBoxContainer" parent="Root/TankHealthPanel/TankHealthMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TankHealthNameLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/outline_size = 4
+text = "Tank"
+horizontal_alignment = 1
+
+[node name="TankHealthProgress" type="ProgressBar" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+show_percentage = false
+
+[node name="TankHealthValueLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox/TankHealthProgress"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "600/600"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="RepairTargetPanel" type="PanelContainer" parent="Root" unique_id=2121900204]
 unique_name_in_owner = true

@@ -35,6 +35,12 @@ var available_chassis_entries: Array[Dictionary] = []
 @export var downforce_strength: float = 20.0
 @export var invert_steering: bool = true
 
+@export_group("Fuel")
+@export var max_fuel: float = 500.0
+@export var current_fuel: float = 500.0
+@export var fuel_consumption_per_second: float = 3.0
+@export var fuel_min_speed_to_consume: float = 0.2
+
 @export_group("Shop")
 @export var shop_money: int = 2000
 
@@ -52,6 +58,7 @@ var available_chassis_entries: Array[Dictionary] = []
 var seat_markers: Array[Marker3D] = []
 var seat_occupants: Array[int] = []
 var turret_mounts: Array[VehicleTurretMount] = []
+var mod_mounts: Array[VehicleModMount] = []
 
 var steer_input: float = 0.0
 var drive_input: float = 0.0
@@ -107,6 +114,10 @@ var is_dead := false
 var _impact_last_hit_time: Dictionary = {}
 var _impact_disable_player_damage_until_frame: int = -1
 var _enemy_soft_impact_area: Area3D = null
+var _damage_absorption_sources: Dictionary = {}
+var _armor_modifier_values: Dictionary = {}
+var _turret_reserve_ammo_modifier_values: Dictionary = {}
+var _turret_base_reserve_max_ammo: Dictionary = {}
 
 
 static func inspect_chassis_scene(scene: PackedScene) -> Dictionary:
@@ -133,11 +144,15 @@ static func inspect_chassis_scene(scene: PackedScene) -> Dictionary:
 
 func _ready() -> void:
 	#VehicleState.register_vehicle(self)
+	if bool(get_meta("lobby_preview_vehicle", false)):
+		_setup_lobby_preview_vehicle()
+		return
 	add_to_group("vehicle")
 	add_to_group("vehicles")
 	
 	set_multiplayer_authority(1)
 	health = max_health
+	current_fuel = clampf(current_fuel, 0.0, max_fuel)
 	
 	if multiplayer.is_server():
 		can_sleep = false
@@ -164,6 +179,7 @@ func _ready() -> void:
 	_scan_seat_markers()
 	_ensure_seat_occupants()
 	_scan_turret_mounts()
+	_scan_mod_mounts()
 	_scan_available_shop_turrets()
 	_scan_available_chassis_entries()
 	
@@ -180,12 +196,38 @@ func _ready() -> void:
 		_broadcast_seat_layout()
 		_broadcast_loadout_state()
 
+func _setup_lobby_preview_vehicle() -> void:
+	add_to_group("vehicle_preview")
+	health = max_health
+	current_fuel = clampf(current_fuel, 0.0, max_fuel)
+	can_sleep = true
+	freeze = true
+	sleeping = true
+	contact_monitor = false
+	custom_integrator = false
+	_scan_seat_markers()
+	_ensure_seat_occupants()
+	_scan_turret_mounts()
+	_scan_mod_mounts()
+	_scan_available_shop_turrets()
+	_scan_available_chassis_entries()
+	set_physics_process(false)
+	set_process(false)
+
+
 func build_session_state() -> Dictionary:
-	var config: Array[Dictionary] = []
+	var turret_config: Array[Dictionary] = []
 	for mount in turret_mounts:
-		config.append({
+		turret_config.append({
 			"seat_index": mount.seat_index,
 			"turret_scene_path": mount.get_turret_scene_path()
+		})
+
+	var mod_config: Array[Dictionary] = []
+	for mod_mount in mod_mounts:
+		mod_config.append({
+			"mod_use_id": mod_mount.mod_use_id,
+			"mod_scene_path": mod_mount.get_mod_scene_path(),
 		})
 
 	return {
@@ -196,7 +238,10 @@ func build_session_state() -> Dictionary:
 		"health": health,
 		"is_dead": is_dead,
 		"shop_money": shop_money,
-		"turret_config": config
+		"max_fuel": max_fuel,
+		"current_fuel": current_fuel,
+		"turret_config": turret_config,
+		"mod_config": mod_config,
 	}
 
 
@@ -205,14 +250,19 @@ func apply_session_state(state: Dictionary) -> void:
 	chassis_id = String(state.get("chassis_id", chassis_id))
 	max_health = int(state.get("max_health", max_health))
 	shop_money = int(state.get("shop_money", shop_money))
+	max_fuel = maxf(float(state.get("max_fuel", max_fuel)), 0.0)
+	current_fuel = clampf(float(state.get("current_fuel", current_fuel)), 0.0, max_fuel)
 
 	var restored_health: int = int(state.get("health", max_health))
 	health = clampi(restored_health, 0, max_health)
 	is_dead = bool(state.get("is_dead", false)) or health <= 0
 
 	var turret_config = state.get("turret_config", [])
-	if turret_config is Array:
-		_sync_loadout_state(shop_money, turret_config)
+	var mod_config = state.get("mod_config", [])
+	if turret_config is Array and mod_config is Array:
+		_sync_loadout_state(shop_money, turret_config, mod_config)
+	elif turret_config is Array:
+		_sync_loadout_state(shop_money, turret_config, [])
 
 	if is_dead:
 		_sync_vehicle_destroyed()
@@ -325,9 +375,16 @@ func get_hud_data_for_player(player: Node) -> Dictionary:
 		"vehicle_name": vehicle_display_name,
 		"health": health,
 		"max_health": max_health,
+		"current_fuel": current_fuel,
+		"max_fuel": max_fuel,
+		"fuel_ratio": get_fuel_ratio(),
 		"current_seat_name": "",
+		"current_seat_index": -1,
+		"is_driver": false,
+		"driver_peer_id": get_driver_peer_id(),
 		"turret_name": "",
 		"turret_ammo": {},
+		"mods": get_mod_runtime_data(),
 		"seats": []
 	}
 
@@ -364,6 +421,8 @@ func get_hud_data_for_player(player: Node) -> Dictionary:
 
 		if is_self:
 			out["current_seat_name"] = seat_name
+			out["current_seat_index"] = seat_index
+			out["is_driver"] = local_peer_id == get_driver_peer_id()
 			out["turret_name"] = turret_name
 
 			var turret := _get_turret_from_mount(mount)
@@ -520,6 +579,24 @@ func _collect_turret_mounts(node: Node) -> void:
 		_collect_turret_mounts(child)
 
 
+func _scan_mod_mounts() -> void:
+	mod_mounts.clear()
+	_collect_mod_mounts(self)
+	mod_mounts.sort_custom(func(a: VehicleModMount, b: VehicleModMount) -> bool:
+		return a.mod_use_id < b.mod_use_id
+	)
+
+	for mod_mount in mod_mounts:
+		mod_mount.initialize(self)
+
+
+func _collect_mod_mounts(node: Node) -> void:
+	for child in node.get_children():
+		if child is VehicleModMount and child.is_in_group("vehicle_mod_mount"):
+			mod_mounts.append(child as VehicleModMount)
+		_collect_mod_mounts(child)
+
+
 func _scan_available_shop_turrets() -> void:
 	available_shop_turrets.clear()
 	_scan_turret_folder_recursive(TURRET_SCAN_ROOT)
@@ -643,8 +720,42 @@ func _scan_available_chassis_entries() -> void:
 		available_chassis_entries[i]["chassis_index"] = i
 
 
+func has_fuel() -> bool:
+	return current_fuel > 0.0
+
+
+func get_fuel_ratio() -> float:
+	if max_fuel <= 0.0:
+		return 0.0
+	return clampf(current_fuel / max_fuel, 0.0, 1.0)
+
+
+func consume_fuel(amount: float) -> float:
+	if not multiplayer.is_server():
+		return 0.0
+
+	if amount <= 0.0 or max_fuel <= 0.0:
+		return 0.0
+
+	var previous_fuel: float = current_fuel
+	current_fuel = clampf(current_fuel - amount, 0.0, max_fuel)
+	return previous_fuel - current_fuel
+
+
+func add_fuel(amount: float) -> float:
+	if not multiplayer.is_server():
+		return 0.0
+
+	if amount <= 0.0 or max_fuel <= 0.0:
+		return 0.0
+
+	var previous_fuel: float = current_fuel
+	current_fuel = clampf(current_fuel + amount, 0.0, max_fuel)
+	return current_fuel - previous_fuel
+
+
 func _update_drive_controls(delta: float) -> void:
-	var driver_peer_id := get_driver_peer_id()
+	var driver_peer_id: int = get_driver_peer_id()
 
 	if driver_peer_id == -1:
 		steer_input = 0.0
@@ -655,16 +766,19 @@ func _update_drive_controls(delta: float) -> void:
 		steering = current_steering
 		return
 
-	var steering_sign := -1.0 if invert_steering else 1.0
-	var target_steering := deg_to_rad(max_steering_deg) * steer_input * steering_sign
+	var steering_sign: float = -1.0 if invert_steering else 1.0
+	var target_steering: float = deg_to_rad(max_steering_deg) * steer_input * steering_sign
 	current_steering = move_toward(current_steering, target_steering, steering_speed * delta)
 	steering = current_steering
 
-	var forward_speed := linear_velocity.dot(global_basis * Vector3.MODEL_FRONT)
+	var forward_speed: float = linear_velocity.dot(global_basis * Vector3.MODEL_FRONT)
+	var has_drive_input: bool = absf(drive_input) > 0.05
 	engine_force = 0.0
 	brake = 0.0
 
-	if drive_input > 0.05:
+	if has_drive_input and not has_fuel():
+		brake = idle_brake_force
+	elif drive_input > 0.05:
 		if forward_speed < -1.0:
 			brake = brake_force
 		else:
@@ -673,14 +787,91 @@ func _update_drive_controls(delta: float) -> void:
 		if forward_speed > 1.0:
 			brake = brake_force
 		else:
-			engine_force = -engine_force_reverse * abs(drive_input)
+			engine_force = -engine_force_reverse * absf(drive_input)
 	else:
 		brake = idle_brake_force
 
+	var speed: float = linear_velocity.length()
+	if absf(engine_force) > 0.0 and speed > fuel_min_speed_to_consume:
+		consume_fuel(absf(drive_input) * fuel_consumption_per_second * delta)
+		if not has_fuel():
+			engine_force = 0.0
+			drive_input = 0.0
+			brake = idle_brake_force
+
 	if downforce_strength > 0.0:
-		var speed := linear_velocity.length()
 		if speed > 0.1:
 			apply_central_force(-global_basis.y * speed * downforce_strength)
+
+
+func is_damage_absorbed() -> bool:
+	return not _damage_absorption_sources.is_empty()
+
+
+func set_damage_absorption_source(source_key: String, enabled: bool) -> void:
+	if enabled:
+		_damage_absorption_sources[source_key] = true
+	else:
+		_damage_absorption_sources.erase(source_key)
+
+
+func add_armor_modifier(source_key: String, amount: int) -> void:
+	if _armor_modifier_values.has(source_key):
+		armor_rating -= int(_armor_modifier_values[source_key])
+
+	_armor_modifier_values[source_key] = amount
+	armor_rating += amount
+
+
+func remove_armor_modifier(source_key: String) -> void:
+	if not _armor_modifier_values.has(source_key):
+		return
+
+	armor_rating -= int(_armor_modifier_values[source_key])
+	_armor_modifier_values.erase(source_key)
+
+
+func add_turret_reserve_ammo_modifier(source_key: String, amount: int) -> void:
+	_turret_reserve_ammo_modifier_values[source_key] = amount
+	_recalculate_turret_reserve_ammo_modifiers()
+
+
+func remove_turret_reserve_ammo_modifier(source_key: String) -> void:
+	if not _turret_reserve_ammo_modifier_values.has(source_key):
+		return
+
+	_turret_reserve_ammo_modifier_values.erase(source_key)
+	_recalculate_turret_reserve_ammo_modifiers()
+
+
+func _get_total_turret_reserve_ammo_bonus() -> int:
+	var total_bonus: int = 0
+	for value in _turret_reserve_ammo_modifier_values.values():
+		total_bonus += int(value)
+	return total_bonus
+
+
+func _recalculate_turret_reserve_ammo_modifiers() -> void:
+	var total_bonus: int = _get_total_turret_reserve_ammo_bonus()
+
+	for mount in turret_mounts:
+		if mount == null or mount.turret == null:
+			continue
+
+		var turret: VehicleTurretBase = mount.turret
+		var turret_key: int = turret.get_instance_id()
+		if not _turret_base_reserve_max_ammo.has(turret_key):
+			_turret_base_reserve_max_ammo[turret_key] = turret.reserve_max_ammo
+
+		var base_reserve_max: int = int(_turret_base_reserve_max_ammo[turret_key])
+		var previous_reserve_max: int = turret.reserve_max_ammo
+		turret.reserve_max_ammo = maxi(base_reserve_max + total_bonus, 0)
+
+		var reserve_delta: int = turret.reserve_max_ammo - previous_reserve_max
+		if reserve_delta > 0:
+			turret.reserve_ammo = clampi(turret.reserve_ammo + reserve_delta, 0, turret.reserve_max_ammo)
+		else:
+			turret.reserve_ammo = clampi(turret.reserve_ammo, 0, turret.reserve_max_ammo)
 
 
 func apply_damage(amount: int) -> void:
@@ -688,6 +879,9 @@ func apply_damage(amount: int) -> void:
 		return
 
 	if is_dead:
+		return
+
+	if is_damage_absorbed():
 		return
 
 	health = max(health - amount, 0)
@@ -759,8 +953,11 @@ func apply_projectile_damage(
 	if not multiplayer.is_server():
 		return
 
-	var effective_armor = max(armor_rating - to_projectile_penetration, 0)
-	var final_damage = max(amount - effective_armor, 1)
+	if is_damage_absorbed():
+		return
+
+	var effective_armor: int = max(armor_rating - to_projectile_penetration, 0)
+	var final_damage: int = max(amount - effective_armor, 1)
 
 	if final_damage <= 0:
 		return
@@ -1262,6 +1459,20 @@ func get_mount_for_seat(seat_index: int) -> VehicleTurretMount:
 	return null
 
 
+func get_mod_mount_for_use_id(mod_use_id: int) -> VehicleModMount:
+	for mod_mount in mod_mounts:
+		if mod_mount.mod_use_id == mod_use_id:
+			return mod_mount
+	return null
+
+
+func get_mod_runtime_data() -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	for mod_mount in mod_mounts:
+		rows.append(mod_mount.get_runtime_data())
+	return rows
+
+
 func get_player_node_by_peer_id(peer_id: int) -> Node:
 	for player in get_tree().get_nodes_in_group("players"):
 		if player.get_multiplayer_authority() == peer_id:
@@ -1316,6 +1527,25 @@ func get_seat_ui_data() -> Array[Dictionary]:
 			row["can_sell"] = mount.has_turret() and not mount.driver_turret
 			row["empty_reason"] = mount.get_empty_reason()
 
+		rows.append(row)
+
+	return rows
+
+
+func get_mod_ui_data() -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+
+	for mod_mount in mod_mounts:
+		var row: Dictionary = {
+			"mod_use_id": mod_mount.mod_use_id,
+			"mount_label": mod_mount.mount_label,
+			"max_mod_size": mod_mount.max_mod_size,
+			"placement": mod_mount.placement,
+			"has_mod": mod_mount.has_mod(),
+			"mod_name": mod_mount.get_mod_label(),
+			"mod_price": mod_mount.get_mod_price(),
+			"empty_reason": mod_mount.get_empty_reason(),
+		}
 		rows.append(row)
 
 	return rows
@@ -1442,6 +1672,20 @@ func request_sell_turret(seat_index: int) -> void:
 	_server_sell_turret(sender, seat_index)
 
 
+@rpc("any_peer", "call_remote", "reliable")
+func request_use_mod(mod_use_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var sender: int = multiplayer.get_remote_sender_id()
+	_server_try_use_mod(sender, mod_use_id)
+
+
+func server_try_use_mod_from_host(mod_use_id: int) -> void:
+	if multiplayer.is_server():
+		_server_try_use_mod(multiplayer.get_unique_id(), mod_use_id)
+
+
 func server_try_enter_from_host() -> void:
 	if multiplayer.is_server():
 		_server_try_enter(multiplayer.get_unique_id())
@@ -1547,6 +1791,7 @@ func _server_install_turret(peer_id: int, shop_index: int, seat_index: int) -> v
 
 	shop_money -= price
 	mount.install_turret(turret_scene)
+	_recalculate_turret_reserve_ammo_modifiers()
 	_broadcast_loadout_state()
 
 
@@ -1569,7 +1814,22 @@ func _server_sell_turret(peer_id: int, seat_index: int) -> void:
 	var refund := mount.get_turret_price()
 	shop_money += refund
 	mount.remove_turret()
+	_recalculate_turret_reserve_ammo_modifiers()
 	_broadcast_loadout_state()
+
+
+func _server_try_use_mod(peer_id: int, mod_use_id: int) -> void:
+	if peer_id != get_driver_peer_id():
+		return
+
+	if mod_use_id < 1 or mod_use_id > 6:
+		return
+
+	var mod_mount: VehicleModMount = get_mod_mount_for_use_id(mod_use_id)
+	if mod_mount == null:
+		return
+
+	mod_mount.apply_host_use(peer_id)
 
 
 func _can_peer_open_menu(peer_id: int) -> bool:
@@ -1623,15 +1883,22 @@ func _broadcast_seat_layout() -> void:
 
 
 func _broadcast_loadout_state() -> void:
-	var config: Array[Dictionary] = []
+	var turret_config: Array[Dictionary] = []
 
 	for mount in turret_mounts:
-		config.append({
+		turret_config.append({
 			"seat_index": mount.seat_index,
 			"turret_scene_path": mount.get_turret_scene_path(),
 		})
 
-	_sync_loadout_state.rpc(shop_money, config)
+	var mod_config: Array[Dictionary] = []
+	for mod_mount in mod_mounts:
+		mod_config.append({
+			"mod_use_id": mod_mount.mod_use_id,
+			"mod_scene_path": mod_mount.get_mod_scene_path(),
+		})
+
+	_sync_loadout_state.rpc(shop_money, turret_config, mod_config)
 
 
 func _open_loadout_menu_local() -> void:
@@ -1673,7 +1940,7 @@ func _sync_seat_layout(new_layout: Array) -> void:
 
 
 @rpc("call_local", "reliable")
-func _sync_loadout_state(new_money: int, mount_config: Array) -> void:
+func _sync_loadout_state(new_money: int, mount_config: Array, mod_config: Array = []) -> void:
 	shop_money = new_money
 
 	for info in mount_config:
@@ -1690,9 +1957,24 @@ func _sync_loadout_state(new_money: int, mount_config: Array) -> void:
 		var scene := load(scene_path) as PackedScene
 		mount.install_turret(scene)
 
+	for info in mod_config:
+		var mod_use_id: int = int(info.get("mod_use_id", -1))
+		var mod_mount: VehicleModMount = get_mod_mount_for_use_id(mod_use_id)
+		if mod_mount == null:
+			continue
+
+		var mod_scene_path: String = String(info.get("mod_scene_path", ""))
+		if mod_scene_path.is_empty():
+			mod_mount.remove_mod()
+			continue
+
+		var mod_scene: PackedScene = load(mod_scene_path) as PackedScene
+		mod_mount.install_mod(mod_scene)
+
 	for mount in turret_mounts:
 		mount.on_vehicle_seat_layout_changed()
 
+	_recalculate_turret_reserve_ammo_modifiers()
 	emit_signal("loadout_state_changed")
 
 
@@ -1790,10 +2072,15 @@ func _sync_vehicle_state(
 	new_angular_velocity: Vector3,
 	new_steering: float,
 	new_engine_force: float,
-	new_brake: float
+	new_brake: float,
+	synced_current_fuel: float,
+	synced_max_fuel: float
 ) -> void:
 	if multiplayer.is_server():
 		return
+
+	max_fuel = maxf(synced_max_fuel, 0.0)
+	current_fuel = clampf(synced_current_fuel, 0.0, max_fuel)
 
 	state_buffer.append({
 		"time": Time.get_ticks_msec() * 0.001,

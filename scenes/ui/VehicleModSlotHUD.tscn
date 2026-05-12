@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/VehicleModSlotHUD.gd" id="1_slot_script"]
+
+[node name="VehicleModSlotHUD" type="PanelContainer"]
+mouse_filter = 2
+custom_minimum_size = Vector2(86, 86)
+script = ExtResource("1_slot_script")
+
+[node name="SlotMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="SlotVBox" type="VBoxContainer" parent="SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="ModNameLabel" type="Label" parent="SlotMargin/SlotVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "empty"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="ModTypeLabel" type="Label" parent="SlotMargin/SlotVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "ACTIVE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="KeyLabel" type="Label" parent="SlotMargin/SlotVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "[1]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CooldownLabel" type="Label" parent="SlotMargin/SlotVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "READY"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CooldownProgress" type="ProgressBar" parent="SlotMargin/SlotVBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+show_percentage = false

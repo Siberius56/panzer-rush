@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dx1yvenaokhcd"]
+
+[ext_resource type="Script" uid="uid://bl8hnv7ahc2vx" path="res://vehicle_system/mods/examples/AmmoPackMod.gd" id="1_ammo"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ammo"]
+size = Vector3(0.75, 0.35, 0.55)
+
+[sub_resource type="StandardMaterial3D" id="Material_ammo"]
+albedo_color = Color(0.32, 0.26, 0.13, 1)
+roughness = 0.75
+
+[node name="AmmoPackMod" type="Node3D" unique_id=358494658]
+script = ExtResource("1_ammo")
+mod_id = "ammo_pack"
+mod_label = "Pack de munitions"
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=68866944]
+
+[node name="Crate" type="MeshInstance3D" parent="VisualRoot" unique_id=1664378215]
+mesh = SubResource("BoxMesh_ammo")
+surface_material_override/0 = SubResource("Material_ammo")

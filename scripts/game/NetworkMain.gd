@@ -22,6 +22,9 @@ const PLAYER_SCENE := preload("res://scenes/player/NetworkProceduralPlayer.tscn"
 @onready var spawn_points_root: Node3D = $SpawnPoints
 @onready var vehicle_spawns_root: Node3D = $VehicleSpawns
 @onready var hud = $CanvasLayer/NetworkHUD
+@onready var world_environment: WorldEnvironment = %WorldEnvironment
+
+const ENV_DAY = preload("uid://ji8qy5d56h0t")
 
 var players_root: Node3D = null
 var vehicles_root: Node3D = null
@@ -38,6 +41,11 @@ func _ready() -> void:
 	add_to_group("network_main")
 	_ensure_players_root()
 	_ensure_vehicles_root()
+	
+	
+	if world_environment:
+		world_environment.environment = ENV_DAY
+	
 	
 	if not NetworkManager.player_list_changed.is_connected(_sync_players):
 		NetworkManager.player_list_changed.connect(_sync_players)

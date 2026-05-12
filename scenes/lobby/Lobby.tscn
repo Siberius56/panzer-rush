@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ccv88msvp1esx"]
 
-[ext_resource type="Script" uid="uid://bb30nt354apuh" path="res://scripts/lobby/Lobby.gd" id="1_lobby"]
+[ext_resource type="Script" uid="uid://bb30nt354apuh" path="res://scenes/lobby/Lobby.gd" id="1_lobby"]
 [ext_resource type="PackedScene" uid="uid://cjv7arc0wkfhi" path="res://asset/map/factory/building-k.glb" id="2_opc5t"]
 [ext_resource type="PackedScene" uid="uid://bk741csbv6524" path="res://asset/map/factory/building-q.glb" id="3_pbg2n"]
 [ext_resource type="PackedScene" uid="uid://bi8rfru842h6q" path="res://vehicle_system/chassis/Tank_Light.tscn" id="4_xyfku"]
@@ -628,6 +628,14 @@ transform = Transform3D(0.6510525, 0, -0.7590327, 0, 1, 0, 0.7590327, 0, 0.65105
 [node name="Tank_Medium" parent="Node3D" unique_id=982500783 instance=ExtResource("5_wp0hx")]
 transform = Transform3D(-0.56124586, 0, -0.82764924, 0, 1, 0, 0.82764924, 0, -0.56124586, 2.5626078, 0.025935411, 3.4035752)
 
+[node name="TankPreviewSpawn" type="Marker3D" parent="Node3D" unique_id=815975149]
+unique_name_in_owner = true
+transform = Transform3D(0.6510525, 0, -0.7590327, 0, 1, 0, 0.7590327, 0, 0.6510525, 3.1519136, 0, -3.9383001)
+
+[node name="TankPreviewRoot" type="Node3D" parent="Node3D" unique_id=1671498949]
+unique_name_in_owner = true
+visible = false
+
 [node name="Stroke" type="Node3D" parent="Node3D" unique_id=1184972900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0)
 
@@ -980,7 +988,7 @@ process_material = SubResource("ParticleProcessMaterial_j7bbn")
 draw_pass_1 = SubResource("QuadMesh_u660g")
 
 [node name="Camera3D" type="Camera3D" parent="Node3D" unique_id=1203080746]
-transform = Transform3D(-4.371139e-08, 0.1736481, -0.9848073, 0, 0.9848073, 0.1736481, 1, 7.590399e-09, -4.3047294e-08, -6, 3.5, 0)
+transform = Transform3D(-4.371139e-08, 0.17364809, -0.98480725, 0, 0.98480725, 0.17364809, 1, 7.590399e-09, -4.304729e-08, -6, 3.5, 0)
 attributes = SubResource("CameraAttributesPractical_34cp8")
 current = true
 fov = 60.0
@@ -988,7 +996,6 @@ fov = 60.0
 [node name="AnimationPlayer_Hangar" type="AnimationPlayer" parent="Node3D" unique_id=389254288]
 unique_name_in_owner = true
 libraries/ = SubResource("AnimationLibrary_2sfbi")
-autoplay = &"start_lobby"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="Node3D" unique_id=192340200]
 
@@ -1172,6 +1179,37 @@ offset_right = -80.0
 offset_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="MissionTabs" type="HBoxContainer" parent="MissionLayer" unique_id=812671188]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_top = 0.01
+anchor_right = 0.96
+anchor_bottom = 0.065
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="MissionTabButton" type="Button" parent="MissionLayer/MissionTabs" unique_id=162108254]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+text = "Carte des missions"
+
+[node name="TankCustomizationTabButton" type="Button" parent="MissionLayer/MissionTabs" unique_id=1150677610]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Customisation du tank"
+
+[node name="CustomizationEditModeCheckButton" type="CheckButton" parent="MissionLayer/MissionTabs" unique_id=1025203683]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Modification par tous"
 
 [node name="MainContainer" type="HBoxContainer" parent="MissionLayer" unique_id=356040311]
 layout_mode = 1
@@ -1416,6 +1454,190 @@ text = "Lancer la partie"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Retour au lobby"
+
+[node name="TankCustomizationRoot" type="Control" parent="MissionLayer" unique_id=1613198722]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchor_left = 0.04
+anchor_top = 0.08
+anchor_right = 0.96
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TankSlotOverlay" type="Control" parent="MissionLayer/TankCustomizationRoot" unique_id=843687781]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopInfoPanel" type="PanelContainer" parent="MissionLayer/TankCustomizationRoot" unique_id=1026216120]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.28
+anchor_bottom = 0.27
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel" unique_id=925370426]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel/MarginContainer" unique_id=1379625931]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TankChassisNameLabel" type="Label" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel/MarginContainer/VBoxContainer" unique_id=1458468690]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tank"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TankScoreLabel" type="Label" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel/MarginContainer/VBoxContainer" unique_id=1281316291]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Score restant : 0 / 0"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TankCustomizationStatusLabel" type="Label" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel/MarginContainer/VBoxContainer" unique_id=1063828790]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sélectionnez une tourelle ou un module."
+autowrap_mode = 3
+
+[node name="ShowChassisListButton" type="Button" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel/MarginContainer/VBoxContainer" unique_id=1660884729]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Changer de châssis"
+
+[node name="ClearCustomizationSelectionButton" type="Button" parent="MissionLayer/TankCustomizationRoot/TopInfoPanel/MarginContainer/VBoxContainer" unique_id=503779937]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Désélectionner"
+
+[node name="ChassisListPanel" type="PanelContainer" parent="MissionLayer/TankCustomizationRoot" unique_id=1759542216]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.29
+anchor_right = 0.28
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MissionLayer/TankCustomizationRoot/ChassisListPanel" unique_id=104486621]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/ChassisListPanel/MarginContainer" unique_id=844013724]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ChassisTitleLabel" type="Label" parent="MissionLayer/TankCustomizationRoot/ChassisListPanel/MarginContainer/VBoxContainer" unique_id=1988248013]
+layout_mode = 2
+text = "Châssis disponibles"
+horizontal_alignment = 1
+
+[node name="ChassisScroll" type="ScrollContainer" parent="MissionLayer/TankCustomizationRoot/ChassisListPanel/MarginContainer/VBoxContainer" unique_id=288442792]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ChassisList" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/ChassisListPanel/MarginContainer/VBoxContainer/ChassisScroll" unique_id=1006777648]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="TurretListPanel" type="PanelContainer" parent="MissionLayer/TankCustomizationRoot" unique_id=309178436]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.73
+anchor_right = 1.0
+anchor_bottom = 0.74
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MissionLayer/TankCustomizationRoot/TurretListPanel" unique_id=659145250]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/TurretListPanel/MarginContainer" unique_id=1891428691]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TurretTitleLabel" type="Label" parent="MissionLayer/TankCustomizationRoot/TurretListPanel/MarginContainer/VBoxContainer" unique_id=1597703928]
+layout_mode = 2
+text = "Tourelles"
+horizontal_alignment = 1
+
+[node name="TurretScroll" type="ScrollContainer" parent="MissionLayer/TankCustomizationRoot/TurretListPanel/MarginContainer/VBoxContainer" unique_id=1932629305]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="TurretList" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/TurretListPanel/MarginContainer/VBoxContainer/TurretScroll" unique_id=2017684513]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ModListPanel" type="PanelContainer" parent="MissionLayer/TankCustomizationRoot" unique_id=463006437]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.72
+anchor_right = 0.7
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MissionLayer/TankCustomizationRoot/ModListPanel" unique_id=605539248]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/ModListPanel/MarginContainer" unique_id=129513630]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ModTitleLabel" type="Label" parent="MissionLayer/TankCustomizationRoot/ModListPanel/MarginContainer/VBoxContainer" unique_id=893122280]
+layout_mode = 2
+text = "Modules"
+horizontal_alignment = 1
+
+[node name="ModScroll" type="ScrollContainer" parent="MissionLayer/TankCustomizationRoot/ModListPanel/MarginContainer/VBoxContainer" unique_id=295323]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ModList" type="VBoxContainer" parent="MissionLayer/TankCustomizationRoot/ModListPanel/MarginContainer/VBoxContainer/ModScroll" unique_id=1780385123]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
 [node name="Debug_Start" type="Button" parent="." unique_id=1408829858]
 layout_mode = 0

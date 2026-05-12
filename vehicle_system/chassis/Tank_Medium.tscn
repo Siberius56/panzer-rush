@@ -7,6 +7,13 @@
 [ext_resource type="PackedScene" uid="uid://cmy1o1eijb6di" path="res://vehicle_system/turrets/Turret_Medium.tscn" id="4_cojh2"]
 [ext_resource type="PackedScene" uid="uid://dtikh1ho4v06s" path="res://asset/tank/box_bevel2.glb" id="5_2cffi"]
 
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ReactorMod.tscn" id="11_reactor"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ShieldMod.tscn" id="12_shield"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ArmorSkirtMod.tscn" id="13_armor"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/SnowplowMod.tscn" id="15_snowplow"]
+
 [sub_resource type="PhysicsMaterial" id="1"]
 friction = 0.2
 
@@ -89,6 +96,9 @@ angular_damp = 0.18
 script = ExtResource("1")
 vehicle_display_name = "Medium Tank"
 engine_force_reverse = 3550.0
+max_fuel = 160.0
+current_fuel = 160.0
+fuel_consumption_per_second = 6.5
 impact_min_speed = 3.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1081311579]
@@ -167,6 +177,40 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.45, -1.15)
 script = ExtResource("2")
 seat_index = 4
 seat_label = "Arrière"
+
+[node name="ModMounts" type="Node3D" parent="BodyVisualRoot"]
+
+[node name="Mod1RearReactor" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.4, -1.75)
+mod_use_id = 1
+mount_label = "Module rear 1"
+max_mod_size = 1
+placement = "rear"
+mod_scene = ExtResource("11_reactor")
+
+[node name="Mod2CenterShield" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+mod_use_id = 2
+mount_label = "Module center 2"
+max_mod_size = 1
+placement = "center"
+mod_scene = ExtResource("12_shield")
+
+[node name="Mod3FrontSnowplow" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.25, 1.85)
+mod_use_id = 3
+mount_label = "Module front 3"
+max_mod_size = 1
+placement = "front"
+mod_scene = ExtResource("15_snowplow")
+
+[node name="Mod4SideEmpty" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 0.45, 0)
+mod_use_id = 4
+mount_label = "Module side 4"
+max_mod_size = 1
+placement = "side"
+
 
 [node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=364243614]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.38, 1.2)

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://c12ku5gft5lu1"]
+
+[ext_resource type="Script" uid="uid://b7cu2iwmwiq8h" path="res://vehicle_system/mods/examples/SnowplowMod.gd" id="1_snowplow"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_blade"]
+size = Vector3(2.3, 0.45, 0.18)
+
+[sub_resource type="StandardMaterial3D" id="Material_blade"]
+albedo_color = Color(0.12, 0.13, 0.14, 1)
+metallic = 0.9
+roughness = 0.45
+
+[sub_resource type="BoxShape3D" id="BoxShape_push"]
+size = Vector3(2.5, 1, 1)
+
+[node name="SnowplowMod" type="Node3D" unique_id=960362230]
+script = ExtResource("1_snowplow")
+mod_id = "snowplow"
+mod_label = "Chasse-neige"
+allowed_placements = Array[String](["front"])
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1439657894]
+
+[node name="Blade" type="MeshInstance3D" parent="VisualRoot" unique_id=258677850]
+transform = Transform3D(1, 0, 0, 0, 0.9063078, -0.42261827, 0, 0.42261827, 0.9063078, 0, 0, -0.15)
+mesh = SubResource("BoxMesh_blade")
+surface_material_override/0 = SubResource("Material_blade")
+
+[node name="PushArea" type="Area3D" parent="." unique_id=1396954293]
+collision_layer = 15
+collision_mask = 0
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PushArea" unique_id=2047803744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.65)
+shape = SubResource("BoxShape_push")

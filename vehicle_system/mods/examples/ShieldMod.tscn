@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://5vcam03jys5m"]
+
+[ext_resource type="Script" uid="uid://bbf56igi5h4jq" path="res://vehicle_system/mods/examples/ShieldMod.gd" id="1_shield"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_shield"]
+radius = 3.0
+height = 6.0
+radial_segments = 32
+rings = 16
+
+[sub_resource type="StandardMaterial3D" id="Material_shield"]
+transparency = 1
+albedo_color = Color(0.15, 0.55, 1, 0.28)
+emission_enabled = true
+emission = Color(0.1, 0.35, 1, 1)
+emission_energy_multiplier = 0.5
+
+[node name="ShieldMod" type="Node3D" unique_id=438572862]
+script = ExtResource("1_shield")
+mod_id = "shield"
+mod_label = "Bouclier"
+activation_mode = "active"
+active_duration = 3.0
+cooldown_duration = 20.0
+show_visual_only_when_active = true
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1070391794]
+
+[node name="ShieldSphere" type="MeshInstance3D" parent="VisualRoot" unique_id=596069029]
+mesh = SubResource("SphereMesh_shield")
+surface_material_override/0 = SubResource("Material_shield")

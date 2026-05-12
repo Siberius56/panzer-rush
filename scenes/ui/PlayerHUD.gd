@@ -4,11 +4,15 @@ class_name PlayerHUD
 signal respawn_requested
 
 #const PLAYER_NAME_MARKER_SCENE: PackedScene = preload("res://scenes/ui/PlayerNameMarker.tscn")
+const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModSlotHUD.tscn")
 
 @export var refresh_every_frame: bool = true
 @export var show_local_player_name_marker: bool = false
 @export var name_marker_margin: float = 24.0
 @export var name_marker_scene: PackedScene #= PLAYER_NAME_MARKER_SCENE
+@export var vehicle_name_marker_scene: PackedScene
+@export var show_vehicle_name_marker: bool = true
+@export var vehicle_marker_world_height: float = 2.6
 
 @export_group("Repair Target Bar")
 @export var repair_bar_screen_offset: Vector2 = Vector2(0.0, -84.0)
@@ -38,6 +42,8 @@ signal respawn_requested
 @onready var vehicle_panel: PanelContainer = %VehiclePanel
 @onready var vehicle_name_label: Label = %VehicleNameLabel
 @onready var vehicle_health_label = %VehicleHealthLabel
+@onready var vehicle_fuel_progress_bar: ProgressBar = %VehicleFuelProgress
+@onready var vehicle_fuel_value_label: Label = %VehicleFuelValueLabel
 @onready var current_seat_label: Label = %CurrentSeatLabel
 @onready var seat_1_label: RichTextLabel = %Seat1Label
 @onready var seat_2_label: RichTextLabel = %Seat2Label
@@ -47,9 +53,12 @@ signal respawn_requested
 @onready var seat_6_label: RichTextLabel = %Seat6Label
 @onready var turret_label: Label = %TurretLabel
 @onready var turret_ammo_label: Label = %TurretAmmo
+@onready var vehicle_mods_panel: PanelContainer = %VehicleModsPanel
+@onready var vehicle_mods_grid: GridContainer = %VehicleModsGrid
 
 var player: Node = null
 var _seat_labels: Array[RichTextLabel] = []
+var _vehicle_mod_slot_nodes: Array[Control] = []
 @onready var death_overlay: Control = %DeathOverlay
 @onready var death_message_label: Label = %DeathMessageLabel
 @onready var respawn_countdown_label: Label = %RespawnCountdownLabel
@@ -60,6 +69,11 @@ var _seat_labels: Array[RichTextLabel] = []
 @onready var revive_label: Label = %ReviveLabel
 @onready var revive_progress_bar: ProgressBar = %ReviveProgress
 @onready var player_name_layer: Control = %PlayerNameLayer
+@onready var vehicle_name_layer: Control = %VehicleNameLayer
+@onready var tank_health_panel: PanelContainer = %TankHealthPanel
+@onready var tank_health_name_label: Label = %TankHealthNameLabel
+@onready var tank_health_progress_bar: ProgressBar = %TankHealthProgress
+@onready var tank_health_value_label: Label = %TankHealthValueLabel
 @onready var passage_panel: PanelContainer = %PassagePanel
 @onready var passage_label: Label = %PassageLabel
 @onready var passage_progress: ProgressBar = %PassageProgress
@@ -68,6 +82,8 @@ var _seat_labels: Array[RichTextLabel] = []
 @onready var repair_target_progress: ProgressBar = %RepairTargetProgress
 var respawn_pending: bool = false
 var _name_marker_labels: Dictionary = {}
+var _vehicle_name_marker: Control = null
+var _vehicle_marker_target_id: int = 0
 var _passage_prompt_owner_id: int = 0
 var _repair_target: Node = null
 var _repair_target_hide_timer: float = 0.0
@@ -102,6 +118,10 @@ func _ready() -> void:
 	hide_passage_prompt()
 	hide_repair_target(true)
 	hide_reload_progress()
+	_hide_vehicle_fuel_bar()
+	_hide_vehicle_mod_slots()
+	_hide_tank_health_bar()
+	_hide_vehicle_name_marker()
 	_refresh_all()
 
 func _process(delta: float) -> void:
@@ -162,6 +182,10 @@ func _refresh_all() -> void:
 	if not is_instance_valid(player):
 		visible = false
 		_clear_name_markers()
+		_hide_vehicle_name_marker()
+		_hide_tank_health_bar()
+		_hide_vehicle_fuel_bar()
+		_hide_vehicle_mod_slots()
 		hide_repair_target(true)
 		hide_reload_progress()
 		return
@@ -171,13 +195,18 @@ func _refresh_all() -> void:
 	var player_data: Dictionary = _get_player_hud_data()
 	var in_vehicle: bool = bool(player_data.get("in_vehicle", false))
 	var is_dead: bool = bool(player_data.get("is_dead", false))
+	var tracked_vehicle: Node = _get_tracked_vehicle(player_data)
 
 	_refresh_player_name_markers()
+	_refresh_tank_health_bar(player_data, tracked_vehicle)
+	_refresh_vehicle_name_marker(player_data, tracked_vehicle, in_vehicle, is_dead)
 
 	if is_dead:
 		common_panel.visible = false
 		on_foot_panel.visible = false
 		vehicle_panel.visible = false
+		_hide_vehicle_fuel_bar()
+		_hide_vehicle_mod_slots()
 		hide_repair_target(true)
 		hide_reload_progress()
 		_show_death_overlay(player_data)
@@ -188,12 +217,15 @@ func _refresh_all() -> void:
 	_refresh_common(player_data)
 	_refresh_on_foot(player_data)
 	_refresh_reload_progress(player_data)
-	_refresh_vehicle(player_data)
+	_refresh_vehicle(player_data, tracked_vehicle)
 	_refresh_revive_panel(player_data)
 
 	common_panel.visible = true
 	on_foot_panel.visible = not in_vehicle
 	vehicle_panel.visible = in_vehicle
+	if not in_vehicle:
+		_hide_vehicle_fuel_bar()
+		_hide_vehicle_mod_slots()
 
 func _show_death_overlay(player_data: Dictionary) -> void:
 	death_overlay.visible = true
@@ -474,6 +506,245 @@ func _clear_name_markers() -> void:
 			marker.queue_free()
 	_name_marker_labels.clear()
 
+func _refresh_tank_health_bar(player_data: Dictionary, tracked_vehicle: Node) -> void:
+	if tank_health_panel == null:
+		return
+
+	var tank_data: Dictionary = _get_tracked_vehicle_hud_data(player_data, tracked_vehicle)
+	if tank_data.is_empty():
+		_hide_tank_health_bar()
+		return
+
+	var tank_name: String = str(tank_data.get("vehicle_name", tank_data.get("name", "Tank")))
+	var max_hp: int = max(int(tank_data.get("max_health", tank_data.get("max_hp", 1))), 1)
+	var hp: int = clampi(int(tank_data.get("health", tank_data.get("hp", 0))), 0, max_hp)
+
+	tank_health_panel.visible = true
+	tank_health_name_label.text = tank_name
+	tank_health_progress_bar.min_value = 0.0
+	tank_health_progress_bar.max_value = float(max_hp)
+	tank_health_progress_bar.value = float(hp)
+	tank_health_value_label.text = "%d/%d" % [hp, max_hp]
+
+
+func _hide_tank_health_bar() -> void:
+	if tank_health_panel != null:
+		tank_health_panel.visible = false
+	if tank_health_progress_bar != null:
+		tank_health_progress_bar.value = 0.0
+	if tank_health_value_label != null:
+		tank_health_value_label.text = "0/0"
+
+
+func _refresh_vehicle_name_marker(player_data: Dictionary, tracked_vehicle: Node, in_vehicle: bool, is_dead: bool) -> void:
+	if not show_vehicle_name_marker or in_vehicle or is_dead:
+		_hide_vehicle_name_marker()
+		return
+
+	if tracked_vehicle == null or not is_instance_valid(tracked_vehicle) or not (tracked_vehicle is Node3D):
+		_hide_vehicle_name_marker()
+		return
+
+	var camera: Camera3D = _get_hud_camera()
+	if camera == null:
+		_hide_vehicle_name_marker()
+		return
+
+	var marker: Control = _get_or_create_vehicle_name_marker(tracked_vehicle)
+	if marker == null:
+		return
+
+	var tank_data: Dictionary = _get_tracked_vehicle_hud_data(player_data, tracked_vehicle)
+	_set_name_marker_text(marker, _get_vehicle_marker_text(tracked_vehicle, tank_data))
+
+	var world_position: Vector3 = _get_vehicle_marker_world_position(tracked_vehicle)
+	var screen_data: Dictionary = _world_position_to_clamped_screen(camera, world_position)
+	var marker_size: Vector2 = marker.get_combined_minimum_size()
+	marker.size = marker_size
+	marker.position = Vector2(float(screen_data.get("x", 0.0)), float(screen_data.get("y", 0.0))) - marker_size * 0.5
+	marker.visible = true
+
+
+func _get_or_create_vehicle_name_marker(tracked_vehicle: Node) -> Control:
+	var tracked_vehicle_id: int = tracked_vehicle.get_instance_id()
+	if _vehicle_name_marker != null and is_instance_valid(_vehicle_name_marker) and _vehicle_marker_target_id == tracked_vehicle_id:
+		return _vehicle_name_marker
+
+	_hide_vehicle_name_marker()
+
+	if vehicle_name_layer == null:
+		return null
+
+	if vehicle_name_marker_scene == null:
+		push_error("PlayerHUD.vehicle_name_marker_scene est vide.")
+		return null
+
+	var marker: Control = vehicle_name_marker_scene.instantiate() as Control
+	if marker == null:
+		push_error("La scène de marqueur de véhicule doit hériter de Control.")
+		return null
+
+	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vehicle_name_layer.add_child(marker)
+	_vehicle_name_marker = marker
+	_vehicle_marker_target_id = tracked_vehicle_id
+	return marker
+
+
+func _hide_vehicle_name_marker() -> void:
+	if _vehicle_name_marker != null and is_instance_valid(_vehicle_name_marker):
+		_vehicle_name_marker.queue_free()
+	_vehicle_name_marker = null
+	_vehicle_marker_target_id = 0
+
+
+func _get_tracked_vehicle(player_data: Dictionary) -> Node:
+	var vehicle_from_data: Node = _find_vehicle_in_dictionary(player_data)
+	if vehicle_from_data != null:
+		return vehicle_from_data
+
+	if player != null and is_instance_valid(player):
+		var method_names: Array[String] = [
+			"get_tracked_vehicle",
+			"get_current_vehicle",
+			"get_vehicle",
+			"get_owned_vehicle",
+			"get_last_vehicle",
+			"get_tank",
+			"get_assigned_vehicle",
+		]
+		for method_name: String in method_names:
+			if player.has_method(method_name):
+				var method_vehicle: Node = _as_valid_vehicle_node(player.call(method_name))
+				if method_vehicle != null:
+					return method_vehicle
+
+		var property_names: Array[String] = [
+			"vehicle",
+			"current_vehicle",
+			"owned_vehicle",
+			"last_vehicle",
+			"tank",
+			"assigned_vehicle",
+			"nearby_vehicle",
+			"target_vehicle",
+		]
+		for property_name: String in property_names:
+			var property_vehicle: Node = _as_valid_vehicle_node(player.get(property_name))
+			if property_vehicle != null:
+				return property_vehicle
+
+	return _find_vehicle_in_common_groups()
+
+
+func _find_vehicle_in_dictionary(data: Dictionary) -> Node:
+	var key_names: Array[String] = [
+		"vehicle",
+		"current_vehicle",
+		"owned_vehicle",
+		"last_vehicle",
+		"tank",
+		"assigned_vehicle",
+		"nearby_vehicle",
+		"target_vehicle",
+	]
+
+	for key_name: String in key_names:
+		var vehicle: Node = _as_valid_vehicle_node(data.get(key_name, null))
+		if vehicle != null:
+			return vehicle
+
+	return null
+
+
+func _find_vehicle_in_common_groups() -> Node:
+	var group_names: Array[String] = ["tanks", "tank", "vehicles", "vehicle"]
+	for group_name: String in group_names:
+		for candidate in get_tree().get_nodes_in_group(group_name):
+			var vehicle: Node = _as_valid_vehicle_node(candidate)
+			if vehicle == null or not (vehicle is Node3D):
+				continue
+			if vehicle.has_method("get_hud_data_for_player") or vehicle.has_method("get_repair_hud_world_position"):
+				return vehicle
+			var max_health_value = vehicle.get("max_health")
+			if max_health_value != null:
+				return vehicle
+
+	return null
+
+
+func _as_valid_vehicle_node(value: Variant) -> Node:
+	if value is Node and is_instance_valid(value):
+		return value as Node
+	return null
+
+
+func _get_tracked_vehicle_hud_data(player_data: Dictionary, tracked_vehicle: Node) -> Dictionary:
+	var data: Dictionary = {}
+
+	if tracked_vehicle != null and is_instance_valid(tracked_vehicle) and tracked_vehicle.has_method("get_hud_data_for_player"):
+		var method_data = tracked_vehicle.call("get_hud_data_for_player", player)
+		if method_data is Dictionary:
+			data = method_data
+
+	if data.is_empty() and player_data.has("vehicle_data") and player_data["vehicle_data"] is Dictionary:
+		data = player_data["vehicle_data"]
+
+	if data.is_empty() and player_data.has("tank_data") and player_data["tank_data"] is Dictionary:
+		data = player_data["tank_data"]
+
+	if data.is_empty() and tracked_vehicle != null and is_instance_valid(tracked_vehicle):
+		data = _get_repair_target_data(tracked_vehicle)
+
+	if data.is_empty() and _player_data_has_flat_vehicle_health(player_data):
+		data = {
+			"vehicle_name": str(player_data.get("vehicle_name", player_data.get("tank_name", "Tank"))),
+			"health": int(player_data.get("vehicle_health", player_data.get("tank_health", 0))),
+			"max_health": int(player_data.get("vehicle_max_health", player_data.get("tank_max_health", 1))),
+		}
+
+	if data.is_empty():
+		return {}
+
+	return {
+		"vehicle_name": str(data.get("vehicle_name", data.get("name", "Tank"))),
+		"health": int(data.get("health", data.get("hp", 0))),
+		"max_health": int(data.get("max_health", data.get("max_hp", 1))),
+	}
+
+
+func _player_data_has_flat_vehicle_health(player_data: Dictionary) -> bool:
+	return player_data.has("vehicle_health") or player_data.has("tank_health")
+
+
+func _get_vehicle_marker_text(tracked_vehicle: Node, tank_data: Dictionary) -> String:
+	if not tank_data.is_empty():
+		return str(tank_data.get("vehicle_name", tank_data.get("name", "Tank")))
+
+	return _read_repair_target_name(tracked_vehicle)
+
+
+func _get_vehicle_marker_world_position(tracked_vehicle: Node) -> Vector3:
+	if tracked_vehicle.has_method("get_hud_vehicle_marker_position"):
+		var vehicle_marker_position = tracked_vehicle.call("get_hud_vehicle_marker_position")
+		if vehicle_marker_position is Vector3:
+			return vehicle_marker_position
+
+	if tracked_vehicle.has_method("get_hud_name_marker_position"):
+		var name_marker_position = tracked_vehicle.call("get_hud_name_marker_position")
+		if name_marker_position is Vector3:
+			return name_marker_position
+
+	if tracked_vehicle.has_method("get_repair_hud_world_position"):
+		var repair_marker_position = tracked_vehicle.call("get_repair_hud_world_position")
+		if repair_marker_position is Vector3:
+			return repair_marker_position
+
+	if tracked_vehicle is Node3D:
+		return (tracked_vehicle as Node3D).global_position + Vector3.UP * vehicle_marker_world_height
+
+	return Vector3.ZERO
+
 func _get_hud_camera() -> Camera3D:
 	if player != null and player.has_method("get_hud_camera"):
 		var camera = player.call("get_hud_camera")
@@ -594,8 +865,8 @@ func hide_reload_progress() -> void:
 	if reload_progress_bar != null:
 		reload_progress_bar.value = 0.0
 
-func _refresh_vehicle(player_data: Dictionary) -> void:
-	var vehicle_data: Dictionary = _get_vehicle_hud_data(player_data)
+func _refresh_vehicle(player_data: Dictionary, tracked_vehicle: Node = null) -> void:
+	var vehicle_data: Dictionary = _get_vehicle_hud_data(player_data, tracked_vehicle)
 	var vehicle_name: String = str(vehicle_data.get("vehicle_name", "Véhicule"))
 	var vehicle_health : int = vehicle_data.get("health", -1)
 	var vehicle_health_max : int = vehicle_data.get("max_health", -1)
@@ -603,8 +874,11 @@ func _refresh_vehicle(player_data: Dictionary) -> void:
 	var turret_name: String = str(vehicle_data.get("turret_name", ""))
 	var seats: Array = vehicle_data.get("seats", [])
 
+	_refresh_vehicle_fuel_bar(vehicle_data, tracked_vehicle)
+	_refresh_vehicle_mod_slots(vehicle_data)
+
 	vehicle_name_label.text = vehicle_name
-	
+	vehicle_health_label.visible = false
 	vehicle_health_label.text = str(vehicle_health) + "/" + str(vehicle_health_max)
 	
 	if current_seat_name.is_empty():
@@ -628,6 +902,208 @@ func _refresh_vehicle(player_data: Dictionary) -> void:
 			label.text = _format_seat_bbcode(seats[i])
 		else:
 			label.visible = false
+
+
+
+func _refresh_vehicle_fuel_bar(vehicle_data: Dictionary, tracked_vehicle: Node = null) -> void:
+	if vehicle_fuel_progress_bar == null or vehicle_fuel_value_label == null:
+		return
+
+	var max_fuel: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+		"max_fuel",
+		"fuel_max",
+		"max_essence",
+		"essence_max",
+	], 0.0)
+
+	if max_fuel <= 0.0:
+		_hide_vehicle_fuel_bar()
+		return
+
+	var current_fuel: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+		"current_fuel",
+		"fuel",
+		"fuel_current",
+		"current_essence",
+		"essence",
+	], max_fuel)
+	current_fuel = clampf(current_fuel, 0.0, max_fuel)
+
+	var consumption: float = _get_current_fuel_consumption(vehicle_data, tracked_vehicle, current_fuel)
+
+	vehicle_fuel_progress_bar.visible = true
+	vehicle_fuel_progress_bar.min_value = 0.0
+	vehicle_fuel_progress_bar.max_value = max_fuel
+	vehicle_fuel_progress_bar.value = current_fuel
+
+	vehicle_fuel_value_label.visible = true
+	vehicle_fuel_value_label.text = "Essence %s/%s  |  Conso %s/s" % [
+		_format_fuel_value(current_fuel),
+		_format_fuel_value(max_fuel),
+		_format_fuel_value(consumption),
+	]
+
+
+func _hide_vehicle_fuel_bar() -> void:
+	if vehicle_fuel_progress_bar != null:
+		vehicle_fuel_progress_bar.visible = false
+		vehicle_fuel_progress_bar.value = 0.0
+	if vehicle_fuel_value_label != null:
+		vehicle_fuel_value_label.visible = false
+		vehicle_fuel_value_label.text = ""
+
+
+func _get_current_fuel_consumption(vehicle_data: Dictionary, tracked_vehicle: Node, current_fuel: float) -> float:
+	var direct_consumption: float = _read_float_from_dictionary(vehicle_data, [
+		"current_fuel_consumption",
+		"fuel_consumption_current",
+		"fuel_current_consumption",
+		"fuel_consumption_rate",
+		"real_time_fuel_consumption",
+	], -1.0)
+	if direct_consumption >= 0.0:
+		return direct_consumption
+
+	var base_consumption: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+		"fuel_consumption_per_second",
+		"fuel_consumption",
+		"consumption_per_second",
+		"essence_consumption_per_second",
+	], 0.0)
+	if base_consumption <= 0.0 or current_fuel <= 0.0:
+		return 0.0
+
+	var is_consuming_fuel: bool = _read_bool_from_dictionary(vehicle_data, [
+		"is_consuming_fuel",
+		"fuel_is_consuming",
+	], false)
+	if is_consuming_fuel:
+		return base_consumption
+
+	if tracked_vehicle == null or not is_instance_valid(tracked_vehicle):
+		return base_consumption
+
+	var drive_input: float = absf(_read_float_from_object(tracked_vehicle, "drive_input", 0.0))
+	var speed: float = _read_vehicle_speed(tracked_vehicle)
+	var min_speed: float = _read_float_from_object(tracked_vehicle, "fuel_min_speed_to_consume", 0.0)
+
+	if drive_input > 0.01 and speed > min_speed:
+		return base_consumption * drive_input
+
+	return 0.0
+
+
+func _read_vehicle_speed(tracked_vehicle: Node) -> float:
+	var linear_velocity_value: Variant = tracked_vehicle.get("linear_velocity")
+	if linear_velocity_value is Vector3:
+		var velocity: Vector3 = linear_velocity_value
+		return velocity.length()
+	return 0.0
+
+
+func _read_float_from_vehicle_sources(vehicle_data: Dictionary, tracked_vehicle: Node, keys: Array[String], fallback: float) -> float:
+	var dictionary_value: float = _read_float_from_dictionary(vehicle_data, keys, INF)
+	if dictionary_value != INF:
+		return dictionary_value
+
+	if tracked_vehicle != null and is_instance_valid(tracked_vehicle):
+		for key: String in keys:
+			var object_value: Variant = tracked_vehicle.get(key)
+			if object_value is int or object_value is float:
+				return float(object_value)
+
+	return fallback
+
+
+func _read_float_from_dictionary(data: Dictionary, keys: Array[String], fallback: float) -> float:
+	for key: String in keys:
+		if not data.has(key):
+			continue
+		var value: Variant = data[key]
+		if value is int or value is float:
+			return float(value)
+		if value is String and value.is_valid_float():
+			return value.to_float()
+	return fallback
+
+
+func _read_float_from_object(object: Object, property_name: String, fallback: float) -> float:
+	if object == null:
+		return fallback
+	var value: Variant = object.get(property_name)
+	if value is int or value is float:
+		return float(value)
+	if value is String and value.is_valid_float():
+		return value.to_float()
+	return fallback
+
+
+func _read_bool_from_dictionary(data: Dictionary, keys: Array[String], fallback: bool) -> bool:
+	for key: String in keys:
+		if not data.has(key):
+			continue
+		return bool(data[key])
+	return fallback
+
+
+func _format_fuel_value(value: float) -> String:
+	if absf(value - roundf(value)) < 0.05:
+		return str(roundi(value))
+	return "%.1f" % value
+
+
+func _refresh_vehicle_mod_slots(vehicle_data: Dictionary) -> void:
+	if vehicle_mods_panel == null or vehicle_mods_grid == null:
+		return
+
+	var mods: Array = vehicle_data.get("mods", [])
+	if mods.is_empty():
+		_hide_vehicle_mod_slots()
+		return
+
+	var is_driver: bool = bool(vehicle_data.get("is_driver", false))
+	vehicle_mods_panel.visible = true
+	_sync_vehicle_mod_slot_count(mods.size())
+
+	for i in range(_vehicle_mod_slot_nodes.size()):
+		var slot: Control = _vehicle_mod_slot_nodes[i]
+		if slot == null:
+			continue
+
+		var slot_data: Dictionary = {}
+		if i < mods.size() and mods[i] is Dictionary:
+			slot_data = mods[i]
+
+		if slot.has_method("set_slot_data"):
+			slot.call("set_slot_data", slot_data, is_driver)
+
+
+func _sync_vehicle_mod_slot_count(target_count: int) -> void:
+	var clamped_count: int = clampi(target_count, 0, 6)
+
+	while _vehicle_mod_slot_nodes.size() < clamped_count:
+		var instance: Node = VEHICLE_MOD_SLOT_SCENE.instantiate()
+		var slot: Control = instance as Control
+		if slot == null:
+			instance.queue_free()
+			return
+
+		vehicle_mods_grid.add_child(slot)
+		_vehicle_mod_slot_nodes.append(slot)
+
+	while _vehicle_mod_slot_nodes.size() > clamped_count:
+		var last_index: int = _vehicle_mod_slot_nodes.size() - 1
+		var slot_to_remove: Control = _vehicle_mod_slot_nodes[last_index]
+		_vehicle_mod_slot_nodes.remove_at(last_index)
+		if slot_to_remove != null:
+			vehicle_mods_grid.remove_child(slot_to_remove)
+			slot_to_remove.queue_free()
+
+
+func _hide_vehicle_mod_slots() -> void:
+	if vehicle_mods_panel != null:
+		vehicle_mods_panel.visible = false
+
 
 
 func _build_turret_ammo_text(player_data: Dictionary, vehicle_data: Dictionary) -> String:
@@ -847,10 +1323,20 @@ func _get_player_hud_data() -> Dictionary:
 			return data
 	return {}
 
-func _get_vehicle_hud_data(player_data: Dictionary) -> Dictionary:
-	var vehicle = player_data.get("vehicle", null)
+func _get_vehicle_hud_data(player_data: Dictionary, tracked_vehicle: Node = null) -> Dictionary:
+	var vehicle: Node = _as_valid_vehicle_node(player_data.get("vehicle", null))
+	if vehicle == null:
+		vehicle = tracked_vehicle
+
 	if vehicle != null and is_instance_valid(vehicle) and vehicle.has_method("get_hud_data_for_player"):
 		var data = vehicle.call("get_hud_data_for_player", player)
 		if data is Dictionary:
 			return data
+
+	if player_data.has("vehicle_data") and player_data["vehicle_data"] is Dictionary:
+		return player_data["vehicle_data"]
+
+	if player_data.has("tank_data") and player_data["tank_data"] is Dictionary:
+		return player_data["tank_data"]
+
 	return {}

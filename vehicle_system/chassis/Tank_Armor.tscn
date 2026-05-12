@@ -6,6 +6,13 @@
 [ext_resource type="PackedScene" uid="uid://bkdesvqe68ejn" path="res://vehicle_system/turrets/Turret_Driver.tscn" id="3_qi570"]
 [ext_resource type="PackedScene" uid="uid://bcfhqdmggyd8i" path="res://vehicle_system/turrets/Turret_Gunner.tscn" id="4_skmyr"]
 
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ReactorMod.tscn" id="11_reactor"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ShieldMod.tscn" id="12_shield"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ArmorSkirtMod.tscn" id="13_armor"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
+[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/SnowplowMod.tscn" id="15_snowplow"]
+
 [sub_resource type="PhysicsMaterial" id="1"]
 friction = 0.2
 
@@ -93,6 +100,9 @@ engine_force_forward = 8200.0
 engine_force_reverse = 6500.0
 brake_force = 600.0
 max_steering_deg = 70.0
+max_fuel = 180.0
+current_fuel = 180.0
+fuel_consumption_per_second = 8.0
 max_health = 1200
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
@@ -129,6 +139,48 @@ seat_label = "siege 2"
 turret_size = 1
 driver_turret = false
 turret_scene = ExtResource("4_skmyr")
+
+[node name="ModMounts" type="Node3D" parent="BodyVisualRoot"]
+
+[node name="Mod1CenterArmor" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+mod_use_id = 1
+mount_label = "Module center 1"
+max_mod_size = 1
+placement = "center"
+mod_scene = ExtResource("13_armor")
+
+[node name="Mod2CenterShield" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02, 0.25)
+mod_use_id = 2
+mount_label = "Module center 2"
+max_mod_size = 1
+placement = "center"
+mod_scene = ExtResource("12_shield")
+
+[node name="Mod3CenterAmmo" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0.58, -0.35)
+mod_use_id = 3
+mount_label = "Module center 3"
+max_mod_size = 1
+placement = "center"
+mod_scene = ExtResource("14_ammo")
+
+[node name="Mod4FrontSnowplow" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.25, 1.85)
+mod_use_id = 4
+mount_label = "Module front 4"
+max_mod_size = 1
+placement = "front"
+mod_scene = ExtResource("15_snowplow")
+
+[node name="Mod5RearEmpty" parent="BodyVisualRoot/ModMounts" instance=ExtResource("10_modmount")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.35, -1.7)
+mod_use_id = 5
+mount_label = "Module rear 5"
+max_mod_size = 1
+placement = "rear"
+
 
 [node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=1619376301]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -0.9, 0.5, 0.9)

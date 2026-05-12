@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://c8022636ofg2h"]
+
+[ext_resource type="Script" uid="uid://bjq2q1gkum8dy" path="res://vehicle_system/mods/examples/ArmorSkirtMod.gd" id="1_armor"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_plate"]
+size = Vector3(2.6, 0.3, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="Material_plate"]
+albedo_color = Color(0.16, 0.16, 0.16, 1)
+metallic = 0.7
+roughness = 0.6
+
+[node name="ArmorSkirtMod" type="Node3D" unique_id=594434686]
+script = ExtResource("1_armor")
+mod_id = "armor_skirt"
+mod_label = "Jupe blindée"
+allowed_placements = Array[String](["center", "side"])
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=33191134]
+
+[node name="LeftPlate" type="MeshInstance3D" parent="VisualRoot" unique_id=69907028]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -1.35, 0, 0)
+mesh = SubResource("BoxMesh_plate")
+surface_material_override/0 = SubResource("Material_plate")
+
+[node name="RightPlate" type="MeshInstance3D" parent="VisualRoot" unique_id=509634936]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 1.35, 0, 0)
+mesh = SubResource("BoxMesh_plate")
+surface_material_override/0 = SubResource("Material_plate")

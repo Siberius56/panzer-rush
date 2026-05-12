@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://doahk7r5nqif3"]
+
+[ext_resource type="Script" uid="uid://dgjsycalqc6t2" path="res://vehicle_system/mods/examples/ReactorMod.gd" id="1_reactor"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_reactor"]
+top_radius = 0.22
+bottom_radius = 0.3
+height = 0.75
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="Material_reactor"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+metallic = 0.8
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Material_flame"]
+albedo_color = Color(0.2, 0.55, 1, 1)
+emission_enabled = true
+emission = Color(0.2, 0.55, 1, 1)
+emission_energy_multiplier = 1.5
+
+[node name="ReactorMod" type="Node3D" unique_id=901458235]
+script = ExtResource("1_reactor")
+thrust_force = 20000.0
+mod_id = "reactor"
+mod_label = "Réacteur"
+activation_mode = "active"
+allowed_placements = Array[String](["rear"])
+active_duration = 3.0
+cooldown_duration = 15.0
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1975146525]
+
+[node name="Body" type="MeshInstance3D" parent="VisualRoot" unique_id=1997629032]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("CylinderMesh_reactor")
+surface_material_override/0 = SubResource("Material_reactor")
+
+[node name="FlamePreview" type="MeshInstance3D" parent="VisualRoot" unique_id=1745101855]
+transform = Transform3D(0.45, 0, 0, 0, -1.9670127e-08, -0.45, 0, 0.45, -1.9670127e-08, 0, 0, 0.48)
+visible = false
+mesh = SubResource("CylinderMesh_reactor")
+surface_material_override/0 = SubResource("Material_flame")

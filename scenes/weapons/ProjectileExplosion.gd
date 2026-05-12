@@ -234,10 +234,57 @@ func _call_apply_damage(target: Node, amount: int, source: Node = null) -> void:
 	if target == null or not is_instance_valid(target):
 		return
 
+	var second_argument_type: int = _get_method_argument_type(target, "apply_damage", 1)
+
+	# DestructibleProp.apply_damage(amount, hit_position, impulse) attend un Vector3 en second argument.
+	# Les autres objets peuvent encore recevoir le shooter si leur apply_damage(amount, source) l'attend.
+	if _method_accepts_argument_count(target, "apply_damage", 3) and second_argument_type == TYPE_VECTOR3:
+		var hit_position: Vector3 = global_position
+		var impulse: Vector3 = _get_explosion_impulse_for_target(target, amount)
+		target.apply_damage(float(amount), hit_position, impulse)
+		return
+
 	if _method_accepts_argument_count(target, "apply_damage", 2):
-		target.apply_damage(amount, source)
+		if second_argument_type == TYPE_VECTOR3:
+			target.apply_damage(float(amount), global_position)
+		else:
+			target.apply_damage(float(amount), source)
+		return
+
+	target.apply_damage(float(amount))
+
+
+func _get_explosion_impulse_for_target(target: Node, amount: int) -> Vector3:
+	if not (target is Node3D):
+		return Vector3.ZERO
+
+	var target_node: Node3D = target as Node3D
+	var direction: Vector3 = target_node.global_position - global_position
+
+	if direction.length_squared() <= 0.001:
+		direction = Vector3.UP
 	else:
-		target.apply_damage(amount)
+		direction = direction.normalized()
+
+	return direction * float(amount) * 0.08
+
+
+func _get_method_argument_type(object: Object, method_name: String, argument_index: int) -> int:
+	if object == null:
+		return TYPE_NIL
+
+	for method_data in object.get_method_list():
+		if String(method_data.name) != method_name:
+			continue
+
+		var args: Array = method_data.get("args", [])
+		if argument_index < 0 or argument_index >= args.size():
+			return TYPE_NIL
+
+		var argument_data: Dictionary = args[argument_index]
+		return int(argument_data.get("type", TYPE_NIL))
+
+	return TYPE_NIL
 
 
 func _method_accepts_argument_count(object: Object, method_name: String, argument_count: int) -> bool:

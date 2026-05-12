@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="2_hud"]
 [ext_resource type="PackedScene" uid="uid://doo6u62srmmdm" path="res://upgrade_station/VehicleUpgradeStation.tscn" id="4_e3e5m"]
 [ext_resource type="PackedScene" uid="uid://beuxaqoiit7tw" path="res://scenes/props/Breakable/anti_tank_obstacle.tscn" id="5_q02x1"]
-[ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Breakable/crate.tscn" id="6_353k1"]
+[ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Breakable/Crate.tscn" id="6_353k1"]
 [ext_resource type="PackedScene" uid="uid://bi8rfru842h6q" path="res://vehicle_system/chassis/Tank_Light.tscn" id="7_edvck"]
 [ext_resource type="PackedScene" uid="uid://s40q2ft30bab" path="res://scenes/props/Breakable/sandbag.tscn" id="7_mhaih"]
 [ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="7_pe7mi"]
