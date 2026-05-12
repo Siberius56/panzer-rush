@@ -254,14 +254,14 @@ visible = false
 layout_mode = 2
 text = "1000/1000"
 
-[node name="VehicleFuelProgress" type="ProgressBar" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox"]
+[node name="VehicleFuelProgress" type="ProgressBar" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=656617663]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 show_percentage = false
 
-[node name="VehicleFuelValueLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/VehicleFuelProgress"]
+[node name="VehicleFuelValueLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox/VehicleFuelProgress" unique_id=1572352917]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -270,7 +270,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "Essence 0/0  |  Conso 0/s"
@@ -355,7 +354,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Tourelle : aucune"
 
-[node name="VehicleModsPanel" type="PanelContainer" parent="Root"]
+[node name="VehicleModsPanel" type="PanelContainer" parent="Root" unique_id=930545053]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -369,22 +368,22 @@ offset_bottom = -24.0
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="VehicleModsMargin" type="MarginContainer" parent="Root/VehicleModsPanel"]
+[node name="VehicleModsMargin" type="MarginContainer" parent="Root/VehicleModsPanel" unique_id=1668179485]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VehicleModsVBox" type="VBoxContainer" parent="Root/VehicleModsPanel/VehicleModsMargin"]
+[node name="VehicleModsVBox" type="VBoxContainer" parent="Root/VehicleModsPanel/VehicleModsMargin" unique_id=343879709]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="VehicleModsTitle" type="Label" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox"]
+[node name="VehicleModsTitle" type="Label" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox" unique_id=1871711782]
 layout_mode = 2
 text = "Modules"
 
-[node name="VehicleModsGrid" type="GridContainer" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox"]
+[node name="VehicleModsGrid" type="GridContainer" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox" unique_id=193545508]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 6
@@ -402,7 +401,7 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
-[node name="VehicleNameLayer" type="Control" parent="Root"]
+[node name="VehicleNameLayer" type="Control" parent="Root" unique_id=21234739]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -413,7 +412,7 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
-[node name="TankHealthPanel" type="PanelContainer" parent="Root"]
+[node name="TankHealthPanel" type="PanelContainer" parent="Root" unique_id=348055265]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(460, 0)
@@ -431,31 +430,31 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="TankHealthMargin" type="MarginContainer" parent="Root/TankHealthPanel"]
+[node name="TankHealthMargin" type="MarginContainer" parent="Root/TankHealthPanel" unique_id=1505968699]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 8
 
-[node name="TankHealthVBox" type="VBoxContainer" parent="Root/TankHealthPanel/TankHealthMargin"]
+[node name="TankHealthVBox" type="VBoxContainer" parent="Root/TankHealthPanel/TankHealthMargin" unique_id=1246516618]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="TankHealthNameLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox"]
+[node name="TankHealthNameLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox" unique_id=654517531]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/outline_size = 4
 text = "Tank"
 horizontal_alignment = 1
 
-[node name="TankHealthProgress" type="ProgressBar" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox"]
+[node name="TankHealthProgress" type="ProgressBar" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox" unique_id=1618842898]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 show_percentage = false
 
-[node name="TankHealthValueLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox/TankHealthProgress"]
+[node name="TankHealthValueLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox/TankHealthProgress" unique_id=17673003]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -463,7 +462,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "600/600"
@@ -548,19 +546,19 @@ show_percentage = false
 
 [node name="ReloadPanel" type="PanelContainer" parent="Root" unique_id=1324680352]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 0)
+self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
-anchors_preset = 7
+anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -230.0
-offset_top = -210.0
-offset_right = 230.0
-offset_bottom = -130.0
+anchor_bottom = 0.5
+offset_left = -110.0
+offset_top = -130.0
+offset_right = 110.000244
+offset_bottom = -63.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="PassageMargin" type="MarginContainer" parent="Root/ReloadPanel" unique_id=218759934]
@@ -573,18 +571,24 @@ theme_override_constants/margin_bottom = 12
 [node name="ReloadPanel" type="VBoxContainer" parent="Root/ReloadPanel/PassageMargin" unique_id=277548469]
 layout_mode = 2
 theme_override_constants/separation = 4
-
-[node name="ReloadLabel" type="Label" parent="Root/ReloadPanel/PassageMargin/ReloadPanel" unique_id=318550348]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Rechargement : 0 %"
-horizontal_alignment = 1
+alignment = 1
 
 [node name="ReloadProgress" type="ProgressBar" parent="Root/ReloadPanel/PassageMargin/ReloadPanel" unique_id=2147451624]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 show_percentage = false
+
+[node name="ReloadLabel" type="Label" parent="Root/ReloadPanel/PassageMargin/ReloadPanel/ReloadProgress" unique_id=318550348]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Rechargement : 0 %"
+horizontal_alignment = 1
 
 [node name="RevivePanel" type="PanelContainer" parent="Root" unique_id=1968841002]
 unique_name_in_owner = true

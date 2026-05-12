@@ -2,31 +2,21 @@
 
 [ext_resource type="Script" uid="uid://cgoeec4ud02h0" path="res://scenes/enemies/NetworkProceduralEnemy.gd" id="1_enemy"]
 [ext_resource type="PackedScene" uid="uid://cusdlnpquk17g" path="res://scenes/weapons/VisualBullet.tscn" id="2_bullet"]
+[ext_resource type="Material" uid="uid://dwrumrmkhcq7y" path="res://asset/Color_Blue.tres" id="3_43wsx"]
 [ext_resource type="Texture2D" uid="uid://ui26ss0ppq1u" path="res://asset/texture/plastic_0010_height_1k.png" id="4_wt3kc"]
 [ext_resource type="Texture2D" uid="uid://cmqw06ya04ram" path="res://asset/texture/plastic_0010_normal_directx_1k.png" id="5_8k3kd"]
 [ext_resource type="PackedScene" uid="uid://cnx4i1totqiwo" path="res://asset/weapon/blaster-h.glb" id="6_tja3g"]
 [ext_resource type="Texture2D" uid="uid://c13t0ar22psth" path="res://asset/texture/plastic_0010_roughness_1k.jpg" id="6_vrw6b"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tl0qy"]
-radius = 0.30615234
-height = 1.5544434
+radius = 0.45
+height = 2.2
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_detection"]
 radius = 12.0
 
 [sub_resource type="BoxMesh" id="Mesh_Body"]
 size = Vector3(0.5, 0.72, 0.3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_curbh"]
-albedo_color = Color(0.19270001, 0.27589, 0.47, 1)
-metallic_specular = 0.15
-roughness = 0.45
-normal_texture = ExtResource("5_8k3kd")
-rim_enabled = true
-rim_texture = ExtResource("6_vrw6b")
-heightmap_texture = ExtResource("4_wt3kc")
-stencil_flags = 2
-stencil_outline_thickness = 0.05
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sn0ha"]
 resource_name = "MasterMat.003"
@@ -252,7 +242,7 @@ attack_debug_logs = false
 death_body_collision_mask = 8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=175046910]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.76311034, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("CapsuleShape3D_tl0qy")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=743883166]
@@ -270,7 +260,7 @@ shape = SubResource("SphereShape3D_detection")
 [node name="Body" type="MeshInstance3D" parent="VisualRoot" unique_id=654348563]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 mesh = SubResource("Mesh_Body")
-surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
+surface_material_override/0 = ExtResource("3_43wsx")
 
 [node name="BackPack" type="MeshInstance3D" parent="VisualRoot" unique_id=1288581310]
 transform = Transform3D(-0.5, 0, -9.814727e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.65, -0.016130686, 0.7696781, -0.19704309)
@@ -296,7 +286,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_yqvj3")
 [node name="Helmet" type="MeshInstance3D" parent="VisualRoot" unique_id=287895534]
 transform = Transform3D(-0.4, 0, -3.4969112e-08, 0, 0.4, 0, 3.4969112e-08, 0, -0.4, 0, 1.0158836, -0.025375336)
 mesh = SubResource("ArrayMesh_bq58x")
-surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
+surface_material_override/0 = ExtResource("3_43wsx")
 
 [node name="Eyes" type="MeshInstance3D" parent="VisualRoot" unique_id=1456055181]
 transform = Transform3D(-0.4, 0, -6.039832e-08, 0, 0.2, 0, 6.039832e-08, 0, -0.4, 0, 1.3511658, -0.054088086)
@@ -411,16 +401,16 @@ surface_material_override/0 = SubResource("Mat_Limb")
 
 [node name="LeftUpperArm" type="MeshInstance3D" parent="Limbs" unique_id=1731804034]
 mesh = SubResource("CapsuleMesh_tl0qy")
-surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
+surface_material_override/0 = ExtResource("3_43wsx")
 
 [node name="LeftLowerArm" type="MeshInstance3D" parent="Limbs" unique_id=1556324618]
 mesh = SubResource("CapsuleMesh_tl0qy")
-surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
+surface_material_override/0 = ExtResource("3_43wsx")
 
 [node name="RightUpperArm" type="MeshInstance3D" parent="Limbs" unique_id=851945167]
 mesh = SubResource("CapsuleMesh_tl0qy")
-surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
+surface_material_override/0 = ExtResource("3_43wsx")
 
 [node name="RightLowerArm" type="MeshInstance3D" parent="Limbs" unique_id=872882379]
 mesh = SubResource("CapsuleMesh_tl0qy")
-surface_material_override/0 = SubResource("StandardMaterial3D_curbh")
+surface_material_override/0 = ExtResource("3_43wsx")

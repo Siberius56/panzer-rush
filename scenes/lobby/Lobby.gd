@@ -18,9 +18,9 @@ const SELECT_MISSION_CAMERA_ROTATION: Vector3 = Vector3(-0.7853982, -1.5707964, 
 const SELECT_MISSION_DOF_FAR_DISTANCE: float = 6.0
 
 const TANK_CUSTOMIZATION_CAMERA_TWEEN_DURATION: float = 1.1
-const TANK_CUSTOMIZATION_CAMERA_POSITION: Vector3 = Vector3(0.15, 1.95, -1.25)
-const TANK_CUSTOMIZATION_CAMERA_LOOK_AT: Vector3 = Vector3(2.5917954, 0.85, -3.4480114)
-const TANK_CUSTOMIZATION_DOF_FAR_DISTANCE: float = 4.5
+const TANK_CUSTOMIZATION_CAMERA_POSITION: Vector3 = Vector3(-2.75, 3.3, -5.0)
+const TANK_CUSTOMIZATION_CAMERA_LOOK_AT: Vector3 = Vector3(2.2, 1.2, -3.5)
+const TANK_CUSTOMIZATION_DOF_FAR_DISTANCE: float = 5.5
 
 const CUSTOMIZATION_SUB_TAB_MISSION: String = "mission"
 const CUSTOMIZATION_SUB_TAB_TANK: String = "tank_customization"
@@ -29,6 +29,7 @@ const TURRET_SCAN_ROOT: String = "res://vehicle_system/turrets"
 const MOD_SCAN_ROOT: String = "res://vehicle_system/mods/examples"
 const DEFAULT_PREVIEW_CHASSIS_PATH: String = "res://vehicle_system/chassis/Tank_Light.tscn"
 const SLOT_BUTTON_SIZE: Vector2 = Vector2(92.0, 38.0)
+const SLOT_UPGRADE_NAME_MAX_LENGTH: int = 18
 
 const LOBBY_RESOURCE_DATABASE: Dictionary = {
 	"chassis": {
@@ -143,6 +144,8 @@ var mission_pin_button_scene: PackedScene = preload("uid://vwyc3iay7o37")
 @onready var hangar_camera: Camera3D = get_node_or_null("Node3D/Camera3D") as Camera3D
 @onready var tank_preview_spawn: Marker3D = get_node_or_null("Node3D/TankPreviewSpawn") as Marker3D
 @onready var tank_preview_root: Node3D = get_node_or_null("Node3D/TankPreviewRoot") as Node3D
+@onready var tank_preview_spotlight: Light3D = _find_tank_preview_spotlight()
+@onready var vehicle_decors_root: Node3D = get_node_or_null("Node3D/Vehicle_Decors") as Node3D
 @onready var static_tank_light: Node3D = get_node_or_null("Node3D/Tank_Light") as Node3D
 @onready var static_tank_medium: Node3D = get_node_or_null("Node3D/Tank_Medium") as Node3D
 
@@ -190,6 +193,7 @@ func _ready() -> void:
 	_build_mission_buttons()
 	_set_selected_mission(-1)
 	_setup_tank_customization()
+	_setup_vehicle_decors()
 
 	lobby_id_row.visible = false
 	mission_layer.visible = false
@@ -754,6 +758,86 @@ func _update_mission_controls() -> void:
 
 
 
+func _setup_vehicle_decors() -> void:
+	if vehicle_decors_root != null:
+		_lock_vehicle_decors_recursive(vehicle_decors_root)
+		return
+
+	# Fallback pour les anciennes scènes où les véhicules décoratifs étaient directement sous Node3D.
+	if static_tank_light != null:
+		_lock_lobby_decor_vehicle(static_tank_light)
+
+	if static_tank_medium != null:
+		_lock_lobby_decor_vehicle(static_tank_medium)
+
+
+func _lock_vehicle_decors_recursive(node: Node) -> void:
+	if node == null:
+		return
+
+	if node != vehicle_decors_root and node is VehicleBody3D:
+		_lock_lobby_decor_vehicle(node)
+		return
+
+	for child: Node in node.get_children():
+		_lock_vehicle_decors_recursive(child)
+
+
+func _lock_lobby_decor_vehicle(vehicle_node: Node) -> void:
+	if vehicle_node == null:
+		return
+
+	var saved_transform: Transform3D = Transform3D.IDENTITY
+	var has_transform: bool = vehicle_node is Node3D
+	if has_transform:
+		saved_transform = (vehicle_node as Node3D).global_transform
+
+	vehicle_node.set_meta("lobby_decor_vehicle", true)
+	_disable_lobby_decor_runtime_nodes(vehicle_node)
+
+	if vehicle_node.has_method("set_use_area_enabled"):
+		vehicle_node.call_deferred("set_use_area_enabled", false)
+
+	if has_transform:
+		var node_3d: Node3D = vehicle_node as Node3D
+		node_3d.global_transform = saved_transform
+		node_3d.set_deferred("global_transform", saved_transform)
+
+
+func _disable_lobby_decor_runtime_nodes(node: Node) -> void:
+	if node == null:
+		return
+
+	node.set_process(false)
+	node.set_physics_process(false)
+	node.set_process_input(false)
+	node.set_process_unhandled_input(false)
+	node.set_process_unhandled_key_input(false)
+
+	if node is CollisionObject3D:
+		var collision_object: CollisionObject3D = node as CollisionObject3D
+		collision_object.collision_layer = 0
+		collision_object.collision_mask = 0
+
+	if node is RigidBody3D:
+		var rigid_body: RigidBody3D = node as RigidBody3D
+		rigid_body.linear_velocity = Vector3.ZERO
+		rigid_body.angular_velocity = Vector3.ZERO
+		rigid_body.freeze = true
+		rigid_body.sleeping = true
+		rigid_body.can_sleep = true
+		rigid_body.contact_monitor = false
+
+	if node is VehicleBody3D:
+		var vehicle_body: VehicleBody3D = node as VehicleBody3D
+		vehicle_body.engine_force = 0.0
+		vehicle_body.brake = 0.0
+		vehicle_body.steering = 0.0
+
+	for child: Node in node.get_children():
+		_disable_lobby_decor_runtime_nodes(child)
+
+
 func _connect_tank_customization_ui_signals() -> void:
 	if mission_tab_button != null and not mission_tab_button.pressed.is_connected(_on_mission_tab_button_pressed):
 		mission_tab_button.pressed.connect(_on_mission_tab_button_pressed)
@@ -902,10 +986,12 @@ func _build_turret_database_entry(scene_path: String) -> Dictionary:
 
 	var fallback_id: String = _to_resource_id(scene_path.get_file().get_basename())
 	var turret_id: String = str(info.get("turret_id", fallback_id))
-	if turret_id.is_empty() or turret_id == "driver_turret":
+	var display_name: String = str(info.get("turret_label", scene_path.get_file().get_basename()))
+
+	if _is_driver_turret_entry(turret_id, display_name, scene_path):
 		return {}
 
-	var display_name: String = str(info.get("turret_label", scene_path.get_file().get_basename()))
+	#var display_name: String = str(info.get("turret_label", scene_path.get_file().get_basename()))
 	var turret_size: int = int(info.get("turret_size", 0))
 	if turret_size <= 0:
 		return {}
@@ -922,6 +1008,32 @@ func _build_turret_database_entry(scene_path: String) -> Dictionary:
 		"score_cost": score_cost,
 		"unlocked": unlocked,
 	}
+
+
+func _is_driver_turret_entry(turret_id: String, display_name: String, scene_path: String) -> bool:
+	var normalized_id: String = turret_id.strip_edges().to_lower()
+	var normalized_name: String = display_name.strip_edges().to_lower()
+	var normalized_path: String = scene_path.strip_edges().to_lower()
+
+	if normalized_id.is_empty():
+		return true
+
+	if normalized_id == "driver_turret":
+		return true
+
+	if normalized_id == "turret_driver":
+		return true
+
+	if normalized_id == "driver":
+		return true
+
+	if normalized_name.contains("driver"):
+		return true
+
+	if normalized_path.contains("driver"):
+		return true
+
+	return false
 
 
 func _build_mod_database_entry(scene_path: String) -> Dictionary:
@@ -1246,19 +1358,75 @@ func _spawn_tank_preview_from_state() -> void:
 
 	_disable_preview_runtime_nodes(instance)
 	_apply_state_to_preview_vehicle()
-	tank_preview_root.visible = mission_selection_open and current_mission_sub_tab == CUSTOMIZATION_SUB_TAB_TANK
+	tank_preview_root.visible = true
+	_set_preview_spotlight_enabled(mission_selection_open and current_mission_sub_tab == CUSTOMIZATION_SUB_TAB_TANK)
 
 
 func _clear_tank_preview() -> void:
-	if preview_vehicle != null and is_instance_valid(preview_vehicle):
-		preview_vehicle.queue_free()
+	var vehicle_to_clear: Node = preview_vehicle
+	if vehicle_to_clear != null and is_instance_valid(vehicle_to_clear):
+		vehicle_to_clear.queue_free()
 	preview_vehicle = null
 
 	if tank_preview_root != null:
 		for child: Node in tank_preview_root.get_children():
-			child.queue_free()
+			if child == vehicle_to_clear:
+				continue
+			if _is_tank_preview_helper_node(child):
+				continue
+			if bool(child.get_meta("lobby_preview_vehicle", false)):
+				child.queue_free()
 
 	_clear_slot_overlay_buttons()
+
+
+func _is_tank_preview_helper_node(node: Node) -> bool:
+	if node == null:
+		return false
+
+	if node.name == &"Spotlight3D_Preview":
+		return true
+
+	if node is Light3D and str(node.name).contains("Preview"):
+		return true
+
+	return false
+
+
+func _find_tank_preview_spotlight() -> Light3D:
+	var direct_node: Node = get_node_or_null("Node3D/TankPreviewRoot/Spotlight3D_Preview")
+	if direct_node is Light3D:
+		return direct_node as Light3D
+
+	direct_node = get_node_or_null("Node3D/Spotlight3D_Preview")
+	if direct_node is Light3D:
+		return direct_node as Light3D
+
+	direct_node = get_node_or_null("Node3D/TankPreviewSpawn/Spotlight3D_Preview")
+	if direct_node is Light3D:
+		return direct_node as Light3D
+
+	if tank_preview_root != null:
+		var recursive_node: Node = tank_preview_root.find_child("Spotlight3D_Preview", true, false)
+		if recursive_node is Light3D:
+			return recursive_node as Light3D
+
+	if hangar_root_3d != null:
+		var fallback_node: Node = hangar_root_3d.find_child("Spotlight3D_Preview", true, false)
+		if fallback_node is Light3D:
+			return fallback_node as Light3D
+
+	return null
+
+
+func _set_preview_spotlight_enabled(enabled: bool) -> void:
+	if tank_preview_spotlight == null or not is_instance_valid(tank_preview_spotlight):
+		tank_preview_spotlight = _find_tank_preview_spotlight()
+
+	if tank_preview_spotlight == null:
+		return
+
+	tank_preview_spotlight.visible = enabled
 
 
 func _disable_preview_runtime_nodes(node: Node) -> void:
@@ -1548,14 +1716,55 @@ func _refresh_slot_overlay_button_states() -> void:
 
 func _get_turret_slot_button_label(seat_index: int, occupied: bool) -> String:
 	if occupied:
-		return "Retirer\nT%d" % seat_index
+		var turret_name: String = _get_equipped_turret_display_name(seat_index)
+		return "Retirer T%d\n%s" % [seat_index, _format_slot_upgrade_name(turret_name)]
 	return "Tourelle\nT%d" % seat_index
 
 
 func _get_mod_slot_button_label(mod_use_id: int, occupied: bool) -> String:
 	if occupied:
-		return "Retirer\nM%d" % mod_use_id
+		var mod_name: String = _get_equipped_mod_display_name(mod_use_id)
+		return "Retirer M%d\n%s" % [mod_use_id, _format_slot_upgrade_name(mod_name)]
 	return "Module\nM%d" % mod_use_id
+
+
+func _get_equipped_turret_display_name(seat_index: int) -> String:
+	var turret_state: Dictionary = tank_customization_state.get("turrets", {})
+	var scene_path: String = str(turret_state.get(str(seat_index), ""))
+	if scene_path.is_empty():
+		return "Tourelle"
+
+	var turret_entry: Dictionary = _get_turret_entry_for_path(scene_path)
+	var display_name: String = str(turret_entry.get("display_name", "")).strip_edges()
+	if not display_name.is_empty():
+		return display_name
+
+	return scene_path.get_file().get_basename().capitalize()
+
+
+func _get_equipped_mod_display_name(mod_use_id: int) -> String:
+	var mod_state: Dictionary = tank_customization_state.get("mods", {})
+	var scene_path: String = str(mod_state.get(str(mod_use_id), ""))
+	if scene_path.is_empty():
+		return "Module"
+
+	var mod_entry: Dictionary = _get_mod_entry_for_path(scene_path)
+	var display_name: String = str(mod_entry.get("display_name", "")).strip_edges()
+	if not display_name.is_empty():
+		return display_name
+
+	return scene_path.get_file().get_basename().capitalize()
+
+
+func _format_slot_upgrade_name(upgrade_name: String) -> String:
+	var clean_name: String = upgrade_name.strip_edges()
+	if clean_name.is_empty():
+		return "Inconnu"
+
+	if clean_name.length() > SLOT_UPGRADE_NAME_MAX_LENGTH:
+		return clean_name.substr(0, SLOT_UPGRADE_NAME_MAX_LENGTH - 3) + "..."
+
+	return clean_name
 
 
 func _update_slot_overlay_positions() -> void:
@@ -1633,13 +1842,9 @@ func _update_mission_sub_tab_visibility() -> void:
 		tank_customization_root.visible = customization_open
 
 	if tank_preview_root != null:
-		tank_preview_root.visible = customization_open
+		tank_preview_root.visible = true
 
-	if static_tank_light != null:
-		static_tank_light.visible = not customization_open
-
-	if static_tank_medium != null:
-		static_tank_medium.visible = not customization_open
+	_set_preview_spotlight_enabled(customization_open)
 
 	if mission_tab_button != null:
 		mission_tab_button.set_pressed_no_signal(current_mission_sub_tab == CUSTOMIZATION_SUB_TAB_MISSION)

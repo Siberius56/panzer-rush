@@ -36,8 +36,8 @@ var available_chassis_entries: Array[Dictionary] = []
 @export var invert_steering: bool = true
 
 @export_group("Fuel")
-@export var max_fuel: float = 500.0
-@export var current_fuel: float = 500.0
+@export var max_fuel: float = 600.0
+@export var current_fuel: float = 600.0
 @export var fuel_consumption_per_second: float = 3.0
 @export var fuel_min_speed_to_consume: float = 0.2
 
@@ -144,9 +144,6 @@ static func inspect_chassis_scene(scene: PackedScene) -> Dictionary:
 
 func _ready() -> void:
 	#VehicleState.register_vehicle(self)
-	if bool(get_meta("lobby_preview_vehicle", false)):
-		_setup_lobby_preview_vehicle()
-		return
 	add_to_group("vehicle")
 	add_to_group("vehicles")
 	
@@ -196,23 +193,38 @@ func _ready() -> void:
 		_broadcast_seat_layout()
 		_broadcast_loadout_state()
 
-func _setup_lobby_preview_vehicle() -> void:
-	add_to_group("vehicle_preview")
-	health = max_health
-	current_fuel = clampf(current_fuel, 0.0, max_fuel)
-	can_sleep = true
-	freeze = true
-	sleeping = true
-	contact_monitor = false
-	custom_integrator = false
-	_scan_seat_markers()
-	_ensure_seat_occupants()
-	_scan_turret_mounts()
-	_scan_mod_mounts()
-	_scan_available_shop_turrets()
-	_scan_available_chassis_entries()
-	set_physics_process(false)
-	set_process(false)
+func prime_client_transform(new_transform: Transform3D) -> void:
+	if multiplayer.is_server():
+		return
+
+	global_transform = new_transform
+	client_target_transform = new_transform
+	client_has_target_transform = true
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	engine_force = 0.0
+	brake = 0.0
+
+	state_buffer.clear()
+	var now: float = Time.get_ticks_msec() * 0.001
+	state_buffer.append({
+		"time": now - 0.001,
+		"transform": new_transform,
+		"linear_velocity": Vector3.ZERO,
+		"angular_velocity": Vector3.ZERO,
+		"steering": steering,
+		"engine_force": 0.0,
+		"brake": 0.0
+	})
+	state_buffer.append({
+		"time": now,
+		"transform": new_transform,
+		"linear_velocity": Vector3.ZERO,
+		"angular_velocity": Vector3.ZERO,
+		"steering": steering,
+		"engine_force": 0.0,
+		"brake": 0.0
+	})
 
 
 func build_session_state() -> Dictionary:
@@ -331,7 +343,9 @@ func _server_physics(delta: float) -> void:
 			angular_velocity,
 			steering,
 			engine_force,
-			brake
+			brake,
+			current_fuel,
+			max_fuel
 		)
 
 
@@ -2073,14 +2087,23 @@ func _sync_vehicle_state(
 	new_steering: float,
 	new_engine_force: float,
 	new_brake: float,
-	synced_current_fuel: float,
-	synced_max_fuel: float
+	synced_current_fuel: float = -1.0,
+	synced_max_fuel: float = -1.0
 ) -> void:
 	if multiplayer.is_server():
 		return
 
-	max_fuel = maxf(synced_max_fuel, 0.0)
-	current_fuel = clampf(synced_current_fuel, 0.0, max_fuel)
+	if synced_max_fuel >= 0.0:
+		max_fuel = maxf(synced_max_fuel, 0.0)
+	if synced_current_fuel >= 0.0:
+		current_fuel = clampf(synced_current_fuel, 0.0, max_fuel)
+
+	if state_buffer.is_empty():
+		global_transform = new_transform
+		client_target_transform = new_transform
+		client_has_target_transform = true
+		linear_velocity = new_linear_velocity
+		angular_velocity = new_angular_velocity
 
 	state_buffer.append({
 		"time": Time.get_ticks_msec() * 0.001,

@@ -21,12 +21,16 @@ size = Vector3(0.18, 0.12, 1.15)
 albedo_color = Color(0.47, 0.36879334, 0.29140002, 1)
 roughness = 0.9
 
-[sub_resource type="BoxMesh" id="mesh_plank_top"]
+[sub_resource type="BoxMesh" id="BoxMesh_fpls0"]
 material = SubResource("mat_wood")
-size = Vector3(1.15, 0.12, 1.15)
+size = Vector3(2.15, 0.12, 1.15)
 
 [sub_resource type="BoxShape3D" id="shape_plank_top"]
-size = Vector3(1.15, 0.12, 1.15)
+size = Vector3(2.2469726, 0.12, 1.15)
+
+[sub_resource type="BoxMesh" id="mesh_plank_top"]
+material = SubResource("mat_wood")
+size = Vector3(2.1, 0.12, 1.15)
 
 [sub_resource type="BoxMesh" id="mesh_plank_side"]
 material = SubResource("mat_wood")
@@ -35,12 +39,16 @@ size = Vector3(0.12, 1.05, 1.15)
 [sub_resource type="BoxShape3D" id="shape_plank_side"]
 size = Vector3(0.12, 1.05, 1.15)
 
-[sub_resource type="BoxMesh" id="mesh_panel"]
+[sub_resource type="BoxMesh" id="BoxMesh_ga5ph"]
 material = SubResource("mat_wood")
-size = Vector3(1.05, 1.05, 0.12)
+size = Vector3(2.27, 1.05, 0.12)
 
 [sub_resource type="BoxShape3D" id="shape_panel"]
-size = Vector3(1.05, 1.05, 0.12)
+size = Vector3(2.1839478, 1.05, 0.12)
+
+[sub_resource type="BoxMesh" id="mesh_panel"]
+material = SubResource("mat_wood")
+size = Vector3(2.13, 1.05, 0.12)
 
 [node name="Crate_Large" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
 script = ExtResource("1_fpls0")
@@ -71,7 +79,7 @@ shape = SubResource("shape_crate")
 visible = false
 
 [node name="CrossPlank" type="RigidBody3D" parent="DebrisRoot" unique_id=2093621406]
-transform = Transform3D(0.6737867, 0, 0.7389259, 0, 1, 0, -0.7389259, 0, 0.6737867, 0, 0.6637167, 0)
+transform = Transform3D(0.6737867, 0, 0.7389259, 0, 1, 0, -0.7389259, 0, 0.6737867, -0.006710708, 0.6637167, 0)
 collision_layer = 0
 collision_mask = 4294967295
 mass = 2.0
@@ -83,7 +91,7 @@ mesh = SubResource("BoxMesh_54g8o")
 shape = SubResource("BoxShape3D_k10yr")
 
 [node name="CrossPlank2" type="RigidBody3D" parent="DebrisRoot" unique_id=927174759]
-transform = Transform3D(-0.72350484, 0.18849558, 0.6640859, 0.45099577, 0.8573829, 0.2479871, -0.5226314, 0.47891977, -0.7053313, 0, 0.7451472, 0)
+transform = Transform3D(-0.72350484, 0.18849558, 0.6640859, 0.45099577, 0.8573829, 0.2479871, -0.5226314, 0.47891977, -0.7053313, -0.006710708, 0.7451472, 0)
 collision_layer = 0
 collision_mask = 4294967295
 mass = 2.0
@@ -101,7 +109,7 @@ collision_mask = 4294967295
 mass = 2.0
 
 [node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/TopPlank" unique_id=1734703731]
-mesh = SubResource("mesh_plank_top")
+mesh = SubResource("BoxMesh_fpls0")
 
 [node name="Collision" type="CollisionShape3D" parent="DebrisRoot/TopPlank" unique_id=390332102]
 shape = SubResource("shape_plank_top")
@@ -116,10 +124,11 @@ mass = 2.0
 mesh = SubResource("mesh_plank_top")
 
 [node name="Collision" type="CollisionShape3D" parent="DebrisRoot/BottomPlank" unique_id=433419981]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05317375, 0, 0)
 shape = SubResource("shape_plank_top")
 
 [node name="LeftSide" type="RigidBody3D" parent="DebrisRoot" unique_id=225257070]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0353794, 0, 0)
 collision_layer = 0
 collision_mask = 4294967295
 mass = 2.0
@@ -131,7 +140,7 @@ mesh = SubResource("mesh_plank_side")
 shape = SubResource("shape_plank_side")
 
 [node name="RightSide" type="RigidBody3D" parent="DebrisRoot" unique_id=1366229]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1267692, 0, 0)
 collision_layer = 0
 collision_mask = 4294967295
 mass = 2.0
@@ -149,7 +158,7 @@ collision_mask = 4294967295
 mass = 2.0
 
 [node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/FrontPanel" unique_id=1724095811]
-mesh = SubResource("mesh_panel")
+mesh = SubResource("BoxMesh_ga5ph")
 
 [node name="Collision" type="CollisionShape3D" parent="DebrisRoot/FrontPanel" unique_id=1941316054]
 shape = SubResource("shape_panel")
@@ -164,4 +173,5 @@ mass = 2.0
 mesh = SubResource("mesh_panel")
 
 [node name="Collision" type="CollisionShape3D" parent="DebrisRoot/BackPanel" unique_id=1448274792]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.012640387, 0, 0)
 shape = SubResource("shape_panel")

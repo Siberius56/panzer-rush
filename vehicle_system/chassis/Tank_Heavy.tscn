@@ -96,9 +96,9 @@ script = ExtResource("1")
 vehicle_display_name = "Heavy Tank"
 engine_force_reverse = 3000.0
 max_steering_deg = 40.0
-max_fuel = 260.0
-current_fuel = 260.0
-fuel_consumption_per_second = 12.0
+max_fuel = 1000.0
+current_fuel = 1000.0
+fuel_consumption_per_second = 6.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=870272697]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.015515149, 1.0479493, 0.038574457)

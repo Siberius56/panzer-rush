@@ -1,18 +1,13 @@
 [gd_scene format=3 uid="uid://cp2owv2un3i85"]
 
 [ext_resource type="Script" uid="uid://cb147hg0lgj7e" path="res://scripts/loot/LootPickup.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://d1a8fk7es0y8a" path="res://asset/weapon/crate-medium.glb" id="2_gbjb5"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_body"]
-size = Vector3(0.24, 0.16, 0.12)
+size = Vector3(0.9904199, 0.35099608, 0.5403149)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
 radius = 1.15
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pistol"]
-albedo_color = Color(0.72, 0.82, 0.95, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_pistol"]
-size = Vector3(0.24, 0.16, 0.12)
 
 [node name="PistolAmmoPickup" type="RigidBody3D" unique_id=1939653805]
 collision_layer = 16
@@ -20,11 +15,12 @@ collision_mask = 12
 mass = 0.45
 script = ExtResource("1_script")
 loot_type = 1
-amount = 18
+amount = 24
 pickup_delay = 0.35
 freeze_after_seconds = 0.8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=637898799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0005810559, 0.17225161, 0.0014489889)
 shape = SubResource("BoxShape3D_body")
 
 [node name="PickupArea3D" type="Area3D" parent="." unique_id=2032043175]
@@ -36,12 +32,10 @@ shape = SubResource("SphereShape3D_pickup")
 
 [node name="VisualRoot" type="Node3D" parent="." unique_id=1682862162]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot" unique_id=998490420]
-material_override = SubResource("StandardMaterial3D_pistol")
-mesh = SubResource("BoxMesh_pistol")
+[node name="crate-medium2" parent="VisualRoot" unique_id=323692344 instance=ExtResource("2_gbjb5")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="Label3D" type="Label3D" parent="." unique_id=445578691]
-transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0.5, 0)
-modulate = Color(0, 0.6039216, 1, 1)
-text = "PISTOL"
-font_size = 96
+[node name="lid" parent="VisualRoot/crate-medium2/crate-medium" parent_id_path=PackedInt32Array(323692344, 2139208490) index="0" unique_id=1299838864]
+transform = Transform3D(1, 5.231803e-16, 0, -5.231803e-16, 1, 0, 0, 0, 1, 0.25, 0.19, -5.4143357e-16)
+
+[editable path="VisualRoot/crate-medium2"]

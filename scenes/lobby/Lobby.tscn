@@ -622,19 +622,34 @@ surface_material_override/0 = SubResource("StandardMaterial3D_grwrp")
 [node name="building-q2" parent="Node3D/Wall" unique_id=1826340063 instance=ExtResource("3_pbg2n")]
 transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, 7.883732, -0.014771938, 21.611084)
 
-[node name="Tank_Light" parent="Node3D" unique_id=1286101069 instance=ExtResource("4_xyfku")]
-transform = Transform3D(0.6510525, 0, -0.7590327, 0, 1, 0, 0.7590327, 0, 0.6510525, 2.5917954, 0, -3.4480114)
+[node name="Vehicle_Decors" type="Node3D" parent="Node3D" unique_id=109240018]
 
-[node name="Tank_Medium" parent="Node3D" unique_id=982500783 instance=ExtResource("5_wp0hx")]
-transform = Transform3D(-0.56124586, 0, -0.82764924, 0, 1, 0, 0.82764924, 0, -0.56124586, 2.5626078, 0.025935411, 3.4035752)
+[node name="Tank_Light" parent="Node3D/Vehicle_Decors" unique_id=1286101069 instance=ExtResource("4_xyfku")]
+transform = Transform3D(0.6510525, 0, -0.7590327, 0, 1, 0, 0.7590327, 0, 0.6510525, 2.5917954, 0, -3.4480114)
+visible = false
+sleeping = true
+freeze = true
+
+[node name="Tank_Medium" parent="Node3D/Vehicle_Decors" unique_id=982500783 instance=ExtResource("5_wp0hx")]
+transform = Transform3D(-0.5735765, 0, -0.8191521, 0, 1, 0, 0.8191521, 0, -0.5735765, 2.8443336, 0, 3.600992)
+sleeping = true
+freeze = true
 
 [node name="TankPreviewSpawn" type="Marker3D" parent="Node3D" unique_id=815975149]
 unique_name_in_owner = true
-transform = Transform3D(0.6510525, 0, -0.7590327, 0, 1, 0, 0.7590327, 0, 0.6510525, 3.1519136, 0, -3.9383001)
+transform = Transform3D(0.64278746, 0, -0.7660444, 0, 1, 0, 0.7660444, 0, 0.64278746, 3.0154188, 0, -3.444686)
 
 [node name="TankPreviewRoot" type="Node3D" parent="Node3D" unique_id=1671498949]
 unique_name_in_owner = true
-visible = false
+
+[node name="SpotLight3D_Preview" type="SpotLight3D" parent="Node3D/TankPreviewRoot" unique_id=1460815949]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 3.622601, 6, -3.8776603)
+light_energy = 10.0
+shadow_enabled = true
+shadow_bias = 0.02
+spot_range = 25.0
+spot_angle = 35.0
+spot_angle_attenuation = 0.5
 
 [node name="Stroke" type="Node3D" parent="Node3D" unique_id=1184972900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0)
@@ -988,7 +1003,7 @@ process_material = SubResource("ParticleProcessMaterial_j7bbn")
 draw_pass_1 = SubResource("QuadMesh_u660g")
 
 [node name="Camera3D" type="Camera3D" parent="Node3D" unique_id=1203080746]
-transform = Transform3D(-4.371139e-08, 0.17364809, -0.98480725, 0, 0.98480725, 0.17364809, 1, 7.590399e-09, -4.304729e-08, -6, 3.5, 0)
+transform = Transform3D(-4.371139e-08, 0.17364809, -0.9848072, 0, 0.9848072, 0.17364809, 1, 7.5903985e-09, -4.304729e-08, -6, 3.5, 0)
 attributes = SubResource("CameraAttributesPractical_34cp8")
 current = true
 fov = 60.0
@@ -1212,6 +1227,7 @@ layout_mode = 2
 text = "Modification par tous"
 
 [node name="MainContainer" type="HBoxContainer" parent="MissionLayer" unique_id=356040311]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.04
@@ -1457,7 +1473,6 @@ text = "Retour au lobby"
 
 [node name="TankCustomizationRoot" type="Control" parent="MissionLayer" unique_id=1613198722]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchor_left = 0.04
 anchor_top = 0.08
@@ -1637,6 +1652,7 @@ horizontal_scroll_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="Debug_Start" type="Button" parent="." unique_id=1408829858]

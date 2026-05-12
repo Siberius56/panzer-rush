@@ -1,18 +1,13 @@
 [gd_scene format=3 uid="uid://dvepi4iwm0o5w"]
 
 [ext_resource type="Script" uid="uid://cb147hg0lgj7e" path="res://scripts/loot/LootPickup.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://qvga6kqmd8f1" path="res://asset/weapon/crate-wide.glb" id="2_dx5im"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_body"]
-size = Vector3(0.36, 0.16, 0.14)
+size = Vector3(1.2475147, 0.33183104, 1.0414257)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
 radius = 1.2
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rifle"]
-albedo_color = Color(0.95, 0.42, 0.18, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_rifle"]
-size = Vector3(0.36, 0.16, 0.14)
 
 [node name="RifleAmmoPickup" type="RigidBody3D" unique_id=1500150172]
 collision_layer = 16
@@ -20,11 +15,11 @@ collision_mask = 12
 mass = 0.5
 script = ExtResource("1_script")
 loot_type = 2
-amount = 12
 pickup_delay = 0.35
 freeze_after_seconds = 0.8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1150123268]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00022217631, 0.1695756, -0.018759742)
 shape = SubResource("BoxShape3D_body")
 
 [node name="PickupArea3D" type="Area3D" parent="." unique_id=1226225409]
@@ -36,12 +31,5 @@ shape = SubResource("SphereShape3D_pickup")
 
 [node name="VisualRoot" type="Node3D" parent="." unique_id=361785822]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot" unique_id=1665282927]
-material_override = SubResource("StandardMaterial3D_rifle")
-mesh = SubResource("BoxMesh_rifle")
-
-[node name="Label3D" type="Label3D" parent="." unique_id=376159018]
-transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0.5, 0)
-modulate = Color(1, 0, 0.38039216, 1)
-text = "RIFLE"
-font_size = 96
+[node name="crate-wide2" parent="VisualRoot" unique_id=293644643 instance=ExtResource("2_dx5im")]
+transform = Transform3D(-8.742278e-08, 0, 1, 0, 1, 0, -2, 0, -4.371139e-08, 0, 0, 0)

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dcjlkduw3fqua"]
 
-[ext_resource type="Script" uid="uid://kudcif4er04y" path="res://scenes/props/destructible_prop.gd" id="1_a3ptl"]
+[ext_resource type="Script" uid="uid://kudcif4er04y" path="res://scenes/props/decors_prop.gd" id="1_a3ptl"]
 [ext_resource type="PackedScene" uid="uid://cht7tbf0cdn2a" path="res://asset/map/misc-2/tree-tall.glb" id="2_2tfvx"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_1niyt"]

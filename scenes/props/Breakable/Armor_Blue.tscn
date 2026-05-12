@@ -1,21 +1,7 @@
-[gd_scene format=4 uid="uid://dh5wsyhjgouon"]
+[gd_scene format=4 uid="uid://dqvmuov624na5"]
 
-[ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1_ukxq2"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_nh32u"]
-[ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_skmyr"]
-[ext_resource type="PackedScene" uid="uid://bkdesvqe68ejn" path="res://vehicle_system/turrets/Turret_Driver.tscn" id="3_qi570"]
-[ext_resource type="PackedScene" uid="uid://bcfhqdmggyd8i" path="res://vehicle_system/turrets/Turret_Gunner.tscn" id="4_skmyr"]
-[ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
-[ext_resource type="PackedScene" uid="uid://5vcam03jys5m" path="res://vehicle_system/mods/examples/ShieldMod.tscn" id="12_shield"]
-[ext_resource type="PackedScene" uid="uid://c8022636ofg2h" path="res://vehicle_system/mods/examples/ArmorSkirtMod.tscn" id="13_armor"]
-[ext_resource type="PackedScene" uid="uid://dx1yvenaokhcd" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
-[ext_resource type="PackedScene" uid="uid://c12ku5gft5lu1" path="res://vehicle_system/mods/examples/SnowplowMod.tscn" id="15_snowplow"]
-
-[sub_resource type="PhysicsMaterial" id="1"]
-friction = 0.2
-
-[sub_resource type="BoxShape3D" id="2"]
-size = Vector3(2.6552887, 1.4, 3.250058)
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_pr81i"]
+[ext_resource type="Material" uid="uid://dwrumrmkhcq7y" path="res://asset/Color_Blue.tres" id="2_pr81i"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k6q16"]
 resource_name = "MasterMat"
@@ -42,7 +28,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_k1qjj"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_b0de8"]
 resource_name = "Tank_Armor_Cube_023"
 _surfaces = [{
 "aabb": AABB(-0.74999994, 3.0733645e-08, -1.0059998, 1.4999999, 1.255, 1.9834735),
@@ -61,201 +47,34 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_dhwv8")
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_yxytb"]
-top_radius = 0.3
-bottom_radius = 0.3
-height = 0.216
-radial_segments = 18
+[sub_resource type="BoxShape3D" id="BoxShape3D_k61cu"]
+size = Vector3(2.6552887, 2.1223633, 2.8720994)
 
-[sub_resource type="StandardMaterial3D" id="6"]
-albedo_color = Color(0.08, 0.08, 0.08, 1)
-roughness = 0.95
+[sub_resource type="BoxShape3D" id="BoxShape3D_n7qx1"]
+size = Vector3(2.6552887, 1.8315674, 1.0161206)
 
-[sub_resource type="CylinderShape3D" id="7"]
-height = 2.7
-radius = 2.5
+[node name="Barrier_Concrete" type="Node3D" unique_id=1968880502]
+script = ExtResource("1_pr81i")
+destroy_when_hp_reaches_zero = false
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jkun5"]
-size = Vector3(2.232974, 1, 3.5261698)
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=921374735 groups=["destructible_prop_bodies"]]
+collision_layer = 12
+collision_mask = 4294967295
+mass = 1000.0
+linear_damp = 0.35
+angular_damp = 0.5
 
-[node name="Tank_Armor" type="VehicleBody3D" unique_id=1286101069 groups=["ally"]]
-collision_layer = 4
-collision_mask = 12
-mass = 3500.0
-physics_material_override = SubResource("1")
-center_of_mass_mode = 1
-continuous_cd = true
-contact_monitor = true
-max_contacts_reported = 16
-linear_damp = 0.08
-angular_damp = 0.18
-script = ExtResource("1_ukxq2")
-vehicle_display_name = "Armored Truck"
-chassis_id = "armor_tank"
-chassis_price = 1200
-chassis_trade_in_value = 900
-engine_force_forward = 8200.0
-engine_force_reverse = 6500.0
-brake_force = 600.0
-max_steering_deg = 70.0
-max_fuel = 800.0
-current_fuel = 800.0
-fuel_consumption_per_second = 4.0
-max_health = 1200
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=681020888]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0029678345, 1.2991391, -0.15645885)
-shape = SubResource("2")
-
-[node name="BodyVisualRoot" type="Node3D" parent="." unique_id=1288168528]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-
-[node name="Body" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=734452507]
+[node name="Body" type="MeshInstance3D" parent="IntactBody/Intact" unique_id=1007251820]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
-material_override = ExtResource("2_nh32u")
-mesh = SubResource("ArrayMesh_k1qjj")
+material_override = ExtResource("2_pr81i")
+mesh = SubResource("ArrayMesh_b0de8")
 
-[node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=1468659701]
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="IntactBody" unique_id=1058744857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0029678345, 0.33628175, -0.34543812)
+shape = SubResource("BoxShape3D_k61cu")
 
-[node name="Seat1Driver" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=1915466685]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6136669, 0.038060486, 0.8950527)
-
-[node name="Seat2Turret" type="Marker3D" parent="BodyVisualRoot/Seats" unique_id=1150537268]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-
-[node name="TurretMounts" type="Node3D" parent="BodyVisualRoot" unique_id=2110846060]
-
-[node name="Seat1" parent="BodyVisualRoot/TurretMounts" unique_id=1270461324 instance=ExtResource("2_skmyr")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, 0.4, 1.55)
-turret_size = 1
-turret_scene = ExtResource("3_qi570")
-
-[node name="Seat2" parent="BodyVisualRoot/TurretMounts" unique_id=80008280 instance=ExtResource("2_skmyr")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 1.4, 0.27)
-seat_index = 2
-seat_label = "siege 2"
-turret_size = 1
-driver_turret = false
-turret_scene = ExtResource("4_skmyr")
-
-[node name="ModMounts" type="Node3D" parent="BodyVisualRoot" unique_id=115498134]
-
-[node name="Mod1CenterArmor" parent="BodyVisualRoot/ModMounts" unique_id=187173573 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
-mount_label = "Module center 1"
-mod_scene = ExtResource("13_armor")
-
-[node name="Mod2CenterShield" parent="BodyVisualRoot/ModMounts" unique_id=2005015758 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02, 0.25)
-mod_use_id = 2
-mount_label = "Module center 2"
-mod_scene = ExtResource("12_shield")
-
-[node name="Mod3CenterAmmo" parent="BodyVisualRoot/ModMounts" unique_id=417698519 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0.58, -0.35)
-mod_use_id = 3
-mount_label = "Module center 3"
-mod_scene = ExtResource("14_ammo")
-
-[node name="Mod4FrontSnowplow" parent="BodyVisualRoot/ModMounts" unique_id=274963315 instance=ExtResource("10_modmount")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.25, 1.85)
-mod_use_id = 4
-mount_label = "Module front 4"
-placement = "front"
-mod_scene = ExtResource("15_snowplow")
-
-[node name="Mod5RearEmpty" parent="BodyVisualRoot/ModMounts" unique_id=778820088 instance=ExtResource("10_modmount")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.35, -1.7)
-mod_use_id = 5
-mount_label = "Module rear 5"
-placement = "rear"
-
-[node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=1619376301]
-transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -0.9, 0.5, 0.9)
-use_as_steering = true
-wheel_roll_influence = 0.12
-wheel_radius = 0.3
-wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
-suspension_stiffness = 59.0
-suspension_max_force = 10000.0
-damping_compression = 0.15
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="FrontLeftWheel" unique_id=5496198]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
-visible = false
-mesh = SubResource("CylinderMesh_yxytb")
-surface_material_override/0 = SubResource("6")
-
-[node name="FrontRightWheel" type="VehicleWheel3D" parent="." unique_id=887756342]
-transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0.9, 0.5, 0.9)
-use_as_steering = true
-wheel_roll_influence = 0.12
-wheel_radius = 0.3
-wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
-suspension_stiffness = 59.0
-suspension_max_force = 10000.0
-damping_compression = 0.15
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="FrontRightWheel" unique_id=1299802971]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
-visible = false
-mesh = SubResource("CylinderMesh_yxytb")
-surface_material_override/0 = SubResource("6")
-
-[node name="RearLeftWheel" type="VehicleWheel3D" parent="." unique_id=347284515]
-transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -0.9, 0.5, -0.9)
-use_as_traction = true
-wheel_roll_influence = 0.12
-wheel_radius = 0.3
-wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
-suspension_stiffness = 59.0
-suspension_max_force = 10000.0
-damping_compression = 0.15
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RearLeftWheel" unique_id=192094562]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
-visible = false
-mesh = SubResource("CylinderMesh_yxytb")
-surface_material_override/0 = SubResource("6")
-
-[node name="RearRightWheel" type="VehicleWheel3D" parent="." unique_id=999012565]
-transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0.9, 0.5, -0.9)
-use_as_traction = true
-wheel_roll_influence = 0.12
-wheel_radius = 0.3
-wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
-suspension_stiffness = 59.0
-suspension_max_force = 10000.0
-damping_compression = 0.15
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RearRightWheel" unique_id=386629346]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
-visible = false
-mesh = SubResource("CylinderMesh_yxytb")
-surface_material_override/0 = SubResource("6")
-
-[node name="UseArea" type="Area3D" parent="." unique_id=1965562369]
-collision_layer = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="UseArea" unique_id=612863531]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
-shape = SubResource("7")
-
-[node name="EnemySoftImpactArea" type="Area3D" parent="." unique_id=369851147]
-collision_layer = 0
-collision_mask = 4
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="EnemySoftImpactArea" unique_id=1682575010]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00931859, 0.52192193, 0.014309168)
-shape = SubResource("BoxShape3D_jkun5")
-debug_color = Color(0.7607843, 0, 0.72156864, 0.69803923)
-
-[node name="ExitPoint" type="Marker3D" parent="." unique_id=1987541066]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.5, 0)
-
-[connection signal="body_entered" from="UseArea" to="." method="_on_use_area_body_entered"]
-[connection signal="body_exited" from="UseArea" to="." method="_on_use_area_body_exited"]
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="IntactBody" unique_id=523096282]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0.0029678345, 0.31020346, 1.0577326)
+shape = SubResource("BoxShape3D_n7qx1")

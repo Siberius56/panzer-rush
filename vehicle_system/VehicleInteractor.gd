@@ -16,7 +16,7 @@ class_name VehicleInteractor
 @export var mod_use_4_action: StringName = &"mod_use_4"
 @export var mod_use_5_action: StringName = &"mod_use_5"
 @export var mod_use_6_action: StringName = &"mod_use_6"
-@export var accept_legacy_mode_use_typo: bool = true
+#@export var accept_legacy_mode_use_typo: bool = true
 @export_group("Movement")
 @export var move_forward_action: StringName = &"move_forward"
 @export var move_backward_action: StringName = &"move_backward"
@@ -193,10 +193,10 @@ func _is_mod_use_action_pressed(event: InputEvent, mod_use_id: int) -> bool:
 	if event.is_action_pressed(action_name):
 		return true
 
-	if accept_legacy_mode_use_typo:
-		var legacy_action: StringName = StringName("mode_use_%d" % mod_use_id)
-		if event.is_action_pressed(legacy_action):
-			return true
+	#if accept_legacy_mode_use_typo:
+		#var legacy_action: StringName = StringName("mode_use_%d" % mod_use_id)
+		#if event.is_action_pressed(legacy_action):
+			#return true
 
 	return false
 

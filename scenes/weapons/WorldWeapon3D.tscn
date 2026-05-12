@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://brw21aujh7jy3" path="res://scenes/weapons/WorldWeapon3D.gd" id="1_script"]
 
 [sub_resource type="BoxShape3D" id="1_box"]
-size = Vector3(0.35, 0.2, 1.2)
+size = Vector3(0.45, 0.3, 1.5)
 
 [node name="WorldWeapon3D" type="RigidBody3D" unique_id=2144849267]
 collision_layer = 16
@@ -18,8 +18,10 @@ script = ExtResource("1_script")
 shape = SubResource("1_box")
 
 [node name="VisualSocket" type="Node3D" parent="." unique_id=110911777]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Label3D" type="Label3D" parent="." unique_id=741685875]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.6315675, 0)
 text = "Weapon"
 font_size = 64

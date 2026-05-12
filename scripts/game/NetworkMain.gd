@@ -1,5 +1,5 @@
 extends Node3D
-class_name NetworkMainRespawnPatch
+class_name NetworkMainClientVehicleSyncPatch
 
 # Nouvelle version pour contourner le cache Godot de l’ancien script.
 
@@ -58,8 +58,7 @@ func _ready() -> void:
 	
 	randomize()
 	_sync_players()
-	_sync_vehicles()
-	_apply_session_snapshot_to_scene()
+	_prepare_vehicle_snapshot_flow()
 
 func _ensure_players_root() -> void:
 	players_root = get_node_or_null("Players") as Node3D
@@ -126,8 +125,65 @@ func _sync_players() -> void:
 			child.queue_free()
 
 
+func _prepare_vehicle_snapshot_flow() -> void:
+	_normalize_game_session_vehicle_keys()
+
+	if multiplayer.is_server():
+		_sync_vehicles()
+		_apply_session_snapshot_to_scene()
+		_broadcast_vehicle_snapshot_to_clients()
+		return
+
+	if GameSessionState.has_vehicle_snapshot() and GameSessionState.get_vehicle_count() > 0:
+		_sync_vehicles()
+		_apply_session_snapshot_to_scene()
+		return
+
+	_request_vehicle_snapshot_from_server.rpc_id(NetworkManager.SERVER_PEER_ID)
+
+
+@rpc("any_peer", "reliable")
+func _request_vehicle_snapshot_from_server() -> void:
+	if not multiplayer.is_server():
+		return
+
+	var requester_peer_id: int = multiplayer.get_remote_sender_id()
+	if requester_peer_id <= 0:
+		return
+
+	_normalize_game_session_vehicle_keys()
+	_receive_vehicle_snapshot_from_server.rpc_id(
+		requester_peer_id,
+		GameSessionState.vehicle_snapshot_active,
+		GameSessionState.vehicles.duplicate(true)
+	)
+
+
+func _broadcast_vehicle_snapshot_to_clients() -> void:
+	if not multiplayer.is_server():
+		return
+
+	_normalize_game_session_vehicle_keys()
+	_receive_vehicle_snapshot_from_server.rpc(
+		GameSessionState.vehicle_snapshot_active,
+		GameSessionState.vehicles.duplicate(true)
+	)
+
+
+@rpc("authority", "call_local", "reliable")
+func _receive_vehicle_snapshot_from_server(snapshot_active: bool, vehicles_snapshot: Dictionary) -> void:
+	GameSessionState.vehicle_snapshot_active = snapshot_active
+	GameSessionState.vehicles = vehicles_snapshot.duplicate(true)
+	_normalize_game_session_vehicle_keys()
+
+	_sync_vehicles()
+	_apply_session_snapshot_to_scene()
+
+
 func _sync_vehicles() -> void:
 	_ensure_vehicles_root()
+	_normalize_game_session_vehicle_keys()
+
 	if vehicles_root == null:
 		return
 
@@ -153,19 +209,31 @@ func _sync_vehicles() -> void:
 		var node_name: String = "Vehicle_%d" % vehicle_index
 		expected[node_name] = true
 
-		var vehicle = vehicles_root.get_node_or_null(node_name)
+		var spawn_point: Node3D = spawn_points[vehicle_index] as Node3D
+		var vehicle: Node = vehicles_root.get_node_or_null(node_name)
+
+		if vehicle != null and not _vehicle_node_matches_expected_scene(vehicle, scene, vehicle_index):
+			vehicles_root.remove_child(vehicle)
+			vehicle.queue_free()
+			vehicle = null
+
 		if vehicle == null:
 			vehicle = scene.instantiate()
 			vehicle.name = node_name
-			vehicle.set_multiplayer_authority(1)
+			vehicle.set_multiplayer_authority(NetworkManager.SERVER_PEER_ID)
 			vehicles_root.add_child(vehicle)
 
-			var spawn_point: Node3D = spawn_points[vehicle_index] as Node3D
-			if spawn_point != null:
-				vehicle.global_transform = spawn_point.global_transform
+			if spawn_point != null and vehicle is Node3D:
+				(vehicle as Node3D).global_transform = spawn_point.global_transform
+				_prime_client_vehicle_transform(vehicle, spawn_point.global_transform)
+		elif spawn_point != null and vehicle is Node3D and not _has_vehicle_state_resilient(vehicle_index):
+			(vehicle as Node3D).global_transform = spawn_point.global_transform
+			_prime_client_vehicle_transform(vehicle, spawn_point.global_transform)
 
-		if GameSessionState.has_vehicle_state(vehicle_index):
-			GameSessionState.apply_vehicle_state_to_node(vehicle_index, vehicle)
+		_apply_vehicle_state_to_spawned_vehicle(vehicle_index, vehicle)
+
+		if spawn_point != null and vehicle is Node3D:
+			_prime_client_vehicle_transform(vehicle, (vehicle as Node3D).global_transform)
 
 	for child in vehicles_root.get_children():
 		if not expected.has(child.name):
@@ -173,7 +241,9 @@ func _sync_vehicles() -> void:
 
 
 func _get_required_vehicle_count(max_spawn_count: int) -> int:
-	if GameSessionState.has_vehicle_snapshot():
+	_normalize_game_session_vehicle_keys()
+
+	if GameSessionState.has_vehicle_snapshot() and GameSessionState.get_vehicle_count() > 0:
 		return min(GameSessionState.get_vehicle_count(), max_spawn_count)
 
 	if not mission_vehicle_scenes.is_empty():
@@ -186,13 +256,14 @@ func _get_required_vehicle_count(max_spawn_count: int) -> int:
 
 
 func _get_vehicle_scene_for_index(vehicle_index: int) -> PackedScene:
-	if GameSessionState.has_vehicle_state(vehicle_index):
-		var state: Dictionary = GameSessionState.get_vehicle_state(vehicle_index)
+	var state: Dictionary = _get_vehicle_state_resilient(vehicle_index)
+	if not state.is_empty():
 		var scene_path: String = String(state.get("scene_path", ""))
 		if not scene_path.is_empty():
 			var loaded_scene: PackedScene = load(scene_path) as PackedScene
 			if loaded_scene != null:
 				return loaded_scene
+			push_warning("[NetworkMain] Impossible de charger le châssis sauvegardé : %s" % scene_path)
 
 		return _get_initial_mission_vehicle_scene(vehicle_index)
 
@@ -209,16 +280,136 @@ func _get_initial_mission_vehicle_scene(vehicle_index: int) -> PackedScene:
 	return null
 
 
+func _has_vehicle_state_resilient(vehicle_index: int) -> bool:
+	if GameSessionState.has_vehicle_state(vehicle_index):
+		return true
+
+	var string_key: String = str(vehicle_index)
+	return GameSessionState.vehicle_snapshot_active and GameSessionState.vehicles.has(string_key)
+
+
+func _get_vehicle_state_resilient(vehicle_index: int) -> Dictionary:
+	if GameSessionState.has_vehicle_state(vehicle_index):
+		return GameSessionState.get_vehicle_state(vehicle_index)
+
+	var string_key: String = str(vehicle_index)
+	if GameSessionState.vehicle_snapshot_active and GameSessionState.vehicles.has(string_key):
+		var state_value: Variant = GameSessionState.vehicles[string_key]
+		if state_value is Dictionary:
+			return (state_value as Dictionary).duplicate(true)
+
+	return {}
+
+
+func _normalize_game_session_vehicle_keys() -> void:
+	if not GameSessionState.vehicle_snapshot_active:
+		return
+	if GameSessionState.vehicles.is_empty():
+		return
+
+	var normalized: Dictionary = {}
+	var changed: bool = false
+
+	for key in GameSessionState.vehicles.keys():
+		var vehicle_index: int = int(key)
+		var state_value: Variant = GameSessionState.vehicles[key]
+		if state_value is Dictionary:
+			var state: Dictionary = (state_value as Dictionary).duplicate(true)
+			state["vehicle_index"] = vehicle_index
+			normalized[vehicle_index] = state
+		else:
+			normalized[vehicle_index] = state_value
+
+		if key != vehicle_index:
+			changed = true
+
+	if changed:
+		GameSessionState.vehicles = normalized
+
+
+func _apply_vehicle_state_to_spawned_vehicle(vehicle_index: int, vehicle: Node) -> void:
+	if vehicle == null or not is_instance_valid(vehicle):
+		return
+
+	var state: Dictionary = _get_vehicle_state_resilient(vehicle_index)
+	if state.is_empty():
+		return
+
+	if vehicle.has_method("apply_session_state"):
+		vehicle.call("apply_session_state", state)
+		return
+
+	GameSessionState.apply_vehicle_state_to_node(vehicle_index, vehicle)
+
+
+func _prime_client_vehicle_transform(vehicle: Node, spawn_transform: Transform3D) -> void:
+	if multiplayer.is_server():
+		return
+	if vehicle == null or not is_instance_valid(vehicle):
+		return
+	if not (vehicle is Node3D):
+		return
+
+	# Le client n'est pas autoritaire sur la physique du tank.
+	# On le plaque immédiatement au transform connu pour éviter qu'il reste en l'air
+	# en attendant les premiers paquets _sync_vehicle_state du serveur.
+	(vehicle as Node3D).global_transform = spawn_transform
+
+	if vehicle.has_method("prime_client_transform"):
+		vehicle.call("prime_client_transform", spawn_transform)
+		return
+
+	if "client_target_transform" in vehicle:
+		vehicle.set("client_target_transform", spawn_transform)
+	if "client_has_target_transform" in vehicle:
+		vehicle.set("client_has_target_transform", true)
+	if "linear_velocity" in vehicle:
+		vehicle.set("linear_velocity", Vector3.ZERO)
+	if "angular_velocity" in vehicle:
+		vehicle.set("angular_velocity", Vector3.ZERO)
+
+
+func _vehicle_node_matches_expected_scene(vehicle: Node, expected_scene: PackedScene, vehicle_index: int) -> bool:
+	if vehicle == null or expected_scene == null:
+		return false
+
+	var expected_scene_path: String = _get_expected_vehicle_scene_path(expected_scene, vehicle_index)
+	if expected_scene_path.is_empty():
+		return true
+
+	var current_scene_path: String = ""
+	if "scene_file_path" in vehicle:
+		current_scene_path = String(vehicle.get("scene_file_path"))
+
+	return current_scene_path == expected_scene_path
+
+
+func _get_expected_vehicle_scene_path(expected_scene: PackedScene, vehicle_index: int) -> String:
+	var state: Dictionary = _get_vehicle_state_resilient(vehicle_index)
+	var saved_scene_path: String = String(state.get("scene_path", ""))
+	if not saved_scene_path.is_empty():
+		return saved_scene_path
+
+	if expected_scene != null and not expected_scene.resource_path.is_empty():
+		return expected_scene.resource_path
+
+	return ""
+
+
 func _apply_session_snapshot_to_scene() -> void:
+	_normalize_game_session_vehicle_keys()
+
 	if GameSessionState.player_snapshot_active:
 		for player in players_root.get_children():
 			GameSessionState.apply_player_state_to_node(player, force_players_alive_on_level_load)
 
 	if GameSessionState.vehicle_snapshot_active and vehicles_root != null:
-		var vehicle_index: int = 0
-		for vehicle in vehicles_root.get_children():
-			GameSessionState.apply_vehicle_state_to_node(vehicle_index, vehicle)
-			vehicle_index += 1
+		for key in GameSessionState.vehicles.keys():
+			var vehicle_index: int = int(key)
+			var vehicle: Node = vehicles_root.get_node_or_null("Vehicle_%d" % vehicle_index)
+			if vehicle == null:
+				continue
+			_apply_vehicle_state_to_spawned_vehicle(vehicle_index, vehicle)
 
 
 func change_level_to_file(scene_path: String) -> void:

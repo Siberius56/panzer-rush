@@ -11,9 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://cs4cla08bi1t4" path="res://asset/map/misc-1/barrel_003.glb" id="7_6gy5a"]
 [ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
 [ext_resource type="PackedScene" uid="uid://doahk7r5nqif3" path="res://vehicle_system/mods/examples/ReactorMod.tscn" id="11_reactor"]
-[ext_resource type="PackedScene" uid="uid://5vcam03jys5m" path="res://vehicle_system/mods/examples/ShieldMod.tscn" id="12_shield"]
-[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/ArmorSkirtMod.tscn" id="13_armor"]
-[ext_resource type="PackedScene" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
+[ext_resource type="PackedScene" uid="uid://dx1yvenaokhcd" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
 [ext_resource type="PackedScene" uid="uid://c12ku5gft5lu1" path="res://vehicle_system/mods/examples/SnowplowMod.tscn" id="15_snowplow"]
 
 [sub_resource type="PhysicsMaterial" id="1"]
@@ -102,9 +100,6 @@ chassis_trade_in_value = 900
 engine_force_forward = 8200.0
 engine_force_reverse = 3500.0
 max_steering_deg = 58.0
-max_fuel = 120.0
-current_fuel = 120.0
-fuel_consumption_per_second = 5.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009307861, 1.2991391, 0.0065979958)
@@ -149,19 +144,19 @@ visible = false
 [node name="box_bevel2" parent="BodyVisualRoot" unique_id=76553973 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.35, 0, 0, 0, 0.3, 0, 0, 0, 0.25, 0.45, 0.838, -0.844)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel2" index="0" unique_id=531334882]
+[node name="Cube" parent="BodyVisualRoot/box_bevel2" index="0" unique_id=1933577301]
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="box_bevel3" parent="BodyVisualRoot" unique_id=898445028 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.35, 0, 0, 0, 0.3, 0, 0, 0, 0.25, -0.45, 0.838, -0.844)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel3" index="0" unique_id=531334882]
+[node name="Cube" parent="BodyVisualRoot/box_bevel3" index="0" unique_id=1933577301]
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="box_bevel4" parent="BodyVisualRoot" unique_id=1851600694 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.5, 0, 0, 0, 0.11820162, 0.09234923, 0, -0.09234923, 0.11820162, 1.1920929e-07, 0.7407563, 1.0903177)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel4" index="0" unique_id=531334882]
+[node name="Cube" parent="BodyVisualRoot/box_bevel4" index="0" unique_id=1933577301]
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="metal-panel-screws-half2" parent="BodyVisualRoot" unique_id=674114915 instance=ExtResource("3_hqdy5")]
@@ -195,46 +190,33 @@ turret_scene = ExtResource("4_3ojlu")
 
 [node name="ModMounts" type="Node3D" parent="BodyVisualRoot" unique_id=1219872386]
 
-[node name="Mod1RearReactor" parent="BodyVisualRoot/ModMounts" unique_id=634477311 instance=ExtResource("10_modmount")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.35, -1.55)
-mount_label = "Module rear 1"
-placement = "rear"
-mod_scene = ExtResource("11_reactor")
-
-[node name="Mod2CenterShield" parent="BodyVisualRoot/ModMounts" unique_id=823466234 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-mod_use_id = 2
-mount_label = "Module central 2"
-mod_scene = ExtResource("12_shield")
-
-[node name="Mod3CenterArmor" parent="BodyVisualRoot/ModMounts" unique_id=1358434001 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-mod_use_id = 3
-mount_label = "Module central 3"
-mod_scene = ExtResource("13_armor")
-
-[node name="Mod4CenterAmmo" parent="BodyVisualRoot/ModMounts" unique_id=1407443471 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.45, -0.2)
-mod_use_id = 4
-mount_label = "Module central 4"
-mod_scene = ExtResource("14_ammo")
-
-[node name="Mod5FrontSnowplow" parent="BodyVisualRoot/ModMounts" unique_id=2094207832 instance=ExtResource("10_modmount")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.05, 1.65)
-mod_use_id = 5
+[node name="Mod1Front" parent="BodyVisualRoot/ModMounts" unique_id=2094207832 instance=ExtResource("10_modmount")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.050000012, 1.65)
 mount_label = "Module front 5"
 placement = "front"
 mod_scene = ExtResource("15_snowplow")
 
-[node name="Mod6SideEmpty" parent="BodyVisualRoot/ModMounts" unique_id=2036052925 instance=ExtResource("10_modmount")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 0.45, 0)
-mod_use_id = 6
-mount_label = "Module latéral 6"
-placement = "side"
+[node name="Mod2Center" parent="BodyVisualRoot/ModMounts" unique_id=1407443471 instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 1.1, -0.85)
+mod_use_id = 2
+mount_label = "Module central 4"
+mod_scene = ExtResource("14_ammo")
+
+[node name="Mod3Center" parent="BodyVisualRoot/ModMounts" unique_id=208767126 instance=ExtResource("10_modmount")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 1.1, -0.85)
+mod_use_id = 3
+mount_label = "Module central 4"
+mod_scene = ExtResource("14_ammo")
+
+[node name="Mod4Rear" parent="BodyVisualRoot/ModMounts" unique_id=634477311 instance=ExtResource("10_modmount")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.45000005, -1.55)
+mod_use_id = 4
+mount_label = "Module rear 1"
+placement = "rear"
+mod_scene = ExtResource("11_reactor")
 
 [node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=1619376301]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, 0.9)
-use_as_traction = true
 use_as_steering = true
 wheel_roll_influence = 0.12
 wheel_radius = 0.48
@@ -250,7 +232,6 @@ surface_material_override/0 = SubResource("6")
 
 [node name="FrontRightWheel" type="VehicleWheel3D" parent="." unique_id=887756342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, 0.9)
-use_as_traction = true
 use_as_steering = true
 wheel_roll_influence = 0.12
 wheel_radius = 0.48
@@ -266,6 +247,7 @@ surface_material_override/0 = SubResource("6")
 
 [node name="RearLeftWheel" type="VehicleWheel3D" parent="." unique_id=347284515]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, -0.9)
+use_as_traction = true
 wheel_roll_influence = 0.12
 wheel_radius = 0.48
 wheel_rest_length = 0.18
@@ -280,6 +262,7 @@ surface_material_override/0 = SubResource("6")
 
 [node name="RearRightWheel" type="VehicleWheel3D" parent="." unique_id=999012565]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, -0.9)
+use_as_traction = true
 wheel_roll_influence = 0.12
 wheel_radius = 0.48
 wheel_rest_length = 0.18

@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://ckx8m86n2p24f"]
+
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_5g0g8"]
+[ext_resource type="PackedScene" uid="uid://cjg7p5dkghwfl" path="res://asset/map/road/construction-barrier.glb" id="1_piqc6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5g0g8"]
+size = Vector3(0.41357422, 0.46517944, 1)
+
+[node name="Barrier_Concrete" type="Node3D" unique_id=1968880502]
+script = ExtResource("1_5g0g8")
+destroy_when_hp_reaches_zero = false
+
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=921374735 groups=["destructible_prop_bodies"]]
+collision_layer = 12
+collision_mask = 4294967295
+mass = 800.0
+linear_damp = 0.35
+angular_damp = 0.5
+
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=681020888]
+
+[node name="construction-barrier2" parent="IntactBody/Intact" unique_id=1603561437 instance=ExtResource("1_piqc6")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="IntactBody" unique_id=1871911526]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0.0021972656, 0.4895985, 0)
+shape = SubResource("BoxShape3D_5g0g8")

@@ -15,6 +15,9 @@ const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
 
 @onready var visual_socket: Node3D = $VisualSocket
 
+@onready var label_3d = %Label3D
+
+
 var net_id: int = -1
 var weapon_visual: WeaponInstance3D
 var replicated_transform: Transform3D
@@ -37,7 +40,10 @@ static func get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 func _ready() -> void:
 	add_to_group("world_weapon")
 	replicated_transform = global_transform
-
+	
+	if is_instance_valid(label_3d):
+		label_3d.hide()
+	
 	if editor_spawn_on_ready:
 		setup_from_state(editor_weapon_id, editor_ammo_in_magazine, editor_reserve_ammo)
 
