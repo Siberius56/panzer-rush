@@ -33,9 +33,17 @@ enum Team {
 @export_group("Lifetime")
 @export var lifetime: float = 0.15
 
+@export_group("Camera Shake")
+@export var camera_shake_enabled: bool = true
+@export_range(0.0, 2.0, 0.01) var camera_shake_intensity: float = 0.42
+@export var camera_shake_radius: float = 18.0
+@export var camera_shake_falloff: float = 1.35
+@export_range(0.1, 4.0, 0.05) var camera_shake_frequency_multiplier: float = 1.0
+
 var shooter: Node = null
 var _active: bool = false
 var _damaged_targets: Array[Node] = []
+var _camera_shake_emitted: bool = false
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 
@@ -73,11 +81,34 @@ func _activate_explosion() -> void:
 	_active = true
 	monitoring = true
 
+	_emit_camera_shake()
+
 	# Give the physics engine one tick to register bodies already inside the Area3D.
 	await get_tree().physics_frame
 
 	_damage_current_overlaps()
 
+
+func _emit_camera_shake() -> void:
+	if _camera_shake_emitted:
+		return
+
+	_camera_shake_emitted = true
+
+	if not camera_shake_enabled:
+		return
+
+	if camera_shake_intensity <= 0.0:
+		return
+
+	CameraShakeController.emit_global_shake(
+		get_tree(),
+		global_position,
+		camera_shake_intensity,
+		camera_shake_radius,
+		camera_shake_falloff,
+		camera_shake_frequency_multiplier
+	)
 
 func _on_body_entered(body: Node3D) -> void:
 	_try_damage_from_collider(body)

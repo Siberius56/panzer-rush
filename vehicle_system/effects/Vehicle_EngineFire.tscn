@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://ccvrst0luot23"]
+
+[sub_resource type="StandardMaterial3D" id="FireMaterial"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0.38, 0.08, 0.82)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="FireQuad"]
+material = SubResource("FireMaterial")
+size = Vector2(0.36, 0.36)
+
+[node name="Vehicle_EngineFire" type="Node3D" unique_id=536537418]
+
+[node name="Particles" type="CPUParticles3D" parent="." unique_id=674461127]
+emitting = false
+amount = 28
+lifetime = 0.75
+preprocess = 0.2
+randomness = 0.5
+mesh = SubResource("FireQuad")
+emission_shape = 1
+emission_sphere_radius = 0.4
+direction = Vector3(0, 1, 0)
+spread = 32.0
+gravity = Vector3(0, 0.15, 0)
+initial_velocity_min = 0.75
+initial_velocity_max = 1.65
+angular_velocity_min = -55.0
+angular_velocity_max = 55.0
+linear_accel_min = -0.08
+linear_accel_max = 0.18
+damping_max = 0.08
+scale_amount_min = 0.35
+color = Color(1, 0.35, 0.08, 0.9)

@@ -5,10 +5,11 @@ const PISTOL_SCENE := preload("uid://dd33dmmqhjkul")
 const SMG_SCENE := preload("uid://nykf7fy7m5jg")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm")
 const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
+const BOMB_SCENE := preload("res://scenes/weapons/BombWeapon.tscn")
 
 @export var state_send_interval: float = 0.05
 
-@export_enum("pistol", "smg", "rifle", "repair_tool") var editor_weapon_id: String = "pistol"
+@export_enum("pistol", "smg", "rifle", "repair_tool", "bomb") var editor_weapon_id: String = "pistol"
 @export var editor_ammo_in_magazine: int = 12
 @export var editor_reserve_ammo: int = 36
 @export var editor_spawn_on_ready: bool = true
@@ -23,6 +24,11 @@ var weapon_visual: WeaponInstance3D
 var replicated_transform: Transform3D
 var state_timer: float = 0.0
 var is_despawning: bool = false
+var current_weapon_id: String = ""
+var objective_origin_transform: Transform3D = Transform3D.IDENTITY
+var objective_origin_initialized: bool = false
+
+signal lost(world_weapon: WorldWeapon3D)
 
 static func get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 	match weapon_id:
@@ -34,12 +40,15 @@ static func get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return RIFLE_SCENE
 		"repair_tool":
 			return REPAIR_TOOL_SCENE
+		"bomb":
+			return BOMB_SCENE
 		_:
 			return null
 
 func _ready() -> void:
 	add_to_group("world_weapon")
 	replicated_transform = global_transform
+	_set_objective_origin_transform(global_transform)
 	
 	if is_instance_valid(label_3d):
 		label_3d.hide()
@@ -52,8 +61,12 @@ func _ready() -> void:
 		linear_velocity = Vector3.ZERO
 		angular_velocity = Vector3.ZERO
 
-func setup_from_state(weapon_id: String, ammo_in_magazine: int, reserve_ammo: int) -> void:
+func setup_from_state(weapon_id: String, ammo_in_magazine: int, reserve_ammo: int, extra_state: Dictionary = {}) -> void:
 	_clear_visual()
+	current_weapon_id = weapon_id
+
+	if extra_state.has("objective_origin_transform") and extra_state["objective_origin_transform"] is Transform3D:
+		_set_objective_origin_transform(extra_state["objective_origin_transform"])
 
 	var scene := get_weapon_scene_by_id(weapon_id)
 	if scene == null:
@@ -70,7 +83,12 @@ func setup_from_state(weapon_id: String, ammo_in_magazine: int, reserve_ammo: in
 func get_weapon_state() -> Dictionary:
 	if weapon_visual == null:
 		return {}
-	return weapon_visual.to_runtime_state()
+
+	var state: Dictionary = weapon_visual.to_runtime_state()
+	if _is_objective_item():
+		state["objective_origin_transform"] = objective_origin_transform
+
+	return state
 
 func apply_spawn_impulse(forward: Vector3) -> void:
 	if not multiplayer.is_server():
@@ -104,6 +122,59 @@ func _clear_visual() -> void:
 	for child in visual_socket.get_children():
 		child.queue_free()
 	weapon_visual = null
+
+func set_objective_origin_transform(new_transform: Transform3D) -> void:
+	objective_origin_transform = new_transform
+	objective_origin_initialized = true
+
+
+func _set_objective_origin_transform(new_transform: Transform3D) -> void:
+	set_objective_origin_transform(new_transform)
+
+
+func _is_objective_item() -> bool:
+	if current_weapon_id == "bomb":
+		return true
+
+	if weapon_visual != null and "weapon_behavior" in weapon_visual:
+		return str(weapon_visual.weapon_behavior).to_lower() == "objective_item"
+
+	return false
+
+
+func is_objective_bomb() -> bool:
+	return current_weapon_id == "bomb"
+
+
+func handle_killzone_entered(killzone: Node) -> bool:
+	if not _is_objective_item():
+		return false
+
+	if not multiplayer.is_server():
+		return true
+
+	_reset_objective_item_to_origin()
+	_notify_lost.rpc()
+	return true
+
+
+func _reset_objective_item_to_origin() -> void:
+	if not objective_origin_initialized:
+		_set_objective_origin_transform(global_transform)
+
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	global_transform = objective_origin_transform
+	replicated_transform = objective_origin_transform
+	sleeping = false
+	state_timer = 0.0
+	_receive_world_state.rpc(global_transform)
+
+
+@rpc("authority", "call_local", "reliable")
+func _notify_lost() -> void:
+	lost.emit(self)
+
 
 func despawn() -> void:
 	if is_despawning:

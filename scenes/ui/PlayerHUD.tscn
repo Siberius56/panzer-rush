@@ -2,8 +2,166 @@
 
 [ext_resource type="Script" uid="uid://cp786xiv1ceq1" path="res://scenes/ui/PlayerHUD.gd" id="1_playerhud"]
 [ext_resource type="PackedScene" uid="uid://h63fhlav7giv" path="res://scenes/ui/PlayerNameMarker.tscn" id="2_0741g"]
-[ext_resource type="Texture2D" uid="uid://bau64is7q1n3" path="res://icon.svg" id="2_rq211"]
 [ext_resource type="PackedScene" path="res://scenes/ui/VehicleNameMarker.tscn" id="3_vehicle_marker"]
+[ext_resource type="Texture2D" uid="uid://dkhluct4vju2c" path="res://asset/ui/ammo/ammo_9mm.png" id="4_844kx"]
+[ext_resource type="Texture2D" uid="uid://qel3hmbrs2q5" path="res://asset/ui/star.png" id="4_acse0"]
+[ext_resource type="Texture2D" uid="uid://c3ywo08opvsug" path="res://asset/ui/ammo/ammo_rifle.png" id="5_acse0"]
+[ext_resource type="Texture2D" uid="uid://dha0fi4m8yt76" path="res://asset/ui/ammo/ammo_9mm_full.png" id="5_wvanu"]
+[ext_resource type="Texture2D" uid="uid://dcqf5qvc61sww" path="res://asset/ui/ammo/ammo_rocket.png" id="6_wvanu"]
+[ext_resource type="PackedScene" uid="uid://dvelcibd3i2dw" path="res://scenes/ui/VehicleModSlotHUD.tscn" id="9_wvanu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4kn3h"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
+expand_margin_left = 96.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wvanu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+corner_radius_top_right = 128
+corner_radius_bottom_right = 128
+expand_margin_left = 100.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eqrcx"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1bolx"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(1, 0.35000002, 0.35000002, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_weapon_slot"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(0.05, 0.05, 0.05, 0.82)
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_844kx"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0.60784316)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cl36r"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.60784316)
+corner_radius_top_left = 64
+corner_radius_bottom_left = 64
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sdjsl"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.60784316)
+corner_radius_top_left = 64
+corner_radius_top_right = 64
+corner_radius_bottom_right = 64
+corner_radius_bottom_left = 64
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5an0b"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0.6, 1, 0.6, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_acse0"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyw7y"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.60784316)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_748xc"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_22eb1"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3s11"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(1, 0.57, 0.57, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=1032802562]
 script = ExtResource("1_playerhud")
@@ -20,205 +178,457 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="LeftMargin" type="MarginContainer" parent="Root" unique_id=1400163101]
+[node name="OnFootPanel" type="MarginContainer" parent="Root" unique_id=1400163101]
+unique_name_in_owner = true
 layout_mode = 1
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 344.0
-offset_bottom = 320.0
+offset_top = 30.0
+offset_right = 552.0
+offset_bottom = 268.0
 mouse_filter = 2
+theme_override_constants/margin_bottom = 10
 
-[node name="LeftVBox" type="VBoxContainer" parent="Root/LeftMargin" unique_id=85744788]
+[node name="LeftVBox" type="VBoxContainer" parent="Root/OnFootPanel" unique_id=85744788]
 custom_minimum_size = Vector2(384, 0)
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="OnFootPanel" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=1033469617]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(320, 164)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4kn3h")
+
+[node name="OnFootMargin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel" unique_id=1135009053]
+custom_minimum_size = Vector2(512, 0)
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="OnFootVBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin" unique_id=527225305]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Panel_Mask" type="Panel" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1492439129]
+clip_children = 1
+custom_minimum_size = Vector2(390, 160)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_wvanu")
+
+[node name="Panel_Back" type="Panel" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask" unique_id=884399994]
+custom_minimum_size = Vector2(380, 128)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_4kn3h")
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask" unique_id=1522763245]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 58
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer" unique_id=385451704]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="OnFootPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1033469617]
+[node name="HealthProgressBar" type="ProgressBar" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer" unique_id=190024948]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1bolx")
+value = 45.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/HealthProgressBar" unique_id=169429897]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+text = "6/100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WeaponSlotsHBox" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer" unique_id=632272740]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 78)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 12
+
+[node name="Weapon1Slot" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox" unique_id=1878343279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(208, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_weapon_slot")
+
+[node name="Weapon1Margin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot" unique_id=817063111]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 0
+
+[node name="Weapon1VBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin" unique_id=1372238261]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Weapon1TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin/Weapon1VBox" unique_id=1981379899]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="Weapon1AmmoLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin/Weapon1VBox" unique_id=1849774440]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 18)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 18
+text = "666"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Weapon2Slot" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox" unique_id=311131073]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 49.39)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_weapon_slot")
+
+[node name="Weapon2Margin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot" unique_id=282976799]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="Weapon2VBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin" unique_id=531783785]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Weapon2TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin/Weapon2VBox" unique_id=647448776]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 42)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Weapon2AmmoLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin/Weapon2VBox" unique_id=1664702418]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(60, 18)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 18
+text = "666"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Control" type="Control" parent="Root/OnFootPanel/LeftVBox/OnFootPanel" unique_id=1218693596]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="CommonPanel" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=1010767737]
+visible = false
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 
-[node name="OnFootMargin" type="MarginContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel" unique_id=1135009053]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="OnFootVBox" type="VBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin" unique_id=527225305]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="OnFootTitle" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=941591861]
-visible = false
-layout_mode = 2
-text = "À pied"
-
-[node name="EquippedWeaponLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1247367780]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "Arme équipée : Aucune"
-
-[node name="Weapon1Label" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2008896332]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Arme 1 : Aucune"
-
-[node name="Weapon2Label" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2079577145]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Arme 2 : Aucune"
-
-[node name="AmmoLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=263193364]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Munitions : 0 / 0"
-
-[node name="ReserveLabel" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=2019493005]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "Reserve: 9MM  117 RIF 90  SFL 24"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1444087852]
-layout_mode = 2
-
-[node name="HBoxContainer1" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=175318749]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer1" unique_id=1135135614]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("2_rq211")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Ammo_9MM" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer1" unique_id=1141463442]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 0)
-layout_mode = 2
-theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
-text = "9999"
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=1403177930]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer2" unique_id=1441584356]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("2_rq211")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Ammo_Rifle" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer2" unique_id=1803308345]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 0)
-layout_mode = 2
-text = "9999"
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=1896070760]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer3" unique_id=658292548]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("2_rq211")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Ammo_Shell" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer3" unique_id=758314505]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 0)
-layout_mode = 2
-text = "9999"
-
-[node name="HBoxContainer4" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=1154646707]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer4" unique_id=1498049713]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("2_rq211")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Ammo_Rocket" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer4" unique_id=1136285043]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 0)
-layout_mode = 2
-text = "9999"
-
-[node name="HBoxContainer5" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer" unique_id=406956642]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer5" unique_id=697740943]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("2_rq211")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Ammo_Energy" type="Label" parent="Root/LeftMargin/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/HBoxContainer/HBoxContainer5" unique_id=424266764]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 0)
-layout_mode = 2
-text = "9999"
-
-[node name="CommonPanel" type="PanelContainer" parent="Root/LeftMargin/LeftVBox" unique_id=1010767737]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 0)
-layout_mode = 2
-
-[node name="CommonMargin" type="MarginContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel" unique_id=490244285]
+[node name="CommonMargin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/CommonPanel" unique_id=490244285]
 layout_mode = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="HealthProgressBar" type="ProgressBar" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin" unique_id=190024948]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="CommonVBox" type="VBoxContainer" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin" unique_id=988903530]
+[node name="CommonVBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/CommonPanel/CommonMargin" unique_id=988903530]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CommonTitle" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=502112993]
+[node name="CommonTitle" type="Label" parent="Root/OnFootPanel/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=502112993]
 layout_mode = 2
 text = "Statut"
 
-[node name="HPLabel" type="Label" parent="Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=769256348]
+[node name="HPLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/CommonPanel/CommonMargin/CommonVBox" unique_id=769256348]
 unique_name_in_owner = true
 layout_mode = 2
 text = "PV : 0 / 0"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Root/LeftMargin/LeftVBox" unique_id=2018452760]
+[node name="MarginContainer" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=928084983]
 layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
 
-[node name="TextureRect" type="TextureRect" parent="Root/LeftMargin/LeftVBox/HBoxContainer" unique_id=1514308955]
-custom_minimum_size = Vector2(48, 48)
+[node name="Ressource" type="GridContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer" unique_id=2036500475]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
-texture = ExtResource("2_rq211")
+size_flags_horizontal = 0
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 24
+columns = 4
+
+[node name="Panel_Money" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=72789225]
+unique_name_in_owner = true
+self_modulate = Color(0, 0, 0, 1)
+custom_minimum_size = Vector2(76, 20)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_844kx")
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Money" unique_id=175318749]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = -4
+
+[node name="TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Money/HBoxContainer1" unique_id=1135135614]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("4_acse0")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MoneyLabel" type="Label" parent="Root/LeftMargin/LeftVBox/HBoxContainer" unique_id=1784108769]
+[node name="MoneyLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Money/HBoxContainer1" unique_id=1141463442]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
-text = "Argent : 0"
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 24
+text = "9999"
+vertical_alignment = 2
+
+[node name="Panel_9mm" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=2023126851]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 20)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_844kx")
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_9mm" unique_id=1807189245]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = -4
+
+[node name="TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_9mm/HBoxContainer1" unique_id=71080634]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("5_wvanu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_9mm" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_9mm/HBoxContainer1" unique_id=1511414909]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 24
+text = "9999"
+vertical_alignment = 2
+
+[node name="Panel_Rifle" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=1551302496]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 20)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_844kx")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Rifle" unique_id=1403177930]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = -4
+
+[node name="TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Rifle/HBoxContainer2" unique_id=1441584356]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("5_acse0")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Rifle" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Rifle/HBoxContainer2" unique_id=1803308345]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 24
+text = "9999"
+vertical_alignment = 2
+
+[node name="Panel_Shell" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=1219569482]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 20)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_844kx")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Shell" unique_id=1896070760]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = -4
+
+[node name="TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Shell/HBoxContainer3" unique_id=658292548]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("4_844kx")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Shell" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Shell/HBoxContainer3" unique_id=758314505]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 24
+text = "9999"
+vertical_alignment = 2
+
+[node name="Panel_Rocket" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=730360900]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 20)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_844kx")
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Rocket" unique_id=1154646707]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = -4
+
+[node name="TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Rocket/HBoxContainer4" unique_id=1498049713]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("6_wvanu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Rocket" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Rocket/HBoxContainer4" unique_id=1136285043]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 24
+text = "999"
+vertical_alignment = 2
+
+[node name="Panel_Energy" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=651209460]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 20)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_844kx")
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Energy" unique_id=406956642]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = -4
+
+[node name="TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Energy/HBoxContainer5" unique_id=697740943]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("6_wvanu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ammo_Energy" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource/Panel_Energy/HBoxContainer5" unique_id=424266764]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 24
+text = "9999"
+vertical_alignment = 2
 
 [node name="RightMargin" type="MarginContainer" parent="Root" unique_id=492481391]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -344.0
-offset_top = 24.0
-offset_right = -24.0
-offset_bottom = 420.0
+offset_left = -320.0
+offset_top = 30.0
+offset_bottom = 426.0
 grow_horizontal = 0
 mouse_filter = 2
 
@@ -226,13 +636,14 @@ mouse_filter = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cl36r")
 
 [node name="VehicleMargin" type="MarginContainer" parent="Root/RightMargin/VehiclePanel" unique_id=1258618346]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_bottom = 24
 
 [node name="VehicleVBox" type="VBoxContainer" parent="Root/RightMargin/VehiclePanel/VehicleMargin" unique_id=47278814]
 layout_mode = 2
@@ -240,11 +651,13 @@ theme_override_constants/separation = 6
 
 [node name="VehicleTitle" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=632833623]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Véhicule"
 
 [node name="VehicleNameLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=906979803]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Véhicule"
 
@@ -354,42 +767,6 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Tourelle : aucune"
 
-[node name="VehicleModsPanel" type="PanelContainer" parent="Root" unique_id=930545053]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = -128.0
-offset_right = 600.0
-offset_bottom = -24.0
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="VehicleModsMargin" type="MarginContainer" parent="Root/VehicleModsPanel" unique_id=1668179485]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="VehicleModsVBox" type="VBoxContainer" parent="Root/VehicleModsPanel/VehicleModsMargin" unique_id=343879709]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="VehicleModsTitle" type="Label" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox" unique_id=1871711782]
-layout_mode = 2
-text = "Modules"
-
-[node name="VehicleModsGrid" type="GridContainer" parent="Root/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox" unique_id=193545508]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-columns = 6
-
 [node name="PlayerNameLayer" type="Control" parent="Root" unique_id=1968841001]
 unique_name_in_owner = true
 layout_mode = 1
@@ -412,49 +789,189 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
-[node name="TankHealthPanel" type="PanelContainer" parent="Root" unique_id=348055265]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(460, 0)
+[node name="BottomMargin" type="MarginContainer" parent="Root" unique_id=1505968699]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -230.0
-offset_top = -96.0
-offset_right = 230.0
-offset_bottom = -24.0
+offset_left = -250.0
+offset_top = -82.0
+offset_right = 250.0
 grow_horizontal = 2
 grow_vertical = 0
-mouse_filter = 2
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 30
 
-[node name="TankHealthMargin" type="MarginContainer" parent="Root/TankHealthPanel" unique_id=1505968699]
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/BottomMargin" unique_id=330310304]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 8
+theme_override_constants/separation = 10
 
-[node name="TankHealthVBox" type="VBoxContainer" parent="Root/TankHealthPanel/TankHealthMargin" unique_id=1246516618]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="TankHealthNameLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox" unique_id=654517531]
+[node name="RevivePanel" type="PanelContainer" parent="Root/BottomMargin/VBoxContainer" unique_id=1968841002]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
-theme_override_constants/outline_size = 4
-text = "Tank"
-horizontal_alignment = 1
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sdjsl")
 
-[node name="TankHealthProgress" type="ProgressBar" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox" unique_id=1618842898]
+[node name="ReviveMargin" type="MarginContainer" parent="Root/BottomMargin/VBoxContainer/RevivePanel" unique_id=1968841003]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="ReviveVBox" type="VBoxContainer" parent="Root/BottomMargin/VBoxContainer/RevivePanel/ReviveMargin" unique_id=1968841004]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ReviveProgress" type="ProgressBar" parent="Root/BottomMargin/VBoxContainer/RevivePanel/ReviveMargin/ReviveVBox" unique_id=1968841006]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_5an0b")
+value = 23.0
 show_percentage = false
 
-[node name="TankHealthValueLabel" type="Label" parent="Root/TankHealthPanel/TankHealthMargin/TankHealthVBox/TankHealthProgress" unique_id=17673003]
+[node name="ReviveLabel" type="Label" parent="Root/BottomMargin/VBoxContainer/RevivePanel/ReviveMargin/ReviveVBox/ReviveProgress" unique_id=1968841005]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "Réanimation"
+horizontal_alignment = 1
+
+[node name="PassagePanel" type="PanelContainer" parent="Root/BottomMargin/VBoxContainer" unique_id=1216488325]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sdjsl")
+
+[node name="PassageMargin" type="MarginContainer" parent="Root/BottomMargin/VBoxContainer/PassagePanel" unique_id=1899952761]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="PassageVBox" type="VBoxContainer" parent="Root/BottomMargin/VBoxContainer/PassagePanel/PassageMargin" unique_id=1677153559]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="PassageProgress" type="ProgressBar" parent="Root/BottomMargin/VBoxContainer/PassagePanel/PassageMargin/PassageVBox" unique_id=2021912896]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_acse0")
+value = 33.0
+show_percentage = false
+
+[node name="PassageLabel" type="Label" parent="Root/BottomMargin/VBoxContainer/PassagePanel/PassageMargin/PassageVBox/PassageProgress" unique_id=631110463]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "Point de passage"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="VehicleModsPanel" type="PanelContainer" parent="Root/BottomMargin/VBoxContainer" unique_id=930545053]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lyw7y")
+
+[node name="VehicleModsMargin" type="MarginContainer" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel" unique_id=1668179485]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="VehicleModsVBox" type="VBoxContainer" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin" unique_id=343879709]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="VehicleModsTitle" type="Label" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox" unique_id=1871711782]
+layout_mode = 2
+text = "Modules"
+horizontal_alignment = 1
+
+[node name="VehicleModsGrid" type="HBoxContainer" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox" unique_id=841012847]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="VehicleModSlotHUD" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox/VehicleModsGrid" unique_id=1852445975 instance=ExtResource("9_wvanu")]
+layout_mode = 2
+
+[node name="VehicleModSlotHUD2" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox/VehicleModsGrid" unique_id=288004406 instance=ExtResource("9_wvanu")]
+layout_mode = 2
+
+[node name="VehicleModSlotHUD3" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox/VehicleModsGrid" unique_id=2086470605 instance=ExtResource("9_wvanu")]
+layout_mode = 2
+
+[node name="VehicleModSlotHUD4" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox/VehicleModsGrid" unique_id=362033624 instance=ExtResource("9_wvanu")]
+layout_mode = 2
+
+[node name="VehicleModSlotHUD5" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox/VehicleModsGrid" unique_id=894320521 instance=ExtResource("9_wvanu")]
+layout_mode = 2
+
+[node name="VehicleModSlotHUD6" parent="Root/BottomMargin/VBoxContainer/VehicleModsPanel/VehicleModsMargin/VehicleModsVBox/VehicleModsGrid" unique_id=1662659079 instance=ExtResource("9_wvanu")]
+layout_mode = 2
+
+[node name="TankHealthPanel" type="PanelContainer" parent="Root/BottomMargin/VBoxContainer" unique_id=348055265]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sdjsl")
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/BottomMargin/VBoxContainer/TankHealthPanel" unique_id=249948528]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="TankHealthVBox" type="VBoxContainer" parent="Root/BottomMargin/VBoxContainer/TankHealthPanel/MarginContainer" unique_id=1246516618]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TankHealthNameLabel" type="Label" parent="Root/BottomMargin/VBoxContainer/TankHealthPanel/MarginContainer/TankHealthVBox" unique_id=654517531]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "Tank"
+horizontal_alignment = 1
+
+[node name="TankHealthProgress" type="ProgressBar" parent="Root/BottomMargin/VBoxContainer/TankHealthPanel/MarginContainer/TankHealthVBox" unique_id=1618842898]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1bolx")
+show_percentage = false
+
+[node name="TankHealthValueLabel" type="Label" parent="Root/BottomMargin/VBoxContainer/TankHealthPanel/MarginContainer/TankHealthVBox/TankHealthProgress" unique_id=17673003]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -501,49 +1018,6 @@ custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 show_percentage = false
 
-[node name="PassagePanel" type="PanelContainer" parent="Root" unique_id=1216488325]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(460, 0)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -230.0
-offset_top = -210.0
-offset_right = 230.0
-offset_bottom = -130.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="PassageMargin" type="MarginContainer" parent="Root/PassagePanel" unique_id=1899952761]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 12
-
-[node name="PassageVBox" type="VBoxContainer" parent="Root/PassagePanel/PassageMargin" unique_id=1677153559]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="PassageLabel" type="Label" parent="Root/PassagePanel/PassageMargin/PassageVBox" unique_id=631110463]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Point de passage"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="PassageProgress" type="ProgressBar" parent="Root/PassagePanel/PassageMargin/PassageVBox" unique_id=2021912896]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
-show_percentage = false
-
 [node name="ReloadPanel" type="PanelContainer" parent="Root" unique_id=1324680352]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0)
@@ -556,12 +1030,35 @@ anchor_bottom = 0.5
 offset_left = -110.0
 offset_top = -130.0
 offset_right = 110.000244
-offset_bottom = -63.0
+offset_bottom = -106.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="ReloadProgress" type="ProgressBar" parent="Root/ReloadPanel" unique_id=2147451624]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_748xc")
+value = 50.0
+show_percentage = false
+
+[node name="ReloadLabel" type="Label" parent="Root/ReloadPanel/ReloadProgress" unique_id=318550348]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+text = "5.2s"
+horizontal_alignment = 1
+
 [node name="PassageMargin" type="MarginContainer" parent="Root/ReloadPanel" unique_id=218759934]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 12
@@ -573,64 +1070,6 @@ layout_mode = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="ReloadProgress" type="ProgressBar" parent="Root/ReloadPanel/PassageMargin/ReloadPanel" unique_id=2147451624]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 24)
-layout_mode = 2
-show_percentage = false
-
-[node name="ReloadLabel" type="Label" parent="Root/ReloadPanel/PassageMargin/ReloadPanel/ReloadProgress" unique_id=318550348]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Rechargement : 0 %"
-horizontal_alignment = 1
-
-[node name="RevivePanel" type="PanelContainer" parent="Root" unique_id=1968841002]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -180.0
-offset_top = -128.0
-offset_right = 180.0
-offset_bottom = -48.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="ReviveMargin" type="MarginContainer" parent="Root/RevivePanel" unique_id=1968841003]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 12
-
-[node name="ReviveVBox" type="VBoxContainer" parent="Root/RevivePanel/ReviveMargin" unique_id=1968841004]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ReviveLabel" type="Label" parent="Root/RevivePanel/ReviveMargin/ReviveVBox" unique_id=1968841005]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Réanimation"
-horizontal_alignment = 1
-
-[node name="ReviveProgress" type="ProgressBar" parent="Root/RevivePanel/ReviveMargin/ReviveVBox" unique_id=1968841006]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
-show_percentage = false
-
 [node name="DeathOverlay" type="Control" parent="Root" unique_id=1480259341]
 unique_name_in_owner = true
 visible = false
@@ -640,6 +1079,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="DeathDim" type="ColorRect" parent="Root/DeathOverlay" unique_id=1792251406]
 layout_mode = 1
@@ -661,11 +1101,14 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="DeathPanel" type="PanelContainer" parent="Root/DeathOverlay/DeathCenter" unique_id=618322044]
-custom_minimum_size = Vector2(420, 180)
+custom_minimum_size = Vector2(600, 260)
 layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_22eb1")
 
 [node name="DeathMargin" type="MarginContainer" parent="Root/DeathOverlay/DeathCenter/DeathPanel" unique_id=303761391]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 24
@@ -673,12 +1116,14 @@ theme_override_constants/margin_bottom = 20
 
 [node name="DeathVBox" type="VBoxContainer" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin" unique_id=542160501]
 layout_mode = 2
-theme_override_constants/separation = 14
+mouse_filter = 2
+theme_override_constants/separation = 6
 alignment = 1
 
 [node name="DeathMessageLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1589284047]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
 text = "Vous êtes mort."
 horizontal_alignment = 1
 
@@ -689,27 +1134,78 @@ horizontal_alignment = 1
 
 [node name="RespawnCountdownLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841007]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Respawn disponible dans 5.0s"
 horizontal_alignment = 1
 
-[node name="DeathReviveLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841008]
-unique_name_in_owner = true
-visible = false
+[node name="Control1" type="Control" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=187162925]
+custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
-text = "Réanimation"
+
+[node name="FinalDeathProgress" type="ProgressBar" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841011]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_h3s11")
+value = 50.0
+show_percentage = false
+
+[node name="FinalDeathCountdownLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox/FinalDeathProgress" unique_id=1968841010]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "Mort définitive dans 30.0s"
 horizontal_alignment = 1
 
 [node name="DeathReviveProgress" type="ProgressBar" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1968841009]
 unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 18)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eqrcx")
+theme_override_styles/fill = SubResource("StyleBoxFlat_5an0b")
+value = 50.0
 show_percentage = false
 
-[node name="RespawnButton" type="Button" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=469228994]
+[node name="DeathReviveLabel" type="Label" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox/DeathReviveProgress" unique_id=1968841008]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 42)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "Réanimation"
+horizontal_alignment = 1
+
+[node name="Control2" type="Control" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1122384556]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox" unique_id=1450228864]
+layout_mode = 2
+
+[node name="RespawnButton" type="Button" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox/HBoxContainer" unique_id=469228994]
+unique_name_in_owner = true
+z_index = 10
+custom_minimum_size = Vector2(256, 42)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Respawn"
+
+[node name="SpectateNextButton" type="Button" parent="Root/DeathOverlay/DeathCenter/DeathPanel/DeathMargin/DeathVBox/HBoxContainer" unique_id=1968841012]
+unique_name_in_owner = true
+z_index = 100
+custom_minimum_size = Vector2(256, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Caméra suivante"

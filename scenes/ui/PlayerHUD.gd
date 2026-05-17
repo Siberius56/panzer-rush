@@ -2,6 +2,7 @@ extends CanvasLayer
 class_name PlayerHUD
 
 signal respawn_requested
+signal spectate_next_requested
 
 #const PLAYER_NAME_MARKER_SCENE: PackedScene = preload("res://scenes/ui/PlayerNameMarker.tscn")
 const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModSlotHUD.tscn")
@@ -19,22 +20,31 @@ const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModS
 @export var repair_bar_world_height: float = 2.4
 @export var repair_bar_hide_delay: float = 1.0
 
-@onready var common_panel: PanelContainer = %CommonPanel #$Root/LeftMargin/LeftVBox/CommonPanel
-@onready var hp_label: Label = %HPLabel #$Root/LeftMargin/LeftVBox/CommonPanel/CommonMargin/CommonVBox/HPLabel
+
+@onready var hp_label: Label = %HPLabel
 @onready var health_progress_bar: ProgressBar = %HealthProgressBar
-@onready var ammo_9mm: Label = %Ammo_9MM
+@onready var health_label = %HealthLabel
+
+@onready var ammo_9mm: Label = %Ammo_9mm
 @onready var ammo_rifle: Label = %Ammo_Rifle
 @onready var ammo_shell: Label = %Ammo_Shell
 @onready var ammo_rocket: Label = %Ammo_Rocket
-@onready var ammo_energy := %Ammo_Energy
+@onready var ammo_energy: Label = %Ammo_Energy
 
-@onready var on_foot_panel: PanelContainer = %OnFootPanel
-@onready var equipped_weapon_label: Label = %EquippedWeaponLabel
-@onready var weapon_1_label: Label = %Weapon1Label
-@onready var weapon_2_label: Label = %Weapon2Label
-@onready var ammo_label: Label = %AmmoLabel
+@onready var panel_9mm: Panel = %Panel_9mm
+@onready var panel_rifle: Panel = %Panel_Rifle
+@onready var panel_shell: Panel = %Panel_Shell
+@onready var panel_rocket: Panel = %Panel_Rocket
+@onready var panel_energy: Panel = %Panel_Energy
+
+@onready var on_foot_panel := %OnFootPanel
+@onready var weapon_1_slot: PanelContainer = %Weapon1Slot
+@onready var weapon_1_texture_rect: TextureRect = %Weapon1TextureRect
+@onready var weapon_1_ammo_label: Label = %Weapon1AmmoLabel
+@onready var weapon_2_slot: PanelContainer = %Weapon2Slot
+@onready var weapon_2_texture_rect: TextureRect = %Weapon2TextureRect
+@onready var weapon_2_ammo_label: Label = %Weapon2AmmoLabel
 @onready var money_label: Label = %MoneyLabel
-@onready var reserve_label: Label = %ReserveLabel
 @onready var reload_panel: PanelContainer = %ReloadPanel
 @onready var reload_label: Label = %ReloadLabel
 @onready var reload_progress_bar: ProgressBar = %ReloadProgress
@@ -54,17 +64,29 @@ const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModS
 @onready var turret_label: Label = %TurretLabel
 @onready var turret_ammo_label: Label = %TurretAmmo
 @onready var vehicle_mods_panel: PanelContainer = %VehicleModsPanel
-@onready var vehicle_mods_grid: GridContainer = %VehicleModsGrid
+@onready var vehicle_mods_grid: HBoxContainer = %VehicleModsGrid
 
 var player: Node = null
 var _seat_labels: Array[RichTextLabel] = []
 var _vehicle_mod_slot_nodes: Array[Control] = []
+var _weapon_slot_panels: Array[PanelContainer] = []
+var _weapon_slot_icons: Array[TextureRect] = []
+var _weapon_slot_ammo_labels: Array[Label] = []
+var _weapon_icon_paths: Dictionary = {}
+var _weapon_icon_textures: Dictionary = {}
+var _weapon_slot_last_ammo_texts: Array[String] = ["", ""]
+var _weapon_slot_last_weapon_names: Array[String] = ["", ""]
+var _weapon_ammo_text_by_name: Dictionary = {}
+var _weapon_slot_normal_style: StyleBoxFlat = null
+var _weapon_slot_equipped_style: StyleBoxFlat = null
 @onready var death_overlay: Control = %DeathOverlay
 @onready var death_message_label: Label = %DeathMessageLabel
-@onready var respawn_countdown_label: Label = %RespawnCountdownLabel
+@onready var final_death_countdown_label: Label = %FinalDeathCountdownLabel
+@onready var final_death_progress: ProgressBar = %FinalDeathProgress
 @onready var death_revive_label: Label = %DeathReviveLabel
 @onready var death_revive_progress: ProgressBar = %DeathReviveProgress
 @onready var respawn_button: Button = %RespawnButton
+@onready var spectate_next_button: Button = %SpectateNextButton
 @onready var revive_panel: PanelContainer = %RevivePanel
 @onready var revive_label: Label = %ReviveLabel
 @onready var revive_progress_bar: ProgressBar = %ReviveProgress
@@ -90,10 +112,16 @@ var _repair_target_hide_timer: float = 0.0
 
 const SELF_COLOR := "#7CFF7C"
 const EMPTY_SEAT_TEXT := "Libre"
+const WEAPON_ICON_DIR: String = "res://asset/ui/weapon/"
+const WEAPON_ICON_PREFIX: String = "weapon_"
+const WEAPON_ICON_EXTENSION: String = ".png"
+const AMMO_PANEL_SELECTED_MODULATE: Color = Color(1.0, 1.0, 1.0, 1.0)
+const AMMO_PANEL_UNSELECTED_MODULATE: Color = Color(0.0, 0.0, 0.0, 1.0)
 
 func _ready() -> void:
 	add_to_group("player_huds")
 	layer = 1
+	set_process_input(true)
 	_seat_labels = [
 		seat_1_label,
 		seat_2_label,
@@ -108,16 +136,39 @@ func _ready() -> void:
 		label.fit_content = true
 		label.scroll_active = false
 
+	_configure_death_overlay_input()
+
 	if not respawn_button.pressed.is_connected(_on_respawn_button_pressed):
 		respawn_button.pressed.connect(_on_respawn_button_pressed)
+	respawn_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	respawn_button.focus_mode = Control.FOCUS_ALL
+	respawn_button.z_index = 10
+
+	if spectate_next_button != null:
+		spectate_next_button.mouse_filter = Control.MOUSE_FILTER_STOP
+		spectate_next_button.focus_mode = Control.FOCUS_ALL
+		spectate_next_button.z_index = 100
+		spectate_next_button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
+		if not spectate_next_button.pressed.is_connected(_on_spectate_next_button_pressed):
+			spectate_next_button.pressed.connect(_on_spectate_next_button_pressed)
 
 	death_overlay.visible = false
 	death_revive_label.visible = false
 	death_revive_progress.visible = false
+	if final_death_countdown_label != null:
+		final_death_countdown_label.visible = false
+	if final_death_progress != null:
+		final_death_progress.visible = false
+	if spectate_next_button != null:
+		spectate_next_button.visible = false
 	revive_panel.visible = false
 	hide_passage_prompt()
 	hide_repair_target(true)
 	hide_reload_progress()
+	_scan_weapon_icon_folder()
+	_cache_weapon_slot_nodes()
+	_setup_weapon_slot_styles()
+	_clear_editor_vehicle_mod_slots()
 	_hide_vehicle_fuel_bar()
 	_hide_vehicle_mod_slots()
 	_hide_tank_health_bar()
@@ -129,6 +180,59 @@ func _process(delta: float) -> void:
 		_refresh_all()
 
 	_update_repair_target_bar(delta)
+
+func _input(event: InputEvent) -> void:
+	if _try_consume_spectate_button_click(event):
+		get_viewport().set_input_as_handled()
+
+
+func _try_consume_spectate_button_click(event: InputEvent) -> bool:
+	if death_overlay == null or not death_overlay.visible:
+		return false
+	if spectate_next_button == null or not spectate_next_button.visible or spectate_next_button.disabled:
+		return false
+
+	var click_position: Vector2 = Vector2.INF
+	if event is InputEventMouseButton:
+		var mouse_event: InputEventMouseButton = event
+		if not mouse_event.pressed or mouse_event.button_index != MOUSE_BUTTON_LEFT:
+			return false
+		click_position = mouse_event.position
+	elif event is InputEventScreenTouch:
+		var touch_event: InputEventScreenTouch = event
+		if not touch_event.pressed:
+			return false
+		click_position = touch_event.position
+	else:
+		return false
+
+	if not spectate_next_button.get_global_rect().has_point(click_position):
+		return false
+
+	_on_spectate_next_button_pressed()
+	return true
+
+
+func _configure_death_overlay_input() -> void:
+	if death_overlay != null:
+		_set_mouse_filter_ignore(death_overlay)
+		_set_mouse_filter_ignore(death_overlay.get_node_or_null("DeathDim") as Control)
+		_set_mouse_filter_ignore(death_overlay.get_node_or_null("DeathCenter") as Control)
+		_set_mouse_filter_ignore(death_overlay.get_node_or_null("DeathCenter/DeathPanel") as Control)
+		_set_mouse_filter_ignore(death_overlay.get_node_or_null("DeathCenter/DeathPanel/DeathMargin") as Control)
+		_set_mouse_filter_ignore(death_overlay.get_node_or_null("DeathCenter/DeathPanel/DeathMargin/DeathVBox") as Control)
+
+	if respawn_button != null:
+		respawn_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	if spectate_next_button != null:
+		spectate_next_button.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _set_mouse_filter_ignore(control: Control) -> void:
+	if control == null:
+		return
+	control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 
 func set_player(p_player: Node) -> void:
 	player = p_player
@@ -202,7 +306,7 @@ func _refresh_all() -> void:
 	_refresh_vehicle_name_marker(player_data, tracked_vehicle, in_vehicle, is_dead)
 
 	if is_dead:
-		common_panel.visible = false
+		#common_panel.visible = false
 		on_foot_panel.visible = false
 		vehicle_panel.visible = false
 		_hide_vehicle_fuel_bar()
@@ -220,7 +324,7 @@ func _refresh_all() -> void:
 	_refresh_vehicle(player_data, tracked_vehicle)
 	_refresh_revive_panel(player_data)
 
-	common_panel.visible = true
+	#common_panel.visible = true
 	on_foot_panel.visible = not in_vehicle
 	vehicle_panel.visible = in_vehicle
 	if not in_vehicle:
@@ -229,31 +333,88 @@ func _refresh_all() -> void:
 
 func _show_death_overlay(player_data: Dictionary) -> void:
 	death_overlay.visible = true
+	_configure_death_overlay_input()
 
-	var hp: int = int(player_data.get("hp", 0))
-	death_message_label.text = "Vous êtes mort." if hp <= 0 else "Vous êtes hors combat."
-
+	var is_final_dead: bool = bool(player_data.get("is_final_dead", false))
+	var team_lives: int = max(int(player_data.get("team_respawn_lives", 0)), 0)
 	var remaining: float = float(player_data.get("respawn_remaining", 0.0))
-	var respawn_available: bool = bool(player_data.get("respawn_available", true))
+	var respawn_delay_ready: bool = remaining <= 0.0
+	var respawn_available: bool = bool(player_data.get("respawn_available", false))
 
-	if respawn_available:
-		respawn_countdown_label.text = "Respawn disponible."
-		respawn_button.text = "Respawn"
+	death_message_label.text = "Vous êtes mort définitivement." if is_final_dead else "Vous êtes à terre."
+
+	if final_death_countdown_label != null and final_death_progress != null:
+		_refresh_final_death_delay(player_data, is_final_dead)
+
+	if team_lives <= 0:
+		respawn_pending = false
+		respawn_button.text = "Plus aucune vie d'équipe."
+	elif respawn_delay_ready:
+		respawn_button.text = _format_respawn_button_text(team_lives)
 	else:
-		respawn_countdown_label.text = "Respawn disponible dans %.1fs" % remaining
-		respawn_button.text = "Respawn (%.1fs)" % remaining
-
+		respawn_button.text = "Respawn disponible dans %.1fs" % remaining
+	
 	respawn_button.disabled = respawn_pending or not respawn_available
-	if respawn_available and not respawn_pending and not respawn_button.has_focus():
-		respawn_button.grab_focus()
 
+	_refresh_spectate_button(player_data)
 	_refresh_death_revive_progress(player_data)
+
+
+func _refresh_final_death_delay(player_data: Dictionary, is_final_dead: bool) -> void:
+	var delay: float = max(float(player_data.get("final_death_delay", 30.0)), 0.0)
+	var remaining: float = max(float(player_data.get("final_death_remaining", delay)), 0.0)
+
+	if is_final_dead:
+		final_death_countdown_label.visible = true
+		final_death_countdown_label.text = "Réanimation impossible. Respawn requis."
+		final_death_progress.visible = false
+		final_death_progress.value = 0.0
+		return
+
+	final_death_countdown_label.visible = true
+	if bool(player_data.get("final_death_timer_paused", false)):
+		final_death_countdown_label.text = "Mort définitive suspendue pendant la réanimation. %.1fs restantes" % remaining
+	else:
+		final_death_countdown_label.text = "Mort définitive dans %.1fs" % remaining
+	final_death_progress.visible = true
+	final_death_progress.min_value = 0.0
+	final_death_progress.max_value = 100.0
+	if delay <= 0.0:
+		final_death_progress.value = 0.0
+	else:
+		final_death_progress.value = clamp(remaining / delay, 0.0, 1.0) * 100.0
+
+
+func _format_respawn_button_text(team_lives: int) -> String:
+	var suffix: String = "vie restante" if team_lives <= 1 else "vies restantes"
+	return "Respawn (x%d %s)" % [team_lives, suffix]
+
+
+func _refresh_spectate_button(player_data: Dictionary) -> void:
+	if spectate_next_button == null:
+		return
+
+	var target_name: String = str(player_data.get("spectator_target_name", ""))
+	spectate_next_button.visible = true
+	spectate_next_button.disabled = false
+	spectate_next_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	spectate_next_button.z_index = 100
+	if bool(player_data.get("spectating", false)) and not target_name.is_empty():
+		spectate_next_button.text = "Caméra suivante : %s" % target_name
+	else:
+		spectate_next_button.text = "Caméra suivante"
 
 func _hide_death_overlay() -> void:
 	respawn_pending = false
 	death_overlay.visible = false
 	death_revive_label.visible = false
 	death_revive_progress.visible = false
+	if final_death_countdown_label != null:
+		final_death_countdown_label.visible = false
+	if final_death_progress != null:
+		final_death_progress.visible = false
+	if spectate_next_button != null:
+		spectate_next_button.visible = false
 	respawn_button.text = "Respawn"
 	respawn_button.disabled = false
 
@@ -264,6 +425,10 @@ func _on_respawn_button_pressed() -> void:
 	respawn_pending = true
 	respawn_button.disabled = true
 	emit_signal("respawn_requested")
+
+
+func _on_spectate_next_button_pressed() -> void:
+	emit_signal("spectate_next_requested")
 
 func _refresh_death_revive_progress(player_data: Dictionary) -> void:
 	var active: bool = bool(player_data.get("revive_active", false))
@@ -456,6 +621,7 @@ func _refresh_player_name_markers() -> void:
 			continue
 
 		_set_name_marker_text(marker, _get_player_marker_text(target))
+		_set_name_marker_death_state(marker, target)
 		var world_position: Vector3 = _get_player_marker_world_position(target)
 		var screen_data: Dictionary = _world_position_to_clamped_screen(camera, world_position)
 		var marker_size: Vector2 = marker.get_combined_minimum_size()
@@ -499,6 +665,46 @@ func _set_name_marker_text(marker: Control, text: String) -> void:
 	if label != null:
 		label.text = text
 
+
+func _set_name_marker_death_state(marker: Control, target: Node) -> void:
+	if marker == null or target == null or not is_instance_valid(target):
+		return
+
+	var dead: bool = bool(target.get("is_dead"))
+	var final_dead: bool = _target_is_final_dead(target)
+	var delay: float = 30.0
+	if _target_has_property(target, "downed_to_final_death_seconds"):
+		delay = max(float(target.get("downed_to_final_death_seconds")), 0.0)
+
+	var elapsed: float = 0.0
+	if _target_has_property(target, "death_elapsed_time"):
+		elapsed = max(float(target.get("death_elapsed_time")), 0.0)
+
+	var remaining: float = max(delay - elapsed, 0.0)
+	var progress: float = 0.0
+	if dead:
+		progress = 0.0 if delay <= 0.0 else clamp(remaining / delay, 0.0, 1.0)
+
+	if marker.has_method("set_death_state"):
+		marker.call("set_death_state", dead, final_dead, progress)
+
+
+func _target_is_final_dead(target: Node) -> bool:
+	if not _target_has_property(target, "is_final_dead"):
+		return false
+	return bool(target.get("is_final_dead"))
+
+
+func _target_has_property(target: Node, property_name: String) -> bool:
+	if target == null or not is_instance_valid(target):
+		return false
+
+	for property_data in target.get_property_list():
+		if str(property_data.get("name", "")) == property_name:
+			return true
+
+	return false
+
 func _clear_name_markers() -> void:
 	for key in _name_marker_labels.keys():
 		var marker = _name_marker_labels.get(key)
@@ -521,6 +727,7 @@ func _refresh_tank_health_bar(player_data: Dictionary, tracked_vehicle: Node) ->
 
 	tank_health_panel.visible = true
 	tank_health_name_label.text = tank_name
+	
 	tank_health_progress_bar.min_value = 0.0
 	tank_health_progress_bar.max_value = float(max_hp)
 	tank_health_progress_bar.value = float(hp)
@@ -769,7 +976,9 @@ func _get_player_marker_text(target: Node) -> String:
 		base_name = str(target.get("player_name"))
 
 	if bool(target.get("is_dead")):
-		return "%s (KO)" % base_name
+		if _target_is_final_dead(target):
+			return "%s (mort)" % base_name
+		return "%s (à terre)" % base_name
 
 	return base_name
 
@@ -804,35 +1013,559 @@ func _refresh_common(player_data: Dictionary) -> void:
 	hp_label.text = "PV : "+str(hp)+" / "+str(max_hp) #) % [str(hp), str(max_hp)]
 	health_progress_bar.value = hp
 	health_progress_bar.max_value = max_hp
+	health_label.text = str(round(hp)) + "/" + str(round(max_hp))
+
+func _cache_weapon_slot_nodes() -> void:
+	_weapon_slot_panels.clear()
+	_weapon_slot_icons.clear()
+	_weapon_slot_ammo_labels.clear()
+
+	if weapon_1_slot != null:
+		_weapon_slot_panels.append(weapon_1_slot)
+	if weapon_2_slot != null:
+		_weapon_slot_panels.append(weapon_2_slot)
+
+	if weapon_1_texture_rect != null:
+		_weapon_slot_icons.append(weapon_1_texture_rect)
+	if weapon_2_texture_rect != null:
+		_weapon_slot_icons.append(weapon_2_texture_rect)
+
+	if weapon_1_ammo_label != null:
+		_weapon_slot_ammo_labels.append(weapon_1_ammo_label)
+	if weapon_2_ammo_label != null:
+		_weapon_slot_ammo_labels.append(weapon_2_ammo_label)
+
+
+func _setup_weapon_slot_styles() -> void:
+	_weapon_slot_normal_style = _make_weapon_slot_style(false)
+	_weapon_slot_equipped_style = _make_weapon_slot_style(true)
+
+	for panel in _weapon_slot_panels:
+		if panel != null:
+			panel.add_theme_stylebox_override("panel", _weapon_slot_normal_style)
+
+
+
+func _refresh_weapon_slot_ui(player_data: Dictionary, weapon_1_name: String, weapon_2_name: String, equipped_weapon_name: String) -> void:
+	if _weapon_slot_panels.is_empty() or _weapon_slot_icons.is_empty() or _weapon_slot_ammo_labels.is_empty():
+		_cache_weapon_slot_nodes()
+
+	var physical_weapon_names: Array[String] = [weapon_1_name, weapon_2_name]
+	var display_weapon_names: Array[String] = _get_display_weapon_names(weapon_1_name, weapon_2_name, equipped_weapon_name)
+
+	for display_slot_index in range(2):
+		if display_slot_index >= _weapon_slot_panels.size() or display_slot_index >= _weapon_slot_icons.size() or display_slot_index >= _weapon_slot_ammo_labels.size():
+			continue
+
+		var weapon_name: String = display_weapon_names[display_slot_index]
+		var source_slot_index: int = _find_weapon_source_slot_index(weapon_name, physical_weapon_names)
+		if source_slot_index < 0:
+			source_slot_index = display_slot_index
+
+		var has_weapon: bool = not _is_empty_weapon_name(weapon_name)
+		var is_equipped: bool = has_weapon and not _is_empty_weapon_name(equipped_weapon_name) and weapon_name == equipped_weapon_name
+
+		var panel: PanelContainer = _weapon_slot_panels[display_slot_index]
+		var icon: TextureRect = _weapon_slot_icons[display_slot_index]
+		var ammo: Label = _weapon_slot_ammo_labels[display_slot_index]
+
+		if panel != null:
+			panel.add_theme_stylebox_override("panel", _weapon_slot_equipped_style if is_equipped else _weapon_slot_normal_style)
+			panel.tooltip_text = weapon_name if has_weapon else "Aucune arme"
+
+		if icon != null:
+			icon.texture = _get_weapon_icon_texture(weapon_name) if has_weapon else null
+			icon.visible = true
+		
+		if display_slot_index == 0:
+			if ammo != null:
+				ammo.visible = has_weapon
+				if has_weapon:
+					_update_weapon_slot_ammo_label(ammo, player_data, display_slot_index, source_slot_index, weapon_name, equipped_weapon_name)
+				else:
+					ammo.text = ""
+					_set_weapon_slot_ammo_cache(display_slot_index, "", "")
+
+
+func _get_display_weapon_names(weapon_1_name: String, weapon_2_name: String, equipped_weapon_name: String) -> Array[String]:
+	var display_weapon_names: Array[String] = []
+
+	if _is_empty_weapon_name(equipped_weapon_name):
+		display_weapon_names.append(weapon_1_name)
+		display_weapon_names.append(weapon_2_name)
+		return display_weapon_names
+
+	var backpack_weapon_name: String = "Aucune"
+	if not _is_empty_weapon_name(weapon_1_name) and weapon_1_name != equipped_weapon_name:
+		backpack_weapon_name = weapon_1_name
+	elif not _is_empty_weapon_name(weapon_2_name) and weapon_2_name != equipped_weapon_name:
+		backpack_weapon_name = weapon_2_name
+
+	display_weapon_names.append(equipped_weapon_name)
+	display_weapon_names.append(backpack_weapon_name)
+	return display_weapon_names
+
+
+func _find_weapon_source_slot_index(weapon_name: String, physical_weapon_names: Array[String]) -> int:
+	if _is_empty_weapon_name(weapon_name):
+		return -1
+
+	var normalized_weapon_name: String = weapon_name.strip_edges().to_lower()
+	for source_slot_index in range(physical_weapon_names.size()):
+		var candidate_name: String = physical_weapon_names[source_slot_index]
+		if candidate_name == weapon_name:
+			return source_slot_index
+		if candidate_name.strip_edges().to_lower() == normalized_weapon_name:
+			return source_slot_index
+
+	return -1
+
+
+func _make_weapon_slot_style(is_equipped: bool) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.05, 0.05, 0.05, 0.82)
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_right = 8
+	style.corner_radius_bottom_left = 8
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color.WHITE if is_equipped else Color.BLACK
+	return style
+
+
+func _scan_weapon_icon_folder() -> void:
+	_weapon_icon_paths.clear()
+
+	var dir: DirAccess = DirAccess.open(WEAPON_ICON_DIR)
+	if dir == null:
+		push_warning("Dossier d'icônes d'armes introuvable : %s" % WEAPON_ICON_DIR)
+		return
+
+	dir.list_dir_begin()
+	var file_name: String = dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and file_name.get_extension().to_lower() == "png":
+			var path: String = WEAPON_ICON_DIR + file_name
+			_weapon_icon_paths[file_name] = path
+			_weapon_icon_paths[file_name.to_lower()] = path
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+
+func _get_weapon_icon_texture(weapon_name: String) -> Texture2D:
+	var icon_path: String = _find_weapon_icon_path(weapon_name)
+	if icon_path.is_empty():
+		return null
+
+	if _weapon_icon_textures.has(icon_path):
+		var cached_texture: Variant = _weapon_icon_textures.get(icon_path)
+		if cached_texture is Texture2D:
+			return cached_texture
+		return null
+
+	var loaded_resource: Resource = load(icon_path)
+	if loaded_resource is Texture2D:
+		var texture: Texture2D = loaded_resource as Texture2D
+		_weapon_icon_textures[icon_path] = texture
+		return texture
+
+	_weapon_icon_textures[icon_path] = null
+	return null
+
+
+func _find_weapon_icon_path(weapon_name: String) -> String:
+	if _is_empty_weapon_name(weapon_name):
+		return ""
+
+	var candidates: Array[String] = _get_weapon_icon_candidates(weapon_name)
+	for candidate in candidates:
+		if _weapon_icon_paths.has(candidate):
+			return str(_weapon_icon_paths[candidate])
+
+		var lower_candidate: String = candidate.to_lower()
+		if _weapon_icon_paths.has(lower_candidate):
+			return str(_weapon_icon_paths[lower_candidate])
+
+		var direct_path: String = WEAPON_ICON_DIR + candidate
+		if ResourceLoader.exists(direct_path):
+			return direct_path
+
+	return ""
+
+
+func _get_weapon_icon_candidates(weapon_name: String) -> Array[String]:
+	var candidates: Array[String] = []
+	var clean_name: String = weapon_name.strip_edges()
+	var normalized_name: String = _normalize_weapon_icon_name(clean_name)
+
+	_append_unique_string(candidates, WEAPON_ICON_PREFIX + clean_name + WEAPON_ICON_EXTENSION)
+	if not normalized_name.is_empty():
+		_append_unique_string(candidates, WEAPON_ICON_PREFIX + normalized_name + WEAPON_ICON_EXTENSION)
+
+	return candidates
+
+
+func _append_unique_string(values: Array[String], value: String) -> void:
+	if value.is_empty():
+		return
+	if not values.has(value):
+		values.append(value)
+
+
+func _normalize_weapon_icon_name(weapon_name: String) -> String:
+	return weapon_name.strip_edges().to_lower().replace(" ", "_").replace("-", "_")
+
+
+func _is_empty_weapon_name(weapon_name: String) -> bool:
+	var clean_name: String = weapon_name.strip_edges().to_lower()
+	return clean_name.is_empty() or clean_name == "aucune" or clean_name == "none" or clean_name == "null" or clean_name == "-"
+
+
+func _update_weapon_slot_ammo_label(ammo: Label, player_data: Dictionary, display_slot_index: int, source_slot_index: int, weapon_name: String, equipped_weapon_name: String) -> void:
+	_ensure_weapon_slot_ammo_cache_size(display_slot_index)
+
+	var cached_weapon_name: String = _weapon_slot_last_weapon_names[display_slot_index]
+	if cached_weapon_name != weapon_name:
+		_weapon_slot_last_weapon_names[display_slot_index] = weapon_name
+		_weapon_slot_last_ammo_texts[display_slot_index] = ""
+		ammo.text = _get_weapon_cached_ammo_text(weapon_name)
+
+	var ammo_text: String = _get_weapon_slot_ammo_text(player_data, source_slot_index, weapon_name, equipped_weapon_name)
+	if not ammo_text.is_empty():
+		ammo.text = ammo_text
+		_weapon_slot_last_ammo_texts[display_slot_index] = ammo_text
+		_set_weapon_cached_ammo_text(weapon_name, ammo_text)
+		return
+
+	var cached_weapon_ammo_text: String = _get_weapon_cached_ammo_text(weapon_name)
+	if not cached_weapon_ammo_text.is_empty():
+		ammo.text = cached_weapon_ammo_text
+		_weapon_slot_last_ammo_texts[display_slot_index] = cached_weapon_ammo_text
+		return
+
+	var cached_slot_ammo_text: String = _weapon_slot_last_ammo_texts[display_slot_index]
+	if ammo.text.is_empty() and not cached_slot_ammo_text.is_empty():
+		ammo.text = cached_slot_ammo_text
+
+
+func _ensure_weapon_slot_ammo_cache_size(slot_index: int) -> void:
+	while _weapon_slot_last_ammo_texts.size() <= slot_index:
+		_weapon_slot_last_ammo_texts.append("")
+	while _weapon_slot_last_weapon_names.size() <= slot_index:
+		_weapon_slot_last_weapon_names.append("")
+
+
+func _set_weapon_slot_ammo_cache(slot_index: int, weapon_name: String, ammo_text: String) -> void:
+	_ensure_weapon_slot_ammo_cache_size(slot_index)
+	_weapon_slot_last_weapon_names[slot_index] = weapon_name
+	_weapon_slot_last_ammo_texts[slot_index] = ammo_text
+
+
+func _get_weapon_cache_key(weapon_name: String) -> String:
+	return weapon_name.strip_edges().to_lower()
+
+
+func _get_weapon_cached_ammo_text(weapon_name: String) -> String:
+	var cache_key: String = _get_weapon_cache_key(weapon_name)
+	if cache_key.is_empty():
+		return ""
+	return str(_weapon_ammo_text_by_name.get(cache_key, ""))
+
+
+func _set_weapon_cached_ammo_text(weapon_name: String, ammo_text: String) -> void:
+	var cache_key: String = _get_weapon_cache_key(weapon_name)
+	if cache_key.is_empty() or ammo_text.is_empty():
+		return
+	_weapon_ammo_text_by_name[cache_key] = ammo_text
+
+
+func _get_weapon_slot_ammo_text(player_data: Dictionary, slot_index: int, weapon_name: String, equipped_weapon_name: String) -> String:
+	var slot_data: Dictionary = _get_weapon_slot_data(player_data, slot_index, weapon_name)
+
+	if weapon_name == equipped_weapon_name:
+		var equipped_slot_data: Dictionary = slot_data.duplicate()
+		var live_equipped_data: Dictionary = {}
+		_copy_first_available_int(player_data, live_equipped_data, ["mag_ammo", "magazine_ammo", "current_ammo", "current_mag_ammo", "munition_actuelle", "munition_actuel", "ammo"], "mag_ammo")
+		_copy_first_available_int(player_data, live_equipped_data, ["max_mag_ammo", "magazine_max_ammo", "max_magazine_ammo", "magazine_capacity", "magazine_size", "clip_size", "taille_du_chargeur", "taille_chargeur", "chargeur_max"], "max_mag_ammo")
+		_copy_first_available_bool(player_data, live_equipped_data, ["infinite_ammo"], "infinite_ammo")
+
+		for key in live_equipped_data.keys():
+			equipped_slot_data[key] = live_equipped_data[key]
+
+		if not equipped_slot_data.has("max_mag_ammo"):
+			var inferred_mag_size: int = _find_weapon_magazine_size(player_data, slot_index, weapon_name, equipped_weapon_name)
+			if inferred_mag_size >= 0:
+				equipped_slot_data["max_mag_ammo"] = inferred_mag_size
+
+		if not equipped_slot_data.is_empty():
+			return _format_weapon_ammo_text(equipped_slot_data, player_data, slot_index, weapon_name, equipped_weapon_name)
+
+	if not slot_data.is_empty():
+		return _format_weapon_ammo_text(slot_data, player_data, slot_index, weapon_name, equipped_weapon_name)
+
+	return ""
+
+
+func _get_weapon_slot_data(player_data: Dictionary, slot_index: int, weapon_name: String) -> Dictionary:
+	var slot_number: int = slot_index + 1
+	var direct_key: String = "weapon_%d_ammo_data" % slot_number
+	if player_data.has(direct_key) and player_data[direct_key] is Dictionary:
+		return player_data[direct_key]
+
+	var slot_data: Dictionary = {}
+
+	var mag_keys: Array[String] = [
+		"weapon_%d_mag_ammo" % slot_number,
+		"weapon_%d_magazine_ammo" % slot_number,
+		"weapon_%d_current_ammo" % slot_number,
+		"weapon_%d_current_mag_ammo" % slot_number,
+		"weapon_%d_munition_actuelle" % slot_number,
+		"weapon_%d_munition_actuel" % slot_number,
+		"weapon_%d_ammo" % slot_number,
+	]
+	var max_mag_keys: Array[String] = [
+		"weapon_%d_max_mag_ammo" % slot_number,
+		"weapon_%d_magazine_max_ammo" % slot_number,
+		"weapon_%d_max_magazine_ammo" % slot_number,
+		"weapon_%d_magazine_capacity" % slot_number,
+		"weapon_%d_magazine_size" % slot_number,
+		"weapon_%d_clip_size" % slot_number,
+		"weapon_%d_taille_du_chargeur" % slot_number,
+		"weapon_%d_taille_chargeur" % slot_number,
+		"weapon_%d_chargeur_max" % slot_number,
+	]
+	var infinite_key: String = "weapon_%d_infinite_ammo" % slot_number
+	var ammo_type_key: String = "weapon_%d_ammo_type" % slot_number
+
+	_copy_first_available_int(player_data, slot_data, mag_keys, "mag_ammo")
+	_copy_first_available_int(player_data, slot_data, max_mag_keys, "max_mag_ammo")
+	if player_data.has(infinite_key):
+		slot_data["infinite_ammo"] = bool(player_data.get(infinite_key, false))
+	if player_data.has(ammo_type_key):
+		slot_data["ammo_type"] = str(player_data.get(ammo_type_key, ""))
+
+	if not slot_data.is_empty():
+		return slot_data
+
+	if player_data.has("weapon_slots") and player_data["weapon_slots"] is Array:
+		var weapon_slots: Array = player_data["weapon_slots"]
+		if slot_index >= 0 and slot_index < weapon_slots.size() and weapon_slots[slot_index] is Dictionary:
+			return weapon_slots[slot_index]
+
+	if player_data.has("weapons") and player_data["weapons"] is Array:
+		var weapons_array: Array = player_data["weapons"]
+		if slot_index >= 0 and slot_index < weapons_array.size() and weapons_array[slot_index] is Dictionary:
+			return weapons_array[slot_index]
+
+	if player_data.has("weapons") and player_data["weapons"] is Dictionary:
+		var weapons_dict: Dictionary = player_data["weapons"]
+		if weapons_dict.has(weapon_name) and weapons_dict[weapon_name] is Dictionary:
+			return weapons_dict[weapon_name]
+
+	return {}
+
+
+func _format_weapon_ammo_text(slot_data: Dictionary, player_data: Dictionary, slot_index: int, weapon_name: String, equipped_weapon_name: String) -> String:
+	if slot_data.has("ammo_text"):
+		return str(slot_data.get("ammo_text", ""))
+
+	var infinite_ammo: bool = bool(slot_data.get("infinite_ammo", false))
+	var mag_ammo: int = _read_int_from_keys(slot_data, ["mag_ammo", "magazine_ammo", "current_ammo", "current_mag_ammo", "munition_actuelle", "munition_actuel", "ammo"], -1)
+	var max_mag_ammo: int = _read_int_from_keys(slot_data, ["max_mag_ammo", "magazine_max_ammo", "max_magazine_ammo", "magazine_capacity", "magazine_size", "clip_size", "taille_du_chargeur", "taille_chargeur", "chargeur_max"], -1)
+
+	if max_mag_ammo < 0:
+		max_mag_ammo = _find_weapon_magazine_size(player_data, slot_index, weapon_name, equipped_weapon_name)
+
+	if mag_ammo >= 0 and max_mag_ammo >= 0:
+		return "%d / %d" % [mag_ammo, max_mag_ammo]
+	if mag_ammo >= 0 and infinite_ammo:
+		return "%d / ∞" % mag_ammo
+	if infinite_ammo:
+		return "∞"
+	if mag_ammo >= 0:
+		return str(mag_ammo)
+	if max_mag_ammo >= 0:
+		return "- / %d" % max_mag_ammo
+
+	return ""
+
+
+func _copy_first_available_int(source: Dictionary, target: Dictionary, keys: Array[String], target_key: String) -> void:
+	for key in keys:
+		if source.has(key):
+			target[target_key] = int(source.get(key, 0))
+			return
+
+
+func _copy_first_available_bool(source: Dictionary, target: Dictionary, keys: Array[String], target_key: String) -> void:
+	for key in keys:
+		if source.has(key):
+			target[target_key] = bool(source.get(key, false))
+			return
+
+
+func _read_int_from_keys(data: Dictionary, keys: Array[String], fallback: int) -> int:
+	for key in keys:
+		if data.has(key):
+			return int(data.get(key, fallback))
+	return fallback
+
+
+func _find_weapon_magazine_size(player_data: Dictionary, slot_index: int, weapon_name: String, equipped_weapon_name: String) -> int:
+	var slot_number: int = slot_index + 1
+	var candidate_values: Array = []
+
+	# Sources les plus fiables : dictionnaires déjà envoyés au HUD.
+	var slot_data: Dictionary = _get_weapon_slot_data(player_data, slot_index, weapon_name)
+	if not slot_data.is_empty():
+		candidate_values.append(slot_data)
+
+	if player_data.has("weapon_slots"):
+		candidate_values.append(player_data.get("weapon_slots"))
+	if player_data.has("weapons"):
+		candidate_values.append(player_data.get("weapons"))
+
+	# Sources possibles : l'arme ou les armes passées directement dans get_hud_data().
+	var player_data_weapon_keys: Array[String] = [
+		"weapon_%d" % slot_number,
+		"weapon_%d_node" % slot_number,
+		"weapon_%d_resource" % slot_number,
+		"weapon_%d_data" % slot_number,
+	]
+	for key in player_data_weapon_keys:
+		if player_data.has(key):
+			candidate_values.append(player_data.get(key))
+
+	if weapon_name == equipped_weapon_name:
+		for key in ["equipped_weapon", "current_weapon", "active_weapon", "weapon"]:
+			if player_data.has(key):
+				candidate_values.append(player_data.get(key))
+
+	# Dernier recours : lire directement dans le player si get_hud_data() n'envoie que l'arme équipée.
+	if player != null and is_instance_valid(player):
+		candidate_values.append(_call_method_if_available(player, "get_weapon", [slot_index]))
+		candidate_values.append(_call_method_if_available(player, "get_weapon", [slot_number]))
+		candidate_values.append(_call_method_if_available(player, "get_weapon_slot", [slot_index]))
+		candidate_values.append(_call_method_if_available(player, "get_weapon_slot", [slot_number]))
+		candidate_values.append(_call_method_if_available(player, "get_weapon_%d" % slot_number, []))
+		if weapon_name == equipped_weapon_name:
+			candidate_values.append(_call_method_if_available(player, "get_equipped_weapon", []))
+			candidate_values.append(_call_method_if_available(player, "get_current_weapon", []))
+			candidate_values.append(_call_method_if_available(player, "get_active_weapon", []))
+
+		for key in ["weapon_%d" % slot_number, "weapon_%d_node" % slot_number, "weapon_%d_resource" % slot_number]:
+			candidate_values.append(player.get(key))
+
+		if weapon_name == equipped_weapon_name:
+			for key in ["equipped_weapon", "current_weapon", "active_weapon", "weapon"]:
+				candidate_values.append(player.get(key))
+
+	for candidate in candidate_values:
+		var value: int = _read_magazine_size_from_variant(candidate, slot_index, weapon_name, 0)
+		if value >= 0:
+			return value
+
+	return -1
+
+
+func _read_magazine_size_from_variant(value: Variant, slot_index: int, weapon_name: String, depth: int) -> int:
+	if depth > 3 or value == null:
+		return -1
+
+	var magazine_size_keys: Array[String] = [
+		"max_mag_ammo",
+		"magazine_max_ammo",
+		"max_magazine_ammo",
+		"magazine_capacity",
+		"magazine_size",
+		"clip_size",
+		"taille_du_chargeur",
+		"taille_chargeur",
+		"chargeur_max",
+	]
+
+	if value is Dictionary:
+		var data: Dictionary = value as Dictionary
+		var direct_value: int = _read_int_from_keys(data, magazine_size_keys, -1)
+		if direct_value >= 0:
+			return direct_value
+
+		var slot_number: int = slot_index + 1
+		for key in ["weapon_%d" % slot_number, "weapon_%d_data" % slot_number, "weapon_%d_resource" % slot_number]:
+			if data.has(key):
+				var nested_slot_value: int = _read_magazine_size_from_variant(data.get(key), slot_index, weapon_name, depth + 1)
+				if nested_slot_value >= 0:
+					return nested_slot_value
+
+		if data.has(weapon_name):
+			var named_weapon_value: int = _read_magazine_size_from_variant(data.get(weapon_name), slot_index, weapon_name, depth + 1)
+			if named_weapon_value >= 0:
+				return named_weapon_value
+
+		for key in ["data", "weapon_data", "stats", "config", "definition", "resource"]:
+			if data.has(key):
+				var nested_data_value: int = _read_magazine_size_from_variant(data.get(key), slot_index, weapon_name, depth + 1)
+				if nested_data_value >= 0:
+					return nested_data_value
+
+		return -1
+
+	if value is Array:
+		var values: Array = value as Array
+		if slot_index >= 0 and slot_index < values.size():
+			var slot_value: int = _read_magazine_size_from_variant(values[slot_index], slot_index, weapon_name, depth + 1)
+			if slot_value >= 0:
+				return slot_value
+		return -1
+
+	if value is Object:
+		var object_value: Object = value as Object
+		var method_names: Array[String] = [
+			"get_max_mag_ammo",
+			"get_magazine_max_ammo",
+			"get_max_magazine_ammo",
+			"get_magazine_capacity",
+			"get_magazine_size",
+			"get_clip_size",
+			"get_taille_du_chargeur",
+		]
+		for method_name in method_names:
+			if object_value.has_method(method_name):
+				return int(object_value.call(method_name))
+
+		for key in magazine_size_keys:
+			var property_value: Variant = object_value.get(key)
+			if property_value != null:
+				return int(property_value)
+
+		for key in ["data", "weapon_data", "stats", "config", "definition", "resource"]:
+			var nested_value: Variant = object_value.get(key)
+			var nested_result: int = _read_magazine_size_from_variant(nested_value, slot_index, weapon_name, depth + 1)
+			if nested_result >= 0:
+				return nested_result
+
+	return -1
+
+
+func _call_method_if_available(target: Object, method_name: String, arguments: Array) -> Variant:
+	if target == null or not target.has_method(method_name):
+		return null
+	return target.callv(method_name, arguments)
+
 
 func _refresh_on_foot(player_data: Dictionary) -> void:
 	var weapon_1_name: String = str(player_data.get("weapon_1_name", "Aucune"))
 	var weapon_2_name: String = str(player_data.get("weapon_2_name", "Aucune"))
 	var equipped_weapon_name: String = str(player_data.get("equipped_weapon_name", "Aucune"))
-	var mag_ammo: int = int(player_data.get("mag_ammo", 0))
-	var reserve_ammo: int = int(player_data.get("reserve_ammo", 0))
 	var money: int = int(player_data.get("money", 0))
 
-	equipped_weapon_label.text = "Arme équipée : %s" % equipped_weapon_name
-	
-	if equipped_weapon_name == weapon_1_name:
-		weapon_1_label.modulate = Color.WHITE
-	else:
-		weapon_1_label.modulate = Color.GRAY
-	
-	if equipped_weapon_name == weapon_2_name:
-		weapon_2_label.modulate = Color.WHITE
-	else:
-		weapon_2_label.modulate = Color.GRAY
-	
-	weapon_1_label.text = "Arme 1 : %s" % weapon_1_name
-	weapon_2_label.text = "Arme 2 : %s" % weapon_2_name
-	ammo_label.text = "Munitions : %d / %d" % [mag_ammo, reserve_ammo]
-	
+	_refresh_weapon_slot_ui(player_data, weapon_1_name, weapon_2_name, equipped_weapon_name)
 	_build_reserve_ui(player_data)
-	
-	#reserve_label.text = _build_reserve_text(player_data)
 	money_label.text = str(money) #"Argent : %d" % money
+
 
 func _refresh_reload_progress(player_data: Dictionary) -> void:
 	var reload_active: bool = bool(player_data.get("reload_active", false))
@@ -844,9 +1577,10 @@ func _refresh_reload_progress(player_data: Dictionary) -> void:
 		return
 
 	var normalized_progress: float = 1.0 - (reload_remaining / reload_duration)
-	show_reload_progress(normalized_progress)
+	show_reload_progress(normalized_progress, reload_remaining)
 
-func show_reload_progress(progress: float) -> void:
+
+func show_reload_progress(progress: float, remaining_seconds: float = -1.0) -> void:
 	if reload_panel == null or reload_progress_bar == null:
 		return
 
@@ -857,7 +1591,11 @@ func show_reload_progress(progress: float) -> void:
 	reload_progress_bar.value = normalized_progress * 100.0
 
 	if reload_label != null:
-		reload_label.text = "Rechargement : %d s" % normalized_progress  #roundi(normalized_progress * 100.0)
+		if remaining_seconds >= 0.0:
+			reload_label.text = "%.1f s" % max(remaining_seconds, 0.0) # "Rechargement : %.1f s" % max(remaining_seconds, 0.0)
+		else:
+			reload_label.text = "%d %%" % roundi(normalized_progress * 100.0)
+
 
 func hide_reload_progress() -> void:
 	if reload_panel != null:
@@ -1052,6 +1790,18 @@ func _format_fuel_value(value: float) -> String:
 	return "%.1f" % value
 
 
+func _clear_editor_vehicle_mod_slots() -> void:
+	_vehicle_mod_slot_nodes.clear()
+
+	if vehicle_mods_grid == null:
+		return
+
+	for child: Node in vehicle_mods_grid.get_children():
+		vehicle_mods_grid.remove_child(child)
+		child.queue_free()
+
+
+
 func _refresh_vehicle_mod_slots(vehicle_data: Dictionary) -> void:
 	if vehicle_mods_panel == null or vehicle_mods_grid == null:
 		return
@@ -1227,37 +1977,43 @@ func _is_valid_object(value: Variant) -> bool:
 
 func _build_reserve_ui(player_data: Dictionary) -> void:
 	var reserves: Dictionary = player_data.get("ammo_reserve_data", {})
-	var equipped_ammo_type: String = str(player_data.get("equipped_ammo_type", ""))
+	var equipped_ammo_type: String = str(player_data.get("equipped_ammo_type", "")).strip_edges().to_lower()
+
+	_refresh_ammo_panel_selection(equipped_ammo_type)
 
 	if reserves.is_empty():
 		return
 
-	#var parts: Array[String] = []
-
 	if reserves.has("9mm"):
 		ammo_9mm.text = str(int(reserves.get("9mm", 0)))
-		if equipped_ammo_type == "9mm":
-			ammo_9mm.text = "> "+ammo_9mm.text
-		
+
 	if reserves.has("rifle"):
 		ammo_rifle.text = str(int(reserves.get("rifle", 0)))
-		if equipped_ammo_type == "rifle":
-			ammo_rifle.text = "> "+ammo_rifle.text
-	
+
 	if reserves.has("shell"):
 		ammo_shell.text = str(int(reserves.get("shell", 0)))
-		if equipped_ammo_type == "shell":
-			ammo_shell.text = "> "+ammo_shell.text
-	
+
 	if reserves.has("rocket"):
 		ammo_rocket.text = str(int(reserves.get("rocket", 0)))
-		if equipped_ammo_type == "rocket":
-			ammo_rocket.text = "> "+ammo_rocket.text
-	
+
 	if reserves.has("energy"):
 		ammo_energy.text = str(int(reserves.get("energy", 0)))
-		if equipped_ammo_type == "energy":
-			ammo_energy.text = "> "+ammo_energy.text
+
+
+func _refresh_ammo_panel_selection(equipped_ammo_type: String) -> void:
+	_set_ammo_panel_selected(panel_9mm, equipped_ammo_type == "9mm")
+	_set_ammo_panel_selected(panel_rifle, equipped_ammo_type == "rifle")
+	_set_ammo_panel_selected(panel_shell, equipped_ammo_type == "shell")
+	_set_ammo_panel_selected(panel_rocket, equipped_ammo_type == "rocket")
+	_set_ammo_panel_selected(panel_energy, equipped_ammo_type == "energy")
+
+
+func _set_ammo_panel_selected(panel: Panel, is_selected: bool) -> void:
+	if panel == null:
+		return
+
+	panel.self_modulate = AMMO_PANEL_SELECTED_MODULATE if is_selected else AMMO_PANEL_UNSELECTED_MODULATE
+
 
 #func _build_reserve_text(player_data: Dictionary) -> String:
 	#var reserves: Dictionary = player_data.get("ammo_reserve_data", {})

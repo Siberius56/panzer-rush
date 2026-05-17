@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvppjv5g8wa6h" path="res://vehicle_system/turrets/VehicleTurretBase.gd" id="1_enh68"]
 [ext_resource type="PackedScene" uid="uid://c3xwrtxdr2ryw" path="res://scenes/weapons/88Bullet.tscn" id="2_enh68"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="3_wvnox"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="3_wvnox"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tygrk"]
 resource_name = "MasterMat"
@@ -80,6 +80,14 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_qo1u4")
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_wvnox"]
+top_radius = 0.2
+bottom_radius = 0.2
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5ij6b"]
+albedo_color = Color(0, 0, 0, 1)
+
 [node name="Turret_Heavy" type="Node3D" unique_id=309238089]
 script = ExtResource("1_enh68")
 turret_id = "turret_heavy"
@@ -112,6 +120,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8043461, 1.4715155)
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -4.8494797, -0.7666477)
 mesh = SubResource("ArrayMesh_wvnox")
 surface_material_override/0 = ExtResource("3_wvnox")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Body/Canon_1/TurretMesh" unique_id=1173805256]
+transform = Transform3D(1, 0, 0, 0, -4.3711392e-08, 1, 0, -1, -4.3711392e-08, 0, 2.524051, 0.94104016)
+mesh = SubResource("CylinderMesh_wvnox")
+surface_material_override/0 = SubResource("StandardMaterial3D_5ij6b")
 
 [node name="TurretMuzzle" type="Marker3D" parent="Body/Canon_1" unique_id=654624459]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.050000012, 1.4393877)

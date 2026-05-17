@@ -25,6 +25,7 @@ reload_duration = 1.2
 automatic_fire = true
 fire_cooldown = 0.09
 shot_dispersion_degrees = 6.0
+camera_shake_intensity = 0.1
 
 [node name="WeaponMesh" type="MeshInstance3D" parent="." unique_id=1203303020]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.28)

@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://h8v8os25dggj"]
+
+[ext_resource type="Script" uid="uid://cjyua434w7f06" path="res://scenes/triggers/SlidingHangarDoor.gd" id="1_sliding_hangar_door"]
+[ext_resource type="PackedScene" uid="uid://bm5eowgsty6rl" path="res://asset/map/misc-2/structure-metal-doorway.glb" id="2_1bq0x"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1bq0x"]
+size = Vector3(3, 6, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_panel"]
+size = Vector3(2.4, 8, 0.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_left"]
+albedo_color = Color(0.24, 0.25, 0.28, 1)
+roughness = 0.75
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_panel"]
+size = Vector3(2.4, 5.754883, 0.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_right"]
+albedo_color = Color(0.19, 0.2, 0.23, 1)
+roughness = 0.75
+
+[node name="SlidingHangarDoor" type="Node3D" unique_id=889991856]
+script = ExtResource("1_sliding_hangar_door")
+
+[node name="Frame" type="StaticBody3D" parent="." unique_id=671146930]
+collision_layer = 8
+collision_mask = 0
+
+[node name="structure-metal-doorway2" parent="Frame" unique_id=130421108 instance=ExtResource("2_1bq0x")]
+transform = Transform3D(18, 0, 0, 0, 12, 0, 0, 0, 12, 0, -0.1, 2.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Frame" unique_id=270607202]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.641094, 3, 0)
+shape = SubResource("BoxShape3D_1bq0x")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Frame" unique_id=388695987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6080472, 3, 0)
+shape = SubResource("BoxShape3D_1bq0x")
+
+[node name="LeftDoor" type="AnimatableBody3D" parent="." unique_id=57608200]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 2, -0.67508364)
+collision_layer = 8
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LeftDoor" unique_id=88586374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25160122, 0)
+mesh = SubResource("BoxMesh_panel")
+surface_material_override/0 = SubResource("StandardMaterial3D_left")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LeftDoor" unique_id=1243017641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8774414, 0)
+shape = SubResource("BoxShape3D_panel")
+
+[node name="RightDoor" type="AnimatableBody3D" parent="." unique_id=1128998722]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 2, -0.67508364)
+collision_layer = 8
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RightDoor" unique_id=925595001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25160122, 0)
+mesh = SubResource("BoxMesh_panel")
+surface_material_override/0 = SubResource("StandardMaterial3D_right")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RightDoor" unique_id=38552847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.87760854, 0)
+shape = SubResource("BoxShape3D_panel")

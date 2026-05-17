@@ -44,7 +44,7 @@ signal final_cleanup_requested(prop: DestructibleProp)
 @export var damage_only_on_multiplayer_authority: bool = true
 ## Alternative simple a un MultiplayerSynchronizer.
 ## Si true, l'autorite envoie un RPC fiable quand l'objet est detruit.
-@export var use_rpc_for_destroyed_state: bool = false
+@export var use_rpc_for_destroyed_state: bool = true 
 ## Peut etre synchronise via MultiplayerSynchronizer.
 ## Les debris ne doivent pas etre synchronises.
 @export var destroyed_state: bool = false

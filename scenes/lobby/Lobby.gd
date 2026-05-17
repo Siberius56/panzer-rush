@@ -63,7 +63,7 @@ const MISSIONS: Array[Dictionary] = [
 		"name": "Defend the Coast",
 		"description": "Mission prototype. Les joueurs entrent dans le hangar et doivent survivre aux premières vagues ennemies.",
 		"difficulty": 1,
-		"scene_path": "res://scenes/game/Mission_01_Attack_A.tscn",
+		"scene_path": "res://scenes/game/Mission_01_A_Outpost.tscn",
 		"position": Vector2(780.0, 270.0)
 	},
 	{
@@ -71,7 +71,7 @@ const MISSIONS: Array[Dictionary] = [
 		"name": "Force Landing",
 		"description": "Mission prototype 2. Les joueurs entrent dans le hangar et doivent survivre aux premières vagues ennemies.",
 		"difficulty": 3,
-		"scene_path": "res://scenes/game/Mission_01_Attack_A.tscn",
+		"scene_path": "res://scenes/game/Mission_01_A_Outpost.tscn",
 		"position": Vector2(650.0, 400.0)
 	}
 ]
@@ -986,12 +986,10 @@ func _build_turret_database_entry(scene_path: String) -> Dictionary:
 
 	var fallback_id: String = _to_resource_id(scene_path.get_file().get_basename())
 	var turret_id: String = str(info.get("turret_id", fallback_id))
-	var display_name: String = str(info.get("turret_label", scene_path.get_file().get_basename()))
-
-	if _is_driver_turret_entry(turret_id, display_name, scene_path):
+	if turret_id.is_empty() or turret_id == "driver_turret":
 		return {}
 
-	#var display_name: String = str(info.get("turret_label", scene_path.get_file().get_basename()))
+	var display_name: String = str(info.get("turret_label", scene_path.get_file().get_basename()))
 	var turret_size: int = int(info.get("turret_size", 0))
 	if turret_size <= 0:
 		return {}
@@ -1008,32 +1006,6 @@ func _build_turret_database_entry(scene_path: String) -> Dictionary:
 		"score_cost": score_cost,
 		"unlocked": unlocked,
 	}
-
-
-func _is_driver_turret_entry(turret_id: String, display_name: String, scene_path: String) -> bool:
-	var normalized_id: String = turret_id.strip_edges().to_lower()
-	var normalized_name: String = display_name.strip_edges().to_lower()
-	var normalized_path: String = scene_path.strip_edges().to_lower()
-
-	if normalized_id.is_empty():
-		return true
-
-	if normalized_id == "driver_turret":
-		return true
-
-	if normalized_id == "turret_driver":
-		return true
-
-	if normalized_id == "driver":
-		return true
-
-	if normalized_name.contains("driver"):
-		return true
-
-	if normalized_path.contains("driver"):
-		return true
-
-	return false
 
 
 func _build_mod_database_entry(scene_path: String) -> Dictionary:
@@ -1953,9 +1925,14 @@ func _on_turret_slot_pressed(seat_index: int) -> void:
 	if selected_customization_type != "turret":
 		return
 
+	var turret_entry: Dictionary = _get_turret_entry_for_path(selected_customization_scene_path)
+	if turret_entry.is_empty():
+		return
+
 	_request_customization_action("install_turret", {
 		"seat_index": seat_index,
-		"scene_path": selected_customization_scene_path,
+		"scene_path": str(turret_entry.get("scene_path", "")),
+		"resource_id": str(turret_entry.get("resource_id", "")),
 	})
 
 
@@ -1971,9 +1948,14 @@ func _on_mod_slot_pressed(mod_use_id: int) -> void:
 	if selected_customization_type != "mod":
 		return
 
+	var mod_entry: Dictionary = _get_mod_entry_for_path(selected_customization_scene_path)
+	if mod_entry.is_empty():
+		return
+
 	_request_customization_action("install_mod", {
 		"mod_use_id": mod_use_id,
-		"scene_path": selected_customization_scene_path,
+		"scene_path": str(mod_entry.get("scene_path", "")),
+		"resource_id": str(mod_entry.get("resource_id", "")),
 	})
 
 
@@ -1994,11 +1976,15 @@ func _request_customization_action(action: String, payload: Dictionary) -> void:
 	if not _can_local_edit_customization():
 		return
 
-	if _is_local_host():
-		_host_apply_customization_action(action, payload)
+	var sanitized_payload: Dictionary = _sanitize_customization_action_payload(action, payload)
+	if sanitized_payload.is_empty() and action.begins_with("install_"):
 		return
 
-	_rpc_request_customization_action.rpc_id(1, action, payload)
+	if _is_local_host():
+		_host_apply_customization_action(action, sanitized_payload)
+		return
+
+	_rpc_request_customization_action.rpc_id(1, action, sanitized_payload)
 
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -2023,6 +2009,69 @@ func _can_peer_edit_customization(peer_id: int) -> bool:
 	return peer_id == multiplayer.get_unique_id()
 
 
+func _sanitize_customization_action_payload(action: String, payload: Dictionary) -> Dictionary:
+	var sanitized: Dictionary = payload.duplicate(true)
+	match action:
+		"install_turret":
+			var turret_scene_path: String = _resolve_resource_scene_path_from_payload("turret", sanitized)
+			if turret_scene_path.is_empty():
+				return {}
+			var turret_entry: Dictionary = _get_turret_entry_for_path(turret_scene_path)
+			sanitized["scene_path"] = turret_scene_path
+			sanitized["resource_id"] = str(turret_entry.get("resource_id", sanitized.get("resource_id", "")))
+			sanitized["seat_index"] = int(sanitized.get("seat_index", -1))
+		"install_mod":
+			var mod_scene_path: String = _resolve_resource_scene_path_from_payload("mod", sanitized)
+			if mod_scene_path.is_empty():
+				return {}
+			var mod_entry: Dictionary = _get_mod_entry_for_path(mod_scene_path)
+			sanitized["scene_path"] = mod_scene_path
+			sanitized["resource_id"] = str(mod_entry.get("resource_id", sanitized.get("resource_id", "")))
+			sanitized["mod_use_id"] = int(sanitized.get("mod_use_id", -1))
+		"remove_turret":
+			sanitized["seat_index"] = int(sanitized.get("seat_index", -1))
+		"remove_mod":
+			sanitized["mod_use_id"] = int(sanitized.get("mod_use_id", -1))
+		"change_chassis":
+			var chassis_scene_path: String = str(sanitized.get("scene_path", ""))
+			if chassis_scene_path.is_empty():
+				return {}
+			sanitized["scene_path"] = chassis_scene_path
+		_:
+			return sanitized
+
+	return sanitized
+
+
+func _resolve_resource_scene_path_from_payload(resource_type: String, payload: Dictionary) -> String:
+	var scene_path: String = str(payload.get("scene_path", "")).strip_edges()
+	if not scene_path.is_empty():
+		match resource_type:
+			"turret":
+				if not _get_turret_entry_for_path(scene_path).is_empty():
+					return scene_path
+			"mod":
+				if not _get_mod_entry_for_path(scene_path).is_empty():
+					return scene_path
+
+	var resource_id: String = str(payload.get("resource_id", "")).strip_edges()
+	if resource_id.is_empty():
+		return ""
+
+	var normalized_resource_id: String = _to_resource_id(resource_id)
+	match resource_type:
+		"turret":
+			for entry: Dictionary in turret_database:
+				if _to_resource_id(str(entry.get("resource_id", ""))) == normalized_resource_id:
+					return str(entry.get("scene_path", ""))
+		"mod":
+			for entry: Dictionary in mod_database:
+				if _to_resource_id(str(entry.get("resource_id", ""))) == normalized_resource_id:
+					return str(entry.get("scene_path", ""))
+
+	return ""
+
+
 func _host_apply_customization_action(action: String, payload: Dictionary) -> void:
 	if not _is_local_host():
 		return
@@ -2036,7 +2085,10 @@ func _host_apply_customization_action(action: String, payload: Dictionary) -> vo
 				return
 			next_state = _build_state_from_chassis_entry(chassis_entry, false)
 		"install_turret":
-			if not _try_write_turret_to_state(next_state, int(payload.get("seat_index", -1)), str(payload.get("scene_path", ""))):
+			var turret_scene_path: String = _resolve_resource_scene_path_from_payload("turret", payload)
+			if turret_scene_path.is_empty():
+				return
+			if not _try_write_turret_to_state(next_state, int(payload.get("seat_index", -1)), turret_scene_path):
 				return
 		"remove_turret":
 			var seat_index: int = int(payload.get("seat_index", -1))
@@ -2044,7 +2096,10 @@ func _host_apply_customization_action(action: String, payload: Dictionary) -> vo
 			turret_state.erase(str(seat_index))
 			next_state["turrets"] = turret_state
 		"install_mod":
-			if not _try_write_mod_to_state(next_state, int(payload.get("mod_use_id", -1)), str(payload.get("scene_path", ""))):
+			var mod_scene_path: String = _resolve_resource_scene_path_from_payload("mod", payload)
+			if mod_scene_path.is_empty():
+				return
+			if not _try_write_mod_to_state(next_state, int(payload.get("mod_use_id", -1)), mod_scene_path):
 				return
 		"remove_mod":
 			var mod_use_id: int = int(payload.get("mod_use_id", -1))
@@ -2520,7 +2575,10 @@ func _stop_background_animation_tweens() -> void:
 
 func _tween_background_to_start_lobby() -> void:
 	_set_black_fade_state(true, Color(1.0, 1.0, 1.0, 1.0))
-
+	
+	hangar_camera.position = Vector3(-8, 5, 0)
+	hangar_camera.rotation_degrees = Vector3(-25, -90, 0)
+	
 	var tween: Tween = _create_background_camera_tween(START_LOBBY_CAMERA_TWEEN_DURATION)
 	_tween_camera_position(tween, START_LOBBY_CAMERA_POSITION, START_LOBBY_CAMERA_TWEEN_DURATION)
 	_tween_camera_rotation(tween, START_LOBBY_CAMERA_ROTATION, START_LOBBY_CAMERA_TWEEN_DURATION)
@@ -2622,4 +2680,4 @@ func _on_debug_start_button_up():
 	NetworkManager.set_local_ready(not NetworkManager.is_local_player_ready())
 	
 	if _is_local_host():
-		_network_start_game("res://scenes/game/Mission_01_Attack_A.tscn")
+		_network_start_game("res://scenes/game/Mission_01_A_Outpost.tscn")

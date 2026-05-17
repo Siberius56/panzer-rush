@@ -1,0 +1,545 @@
+[gd_scene format=3 uid="uid://chwaonkudpxul"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hqrcp"]
+
+[sub_resource type="Gradient" id="Gradient_4nyku"]
+offsets = PackedFloat32Array(0, 0.508621, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.607843, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1qro8"]
+gradient = SubResource("Gradient_4nyku")
+
+[sub_resource type="Curve" id="Curve_o2jnb"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_76oov"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0, 2.50549), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_bfqwl"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_3l4c3"]
+curve_x = SubResource("Curve_o2jnb")
+curve_y = SubResource("Curve_76oov")
+curve_z = SubResource("Curve_bfqwl")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0vnvq"]
+emission_shape_scale = Vector3(8, 2, 1)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -2.23517e-06
+linear_accel_max = -2.23517e-06
+scale_min = 4.0
+scale_max = 4.0
+scale_curve = SubResource("CurveXYZTexture_3l4c3")
+color = Color(0.203922, 0.745098, 0.921569, 1)
+color_ramp = SubResource("GradientTexture1D_1qro8")
+turbulence_influence_min = 0.32
+turbulence_influence_max = 0.32
+
+[sub_resource type="QuadMesh" id="QuadMesh_ph8l2"]
+size = Vector2(0.75, 3)
+
+[sub_resource type="Curve" id="Curve_6j3cu"]
+_data = [Vector2(0, 0), 0.0, 3.88889, 0, 0, Vector2(0.505495, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.90909, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_p82p3"]
+curve = SubResource("Curve_6j3cu")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_unvks"]
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_box_extents = Vector3(25, 2, 25)
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 0.1
+initial_velocity_max = 0.5
+gravity = Vector3(0, 0.5, 0)
+damping_min = 0.1
+damping_max = 0.9
+scale_min = 0.06
+scale_max = 0.14
+scale_curve = SubResource("CurveTexture_p82p3")
+turbulence_influence_min = 0.5
+turbulence_influence_max = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q37i2"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_mtm2q"]
+material = SubResource("ShaderMaterial_q37i2")
+
+[sub_resource type="Gradient" id="Gradient_hdomu"]
+offsets = PackedFloat32Array(0.1125, 0.366667, 0.641667)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.607843, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_jrims"]
+gradient = SubResource("Gradient_hdomu")
+
+[sub_resource type="Curve" id="Curve_tcjlj"]
+_limits = [-10.0, 10.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.25, 4), 0.0, 0.0, 0, 0, Vector2(0.75, -8), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_veu1i"]
+curve = SubResource("Curve_tcjlj")
+
+[sub_resource type="Curve" id="Curve_5gdwj"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.237132, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_ee3tb"]
+curve = SubResource("Curve_5gdwj")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_cplqr"]
+particle_flag_rotate_y = true
+emission_shape = 3
+emission_box_extents = Vector3(5, 0, 10)
+direction = Vector3(0, 1, 0)
+spread = 0.0
+flatness = 1.0
+initial_velocity_min = 18.0
+initial_velocity_max = 24.0
+gravity = Vector3(0, 0, 0)
+radial_accel_min = -2.0
+radial_accel_max = 3.0
+radial_accel_curve = SubResource("CurveTexture_veu1i")
+scale_min = 0.08
+scale_max = 0.15
+color_ramp = SubResource("GradientTexture1D_jrims")
+turbulence_noise_strength = 0.1
+turbulence_influence_min = 0.01
+turbulence_influence_max = 0.01
+turbulence_influence_over_life = SubResource("CurveTexture_ee3tb")
+
+[sub_resource type="Curve" id="Curve_1r13t"]
+_data = [Vector2(0, 0), 0.0, 7.40474, 0, 0, Vector2(0.232877, 1), 0.0, 0.0, 0, 0, Vector2(0.804795, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -7.8919, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_taqe1"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+billboard_keep_scale = true
+use_particle_trails = true
+
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_4cwcd"]
+material = SubResource("StandardMaterial3D_taqe1")
+radius = 0.2
+sections = 12
+curve = SubResource("Curve_1r13t")
+
+[sub_resource type="Gradient" id="Gradient_1ty3l"]
+offsets = PackedFloat32Array(0, 0.508621, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.607843, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_8gp63"]
+gradient = SubResource("Gradient_1ty3l")
+
+[sub_resource type="Curve" id="Curve_6dx0x"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_vm5jo"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0, 2.50549), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_cjvd4"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_bgms3"]
+curve_x = SubResource("Curve_6dx0x")
+curve_y = SubResource("Curve_vm5jo")
+curve_z = SubResource("Curve_cjvd4")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_36ew0"]
+emission_shape_scale = Vector3(8, 2, 1)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -2.23517e-06
+linear_accel_max = -2.23517e-06
+scale_min = 4.0
+scale_max = 4.0
+scale_curve = SubResource("CurveXYZTexture_bgms3")
+color = Color(1, 1, 0.807843, 1)
+color_ramp = SubResource("GradientTexture1D_8gp63")
+turbulence_influence_min = 0.32
+turbulence_influence_max = 0.32
+
+[sub_resource type="Curve" id="Curve_w641k"]
+_data = [Vector2(0, 0.501854), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_du8ta"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 2), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_g3clh"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_fkths"]
+curve_x = SubResource("Curve_w641k")
+curve_y = SubResource("Curve_du8ta")
+curve_z = SubResource("Curve_g3clh")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_781o3"]
+emission_shape_scale = Vector3(30, 1, 25)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+direction = Vector3(0, -1, 0)
+spread = 2.0
+initial_velocity_min = 12.0
+initial_velocity_max = 18.0
+gravity = Vector3(0, -11, 0)
+scale_min = 0.05
+scale_max = 0.1
+scale_curve = SubResource("CurveXYZTexture_fkths")
+
+[sub_resource type="Gradient" id="Gradient_d2mxq"]
+offsets = PackedFloat32Array(0.8, 0.844444)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7myuc"]
+gradient = SubResource("Gradient_d2mxq")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ijdfq"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+albedo_texture = SubResource("GradientTexture2D_7myuc")
+billboard_mode = 2
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_udppm"]
+material = SubResource("StandardMaterial3D_ijdfq")
+size = Vector2(0.75, 6)
+
+[node name="Stage_Enviro" type="Node3D" unique_id=668883432]
+
+[node name="Night" type="Node3D" parent="." unique_id=588545013]
+visible = false
+
+[node name="Directional_Light_Day" type="DirectionalLight3D" parent="Night" unique_id=1223461733]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+light_color = Color(1.92523e-06, 0, 0.608105, 1)
+light_volumetric_fog_energy = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+shadow_bias = 0.003
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 60.0
+directional_shadow_pancake_size = 1024.0
+
+[node name="GPUParticles_Godray1" type="GPUParticles3D" parent="Night" unique_id=788756053]
+transform = Transform3D(0.865784, 0.5, -0.0204488, -0.499861, 0.866025, 0.0118061, 0.0236122, 3.03184e-08, 0.999721, 2, 13, 1)
+material_override = SubResource("ShaderMaterial_hqrcp")
+cast_shadow = 0
+amount = 6
+lifetime = 6.0
+process_material = SubResource("ParticleProcessMaterial_0vnvq")
+draw_pass_1 = SubResource("QuadMesh_ph8l2")
+
+[node name="SpotLight3D1" type="SpotLight3D" parent="Night" unique_id=1559449766]
+transform = Transform3D(0.707107, 0.353554, -0.612372, -4.91925e-09, 0.866025, 0.500001, 0.707107, -0.353554, 0.612372, -9.90776, 12, -7)
+light_color = Color(0, 0.466667, 1, 1)
+light_energy = 14.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 70.0
+
+[node name="SpotLight3D2" type="SpotLight3D" parent="Night" unique_id=634275814]
+transform = Transform3D(-1, -4.37114e-08, 7.57104e-08, 8.74228e-08, -0.5, 0.866025, 1.45495e-14, 0.866025, 0.5, 1.01179, 16, 0.857363)
+light_color = Color(0, 0.666667, 1, 1)
+light_energy = 2.143
+light_specular = 10.0
+light_bake_mode = 1
+shadow_enabled = true
+shadow_transmittance_bias = 0.355
+shadow_opacity = 0.89
+shadow_blur = 1.06
+spot_range = 50.0
+spot_angle = 75.0
+
+[node name="SpotLight3D_Blue1" type="SpotLight3D" parent="Night" unique_id=17293619]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, -1.31423, 10, 3.97189)
+light_color = Color(0, 0.494118, 0.890196, 1)
+light_energy = 10.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 60.0
+
+[node name="SpotLight3D_Purple" type="SpotLight3D" parent="Night" unique_id=615486329]
+transform = Transform3D(1, 0, 0, 0, -0.173647, 0.984808, 0, -0.984808, -0.173647, -2.62846, 19.4705, 11.9939)
+light_color = Color(0.971, 0.42, 1, 1)
+light_energy = 4.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 60.0
+
+[node name="SpotLight3D_Blue2" type="SpotLight3D" parent="Night" unique_id=703558660]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 14.5229, 10, 3.26308)
+light_color = Color(0.44, 0.16, 1, 1)
+light_energy = 8.571
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 60.0
+
+[node name="SpotLight3D_Blue3" type="SpotLight3D" parent="Night" unique_id=368368815]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, -14.382, 10, 1.55888)
+light_color = Color(0.44, 0.16, 1, 1)
+light_energy = 8.571
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 60.0
+
+[node name="GPUParticles_Ambiant1" type="GPUParticles3D" parent="Night" unique_id=162840038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 2.08165e-12)
+cast_shadow = 0
+amount = 120
+lifetime = 6.0
+process_material = SubResource("ParticleProcessMaterial_unvks")
+draw_pass_1 = SubResource("QuadMesh_mtm2q")
+
+[node name="SpotLight3D3" type="SpotLight3D" parent="Night" unique_id=1657038108]
+transform = Transform3D(-1, -4.37114e-08, 7.57104e-08, 8.74228e-08, -0.5, 0.866025, 1.45495e-14, 0.866025, 0.5, 5.786, 6.30413, 5.48702)
+light_color = Color(0.34, 0.593, 1, 1)
+light_energy = 2.714
+light_specular = 10.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 75.0
+
+[node name="SpotLight3D4" type="SpotLight3D" parent="Night" unique_id=858638005]
+transform = Transform3D(-1, -4.3711406e-08, 7.571037e-08, 8.74228e-08, -0.50000024, 0.8660253, 1.45495e-14, 0.8660253, 0.50000024, -22, 12, 13)
+light_color = Color(0.34, 0.593, 1, 1)
+light_energy = 2.0
+light_specular = 10.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 75.0
+
+[node name="Day_Sun" type="Node3D" parent="." unique_id=1945416412]
+
+[node name="Env_Sun" type="DirectionalLight3D" parent="Day_Sun" unique_id=2081519976]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+visible = false
+light_color = Color(1, 0.974333, 0.86, 1)
+light_energy = 0.7
+light_volumetric_fog_energy = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+shadow_bias = 0.005
+shadow_opacity = 0.9
+shadow_blur = 0.9
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 65.0
+directional_shadow_pancake_size = 200.0
+
+[node name="Env_Edge" type="DirectionalLight3D" parent="Day_Sun" unique_id=801133637]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+visible = false
+light_color = Color(0.9, 0.693, 0.279, 1)
+light_energy = 0.45
+light_volumetric_fog_energy = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+shadow_bias = 0.004
+shadow_opacity = 0.9
+shadow_blur = 6.0
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 65.0
+directional_shadow_pancake_size = 200.0
+
+[node name="Env_BlueHaze" type="DirectionalLight3D" parent="Day_Sun" unique_id=715267880]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+visible = false
+light_color = Color(0, 0.533333, 1, 1)
+light_energy = 0.3
+light_bake_mode = 1
+shadow_bias = 0.003
+shadow_opacity = 0.9
+shadow_blur = 0.9
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 55.0
+directional_shadow_pancake_size = 200.0
+
+[node name="Env_LightBlue" type="DirectionalLight3D" parent="Day_Sun" unique_id=709924658]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+visible = false
+light_color = Color(0, 0.447086, 0.817772, 1)
+light_energy = 0.2
+light_bake_mode = 1
+shadow_bias = 0.003
+shadow_opacity = 0.9
+shadow_blur = 0.9
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 55.0
+directional_shadow_pancake_size = 200.0
+
+[node name="SpotLight3D2" type="SpotLight3D" parent="Day_Sun" unique_id=86101599]
+transform = Transform3D(-1, -4.37114e-08, 7.57104e-08, 8.74228e-08, -0.5, 0.866025, 1.45495e-14, 0.866025, 0.5, 1.01179, 16, -3.27966)
+visible = false
+light_color = Color(0.34, 0.692, 1, 1)
+light_energy = 6.0
+light_specular = 4.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 75.0
+
+[node name="SpotLight3D_Blue1" type="SpotLight3D" parent="Day_Sun" unique_id=55740468]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, -9.2754, 10, 15.6635)
+visible = false
+light_color = Color(0.89, 0.3115, 0, 1)
+light_energy = 10.0
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 60.0
+
+[node name="SpotLight3D_Blue2" type="SpotLight3D" parent="Day_Sun" unique_id=230659702]
+transform = Transform3D(1, 0, 0, 0, 0.422619, 0.906308, 0, -0.906308, 0.422619, 5.80859, 10, 16.6635)
+visible = false
+light_color = Color(0.89, 0.237333, 0, 1)
+light_energy = 10.0
+light_bake_mode = 1
+spot_range = 50.0
+
+[node name="WindTrails" type="GPUParticles3D" parent="Day_Sun" unique_id=180868723]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 44, 4, 0)
+amount = 3
+lifetime = 6.0
+visibility_aabb = AABB(-4, 40, -4, 8, 8, 8)
+transform_align = 2
+trail_enabled = true
+trail_lifetime = 0.6
+process_material = SubResource("ParticleProcessMaterial_cplqr")
+draw_pass_1 = SubResource("TubeTrailMesh_4cwcd")
+
+[node name="GPUParticles_Ambiant1" type="GPUParticles3D" parent="Day_Sun" unique_id=2047871497]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 2.08165e-12)
+cast_shadow = 0
+amount = 100
+lifetime = 4.0
+process_material = SubResource("ParticleProcessMaterial_unvks")
+draw_pass_1 = SubResource("QuadMesh_mtm2q")
+
+[node name="GPUParticles_Godray1" type="GPUParticles3D" parent="Day_Sun" unique_id=1832369708]
+transform = Transform3D(0.865784, 0.5, -0.0204488, -0.499861, 0.866025, 0.0118061, 0.0236122, 3.03184e-08, 0.999721, 2, 13, 1)
+visible = false
+material_override = SubResource("ShaderMaterial_hqrcp")
+cast_shadow = 0
+amount = 6
+lifetime = 6.0
+process_material = SubResource("ParticleProcessMaterial_36ew0")
+draw_pass_1 = SubResource("QuadMesh_ph8l2")
+
+[node name="SpotLight3D3" type="SpotLight3D" parent="Day_Sun" unique_id=524575983]
+transform = Transform3D(-1, -4.37114e-08, 7.57104e-08, 8.74228e-08, -0.5, 0.866025, 1.45495e-14, 0.866025, 0.5, 5.55918, 10.0914, -7.10794)
+visible = false
+light_color = Color(0, 0.533333, 1, 1)
+light_energy = 4.142
+light_indirect_energy = 16.0
+light_specular = 10.0
+light_bake_mode = 1
+shadow_enabled = true
+spot_range = 50.0
+spot_angle = 75.0
+
+[node name="Day_Rain" type="Node3D" parent="." unique_id=687688496]
+visible = false
+
+[node name="Directional_Rain_1" type="DirectionalLight3D" parent="Day_Rain" unique_id=1225552894]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+light_color = Color(0.854902, 0.886275, 0.964706, 1)
+light_energy = 0.25
+light_bake_mode = 1
+shadow_enabled = true
+shadow_opacity = 0.86
+shadow_blur = 1.5
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 60.0
+
+[node name="Directional_Rain_2" type="DirectionalLight3D" parent="Day_Rain" unique_id=684107864]
+transform = Transform3D(0.5, 0.612372, -0.612373, 1.49012e-08, 0.707107, 0.707106, 0.866025, -0.353553, 0.353554, -3.8147e-06, 17, 0)
+light_color = Color(0.58, 0.699, 1, 1)
+light_energy = 0.25
+light_bake_mode = 1
+shadow_enabled = true
+shadow_opacity = 0.86
+shadow_blur = 3.0
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 60.0
+
+[node name="SpotLight3D1" type="SpotLight3D" parent="Day_Rain" unique_id=1003090423]
+transform = Transform3D(0.707107, 0.353554, -0.612372, -4.91925e-09, 0.866025, 0.500001, 0.707107, -0.353554, 0.612372, -34.007, 12, -7)
+light_color = Color(0.372549, 0.517647, 0.733333, 1)
+light_energy = 18.0
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 70.0
+
+[node name="SpotLight3D3" type="SpotLight3D" parent="Day_Rain" unique_id=856509769]
+transform = Transform3D(0.5, -0.433013, 0.75, -4.91924e-09, 0.866025, 0.500001, -0.866025, -0.25, 0.433013, 26.993, 12, 3)
+light_color = Color(0.372549, 0.517647, 0.733333, 1)
+light_energy = 16.0
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 70.0
+
+[node name="SpotLight3D2" type="SpotLight3D" parent="Day_Rain" unique_id=849105623]
+transform = Transform3D(-1, -4.37114e-08, 7.57104e-08, 8.74228e-08, -0.5, 0.866025, 1.45495e-14, 0.866025, 0.5, 1.01179, 16, -5.401)
+light_color = Color(0.372549, 0.517647, 0.733333, 1)
+light_energy = 7.0
+light_specular = 10.0
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 75.0
+
+[node name="SpotLight3D_Blue1" type="SpotLight3D" parent="Day_Rain" unique_id=1319954649]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, -9.2754, 10, 15.6635)
+light_color = Color(0.372549, 0.517647, 0.733333, 1)
+light_energy = 5.571
+light_bake_mode = 1
+spot_range = 50.0
+spot_angle = 60.0
+
+[node name="SpotLight3D_Blue2" type="SpotLight3D" parent="Day_Rain" unique_id=1432715354]
+transform = Transform3D(1, 0, 0, 0, 0.422619, 0.906308, 0, -0.906308, 0.422619, 5.80859, 10, 16.6635)
+light_color = Color(0.372549, 0.517647, 0.733333, 1)
+light_energy = 10.0
+light_bake_mode = 1
+spot_range = 50.0
+
+[node name="GPUParticles_Rain" type="GPUParticles3D" parent="Day_Rain" unique_id=630175550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 10)
+cast_shadow = 0
+amount = 800
+lifetime = 0.7
+visibility_aabb = AABB(-10, -10, -10, 20, 20, 20)
+process_material = SubResource("ParticleProcessMaterial_781o3")
+draw_pass_1 = SubResource("QuadMesh_udppm")

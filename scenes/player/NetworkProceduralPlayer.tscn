@@ -6,7 +6,9 @@
 [ext_resource type="Texture2D" uid="uid://ui26ss0ppq1u" path="res://asset/texture/plastic_0010_height_1k.png" id="4_wt3kc"]
 [ext_resource type="Texture2D" uid="uid://cmqw06ya04ram" path="res://asset/texture/plastic_0010_normal_directx_1k.png" id="5_8k3kd"]
 [ext_resource type="Texture2D" uid="uid://c13t0ar22psth" path="res://asset/texture/plastic_0010_roughness_1k.jpg" id="6_vrw6b"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="7_xqutu"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="7_xqutu"]
+[ext_resource type="PackedScene" uid="uid://chwaonkudpxul" path="res://asset/World_Particle.tscn" id="8_wt3kc"]
+[ext_resource type="Script" uid="uid://jp1e22vtugvp" path="res://scenes/player/CameraShakeController.gd" id="9_camera_shake"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tl0qy"]
 radius = 0.30615234
@@ -242,7 +244,7 @@ dof_blur_far_distance = 20.0
 dof_blur_amount = 0.15
 
 [node name="NetworkProceduralPlayer" type="CharacterBody3D" unique_id=1893229279 groups=["ally"]]
-collision_mask = 15
+collision_mask = 31
 floor_constant_speed = true
 floor_max_angle = 1.3962634
 script = ExtResource("1_player")
@@ -302,7 +304,7 @@ mesh = SubResource("CylinderMesh_wt3kc")
 surface_material_override/0 = SubResource("StandardMaterial3D_yqvj3")
 
 [node name="Helmet" type="MeshInstance3D" parent="VisualRoot" unique_id=1779330987]
-transform = Transform3D(-0.4, 0, -3.4969112e-08, 0, 0.4, 0, 3.4969112e-08, 0, -0.4, 0, 1.0158836, -0.025375336)
+transform = Transform3D(-0.39999998, -1.2194185e-16, -3.4969105e-08, -2.626808e-09, 0.39886987, 0.030047182, 3.4870304e-08, 0.030047182, -0.39886987, 0, 1.0033485, -0.08066574)
 mesh = SubResource("ArrayMesh_bq58x")
 surface_material_override/0 = ExtResource("7_xqutu")
 
@@ -406,14 +408,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -2)
 mesh = SubResource("Mesh_Aim")
 surface_material_override/0 = SubResource("Mat_Aim")
 
-[node name="CameraRig_" type="Node3D" parent="." unique_id=281091610]
-
-[node name="Camera3D" type="Camera3D" parent="CameraRig_" unique_id=1895304300]
-transform = Transform3D(1, 0, 0, 0, 0.7071069, 0.70710665, 0, -0.70710665, 0.7071069, 0, 6.8, 7.2)
-fov = 55.0
-
 [node name="CameraRig" type="Node3D" parent="." unique_id=1155527045]
 transform = Transform3D(1, 0, 0, 0, 0.57357645, 0.81915206, 0, -0.81915206, 0.57357645, 0, 0.8, 0)
+
+[node name="CameraShakeController" type="Node3D" parent="CameraRig" unique_id=57008552]
+script = ExtResource("9_camera_shake")
+camera_path = NodePath("../SpringArm3D/Camera3D")
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraRig" unique_id=1445163743]
 collision_mask = 0
@@ -422,3 +422,5 @@ spring_length = 7.0
 [node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D" unique_id=1141068449]
 attributes = SubResource("CameraAttributesPractical_6qof4")
 fov = 55.0
+
+[node name="Stage_Enviro" parent="." unique_id=668883432 instance=ExtResource("8_wt3kc")]

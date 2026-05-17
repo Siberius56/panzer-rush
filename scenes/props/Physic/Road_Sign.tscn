@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://bup02cukcxu2l"]
+
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_j1vcd"]
+[ext_resource type="PackedScene" uid="uid://cslw8ngb6hsxu" path="res://asset/map/road/sign-highway-wide.glb" id="2_p4cpd"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l2qsm"]
+size = Vector3(0.5, 6, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o0upt"]
+size = Vector3(0.5, 9.125793, 0.5)
+
+[node name="Road_Sign" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
+script = ExtResource("1_j1vcd")
+max_hp = 1.0
+physics_enabled = false
+enemies_can_physically_interact = false
+debris_min_impulse = 1.3
+debris_max_impulse = 3.4
+debris_upward_bias = 0.35
+debris_torque_impulse = 2.2
+debris_collision_layer = 0
+debris_collision_mask = 4278190095
+
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=106632416 groups=["destructible_prop_bodies"]]
+collision_layer = 24
+collision_mask = 4294967295
+mass = 12.0
+linear_damp = 0.35
+angular_damp = 0.5
+
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=861077649]
+
+[node name="sign-highway-wide2" parent="IntactBody/Intact" unique_id=244120307 instance=ExtResource("2_p4cpd")]
+transform = Transform3D(-4.371139e-07, 0, 10, 0, 10, 0, -10, 0, -4.371139e-07, 0, 0, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="IntactBody" unique_id=1808628591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.709564, 3, 0)
+shape = SubResource("BoxShape3D_l2qsm")
+
+[node name="Collision2" type="CollisionShape3D" parent="IntactBody" unique_id=949717849]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.769783, 3, 0)
+shape = SubResource("BoxShape3D_l2qsm")
+
+[node name="Collision3" type="CollisionShape3D" parent="IntactBody" unique_id=1930164488]
+transform = Transform3D(0, -1.0000001, 0, 1.0000001, 0, 0, 0, 0, 1, -0.058214754, 5.7617974, 0)
+shape = SubResource("BoxShape3D_o0upt")
+
+[node name="DebrisRoot" type="Node3D" parent="." unique_id=1062000715]
+visible = false
+
+[node name="TopPlank" type="RigidBody3D" parent="DebrisRoot" unique_id=1629069113]
+transform = Transform3D(0.99776894, -0.06676151, 0, 0.06676151, 0.99776894, 0, 0, 0, 1, 0.22614717, 0.62, 0)
+collision_layer = 0
+collision_mask = 4294967295
+mass = 2.0
+
+[node name="sign-highway-wide2" parent="DebrisRoot/TopPlank" unique_id=1926718777 instance=ExtResource("2_p4cpd")]
+transform = Transform3D(-4.3711387e-07, 0, 10, 0, 10, 0, -10, 0, -4.371139e-07, 0, 0, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/TopPlank" unique_id=64288129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.709564, 3, 0)
+shape = SubResource("BoxShape3D_l2qsm")
+
+[node name="Collision3" type="CollisionShape3D" parent="DebrisRoot/TopPlank" unique_id=2133113799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.769783, 3, 0)
+shape = SubResource("BoxShape3D_l2qsm")
+
+[node name="Collision4" type="CollisionShape3D" parent="DebrisRoot/TopPlank" unique_id=1015567966]
+transform = Transform3D(0, -1.0000001, 0, 1.0000001, 0, 0, 0, 0, 1, -0.058214754, 5.7617974, 0)
+shape = SubResource("BoxShape3D_o0upt")

@@ -9,7 +9,7 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export var weapon_local_position: Vector3 = Vector3(0.22, 1.25, -0.5)
 
 @export_group("Behaviour")
-@export_enum("projectile", "repair_tool") var weapon_behavior: String = "projectile"
+@export_enum("projectile", "repair_tool", "objective_item") var weapon_behavior: String = "projectile"
 
 @export_group("Ammo")
 @export var magazine_size: int = 12
@@ -26,6 +26,11 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export var projectile_tk: bool = false
 @export var projectile_scene: PackedScene = DEFAULT_VISUAL_BULLET_SCENE
 @export var projectile_impact_scene: PackedScene
+
+@export_group("Camera Shake")
+@export var camera_shake_enabled: bool = true
+@export_range(0.0, 2.0, 0.01) var camera_shake_intensity: float = 0.16
+@export_range(0.1, 4.0, 0.05) var camera_shake_frequency_multiplier: float = 1.0
 
 @export_group("Repair Tool")
 @export var repair_amount: int = 8
@@ -66,6 +71,24 @@ func to_runtime_state() -> Dictionary:
 func get_muzzle_transform() -> Transform3D:
 	return muzzle.global_transform
 
+func get_fire_camera_shake_intensity() -> float:
+	if not camera_shake_enabled:
+		return 0.0
+
+	if not can_fire():
+		return 0.0
+
+	return maxf(camera_shake_intensity, 0.0)
+
+func can_fire() -> bool:
+	if weapon_behavior == "repair_tool":
+		return true
+
+	if weapon_behavior == "objective_item":
+		return false
+
+	return true
+
 #func can_reload() -> bool:
 	#return ammo_in_magazine < magazine_size and reserve_ammo > 0
 
@@ -79,6 +102,9 @@ func get_muzzle_transform() -> Transform3D:
 	#reserve_ammo -= loaded
 
 func consume_round() -> bool:
+	if not can_fire():
+		return false
+
 	if ammo_in_magazine <= 0:
 		return false
 

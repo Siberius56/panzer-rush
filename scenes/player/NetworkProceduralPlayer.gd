@@ -9,6 +9,7 @@ const PISTOL_SCENE := preload("uid://dd33dmmqhjkul") #preload("res://weapons/Pis
 const SMG_SCENE := preload("uid://nykf7fy7m5jg") #preload("res://weapons/SMGWeapon.tscn")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm") #preload("res://weapons/RifleWeapon.tscn")
 const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
+const BOMB_SCENE := preload("res://scenes/weapons/BombWeapon.tscn")
 const EMPTY_WEAPON_SCENE_PATH := "res://scenes/weapons/weapon_empty.tscn"
 const EMPTY_WEAPON_SCENE := preload("res://scenes/weapons/weapon_empty.tscn")
 
@@ -42,6 +43,7 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export_group("Respawn")
 @export var respawn_delay_seconds: float = 5.0
 @export var respawn_damage_grace_seconds: float = 0.25
+@export var downed_to_final_death_seconds: float = 30.0
 
 @export_group("Revive")
 @export var revive_action: StringName = &"heal"
@@ -185,6 +187,7 @@ var player_id: int = 1
 var player_name: String = "Player"
 var health: int = 0
 var is_dead: bool = false
+var is_final_dead: bool = false
 var vehicle_mode: bool = false
 
 var state_timer: float = 0.0
@@ -223,6 +226,7 @@ var death_elapsed_time: float = 0.0
 var last_death_was_killzone: bool = false
 var _server_death_msec: int = 0
 var _server_respawn_protection_until_msec: int = 0
+var _server_final_death_synced: bool = false
 var _local_revive_button_down: bool = false
 var _server_revive_target: Node = null
 var _server_revive_progress: float = 0.0
@@ -232,6 +236,9 @@ var revive_role: int = 0 # 0 = aucun, 1 = réanimateur, 2 = réanimé
 var revive_other_player_id: int = 0
 var revive_other_player_name: String = ""
 var revive_progress: float = 0.0
+
+var is_spectating: bool = false
+var spectator_target_player_id: int = 0
 
 @export_group("Money")
 @export var carried_money: int = 0
@@ -282,6 +289,8 @@ func _ready() -> void:
 		hud.set_player(self)
 		if hud.has_signal("respawn_requested"):
 			hud.respawn_requested.connect(_on_hud_respawn_requested)
+		if hud.has_signal("spectate_next_requested"):
+			hud.spectate_next_requested.connect(_on_hud_spectate_next_requested)
 
 	ui_input_blocked = false
 	add_to_group("player")
@@ -310,6 +319,8 @@ func _ready() -> void:
 	_update_visuals(0.016)
 	_apply_vehicle_visual_state()
 	emit_signal("health_changed", health, max_health)
+	if multiplayer.is_server():
+		_server_sync_team_respawn_lives_state()
 
 func _exit_tree() -> void:
 	if multiplayer.is_server():
@@ -328,6 +339,7 @@ func build_session_state() -> Dictionary:
 		"max_health": max_health,
 		"health": health,
 		"is_dead": is_dead,
+		"is_final_dead": is_final_dead,
 		"carried_money": carried_money,
 		"weapon_slots": weapon_slots.duplicate(true),
 		"current_weapon_slot": current_weapon_slot,
@@ -342,13 +354,16 @@ func apply_session_state(state: Dictionary, force_alive: bool = true) -> void:
 
 	var restored_health: int = int(state.get("health", max_health))
 	var restored_dead: bool = bool(state.get("is_dead", false))
+	var restored_final_dead: bool = bool(state.get("is_final_dead", false))
 
 	if force_alive:
 		restored_dead = false
+		restored_final_dead = false
 		restored_health = max(restored_health, 1)
 
 	health = clampi(restored_health, 0, max_health)
 	is_dead = restored_dead
+	is_final_dead = restored_final_dead and restored_dead
 	carried_money = max(int(state.get("carried_money", carried_money)), 0)
 
 	var restored_ammo_reserve = state.get("ammo_reserve", ammo_reserve)
@@ -405,17 +420,20 @@ func _sync_to_vehicle_seat() -> void:
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
-		death_elapsed_time += delta
+		if not _is_final_death_countdown_paused():
+			death_elapsed_time += delta
 	else:
 		death_elapsed_time = 0.0
 
 	if multiplayer.is_server():
 		_server_weapon_tick(delta)
+		_server_final_death_tick()
 		_server_revive_tick(delta)
 
 	if is_multiplayer_authority():
 		_local_weapon_tick(delta)
 		_update_revive_input()
+		_update_spectator_camera_state()
 
 	if ui_input_blocked:
 		velocity.x = 0.0
@@ -822,6 +840,9 @@ func _try_fire_local() -> void:
 	if weapon == null:
 		return
 
+	if _is_non_firing_weapon(weapon):
+		return
+
 	var current_ammo := int(slot_state.get("ammo_in_magazine", 0))
 
 	if current_ammo <= 0:
@@ -849,6 +870,9 @@ func _try_fire_local() -> void:
 	if uses_repair_tool:
 		_update_local_repair_target_hud(shot_origin, shot_direction, weapon)
 
+	if not uses_repair_tool:
+		_emit_weapon_fire_camera_shake(weapon)
+
 	# Prédiction visuelle uniquement côté client.
 	# Le serveur spawn la vraie balle dans _server_fire_weapon().
 	# Le repair tool n'utilise pas de projectile.
@@ -865,6 +889,28 @@ func _try_fire_local() -> void:
 	if not multiplayer.is_server():
 		if predicted_ammo <= 0 and _get_reserve_for_weapon(weapon) > 0:
 			_request_reload_current_weapon()
+
+func _emit_weapon_fire_camera_shake(weapon: WeaponInstance3D) -> void:
+	if weapon == null:
+		return
+
+	if _is_repair_tool_weapon(weapon):
+		return
+
+	var intensity: float = 0.0
+	if weapon.has_method("get_fire_camera_shake_intensity"):
+		intensity = float(weapon.get_fire_camera_shake_intensity())
+	elif "camera_shake_intensity" in weapon:
+		intensity = float(weapon.camera_shake_intensity)
+
+	if intensity <= 0.0:
+		return
+
+	var frequency_multiplier: float = 1.0
+	if "camera_shake_frequency_multiplier" in weapon:
+		frequency_multiplier = float(weapon.camera_shake_frequency_multiplier)
+
+	CameraShakeController.emit_local_shake(get_tree(), intensity, frequency_multiplier)
 
 func _spawn_visual_bullet_from_weapon(weapon: WeaponInstance3D, start_pos: Vector3, direction: Vector3) -> void:
 	spawn_projectile(
@@ -930,6 +976,8 @@ func _request_reload_current_weapon() -> void:
 	if weapon == null:
 		return
 	if is_reloading_local:
+		return
+	if _is_non_firing_weapon(weapon):
 		return
 	#if not weapon.can_reload():
 		#return
@@ -1108,19 +1156,31 @@ func _server_spawn_world_weapon(state: Dictionary, spawn_position: Vector3, forw
 	var net_id := NEXT_WORLD_WEAPON_NET_ID
 	NEXT_WORLD_WEAPON_NET_ID += 1
 
-	#_spawn_world_weapon_local(net_id, String(state.get("weapon_id", "")), int(state.get("ammo_in_magazine", 0)), int(state.get("reserve_ammo", 0)), spawn_position, forward)
-	#_spawn_world_weapon_remote.rpc(net_id, String(state.get("weapon_id", "")), int(state.get("ammo_in_magazine", 0)), int(state.get("reserve_ammo", 0)), spawn_position, forward)
-	_spawn_world_weapon_local(net_id, String(state.get("weapon_id", "")), int(state.get("ammo_in_magazine", 0)), 0, spawn_position, forward)
-	_spawn_world_weapon_remote.rpc(net_id, String(state.get("weapon_id", "")), int(state.get("ammo_in_magazine", 0)), 0, spawn_position, forward)
+	var spawn_state: Dictionary = state.duplicate(true)
+	spawn_state["reserve_ammo"] = 0
 
-func _spawn_world_weapon_local(net_id: int, weapon_id: String, ammo_in_magazine: int, reserve_ammo: int, spawn_position: Vector3, forward: Vector3) -> void:
+	_spawn_world_weapon_local(net_id, spawn_state, spawn_position, forward)
+	_spawn_world_weapon_remote.rpc(net_id, spawn_state, spawn_position, forward)
+
+func _spawn_world_weapon_local(net_id: int, state: Dictionary, spawn_position: Vector3, forward: Vector3) -> void:
 	var world_weapon := WORLD_WEAPON_SCENE.instantiate() as WorldWeapon3D
 	world_weapon.name = "WorldWeapon_%d" % net_id
 	world_weapon.net_id = net_id
 	get_tree().current_scene.add_child(world_weapon)
 	world_weapon.global_position = spawn_position
 	world_weapon.replicated_transform = world_weapon.global_transform
-	world_weapon.setup_from_state(weapon_id, ammo_in_magazine, reserve_ammo)
+
+	var origin_transform: Transform3D = world_weapon.global_transform
+	if state.has("objective_origin_transform") and state["objective_origin_transform"] is Transform3D:
+		origin_transform = state["objective_origin_transform"]
+	world_weapon.set_objective_origin_transform(origin_transform)
+
+	world_weapon.setup_from_state(
+		String(state.get("weapon_id", "")),
+		int(state.get("ammo_in_magazine", 0)),
+		0,
+		state
+	)
 	world_weapon.apply_spawn_impulse(forward)
 
 func _server_despawn_world_weapon(world_weapon: WorldWeapon3D) -> void:
@@ -1251,6 +1311,10 @@ func _server_fire_weapon(slot_index: int, shot_origin: Vector3, shot_direction: 
 
 	weapon.apply_runtime_state(slot_state)
 
+	if _is_non_firing_weapon(weapon):
+		weapon.free()
+		return
+
 	if not weapon.consume_round():
 		var can_reload_now := _can_reload_weapon_from_player_reserve(weapon)
 		weapon.free()
@@ -1323,6 +1387,19 @@ func _is_repair_tool_weapon(weapon: WeaponInstance3D) -> bool:
 		return true
 
 	if "weapon_id" in weapon and str(weapon.weapon_id).to_lower() == "repair_tool":
+		return true
+
+	return false
+
+
+func _is_non_firing_weapon(weapon: WeaponInstance3D) -> bool:
+	if weapon == null:
+		return false
+
+	if weapon.has_method("can_fire"):
+		return weapon.call("can_fire") != true
+
+	if "weapon_behavior" in weapon and str(weapon.weapon_behavior).to_lower() == "objective_item":
 		return true
 
 	return false
@@ -1479,6 +1556,8 @@ func _get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return RIFLE_SCENE
 		"repair_tool":
 			return REPAIR_TOOL_SCENE
+		"bomb":
+			return BOMB_SCENE
 		_:
 			return null
 
@@ -1896,6 +1975,8 @@ func request_respawn() -> void:
 		return
 	if death_elapsed_time < respawn_delay_seconds and not multiplayer.is_server():
 		return
+	if GameSessionState.get_team_respawn_lives() <= 0 and not multiplayer.is_server():
+		return
 
 	if multiplayer.is_server():
 		_server_respawn_player()
@@ -1904,6 +1985,10 @@ func request_respawn() -> void:
 
 func _on_hud_respawn_requested() -> void:
 	request_respawn()
+
+
+func _on_hud_spectate_next_requested() -> void:
+	request_spectate_next()
 
 func _server_die(damage_source: Node = null) -> void:
 	if not multiplayer.is_server():
@@ -1917,6 +2002,8 @@ func _server_die(damage_source: Node = null) -> void:
 	_server_respawn_protection_until_msec = 0
 
 	health = 0
+	is_final_dead = false
+	_server_final_death_synced = false
 	_server_death_msec = Time.get_ticks_msec()
 	_server_cancel_revive(true)
 	_server_cancel_revives_targeting(self)
@@ -2037,8 +2124,10 @@ func _apply_death_state(value: int, death_transform: Transform3D, impulse_direct
 
 	health = clampi(value, 0, max_health)
 	is_dead = true
+	is_final_dead = false
 	death_elapsed_time = 0.0
 	_apply_revive_progress_state(false, 0, 0, "", 0.0)
+	_stop_spectating()
 	velocity = Vector3.ZERO
 	replicated_position = death_transform.origin
 	replicated_velocity = Vector3.ZERO
@@ -2062,6 +2151,46 @@ func _apply_death_state(value: int, death_transform: Transform3D, impulse_direct
 
 	if not was_dead:
 		emit_signal("died")
+
+
+func _server_final_death_tick() -> void:
+	if not multiplayer.is_server():
+		return
+	if not is_dead or is_final_dead:
+		return
+
+	var delay: float = max(downed_to_final_death_seconds, 0.0)
+	if delay <= 0.0:
+		_server_set_final_dead()
+		return
+
+	var elapsed: float = death_elapsed_time
+	if elapsed >= delay:
+		_server_set_final_dead()
+
+
+func _server_set_final_dead() -> void:
+	if not multiplayer.is_server():
+		return
+	if not is_dead or is_final_dead:
+		return
+
+	is_final_dead = true
+	_server_final_death_synced = true
+	_server_cancel_revives_targeting(self)
+	_apply_final_dead_state(true)
+	_receive_final_dead_state.rpc(true)
+
+
+func _apply_final_dead_state(final_dead_now: bool) -> void:
+	is_final_dead = final_dead_now and is_dead
+	if is_final_dead:
+		_apply_revive_progress_state(false, 0, 0, "", 0.0)
+	emit_signal("health_changed", health, max_health)
+
+
+func _is_final_death_countdown_paused() -> bool:
+	return is_dead and not is_final_dead and revive_active and revive_role == 2
 
 func _spawn_death_body(death_transform: Transform3D, impulse_direction: Vector3) -> void:
 	if not death_body_enabled:
@@ -2151,7 +2280,11 @@ func _server_respawn_player() -> void:
 		return
 	if not _server_can_respawn_now():
 		return
+	if not GameSessionState.consume_team_respawn_life():
+		_server_sync_team_respawn_lives_state()
+		return
 
+	_server_sync_team_respawn_lives_state()
 	_server_cancel_revives_targeting(self)
 	var spawn_transform: Transform3D = _get_respawn_transform_from_main()
 	var respawn_health: int = max_health
@@ -2233,6 +2366,8 @@ func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> vo
 
 	health = clampi(health_value, 1, max_health)
 	is_dead = false
+	is_final_dead = false
+	_server_final_death_synced = false
 	death_elapsed_time = 0.0
 	last_death_was_killzone = false
 	if multiplayer.is_server():
@@ -2240,6 +2375,7 @@ func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> vo
 		_server_respawn_protection_until_msec = Time.get_ticks_msec() + grace_duration_msec
 
 	_set_body_collision_enabled(true)
+	_stop_spectating()
 	if camera != null:
 		camera.current = is_multiplayer_authority()
 	emit_signal("health_changed", health, max_health)
@@ -2300,6 +2436,17 @@ func _server_start_revive_nearest() -> void:
 	_server_revive_progress = 0.0
 	_server_sync_revive_pair(target, 0.0)
 
+
+func _node_is_final_dead(node: Node) -> bool:
+	if node == null or not is_instance_valid(node):
+		return false
+
+	for property_data in node.get_property_list():
+		if str(property_data.get("name", "")) == "is_final_dead":
+			return bool(node.get("is_final_dead"))
+
+	return false
+
 func _server_find_nearest_revive_target() -> Node:
 	var closest: Node = null
 	var closest_distance := INF
@@ -2312,6 +2459,8 @@ func _server_find_nearest_revive_target() -> Node:
 		if not is_instance_valid(node):
 			continue
 		if not bool(node.get("is_dead")):
+			continue
+		if _node_is_final_dead(node):
 			continue
 
 		var target_position := Vector3.ZERO
@@ -2352,6 +2501,8 @@ func _server_can_continue_revive(target: Node) -> bool:
 	if target == null or not is_instance_valid(target):
 		return false
 	if not bool(target.get("is_dead")):
+		return false
+	if _node_is_final_dead(target):
 		return false
 
 	var target_position := Vector3.ZERO
@@ -2444,6 +2595,8 @@ func _server_revive_from_physical_body(health_value: int) -> void:
 		return
 	if not is_dead:
 		return
+	if is_final_dead:
+		return
 
 	_server_cancel_revives_targeting(self)
 
@@ -2496,6 +2649,121 @@ func get_hud_camera() -> Camera3D:
 	return camera
 
 
+
+func request_spectate_next() -> void:
+	if not is_multiplayer_authority():
+		return
+	if not is_dead:
+		_stop_spectating()
+		return
+
+	var candidates: Array[Node] = _get_spectator_candidates()
+	if candidates.is_empty():
+		_stop_spectating()
+		return
+
+	var current_index: int = -1
+	for i in range(candidates.size()):
+		var candidate: Node = candidates[i]
+		if candidate != null and is_instance_valid(candidate) and int(candidate.get("player_id")) == spectator_target_player_id:
+			current_index = i
+			break
+
+	var next_index: int = (current_index + 1) % candidates.size()
+	_apply_spectator_target(candidates[next_index])
+
+
+func _get_spectator_candidates() -> Array[Node]:
+	var candidates: Array[Node] = []
+	for node in get_tree().get_nodes_in_group("players"):
+		if node == null or not is_instance_valid(node):
+			continue
+		if not (node is Node3D):
+			continue
+		if not node.has_method("get_hud_camera"):
+			continue
+		var target_camera = node.call("get_hud_camera")
+		if target_camera is Camera3D and is_instance_valid(target_camera):
+			candidates.append(node)
+
+	candidates.sort_custom(func(a: Node, b: Node) -> bool:
+		return int(a.get("player_id")) < int(b.get("player_id"))
+	)
+	return candidates
+
+
+func _apply_spectator_target(target: Node) -> void:
+	if target == null or not is_instance_valid(target):
+		_stop_spectating()
+		return
+
+	var target_camera = target.call("get_hud_camera") if target.has_method("get_hud_camera") else null
+	if not (target_camera is Camera3D) or not is_instance_valid(target_camera):
+		_stop_spectating()
+		return
+
+	is_spectating = target != self
+	spectator_target_player_id = int(target.get("player_id"))
+	(target_camera as Camera3D).current = true
+
+	if target == self:
+		is_spectating = false
+
+
+func _update_spectator_camera_state() -> void:
+	if not is_spectating:
+		return
+	if not is_dead:
+		_stop_spectating()
+		return
+
+	var target: Node = _get_player_by_id(spectator_target_player_id)
+	if target == null or not is_instance_valid(target):
+		request_spectate_next()
+		return
+
+	var target_camera = target.call("get_hud_camera") if target.has_method("get_hud_camera") else null
+	if target_camera is Camera3D and is_instance_valid(target_camera) and not (target_camera as Camera3D).current:
+		(target_camera as Camera3D).current = true
+
+
+func _stop_spectating() -> void:
+	if not is_multiplayer_authority():
+		return
+	is_spectating = false
+	spectator_target_player_id = player_id
+	if camera != null and is_instance_valid(camera):
+		camera.current = true
+
+
+func _get_player_by_id(target_player_id: int) -> Node:
+	for node in get_tree().get_nodes_in_group("players"):
+		if node != null and is_instance_valid(node) and int(node.get("player_id")) == target_player_id:
+			return node
+	return null
+
+
+func get_spectator_target_name() -> String:
+	var target: Node = _get_player_by_id(spectator_target_player_id)
+	if target != null and is_instance_valid(target) and "player_name" in target:
+		return str(target.get("player_name"))
+	return player_name
+
+
+func _server_sync_team_respawn_lives_state() -> void:
+	if not multiplayer.is_server():
+		return
+
+	var remaining: int = GameSessionState.get_team_respawn_lives()
+	var maximum: int = GameSessionState.get_max_team_respawn_lives()
+	_apply_team_respawn_lives_state(remaining, maximum)
+	_receive_team_respawn_lives_state.rpc(remaining, maximum)
+
+
+func _apply_team_respawn_lives_state(remaining: int, maximum: int) -> void:
+	GameSessionState.set_team_respawn_lives(remaining, maximum)
+
+
 func get_hud_data() -> Dictionary:
 	var vehicle := _get_current_vehicle_for_hud()
 	var to_equipped_weapon := get_equipped_weapon()
@@ -2505,11 +2773,22 @@ func get_hud_data() -> Dictionary:
 	return {
 		"hp": health,
 		"is_dead": is_dead,
+		"is_final_dead": is_final_dead,
 		"max_hp": max_health,
 		"respawn_delay": respawn_delay_seconds,
 		"death_elapsed": death_elapsed_time,
 		"respawn_remaining": max(respawn_delay_seconds - death_elapsed_time, 0.0),
-		"respawn_available": death_elapsed_time >= respawn_delay_seconds,
+		"respawn_available": death_elapsed_time >= respawn_delay_seconds and GameSessionState.get_team_respawn_lives() > 0,
+		"team_respawn_lives": GameSessionState.get_team_respawn_lives(),
+		"team_respawn_lives_max": GameSessionState.get_max_team_respawn_lives(),
+		"final_death_delay": downed_to_final_death_seconds,
+		"final_death_elapsed": death_elapsed_time,
+		"final_death_remaining": max(downed_to_final_death_seconds - death_elapsed_time, 0.0),
+		"final_death_progress": 1.0 if downed_to_final_death_seconds <= 0.0 else clamp(death_elapsed_time / downed_to_final_death_seconds, 0.0, 1.0),
+		"final_death_timer_paused": _is_final_death_countdown_paused(),
+		"spectating": is_spectating,
+		"spectator_target_player_id": spectator_target_player_id,
+		"spectator_target_name": get_spectator_target_name(),
 		"revive_active": revive_active,
 		"revive_role": revive_role,
 		"revive_other_player_id": revive_other_player_id,
@@ -2622,6 +2901,8 @@ func _apply_health_state(value: int, dead_now: bool) -> void:
 		if not was_dead:
 			emit_signal("died")
 	else:
+		is_final_dead = false
+		_stop_spectating()
 		_set_body_collision_enabled(true)
 		_apply_vehicle_visual_state()
 
@@ -3401,7 +3682,7 @@ func _receive_weapon_inventory(slot_0: Dictionary, slot_1: Dictionary, selected_
 	_apply_received_weapon_inventory(slot_0, slot_1, selected_slot, reloading, remaining_reload)
 
 @rpc("any_peer", "call_remote", "reliable")
-func _spawn_world_weapon_remote(net_id: int, weapon_id: String, ammo_in_magazine: int, reserve_ammo: int, spawn_position: Vector3, forward: Vector3) -> void:
+func _spawn_world_weapon_remote(net_id: int, state: Dictionary, spawn_position: Vector3, forward: Vector3) -> void:
 	if multiplayer.is_server():
 		return
 
@@ -3417,7 +3698,7 @@ func _spawn_world_weapon_remote(net_id: int, weapon_id: String, ammo_in_magazine
 	if existing != null and is_instance_valid(existing):
 		existing.queue_free()
 
-	_spawn_world_weapon_local(net_id, weapon_id, ammo_in_magazine, reserve_ammo, spawn_position, forward)
+	_spawn_world_weapon_local(net_id, state, spawn_position, forward)
 
 @rpc("any_peer", "call_remote", "reliable")
 func _despawn_world_weapon_remote(net_id: int, node_path: NodePath) -> void:
@@ -3469,6 +3750,22 @@ func _receive_revive_progress_state(active: bool, role: int, other_id: int, othe
 		return
 
 	_apply_revive_progress_state(active, role, other_id, other_name, progress_value)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _receive_final_dead_state(final_dead_now: bool) -> void:
+	if not multiplayer.is_server() and multiplayer.get_remote_sender_id() != 1:
+		return
+
+	_apply_final_dead_state(final_dead_now)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _receive_team_respawn_lives_state(remaining: int, maximum: int) -> void:
+	if not multiplayer.is_server() and multiplayer.get_remote_sender_id() != 1:
+		return
+
+	_apply_team_respawn_lives_state(remaining, maximum)
+
 
 @rpc("any_peer", "reliable")
 func _request_respawn_rpc() -> void:

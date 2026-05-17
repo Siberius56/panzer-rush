@@ -2,18 +2,17 @@
 
 [ext_resource type="Script" uid="uid://cgoeec4ud02h0" path="res://scenes/enemies/NetworkProceduralEnemy.gd" id="1_enemy"]
 [ext_resource type="PackedScene" uid="uid://cusdlnpquk17g" path="res://scenes/weapons/VisualBullet.tscn" id="2_bullet"]
-[ext_resource type="Material" uid="uid://dwrumrmkhcq7y" path="res://asset/Color_Blue.tres" id="3_43wsx"]
+[ext_resource type="Material" uid="uid://dwrumrmkhcq7y" path="res://asset/texture/Color_Blue.tres" id="3_43wsx"]
 [ext_resource type="Texture2D" uid="uid://ui26ss0ppq1u" path="res://asset/texture/plastic_0010_height_1k.png" id="4_wt3kc"]
 [ext_resource type="Texture2D" uid="uid://cmqw06ya04ram" path="res://asset/texture/plastic_0010_normal_directx_1k.png" id="5_8k3kd"]
 [ext_resource type="PackedScene" uid="uid://cnx4i1totqiwo" path="res://asset/weapon/blaster-h.glb" id="6_tja3g"]
 [ext_resource type="Texture2D" uid="uid://c13t0ar22psth" path="res://asset/texture/plastic_0010_roughness_1k.jpg" id="6_vrw6b"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tl0qy"]
-radius = 0.45
 height = 2.2
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_detection"]
-radius = 12.0
+radius = 4.0
 
 [sub_resource type="BoxMesh" id="Mesh_Body"]
 size = Vector3(0.5, 0.72, 0.3)
@@ -235,6 +234,8 @@ floor_max_angle = 1.3962634
 script = ExtResource("1_enemy")
 debug_logs = false
 max_health = 20
+detection_radius = 10.0
+ally_death_alert_radius = 10.0
 line_of_sight_mask = 4294901772
 enemy_separation_radius = 3.0
 projectile_scene = ExtResource("2_bullet")

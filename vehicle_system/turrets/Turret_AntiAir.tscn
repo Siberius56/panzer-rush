@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://dg0b5h54ol6gl"]
 
 [ext_resource type="Script" uid="uid://dvppjv5g8wa6h" path="res://vehicle_system/turrets/VehicleTurretBase.gd" id="1_8d888"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_0d7xt"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="2_0d7xt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jtxpu"]
 resource_name = "MasterMat"

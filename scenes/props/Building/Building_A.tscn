@@ -110,7 +110,7 @@ size = Vector3(5.5, 1, 12)
 [sub_resource type="BoxShape3D" id="BoxShape3D_7ahsn"]
 size = Vector3(14.612915, 1, 10.105347)
 
-[node name="Building" type="Node3D" unique_id=455294865]
+[node name="Building_Outpost_A" type="Node3D" unique_id=455294865]
 script = ExtResource("1_3ykyk")
 
 [node name="Floor_1" type="StaticBody3D" parent="." unique_id=313229910]

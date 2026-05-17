@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bytk1jj0bwgrs"]
+
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="1_ah3du"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_l5tja"]
+material = ExtResource("1_ah3du")
+top_radius = 0.2
+bottom_radius = 0.2
+height = 0.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_3kfaw"]
+top_radius = 0.17
+bottom_radius = 0.17
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hx4bs"]
+albedo_color = Color(1, 0.95666665, 0.48000002, 1)
+emission_enabled = true
+emission = Color(1, 0.965, 0.58000004, 1)
+emission_energy_multiplier = 2.0
+
+[node name="Tank_Bulb" type="Node3D" unique_id=827648905]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=211897692]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -0.1, 0, 0)
+mesh = SubResource("CylinderMesh_l5tja")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=976956822]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0.066447854, 0, 0)
+mesh = SubResource("CylinderMesh_3kfaw")
+surface_material_override/0 = SubResource("StandardMaterial3D_hx4bs")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=887647425]
+transform = Transform3D(-3.785517e-08, 0.5000001, -0.8660253, 2.1855696e-08, 0.8660253, 0.5000001, 1, 4.4659473e-16, -4.3711395e-08, 0.18292671, 0, 0)
+light_energy = 3.0

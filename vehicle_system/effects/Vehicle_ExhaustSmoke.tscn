@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://dghgpi5ua4ev7"]
+
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="1_b358a"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ckype"]
+material = ExtResource("1_b358a")
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ao1lm"]
+top_radius = 0.08
+bottom_radius = 0.08
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vam0s"]
+albedo_color = Color(0, 0, 0, 1)
+emission = Color(1, 0.965, 0.58000004, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="SmokeMaterial"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(0.36, 0.36, 0.36, 0.32)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="SmokeQuad"]
+material = SubResource("SmokeMaterial")
+size = Vector2(0.32, 0.32)
+
+[node name="Vehicle_ExhaustSmoke" type="Node3D" unique_id=1298056264]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2123469507]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -0.1, 0, 0)
+mesh = SubResource("CylinderMesh_ckype")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1220160312]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0.051, 0, 0)
+mesh = SubResource("CylinderMesh_ao1lm")
+surface_material_override/0 = SubResource("StandardMaterial3D_vam0s")
+
+[node name="Particles" type="CPUParticles3D" parent="." unique_id=2025054643]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11486238, 0, 0)
+emitting = false
+amount = 22
+lifetime = 1.45
+preprocess = 0.35
+randomness = 0.55
+mesh = SubResource("SmokeQuad")
+emission_shape = 1
+emission_sphere_radius = 0.04
+direction = Vector3(0.4, 1, -0.15)
+spread = 18.0
+gravity = Vector3(0, 0.35, 0)
+initial_velocity_min = 0.45
+initial_velocity_max = 0.9
+angular_velocity_min = -20.0
+angular_velocity_max = 20.0
+linear_accel_min = -0.05
+linear_accel_max = 0.08
+damping_min = 0.05
+damping_max = 0.18
+scale_amount_min = 0.35
+scale_amount_max = 0.9
+color = Color(0.42, 0.42, 0.42, 0.38)

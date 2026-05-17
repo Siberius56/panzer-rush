@@ -50,7 +50,22 @@ var available_chassis_entries: Array[Dictionary] = []
 @export_group("Replication")
 @export var state_send_interval: float = 0.033
 
-@onready var body_visual_root: Node3D = $BodyVisualRoot
+@export_group("Visual Effects")
+@export var visual_idle_animation_enabled: bool = true
+@export var visual_idle_shake_amplitude: float = 0.02
+@export var visual_idle_shake_rotation_degrees: float = 0.4
+@export var visual_idle_critical_shake_rotation_degrees: float = 1.5
+@export var visual_idle_shake_frequency: float = 18.0
+@export_range(0.01, 1.0, 0.01) var critical_health_effect_ratio: float = 0.3
+@export var visual_idle_shake_root_path: NodePath = ^"BodyVisualRoot/EngineShakeRoot"
+
+@export_group("Wheel Dust")
+@export var wheel_dust_enabled: bool = true
+@export var wheel_dust_min_speed: float = 1.15
+@export var wheel_dust_min_rpm: float = 0.0
+@export var wheel_dust_require_ground_contact: bool = true
+
+@onready var visual_idle_shake_root: Node3D = get_node_or_null(visual_idle_shake_root_path) as Node3D
 @onready var seats_root: Node = $BodyVisualRoot/Seats
 @onready var exit_point: Marker3D = $ExitPoint
 @onready var use_area: Area3D = $UseArea
@@ -93,6 +108,21 @@ var is_dead := false
 	&"damageable",
 ]
 @export var impact_damage_debug: bool = false
+
+@export_group("Impact Camera Shake")
+@export var impact_camera_shake_enabled: bool = true
+@export var impact_camera_shake_min_speed: float = 3.5
+@export var impact_camera_shake_intensity_at_min_speed: float = 0.35
+@export var impact_camera_shake_intensity_per_speed: float = 0.055
+@export var impact_camera_shake_max_intensity: float = 1.0
+@export var impact_camera_shake_radius: float = 32.0
+@export var impact_camera_shake_falloff: float = 1.0
+@export var impact_camera_shake_cooldown: float = 0.12
+@export var impact_camera_shake_use_speed_drop_detection: bool = true
+@export var impact_camera_shake_min_speed_drop: float = 2.2
+@export var impact_camera_shake_speed_drop_multiplier: float = 0.09
+@export var impact_camera_shake_debug: bool = false
+
 @export_range(0, 6, 1) var impact_disable_player_damage_after_exit_frames: int = 2
 @export var impact_player_groups: Array[StringName] = [
 	&"player",
@@ -113,11 +143,28 @@ var is_dead := false
 
 var _impact_last_hit_time: Dictionary = {}
 var _impact_disable_player_damage_until_frame: int = -1
+var _last_impact_camera_shake_time: float = -9999.0
+var _previous_impact_camera_velocity: Vector3 = Vector3.ZERO
+var _has_previous_impact_camera_velocity: bool = false
 var _enemy_soft_impact_area: Area3D = null
 var _damage_absorption_sources: Dictionary = {}
 var _armor_modifier_values: Dictionary = {}
 var _turret_reserve_ammo_modifier_values: Dictionary = {}
 var _turret_base_reserve_max_ammo: Dictionary = {}
+
+var _exhaust_smoke_emitters: Array[Node] = []
+var _engine_damage_smoke_emitters: Array[Node] = []
+var _engine_fire_emitters: Array[Node] = []
+var _wheel_dust_emitters: Array[Node] = []
+var _vehicle_wheels: Array[VehicleWheel3D] = []
+var _visual_effect_emitters_scanned: bool = false
+var _visual_idle_shake_base_transform: Transform3D = Transform3D.IDENTITY
+var _visual_idle_shake_base_transform_ready: bool = false
+var _visual_idle_time: float = 0.0
+var _last_exhaust_smoke_enabled: bool = false
+var _last_engine_damage_smoke_enabled: bool = false
+var _last_engine_fire_enabled: bool = false
+var _wheel_dust_emitter_states: Dictionary = {}
 
 
 static func inspect_chassis_scene(scene: PackedScene) -> Dictionary:
@@ -150,6 +197,9 @@ func _ready() -> void:
 	set_multiplayer_authority(1)
 	health = max_health
 	current_fuel = clampf(current_fuel, 0.0, max_fuel)
+	_cache_visual_idle_shake_base_transform()
+	_scan_vehicle_visual_effect_emitters()
+	_update_vehicle_visual_effects(0.0)
 	
 	if multiplayer.is_server():
 		can_sleep = false
@@ -303,6 +353,10 @@ func set_use_area_enabled(enabled: bool) -> void:
 
 	print("[VEHICLE] UseArea -> monitoring=", use_area.monitoring, " monitorable=", use_area.monitorable, " enabled=", enabled)
 
+func _process(delta: float) -> void:
+	_update_vehicle_visual_effects(delta)
+
+
 func _physics_process(delta: float) -> void:
 	if multiplayer.is_server():
 		_server_physics(delta)
@@ -332,6 +386,7 @@ func _server_physics(delta: float) -> void:
 
 	_update_drive_controls(delta)
 	_process_enemy_soft_impacts(delta)
+	_process_impact_camera_shake_from_speed_drop(delta)
 
 	state_timer -= delta
 	if state_timer <= 0.0:
@@ -744,6 +799,211 @@ func get_fuel_ratio() -> float:
 	return clampf(current_fuel / max_fuel, 0.0, 1.0)
 
 
+func _cache_visual_idle_shake_base_transform() -> void:
+	if visual_idle_shake_root == null:
+		visual_idle_shake_root = get_node_or_null(visual_idle_shake_root_path) as Node3D
+
+	if visual_idle_shake_root == null:
+		return
+
+	_visual_idle_shake_base_transform = visual_idle_shake_root.transform
+	_visual_idle_shake_base_transform_ready = true
+
+
+func _scan_vehicle_visual_effect_emitters() -> void:
+	_exhaust_smoke_emitters.clear()
+	_engine_damage_smoke_emitters.clear()
+	_engine_fire_emitters.clear()
+	_wheel_dust_emitters.clear()
+	_vehicle_wheels.clear()
+	_collect_vehicle_visual_effect_emitters(self)
+	_visual_effect_emitters_scanned = true
+
+
+func _collect_vehicle_visual_effect_emitters(node: Node) -> void:
+	if node == null:
+		return
+
+	if node.is_in_group(&"vehicle_exhaust_smoke"):
+		_exhaust_smoke_emitters.append(node)
+	if node.is_in_group(&"vehicle_engine_damage_smoke"):
+		_engine_damage_smoke_emitters.append(node)
+	if node.is_in_group(&"vehicle_engine_fire"):
+		_engine_fire_emitters.append(node)
+	if node.is_in_group(&"vehicle_wheel_dust"):
+		_wheel_dust_emitters.append(node)
+	if node is VehicleWheel3D:
+		_vehicle_wheels.append(node as VehicleWheel3D)
+
+	for child in node.get_children():
+		_collect_vehicle_visual_effect_emitters(child)
+
+
+func _update_vehicle_visual_effects(delta: float) -> void:
+	if not _visual_idle_shake_base_transform_ready:
+		_cache_visual_idle_shake_base_transform()
+	if not _visual_effect_emitters_scanned:
+		_scan_vehicle_visual_effect_emitters()
+
+	var engine_is_running: bool = not is_dead and has_fuel()
+	var health_ratio: float = _get_health_ratio()
+	var engine_damage_smoke_enabled: bool = health_ratio < critical_health_effect_ratio
+	var engine_fire_enabled: bool = is_dead
+
+	_update_idle_visual_shake(delta, engine_is_running, health_ratio)
+	_set_effect_emitters_enabled_if_changed(_exhaust_smoke_emitters, engine_is_running, "exhaust")
+	_set_effect_emitters_enabled_if_changed(_engine_damage_smoke_emitters, engine_damage_smoke_enabled, "engine_smoke")
+	_set_effect_emitters_enabled_if_changed(_engine_fire_emitters, engine_fire_enabled, "engine_fire")
+	_update_wheel_dust_effects()
+
+
+func _get_health_ratio() -> float:
+	if max_health <= 0:
+		return 0.0
+	return clampf(float(health) / float(max_health), 0.0, 1.0)
+
+
+func _update_idle_visual_shake(delta: float, engine_is_running: bool, health_ratio: float) -> void:
+	if visual_idle_shake_root == null or not _visual_idle_shake_base_transform_ready:
+		return
+
+	if not visual_idle_animation_enabled or not engine_is_running:
+		visual_idle_shake_root.transform = _visual_idle_shake_base_transform
+		return
+
+	_visual_idle_time += delta
+	var time_value: float = _visual_idle_time * visual_idle_shake_frequency
+	var current_rotation_degrees: float = visual_idle_shake_rotation_degrees
+	if health_ratio < critical_health_effect_ratio:
+		current_rotation_degrees = visual_idle_critical_shake_rotation_degrees
+
+	var offset_x: float = sin(time_value * 1.73) * visual_idle_shake_amplitude * 0.35
+	var offset_y: float = sin(time_value * 2.11) * visual_idle_shake_amplitude
+	var rot_x: float = deg_to_rad(sin(time_value * 1.37) * current_rotation_degrees)
+	var rot_z: float = deg_to_rad(sin(time_value * 1.91) * current_rotation_degrees)
+	var shake_basis: Basis = Basis.from_euler(Vector3(rot_x, 0.0, rot_z))
+	var shake_transform: Transform3D = Transform3D(shake_basis, Vector3(offset_x, offset_y, 0.0))
+	visual_idle_shake_root.transform = _visual_idle_shake_base_transform * shake_transform
+
+
+func _update_wheel_dust_effects() -> void:
+	var speed: float = linear_velocity.length()
+	var forward_speed: float = linear_velocity.dot(global_basis * Vector3.MODEL_FRONT)
+	var dust_direction: Vector3 = -Vector3.MODEL_FRONT
+	if forward_speed < 0.0:
+		dust_direction = Vector3.MODEL_FRONT
+
+	for emitter_root in _wheel_dust_emitters:
+		if emitter_root == null:
+			continue
+
+		_set_particle_tree_direction(emitter_root, dust_direction)
+
+		var enabled: bool = false
+		if wheel_dust_enabled and not is_dead and speed >= wheel_dust_min_speed:
+			var wheel: VehicleWheel3D = _get_closest_vehicle_wheel(emitter_root)
+			if wheel != null:
+				var contact_ok: bool = true
+				if wheel_dust_require_ground_contact:
+					contact_ok = wheel.is_in_contact()
+
+				var rpm_ok: bool = true
+				if wheel_dust_min_rpm > 0.0:
+					rpm_ok = absf(wheel.get_rpm()) >= wheel_dust_min_rpm
+
+				enabled = contact_ok and rpm_ok
+			else:
+				enabled = true
+
+		_set_wheel_dust_emitter_enabled_if_changed(emitter_root, enabled)
+
+
+func _get_closest_vehicle_wheel(node: Node) -> VehicleWheel3D:
+	if node == null or _vehicle_wheels.is_empty():
+		return null
+
+	var node_3d: Node3D = node as Node3D
+	if node_3d == null:
+		return null
+
+	var closest_wheel: VehicleWheel3D = null
+	var closest_distance_squared: float = INF
+	for wheel in _vehicle_wheels:
+		if wheel == null:
+			continue
+
+		var distance_squared: float = node_3d.global_position.distance_squared_to(wheel.global_position)
+		if distance_squared < closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_wheel = wheel
+
+	return closest_wheel
+
+
+func _set_effect_emitters_enabled_if_changed(emitters: Array[Node], enabled: bool, effect_key: String) -> void:
+	if effect_key == "exhaust":
+		if _last_exhaust_smoke_enabled == enabled:
+			return
+		_last_exhaust_smoke_enabled = enabled
+	elif effect_key == "engine_smoke":
+		if _last_engine_damage_smoke_enabled == enabled:
+			return
+		_last_engine_damage_smoke_enabled = enabled
+	elif effect_key == "engine_fire":
+		if _last_engine_fire_enabled == enabled:
+			return
+		_last_engine_fire_enabled = enabled
+
+	for emitter_root in emitters:
+		_set_particle_tree_emitting(emitter_root, enabled)
+
+
+func _set_wheel_dust_emitter_enabled_if_changed(emitter_root: Node, enabled: bool) -> void:
+	var emitter_id: int = emitter_root.get_instance_id()
+	var previous_enabled: bool = bool(_wheel_dust_emitter_states.get(emitter_id, false))
+	if previous_enabled == enabled:
+		return
+
+	_wheel_dust_emitter_states[emitter_id] = enabled
+	_set_particle_tree_emitting(emitter_root, enabled)
+
+
+func _set_particle_tree_emitting(node: Node, enabled: bool) -> void:
+	if node == null:
+		return
+
+	if node is GPUParticles3D:
+		var gpu_particles: GPUParticles3D = node as GPUParticles3D
+		gpu_particles.emitting = enabled
+	elif node is CPUParticles3D:
+		var cpu_particles: CPUParticles3D = node as CPUParticles3D
+		cpu_particles.emitting = enabled
+
+	for child in node.get_children():
+		_set_particle_tree_emitting(child, enabled)
+
+
+func _set_particle_tree_direction(node: Node, direction: Vector3) -> void:
+	if node == null:
+		return
+
+	if node is CPUParticles3D:
+		var cpu_particles: CPUParticles3D = node as CPUParticles3D
+		cpu_particles.direction = direction
+
+	for child in node.get_children():
+		_set_particle_tree_direction(child, direction)
+
+
+func rescan_vehicle_visual_effect_emitters() -> void:
+	_scan_vehicle_visual_effect_emitters()
+	_last_exhaust_smoke_enabled = false
+	_last_engine_damage_smoke_enabled = false
+	_last_engine_fire_enabled = false
+	_wheel_dust_emitter_states.clear()
+	_update_vehicle_visual_effects(0.0)
+
+
 func consume_fuel(amount: float) -> float:
 	if not multiplayer.is_server():
 		return 0.0
@@ -1010,7 +1270,7 @@ func _process_enemy_soft_impacts(delta: float) -> void:
 	if _enemy_soft_impact_area == null:
 		return
 
-	var speed := linear_velocity.length()
+	var speed: float = linear_velocity.length()
 	if speed < impact_min_speed:
 		return
 
@@ -1139,13 +1399,15 @@ func _on_vehicle_body_entered(body: Node) -> void:
 	if not multiplayer.is_server():
 		return
 
-	if not impact_damage_enabled:
-		return
-
 	if body == null or body == self:
 		return
 
-	var speed := linear_velocity.length()
+	var speed: float = linear_velocity.length()
+	_try_emit_impact_camera_shake(body, speed)
+
+	if not impact_damage_enabled:
+		return
+
 	if speed < impact_min_speed:
 		return
 
@@ -1170,6 +1432,82 @@ func _on_vehicle_body_entered(body: Node) -> void:
 
 	if impact_damage_debug:
 		print("[VEHICLE IMPACT] ", name, " hit ", target.name, " | speed=", speed, " | damage=", damage)
+
+
+func _process_impact_camera_shake_from_speed_drop(_delta: float) -> void:
+	if not multiplayer.is_server():
+		return
+
+	if not impact_camera_shake_enabled or not impact_camera_shake_use_speed_drop_detection:
+		_previous_impact_camera_velocity = linear_velocity
+		_has_previous_impact_camera_velocity = true
+		return
+
+	var current_velocity: Vector3 = linear_velocity
+	if not _has_previous_impact_camera_velocity:
+		_previous_impact_camera_velocity = current_velocity
+		_has_previous_impact_camera_velocity = true
+		return
+
+	var previous_speed: float = _previous_impact_camera_velocity.length()
+	var current_speed: float = current_velocity.length()
+	var speed_drop: float = previous_speed - current_speed
+	_previous_impact_camera_velocity = current_velocity
+
+	if previous_speed < impact_camera_shake_min_speed:
+		return
+
+	if speed_drop < impact_camera_shake_min_speed_drop:
+		return
+
+	var raw_intensity: float = impact_camera_shake_intensity_at_min_speed
+	raw_intensity += ((previous_speed - impact_camera_shake_min_speed) * impact_camera_shake_intensity_per_speed)
+	raw_intensity += (speed_drop * impact_camera_shake_speed_drop_multiplier)
+	var intensity: float = clampf(raw_intensity, 0.0, impact_camera_shake_max_intensity)
+	_emit_impact_camera_shake_at_position(global_position, intensity, "speed_drop prev=%.2f current=%.2f drop=%.2f" % [previous_speed, current_speed, speed_drop])
+
+
+func _try_emit_impact_camera_shake(body: Node, speed: float) -> void:
+	if not multiplayer.is_server():
+		return
+
+	if not impact_camera_shake_enabled:
+		return
+
+	if body == null or body == self:
+		return
+
+	if speed < impact_camera_shake_min_speed:
+		return
+
+	var source_position: Vector3 = global_position
+	if body is Node3D:
+		source_position = (global_position + (body as Node3D).global_position) * 0.5
+
+	var raw_intensity: float = impact_camera_shake_intensity_at_min_speed + ((speed - impact_camera_shake_min_speed) * impact_camera_shake_intensity_per_speed)
+	var intensity: float = clampf(raw_intensity, 0.0, impact_camera_shake_max_intensity)
+	_emit_impact_camera_shake_at_position(source_position, intensity, "body_entered speed=%.2f body=%s" % [speed, str(body.name)])
+
+
+func _emit_impact_camera_shake_at_position(source_position: Vector3, intensity: float, debug_reason: String = "") -> void:
+	if intensity <= 0.0:
+		return
+
+	var now: float = Time.get_ticks_msec() * 0.001
+	if now - _last_impact_camera_shake_time < impact_camera_shake_cooldown:
+		return
+
+	_last_impact_camera_shake_time = now
+
+	if impact_camera_shake_debug:
+		print("[VEHICLE CAMERA SHAKE] ", debug_reason, " intensity=", intensity, " radius=", impact_camera_shake_radius)
+
+	_emit_impact_camera_shake.rpc(source_position, intensity, impact_camera_shake_radius, impact_camera_shake_falloff)
+
+
+@rpc("authority", "call_local", "unreliable")
+func _emit_impact_camera_shake(source_position: Vector3, intensity: float, radius: float, falloff: float) -> void:
+	CameraShakeController.emit_global_shake(get_tree(), source_position, intensity, radius, falloff, 1.0)
 
 
 func _get_impact_damage_target(body: Node) -> Node:
@@ -2037,6 +2375,7 @@ func _sync_vehicle_health(new_health: int) -> void:
 	health = clampi(new_health, 0, max_health)
 	if health > 0 and is_dead:
 		_apply_vehicle_revived_state(health)
+	_update_vehicle_visual_effects(0.0)
 
 
 func _apply_vehicle_revived_state(new_health: int) -> void:
@@ -2051,6 +2390,7 @@ func _apply_vehicle_revived_state(new_health: int) -> void:
 	client_has_target_transform = false
 
 	set_use_area_enabled(not bool(get_meta("upgrade_station_locked", false)))
+	_update_vehicle_visual_effects(0.0)
 	emit_signal("seat_layout_changed")
 
 
@@ -2076,6 +2416,7 @@ func _sync_vehicle_destroyed() -> void:
 		freeze = true
 		sleeping = true
 
+	_update_vehicle_visual_effects(0.0)
 	emit_signal("seat_layout_changed")
 
 

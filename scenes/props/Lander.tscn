@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://c02y6m8515d27"]
 
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="1_r2302"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="1_r2302"]
+[ext_resource type="Material" uid="uid://2hcuccvspy1n" path="res://asset/texture/Color_Dark.tres" id="2_hcsab"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b2asa"]
 resource_name = "MasterMat"
@@ -139,9 +140,6 @@ top_radius = 0.08
 bottom_radius = 0.08
 height = 0.1
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e41n6"]
-albedo_color = Color(0, 0, 0, 1)
-
 [sub_resource type="BoxMesh" id="BoxMesh_w7op5"]
 size = Vector3(0.72, 0.38, 0.52)
 
@@ -190,7 +188,7 @@ surface_material_override/0 = ExtResource("1_r2302")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="TurretMesh" unique_id=754432016]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 1.7252705, 2.1415572)
 mesh = SubResource("CylinderMesh_e4og6")
-surface_material_override/0 = SubResource("StandardMaterial3D_e41n6")
+surface_material_override/0 = ExtResource("2_hcsab")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1365607421]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 2.5928688, -1.7924874)

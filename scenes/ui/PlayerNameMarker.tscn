@@ -22,7 +22,7 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -64.0
-offset_top = -72.0
+offset_top = -112.0
 offset_right = 64.0
 offset_bottom = -34.0
 grow_horizontal = 2
@@ -45,6 +45,39 @@ theme_override_font_sizes/font_size = 24
 text = "Player"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+
+[node name="DeathRow" type="HBoxContainer" parent="Marge/VBoxContainer" unique_id=1968841020]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="DeathIconTextureRect" type="TextureRect" parent="Marge/VBoxContainer/DeathRow" unique_id=1968841021]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DeathIconFallbackLabel" type="Label" parent="Marge/VBoxContainer/DeathRow" unique_id=1968841022]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 28
+text = "☠"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ReviveTimerProgress" type="ProgressBar" parent="Marge/VBoxContainer" unique_id=1968841023]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(96, 8)
+layout_mode = 2
+show_percentage = false
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=965889141]
 layout_mode = 1

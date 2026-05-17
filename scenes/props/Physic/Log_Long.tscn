@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://kw55e1hrrxyg"]
+
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_2fdfk"]
+[ext_resource type="PackedScene" uid="uid://bwbot52tqth6l" path="res://asset/map/misc-2/tree-log.glb" id="2_2fdfk"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7rdoj"]
+size = Vector3(1.2514648, 6, 0.96191406)
+
+[node name="Log_Long" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
+script = ExtResource("1_2fdfk")
+main_collision_path = NodePath("")
+max_hp = 1.0
+enemies_can_physically_interact = false
+debris_min_impulse = 1.3
+debris_max_impulse = 3.4
+debris_upward_bias = 0.35
+debris_torque_impulse = 2.2
+debris_collision_layer = 0
+debris_collision_mask = 4278190095
+
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=106632416 groups=["destructible_prop_bodies"]]
+collision_layer = 24
+collision_mask = 4294967295
+mass = 12.0
+linear_damp = 0.35
+angular_damp = 0.5
+
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=861077649]
+
+[node name="tree-log2" parent="IntactBody/Intact" unique_id=1497703991 instance=ExtResource("2_2fdfk")]
+transform = Transform3D(2.9999998, 5.1961527, 0, -5.1961527, 2.9999998, 0, 0, 0, 6, 0, 0.65037835, 0)
+
+[node name="Collision3" type="CollisionShape3D" parent="IntactBody" unique_id=1930164488]
+transform = Transform3D(0, 4.3711392e-08, 1, 1.0000001, 0, 0, 0, 1.0000001, -4.371139e-08, -0.021972666, 0.6389161, -0.010735333)
+shape = SubResource("BoxShape3D_7rdoj")
+
+[node name="DebrisRoot" type="Node3D" parent="." unique_id=1062000715]
+visible = false
+
+[node name="TopPlank" type="RigidBody3D" parent="DebrisRoot" unique_id=1629069113]
+transform = Transform3D(0.99776894, -0.06676151, 0, 0.06676151, 0.99776894, 0, 0, 0, 1, 0.22614717, 0.21037817, 0)
+collision_layer = 0
+collision_mask = 4294967295
+mass = 2.0
+
+[node name="tree-log2" parent="DebrisRoot/TopPlank" unique_id=361236612 instance=ExtResource("2_2fdfk")]
+transform = Transform3D(2.9999998, 5.1961527, 0, -5.1961527, 2.9999998, 0, 0, 0, 6, 0, 0.65037835, 0)
+
+[node name="Collision3" type="CollisionShape3D" parent="DebrisRoot/TopPlank" unique_id=2003919089]
+transform = Transform3D(0, 4.3711392e-08, 1, 1.0000001, 0, 0, 0, 1.0000001, -4.371139e-08, -0.021972666, 0.6389161, -0.010735333)
+shape = SubResource("BoxShape3D_7rdoj")

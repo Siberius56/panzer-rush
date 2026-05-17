@@ -2,17 +2,19 @@
 
 [ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_7af67"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_be308"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="2_be308"]
 [ext_resource type="PackedScene" uid="uid://dtikh1ho4v06s" path="res://asset/tank/box_bevel2.glb" id="3_13c08"]
+[ext_resource type="PackedScene" uid="uid://bytk1jj0bwgrs" path="res://vehicle_system/tank_Bulb.tscn" id="3_a3h3n"]
 [ext_resource type="PackedScene" uid="uid://85fhv522s8eo" path="res://asset/map/misc-2/barrel.glb" id="3_bshfi"]
-[ext_resource type="PackedScene" uid="uid://cy3mff60d638u" path="res://asset/map/misc-2/metal-panel-screws-half.glb" id="3_hqdy5"]
 [ext_resource type="PackedScene" uid="uid://c3kpi687gtclf" path="res://vehicle_system/turrets/Turret_Light.tscn" id="4_3ojlu"]
-[ext_resource type="PackedScene" uid="uid://ccjv38408lp72" path="res://asset/map/misc-2/metal-panel-screws-narrow.glb" id="4_6gy5a"]
-[ext_resource type="PackedScene" uid="uid://cs4cla08bi1t4" path="res://asset/map/misc-1/barrel_003.glb" id="7_6gy5a"]
 [ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
 [ext_resource type="PackedScene" uid="uid://doahk7r5nqif3" path="res://vehicle_system/mods/examples/ReactorMod.tscn" id="11_reactor"]
 [ext_resource type="PackedScene" uid="uid://dx1yvenaokhcd" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
 [ext_resource type="PackedScene" uid="uid://c12ku5gft5lu1" path="res://vehicle_system/mods/examples/SnowplowMod.tscn" id="15_snowplow"]
+[ext_resource type="PackedScene" uid="uid://dghgpi5ua4ev7" path="res://vehicle_system/effects/Vehicle_ExhaustSmoke.tscn" id="20_exhaust_smoke"]
+[ext_resource type="PackedScene" uid="uid://c7hxotilt34mx" path="res://vehicle_system/effects/Vehicle_EngineDamageSmoke.tscn" id="21_engine_smoke"]
+[ext_resource type="PackedScene" uid="uid://ccvrst0luot23" path="res://vehicle_system/effects/Vehicle_EngineFire.tscn" id="22_engine_fire"]
+[ext_resource type="PackedScene" uid="uid://dslr7j7svjwsl" path="res://vehicle_system/effects/Vehicle_WheelDust.tscn" id="23_wheel_dust"]
 
 [sub_resource type="PhysicsMaterial" id="1"]
 friction = 0.2
@@ -99,73 +101,64 @@ chassis_price = 1200
 chassis_trade_in_value = 900
 engine_force_forward = 8200.0
 engine_force_reverse = 3500.0
-max_steering_deg = 58.0
+visual_idle_shake_rotation_degrees = 0.3
+visual_idle_critical_shake_rotation_degrees = 1.8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009307861, 1.2991391, 0.0065979958)
 shape = SubResource("2")
 
+[node name="EngineDamageSmoke" parent="." unique_id=1494191944 groups=["vehicle_engine_damage_smoke"] instance=ExtResource("21_engine_smoke")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5699999, -0.82)
+
+[node name="EngineFire" parent="." unique_id=507530982 groups=["vehicle_engine_fire"] instance=ExtResource("22_engine_fire")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, -0.82)
+
+[node name="WheelDustLeft" parent="." unique_id=1236914614 groups=["vehicle_wheel_dust"] instance=ExtResource("23_wheel_dust")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.01999998, -1.05)
+
+[node name="WheelDustRight" parent="." unique_id=499043178 groups=["vehicle_wheel_dust"] instance=ExtResource("23_wheel_dust")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.01999998, -1.05)
+
 [node name="BodyVisualRoot" type="Node3D" parent="." unique_id=1288168528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
-[node name="Body" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=1106500422]
+[node name="EngineShakeRoot" type="Node3D" parent="BodyVisualRoot" unique_id=1144166463]
+
+[node name="Body" type="MeshInstance3D" parent="BodyVisualRoot/EngineShakeRoot" unique_id=1106500422]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
 mesh = SubResource("ArrayMesh_785wl")
 surface_material_override/0 = ExtResource("2_be308")
 
-[node name="barrel2" parent="BodyVisualRoot" unique_id=1258258365 instance=ExtResource("3_bshfi")]
-transform = Transform3D(2.25, -9.835063e-08, -9.8350625e-08, -9.835063e-08, -9.835062e-08, -2.25, 9.8350625e-08, 2.25, -9.8350625e-08, 1.34, 0.60118103, -0.9233247)
+[node name="barrel2" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1258258365 instance=ExtResource("3_bshfi")]
+transform = Transform3D(1.25, -5.4639244e-08, -5.463924e-08, -5.4639244e-08, -5.4639234e-08, -1.25, 5.463924e-08, 1.25, -5.463924e-08, 0.7444445, 0.7506562, -0.51295817)
 
-[node name="barrel3" parent="BodyVisualRoot" unique_id=824926015 instance=ExtResource("3_bshfi")]
-transform = Transform3D(2.25, -9.835063e-08, -9.8350625e-08, -9.835063e-08, -9.835062e-08, -2.25, 9.8350625e-08, 2.25, -9.8350625e-08, 1.34, 0.60118103, 0.04262662)
+[node name="barrel3" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=824926015 instance=ExtResource("3_bshfi")]
+transform = Transform3D(1.25, -5.4639244e-08, -5.463924e-08, -5.4639244e-08, -5.4639234e-08, -1.25, 5.463924e-08, 1.25, -5.463924e-08, 0.7444445, 0.7506562, 0.023681456)
 
-[node name="barrel4" parent="BodyVisualRoot" unique_id=1040396634 instance=ExtResource("3_bshfi")]
-transform = Transform3D(-2.25, 9.8350625e-08, -9.8350625e-08, -9.835062e-08, 9.835061e-08, 2.25, 9.835062e-08, 2.25, -9.835062e-08, -1.34, 0.60118103, -0.9233247)
+[node name="barrel4" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1040396634 instance=ExtResource("3_bshfi")]
+transform = Transform3D(-1.25, 5.463924e-08, -5.463924e-08, -5.4639234e-08, 5.463923e-08, 1.25, 5.4639234e-08, 1.25, -5.4639234e-08, -0.7444445, 0.7506562, -0.51295817)
 
-[node name="barrel5" parent="BodyVisualRoot" unique_id=1663058580 instance=ExtResource("3_bshfi")]
-transform = Transform3D(-2.25, 9.8350625e-08, -9.8350625e-08, -9.835062e-08, 9.835061e-08, 2.25, 9.835062e-08, 2.25, -9.835062e-08, -1.34, 0.60118103, 0.04262662)
+[node name="barrel5" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1663058580 instance=ExtResource("3_bshfi")]
+transform = Transform3D(-1.25, 5.463924e-08, -5.463924e-08, -5.4639234e-08, 5.463923e-08, 1.25, 5.4639234e-08, 1.25, -5.4639234e-08, -0.7444445, 0.7506562, 0.023681456)
 
-[node name="barrel_0032" parent="BodyVisualRoot" unique_id=1343256185 instance=ExtResource("7_6gy5a")]
-transform = Transform3D(0.93969256, 9.825314e-09, 0.34202012, 0.34202012, -5.5722158e-08, -0.93969256, 9.825313e-09, 1, -5.5722154e-08, 1.337355, 0.59000707, -0.9641681)
-visible = false
+[node name="box_bevel2" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=76553973 instance=ExtResource("3_13c08")]
+transform = Transform3D(0.19444445, 0, 0, 0, 0.16666669, 0, 0, 0, 0.1388889, 0.25, 0.8822223, -0.4688889)
 
-[node name="barrel_0033" parent="BodyVisualRoot" unique_id=841918474 instance=ExtResource("7_6gy5a")]
-transform = Transform3D(0.93969256, 9.825314e-09, 0.34202012, 0.34202012, -5.5722158e-08, -0.93969256, 9.825313e-09, 1, -5.5722154e-08, 1.337355, 0.59000707, 0.03583193)
-visible = false
+[node name="box_bevel3" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=898445028 instance=ExtResource("3_13c08")]
+transform = Transform3D(0.19444445, 0, 0, 0, 0.16666669, 0, 0, 0, 0.1388889, -0.25, 0.8822223, -0.4688889)
 
-[node name="barrel_0034" parent="BodyVisualRoot" unique_id=1276249989 instance=ExtResource("7_6gy5a")]
-transform = Transform3D(0.93969256, -9.825314e-09, -0.34202012, -0.34202012, -5.5722158e-08, -0.93969256, -9.825313e-09, 1, -5.5722154e-08, -1.34623, 0.59000707, -0.9641681)
-visible = false
+[node name="box_bevel4" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1851600694 instance=ExtResource("3_13c08")]
+transform = Transform3D(0.2777778, 0, 0, 0, 0.06566757, 0.05130513, 0, -0.05130513, 0.06566757, 6.6227386e-08, 0.82819796, 0.6057321)
 
-[node name="barrel_0035" parent="BodyVisualRoot" unique_id=842258631 instance=ExtResource("7_6gy5a")]
-transform = Transform3D(0.93969256, -9.825314e-09, -0.34202012, -0.34202012, -5.5722158e-08, -0.93969256, -9.825313e-09, 1, -5.5722154e-08, -1.34623, 0.59000707, 0.03583193)
-visible = false
+[node name="Tank_Bulb1" parent="BodyVisualRoot/EngineShakeRoot" unique_id=827648905 instance=ExtResource("3_a3h3n")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.78, 0.602, 1.29)
 
-[node name="box_bevel2" parent="BodyVisualRoot" unique_id=76553973 instance=ExtResource("3_13c08")]
-transform = Transform3D(0.35, 0, 0, 0, 0.3, 0, 0, 0, 0.25, 0.45, 0.838, -0.844)
+[node name="Tank_Bulb2" parent="BodyVisualRoot/EngineShakeRoot" unique_id=1297535589 instance=ExtResource("3_a3h3n")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -0.78, 0.602, 1.29)
 
-[node name="Cube" parent="BodyVisualRoot/box_bevel2" index="0" unique_id=1933577301]
-surface_material_override/0 = ExtResource("2_be308")
-
-[node name="box_bevel3" parent="BodyVisualRoot" unique_id=898445028 instance=ExtResource("3_13c08")]
-transform = Transform3D(0.35, 0, 0, 0, 0.3, 0, 0, 0, 0.25, -0.45, 0.838, -0.844)
-
-[node name="Cube" parent="BodyVisualRoot/box_bevel3" index="0" unique_id=1933577301]
-surface_material_override/0 = ExtResource("2_be308")
-
-[node name="box_bevel4" parent="BodyVisualRoot" unique_id=1851600694 instance=ExtResource("3_13c08")]
-transform = Transform3D(0.5, 0, 0, 0, 0.11820162, 0.09234923, 0, -0.09234923, 0.11820162, 1.1920929e-07, 0.7407563, 1.0903177)
-
-[node name="Cube" parent="BodyVisualRoot/box_bevel4" index="0" unique_id=1933577301]
-surface_material_override/0 = ExtResource("2_be308")
-
-[node name="metal-panel-screws-half2" parent="BodyVisualRoot" unique_id=674114915 instance=ExtResource("3_hqdy5")]
-transform = Transform3D(-6.556708e-08, 0, 1.5, 0, 1.5, 0, -1.5, 0, -6.556708e-08, 1.1389712, 0.49989438, -0.5039052)
-visible = false
-
-[node name="metal-panel-screws-narrow2" parent="BodyVisualRoot" unique_id=580354889 instance=ExtResource("4_6gy5a")]
-transform = Transform3D(-6.5567086e-08, -6.5567086e-08, 1.5, -1.4893364, 0.1785417, -5.7296646e-08, -0.1785417, -1.4893364, -7.290527e-08, 1.1199358, 0.6033348, 1.0548713)
-visible = false
+[node name="ExhaustSmoke1" parent="BodyVisualRoot/EngineShakeRoot" unique_id=1559043494 groups=["vehicle_exhaust_smoke"] instance=ExtResource("20_exhaust_smoke")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, -1.42)
 
 [node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=1468659701]
 
@@ -221,7 +214,7 @@ use_as_steering = true
 wheel_roll_influence = 0.12
 wheel_radius = 0.48
 wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
+wheel_friction_slip = 2.0
 suspension_stiffness = 59.0
 damping_compression = 0.15
 
@@ -236,7 +229,7 @@ use_as_steering = true
 wheel_roll_influence = 0.12
 wheel_radius = 0.48
 wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
+wheel_friction_slip = 2.0
 suspension_stiffness = 59.0
 damping_compression = 0.15
 
@@ -296,7 +289,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.5, 0)
 
 [connection signal="body_entered" from="UseArea" to="." method="_on_use_area_body_entered"]
 [connection signal="body_exited" from="UseArea" to="." method="_on_use_area_body_exited"]
-
-[editable path="BodyVisualRoot/box_bevel2"]
-[editable path="BodyVisualRoot/box_bevel3"]
-[editable path="BodyVisualRoot/box_bevel4"]

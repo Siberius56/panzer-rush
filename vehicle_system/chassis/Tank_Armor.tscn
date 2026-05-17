@@ -1,8 +1,9 @@
 [gd_scene format=4 uid="uid://dh5wsyhjgouon"]
 
 [ext_resource type="Script" uid="uid://cui8hv6j4nh3b" path="res://vehicle_system/Vehicle.gd" id="1_ukxq2"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="2_nh32u"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="2_nh32u"]
 [ext_resource type="PackedScene" uid="uid://b4bpxkvofd6b" path="res://vehicle_system/VehicleSeat.tscn" id="2_skmyr"]
+[ext_resource type="PackedScene" uid="uid://bytk1jj0bwgrs" path="res://vehicle_system/tank_Bulb.tscn" id="3_mswaw"]
 [ext_resource type="PackedScene" uid="uid://bkdesvqe68ejn" path="res://vehicle_system/turrets/Turret_Driver.tscn" id="3_qi570"]
 [ext_resource type="PackedScene" uid="uid://bcfhqdmggyd8i" path="res://vehicle_system/turrets/Turret_Gunner.tscn" id="4_skmyr"]
 [ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
@@ -10,6 +11,10 @@
 [ext_resource type="PackedScene" uid="uid://c8022636ofg2h" path="res://vehicle_system/mods/examples/ArmorSkirtMod.tscn" id="13_armor"]
 [ext_resource type="PackedScene" uid="uid://dx1yvenaokhcd" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
 [ext_resource type="PackedScene" uid="uid://c12ku5gft5lu1" path="res://vehicle_system/mods/examples/SnowplowMod.tscn" id="15_snowplow"]
+[ext_resource type="PackedScene" uid="uid://dghgpi5ua4ev7" path="res://vehicle_system/effects/Vehicle_ExhaustSmoke.tscn" id="20_exhaust_smoke"]
+[ext_resource type="PackedScene" uid="uid://c7hxotilt34mx" path="res://vehicle_system/effects/Vehicle_EngineDamageSmoke.tscn" id="21_engine_smoke"]
+[ext_resource type="PackedScene" uid="uid://ccvrst0luot23" path="res://vehicle_system/effects/Vehicle_EngineFire.tscn" id="22_engine_fire"]
+[ext_resource type="PackedScene" uid="uid://dslr7j7svjwsl" path="res://vehicle_system/effects/Vehicle_WheelDust.tscn" id="23_wheel_dust"]
 
 [sub_resource type="PhysicsMaterial" id="1"]
 friction = 0.2
@@ -110,10 +115,36 @@ shape = SubResource("2")
 [node name="BodyVisualRoot" type="Node3D" parent="." unique_id=1288168528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
-[node name="Body" type="MeshInstance3D" parent="BodyVisualRoot" unique_id=734452507]
+
+[node name="EngineShakeRoot" type="Node3D" parent="BodyVisualRoot"]
+[node name="Body" type="MeshInstance3D" parent="BodyVisualRoot/EngineShakeRoot" unique_id=734452507]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, -0.75, 0)
 material_override = ExtResource("2_nh32u")
 mesh = SubResource("ArrayMesh_k1qjj")
+
+[node name="Tank_Bulb1" parent="BodyVisualRoot/EngineShakeRoot" unique_id=827648905 instance=ExtResource("3_mswaw")]
+transform = Transform3D(-3.934025e-08, 0, -0.9, 0, 0.9, 0, 0.9, 0, -3.934025e-08, 0.9, 0, 1.7)
+
+[node name="Tank_Bulb2" parent="BodyVisualRoot/EngineShakeRoot" unique_id=1624940483 instance=ExtResource("3_mswaw")]
+transform = Transform3D(-3.934025e-08, 0, -0.9, 0, 0.9, 0, 0.9, 0, -3.934025e-08, -0.9, 0, 1.7)
+
+[node name="ExhaustSmokeLeft" parent="BodyVisualRoot/EngineShakeRoot" groups=["vehicle_exhaust_smoke"] instance=ExtResource("20_exhaust_smoke")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0.4, -1.55)
+
+[node name="ExhaustSmokeRight" parent="BodyVisualRoot/EngineShakeRoot" groups=["vehicle_exhaust_smoke"] instance=ExtResource("20_exhaust_smoke")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.4, -1.55)
+
+[node name="EngineDamageSmoke" parent="BodyVisualRoot/EngineShakeRoot" groups=["vehicle_engine_damage_smoke"] instance=ExtResource("21_engine_smoke")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0.85, -1.0)
+
+[node name="EngineFire" parent="BodyVisualRoot/EngineShakeRoot" groups=["vehicle_engine_fire"] instance=ExtResource("22_engine_fire")]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0.82, -1.0)
+
+[node name="WheelDustLeft" parent="BodyVisualRoot/EngineShakeRoot" groups=["vehicle_wheel_dust"] instance=ExtResource("23_wheel_dust")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.900, -0.550, -1.050)
+
+[node name="WheelDustRight" parent="BodyVisualRoot/EngineShakeRoot" groups=["vehicle_wheel_dust"] instance=ExtResource("23_wheel_dust")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.900, -0.550, -1.050)
 
 [node name="Seats" type="Node3D" parent="BodyVisualRoot" unique_id=1468659701]
 
@@ -187,6 +218,7 @@ visible = false
 mesh = SubResource("CylinderMesh_yxytb")
 surface_material_override/0 = SubResource("6")
 
+
 [node name="FrontRightWheel" type="VehicleWheel3D" parent="." unique_id=887756342]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0.9, 0.5, 0.9)
 use_as_steering = true
@@ -203,6 +235,7 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 
 visible = false
 mesh = SubResource("CylinderMesh_yxytb")
 surface_material_override/0 = SubResource("6")
+
 
 [node name="RearLeftWheel" type="VehicleWheel3D" parent="." unique_id=347284515]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -0.9, 0.5, -0.9)
@@ -221,6 +254,7 @@ visible = false
 mesh = SubResource("CylinderMesh_yxytb")
 surface_material_override/0 = SubResource("6")
 
+
 [node name="RearRightWheel" type="VehicleWheel3D" parent="." unique_id=999012565]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0.9, 0.5, -0.9)
 use_as_traction = true
@@ -237,6 +271,7 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 
 visible = false
 mesh = SubResource("CylinderMesh_yxytb")
 surface_material_override/0 = SubResource("6")
+
 
 [node name="UseArea" type="Area3D" parent="." unique_id=1965562369]
 collision_layer = 0

@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://de28p2htwgvqs"]
+
+[ext_resource type="Script" uid="uid://cvdneexrf1he2" path="res://scenes/triggers/PassageGate.gd" id="1_passage_gate"]
+[ext_resource type="PackedScene" uid="uid://cp3o2d2kduimw" path="res://asset/map/road/road-square.glb" id="2_aboca"]
+[ext_resource type="PackedScene" uid="uid://c23d4w2brqi2u" path="res://asset/map/misc-2/indicator-special-cross.glb" id="2_rfhyr"]
+[ext_resource type="PackedScene" uid="uid://c4nxd06ghh0fu" path="res://asset/map/misc-2/indicator-special-area.glb" id="2_s2yx6"]
+[ext_resource type="PackedScene" uid="uid://h8v8os25dggj" path="res://scenes/triggers/SlidingHangarDoor.tscn" id="2_sliding_door"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_s2yx6"]
+size = Vector3(5, 1, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s2yx6"]
+albedo_color = Color(0.12, 0.12, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qnygc"]
+size = Vector3(4, 4, 4)
+
+[node name="PassageGate" type="Node3D" unique_id=691636036]
+script = ExtResource("1_passage_gate")
+
+[node name="road-square2" parent="." unique_id=294416620 instance=ExtResource("2_aboca")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -6.5, 0.5, 0)
+
+[node name="indicator-special-cross2" parent="." unique_id=335567688 instance=ExtResource("2_rfhyr")]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -6.5, 0.57, 0)
+
+[node name="PlatformMesh" type="MeshInstance3D" parent="." unique_id=676617252]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 0)
+visible = false
+mesh = SubResource("BoxMesh_s2yx6")
+surface_material_override/0 = SubResource("StandardMaterial3D_s2yx6")
+
+[node name="SpawnPoints" type="Node3D" parent="." unique_id=2021538358]
+
+[node name="SpawnA" type="Marker3D" parent="SpawnPoints" unique_id=546583090]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+
+[node name="SpawnB" type="Marker3D" parent="SpawnPoints" unique_id=617342159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+
+[node name="SpawnC" type="Marker3D" parent="SpawnPoints" unique_id=1775256389]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
+
+[node name="SpawnD" type="Marker3D" parent="SpawnPoints" unique_id=163466722]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+
+[node name="Tank_TP" type="Marker3D" parent="." unique_id=1001459706]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1, 0)
+
+[node name="PassageArea" type="Area3D" parent="." unique_id=1868135032]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.8)
+collision_layer = 0
+collision_mask = 4294901765
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PassageArea" unique_id=1661666517]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8625357, 0)
+shape = SubResource("BoxShape3D_qnygc")
+
+[node name="indicator-special-area2" parent="PassageArea" unique_id=1700644003 instance=ExtResource("2_s2yx6")]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0.6, 0)
+
+[node name="FrontDoor" parent="." unique_id=1657650298 instance=ExtResource("2_sliding_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+left_open_position = Vector3(-3, 0, 0)
+right_open_position = Vector3(3, 0, 0)
+
+[node name="RearDoor" parent="." unique_id=1019870505 instance=ExtResource("2_sliding_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+left_open_position = Vector3(-3, 0, 0)
+right_open_position = Vector3(3, 0, 0)
+start_open = true

@@ -3,15 +3,21 @@
 [ext_resource type="Script" uid="uid://b7cu2iwmwiq8h" path="res://vehicle_system/mods/examples/SnowplowMod.gd" id="1_snowplow"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_blade"]
-size = Vector3(2.3, 0.45, 0.18)
+size = Vector3(3, 0.6, 0.18)
 
 [sub_resource type="StandardMaterial3D" id="Material_blade"]
 albedo_color = Color(0.12, 0.13, 0.14, 1)
 metallic = 0.9
 roughness = 0.45
 
+[sub_resource type="BoxMesh" id="BoxMesh_03y07"]
+size = Vector3(0.4, 2, 0.18)
+
 [sub_resource type="BoxShape3D" id="BoxShape_push"]
-size = Vector3(2.5, 1, 1)
+size = Vector3(3, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_03y07"]
+size = Vector3(3, 0.5957031, 0.18695068)
 
 [node name="SnowplowMod" type="Node3D" unique_id=960362230]
 script = ExtResource("1_snowplow")
@@ -26,11 +32,29 @@ transform = Transform3D(1, 0, 0, 0, 0.9063078, -0.42261827, 0, 0.42261827, 0.906
 mesh = SubResource("BoxMesh_blade")
 surface_material_override/0 = SubResource("Material_blade")
 
+[node name="Blade2" type="MeshInstance3D" parent="VisualRoot" unique_id=359943374]
+transform = Transform3D(1, 0, 0, 0, 1.3113416e-07, 1, 0, -1, 1.3113416e-07, -0.7, 0, 0.842)
+mesh = SubResource("BoxMesh_03y07")
+surface_material_override/0 = SubResource("Material_blade")
+
+[node name="Blade3" type="MeshInstance3D" parent="VisualRoot" unique_id=2083310943]
+transform = Transform3D(1, 0, 0, 0, 1.3113416e-07, 1, 0, -1, 1.3113416e-07, 0.7, 0, 0.842)
+mesh = SubResource("BoxMesh_03y07")
+surface_material_override/0 = SubResource("Material_blade")
+
 [node name="PushArea" type="Area3D" parent="." unique_id=1396954293]
-collision_layer = 15
-collision_mask = 0
+collision_layer = 0
+collision_mask = 2
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PushArea" unique_id=2047803744]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.65)
 shape = SubResource("BoxShape_push")
+
+[node name="PhysicalPushBody" type="StaticBody3D" parent="." unique_id=908483008]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PhysicalPushBody" unique_id=263649167]
+transform = Transform3D(1, 0, 0, 0, 0.90630776, -0.42261827, 0, 0.42261827, 0.90630776, 0, -0.005946533, -0.1501723)
+shape = SubResource("BoxShape3D_03y07")

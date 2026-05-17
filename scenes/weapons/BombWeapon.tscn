@@ -1,0 +1,92 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_dark"]
+albedo_color = Color(0.045, 0.045, 0.05, 1)
+roughness = 0.72
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.38, 0.39, 0.42, 1)
+metallic = 0.2
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_red"]
+albedo_color = Color(0.8, 0.08, 0.035, 1)
+emission_enabled = true
+emission = Color(0.8, 0.05, 0.02, 1)
+emission_energy_multiplier = 0.45
+
+[sub_resource type="StandardMaterial3D" id="mat_green"]
+albedo_color = Color(0.08, 0.9, 0.22, 1)
+emission_enabled = true
+emission = Color(0.08, 0.9, 0.22, 1)
+emission_energy_multiplier = 0.65
+
+[sub_resource type="BoxMesh" id="mesh_body"]
+size = Vector3(0.34, 0.26, 0.58)
+
+[sub_resource type="CylinderMesh" id="mesh_cap"]
+top_radius = 0.14
+bottom_radius = 0.14
+height = 0.08
+radial_segments = 16
+
+[sub_resource type="BoxMesh" id="mesh_strap"]
+size = Vector3(0.38, 0.045, 0.08)
+
+[sub_resource type="SphereMesh" id="mesh_led"]
+radius = 0.035
+height = 0.07
+radial_segments = 8
+rings = 4
+
+[node name="BombWeapon" type="Node3D"]
+script = ExtResource("1_script")
+weapon_id = "bomb"
+weapon_label = "Bomb"
+weapon_local_position = Vector3(0.12, 1.12, -0.34)
+weapon_behavior = "objective_item"
+magazine_size = 0
+reload_duration = 0.0
+automatic_fire = false
+fire_cooldown = 999.0
+camera_shake_enabled = false
+hand_position = Vector3(0.12, -0.04, -0.02)
+hand_rotation_deg = Vector3(0, 0, 0)
+back_position = Vector3(0.12, 0.02, 0.05)
+back_rotation_deg = Vector3(-80, 0, 10)
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.005, -0.16)
+material_override = SubResource("mat_dark")
+mesh = SubResource("mesh_body")
+
+[node name="FrontCap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.07, -0.43)
+material_override = SubResource("mat_metal")
+mesh = SubResource("mesh_cap")
+
+[node name="BackCap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.08, 0.1)
+material_override = SubResource("mat_metal")
+mesh = SubResource("mesh_cap")
+
+[node name="RedStrap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.14, -0.18)
+material_override = SubResource("mat_red")
+mesh = SubResource("mesh_strap")
+
+[node name="GreenLed" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0.13, 0.14, -0.28)
+material_override = SubResource("mat_green")
+mesh = SubResource("mesh_led")
+
+[node name="Muzzle" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.48)
+
+[node name="LeftGrip" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.02, -0.19)
+
+[node name="RightGrip" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.02, -0.05)

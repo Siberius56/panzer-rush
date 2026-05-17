@@ -5,6 +5,7 @@ class_name NetworkMainClientVehicleSyncPatch
 
 const MENU_SCENE_PATH := "res://scenes/menu/MainMenu.tscn"
 const PLAYER_SCENE := preload("res://scenes/player/NetworkProceduralPlayer.tscn")
+const TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH := "res://scenes/enemies/TransportHelicopterEnemySpawner.tscn"
 
 @export var debug_disable_enemy_spawn: bool = true
 @export var initial_enemy_count: int = 4
@@ -18,6 +19,17 @@ const PLAYER_SCENE := preload("res://scenes/player/NetworkProceduralPlayer.tscn"
 @export_group("Respawn")
 @export var trigger_root_path: NodePath = ^"Trigger"
 
+@export_group("Initial Network Zones")
+@export var apply_initial_network_zone_state_on_ready: bool = true
+@export var initial_network_zones_to_activate: Array[NodePath] = []
+@export var initial_network_zones_to_deactivate: Array[NodePath] = []
+@export var debug_initial_network_zone_state: bool = false
+
+@export_group("Transport Helicopter Attacks")
+@export var transport_helicopter_scene: PackedScene
+@export var max_active_transport_helicopters: int = 4
+@export var allow_client_transport_helicopter_requests: bool = false
+
 @onready var enemies_root: Node3D = $Enemies
 @onready var spawn_points_root: Node3D = $SpawnPoints
 @onready var vehicle_spawns_root: Node3D = $VehicleSpawns
@@ -29,6 +41,7 @@ const ENV_DAY = preload("uid://ji8qy5d56h0t")
 var players_root: Node3D = null
 var vehicles_root: Node3D = null
 var next_enemy_id: int = 1
+var next_transport_helicopter_id: int = 1
 var active_respawn_passage: Node3D = null
 var active_respawn_passage_path: NodePath = NodePath("")
 
@@ -41,6 +54,7 @@ func _ready() -> void:
 	add_to_group("network_main")
 	_ensure_players_root()
 	_ensure_vehicles_root()
+	_apply_initial_network_zone_states()
 	
 	
 	if world_environment:
@@ -60,6 +74,59 @@ func _ready() -> void:
 	_sync_players()
 	_prepare_vehicle_snapshot_flow()
 
+func _apply_initial_network_zone_states() -> void:
+	if not apply_initial_network_zone_state_on_ready:
+		return
+
+	# On désactive d'abord, puis on active.
+	# Si une zone est dans les deux listes, l'activation gagne.
+	for zone_path: NodePath in initial_network_zones_to_deactivate:
+		_apply_initial_network_zone_state_from_path(zone_path, false)
+
+	for zone_path: NodePath in initial_network_zones_to_activate:
+		_apply_initial_network_zone_state_from_path(zone_path, true)
+
+
+func _apply_initial_network_zone_state_from_path(zone_path: NodePath, active: bool) -> void:
+	if zone_path.is_empty():
+		return
+
+	var zone_node: Node = _get_initial_network_zone_from_path(zone_path)
+	if zone_node == null or not is_instance_valid(zone_node):
+		var action_text: String = "activer" if active else "désactiver"
+		push_warning("[NetworkMain] Impossible de %s la zone initiale : %s" % [action_text, str(zone_path)])
+		return
+
+	_set_initial_network_zone_active(zone_node, active)
+
+
+func _get_initial_network_zone_from_path(zone_path: NodePath) -> Node:
+	if zone_path.is_empty():
+		return null
+
+	var node: Node = get_node_or_null(zone_path)
+	if node == null:
+		var current_scene: Node = get_tree().current_scene
+		if current_scene != null and current_scene != self:
+			node = current_scene.get_node_or_null(zone_path)
+
+	return node
+
+
+func _set_initial_network_zone_active(zone_node: Node, active: bool) -> void:
+	if zone_node == null or not is_instance_valid(zone_node):
+		return
+
+	if debug_initial_network_zone_state:
+		var state_text: String = "activée" if active else "désactivée"
+		print("[NetworkMain] Zone initiale %s : %s" % [state_text, zone_node.get_path()])
+
+	if not zone_node.has_method("set_network_zone_active"):
+		push_warning("[NetworkMain] La zone ne possède pas set_network_zone_active(active). Ajoute NetworkZone.gd sur : %s" % str(zone_node.get_path()))
+		return
+
+	zone_node.call("set_network_zone_active", active)
+
 func _ensure_players_root() -> void:
 	players_root = get_node_or_null("Players") as Node3D
 	if players_root != null:
@@ -77,6 +144,164 @@ func _ensure_vehicles_root() -> void:
 	vehicles_root = Node3D.new()
 	vehicles_root.name = "Vehicles"
 	add_child(vehicles_root)
+
+
+func _ensure_enemies_root() -> void:
+	enemies_root = get_node_or_null("Enemies") as Node3D
+	if enemies_root != null:
+		return
+
+	enemies_root = Node3D.new()
+	enemies_root.name = "Enemies"
+	add_child(enemies_root)
+
+
+func request_transport_helicopter(
+	spawn_transform: Transform3D,
+	destination_position: Vector3,
+	unit_set_id: String
+) -> void:
+	if multiplayer.multiplayer_peer != null and not multiplayer.is_server():
+		if allow_client_transport_helicopter_requests:
+			_request_transport_helicopter_from_client.rpc_id(
+				NetworkManager.SERVER_PEER_ID,
+				spawn_transform,
+				destination_position,
+				unit_set_id
+			)
+		return
+
+	_server_request_transport_helicopter(spawn_transform, destination_position, unit_set_id)
+
+
+@rpc("any_peer", "reliable")
+func _request_transport_helicopter_from_client(
+	spawn_transform: Transform3D,
+	destination_position: Vector3,
+	unit_set_id: String
+) -> void:
+	if multiplayer.multiplayer_peer == null:
+		return
+	if not multiplayer.is_server():
+		return
+	if not allow_client_transport_helicopter_requests:
+		return
+
+	_server_request_transport_helicopter(spawn_transform, destination_position, unit_set_id)
+
+
+func _server_request_transport_helicopter(
+	spawn_transform: Transform3D,
+	destination_position: Vector3,
+	unit_set_id: String
+) -> void:
+	if multiplayer.multiplayer_peer != null and not multiplayer.is_server():
+		return
+
+	_ensure_enemies_root()
+
+	if enemies_root == null:
+		push_warning("[NetworkMain] Enemies root introuvable. Impossible de créer l'hélicoptère.")
+		return
+
+	if _get_active_transport_helicopter_count() >= max_active_transport_helicopters:
+		push_warning("[NetworkMain] Limite d'hélicoptères actifs atteinte.")
+		return
+
+	var helicopter_name: String = "TransportHelicopter_%d" % next_transport_helicopter_id
+	next_transport_helicopter_id += 1
+
+	if multiplayer.multiplayer_peer != null:
+		_spawn_transport_helicopter_remote.rpc(
+			helicopter_name,
+			spawn_transform,
+			destination_position,
+			unit_set_id
+		)
+		return
+
+	_spawn_transport_helicopter_remote(
+		helicopter_name,
+		spawn_transform,
+		destination_position,
+		unit_set_id
+	)
+
+
+@rpc("authority", "call_local", "reliable")
+func _spawn_transport_helicopter_remote(
+	helicopter_name: String,
+	spawn_transform: Transform3D,
+	destination_position: Vector3,
+	unit_set_id: String
+) -> void:
+	_ensure_enemies_root()
+
+	if enemies_root == null:
+		return
+
+	if enemies_root.get_node_or_null(helicopter_name) != null:
+		return
+
+	var scene: PackedScene = _get_transport_helicopter_scene()
+	if scene == null:
+		push_warning("[NetworkMain] Scène d'hélicoptère introuvable : %s" % TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH)
+		return
+
+	var helicopter: Node = scene.instantiate()
+	helicopter.name = helicopter_name
+	helicopter.set_multiplayer_authority(NetworkManager.SERVER_PEER_ID)
+	enemies_root.add_child(helicopter)
+
+	if helicopter is Node3D:
+		(helicopter as Node3D).global_transform = spawn_transform
+
+	if helicopter.has_method("setup_transport_helicopter"):
+		helicopter.call("setup_transport_helicopter", spawn_transform, destination_position, unit_set_id)
+		return
+
+	_set_property_if_exists(helicopter, "destination_position", destination_position)
+	_set_property_if_exists(helicopter, "spawn_position", spawn_transform.origin)
+	_set_property_if_exists(helicopter, "unit_set_id", unit_set_id)
+
+
+func _get_transport_helicopter_scene() -> PackedScene:
+	if transport_helicopter_scene != null:
+		return transport_helicopter_scene
+
+	if ResourceLoader.exists(TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH):
+		return load(TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH) as PackedScene
+
+	return null
+
+
+func _get_active_transport_helicopter_count() -> int:
+	_ensure_enemies_root()
+
+	if enemies_root == null:
+		return 0
+
+	var count: int = 0
+	for child in enemies_root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		if child.is_in_group("transport_helicopters"):
+			count += 1
+			continue
+		if String(child.name).begins_with("TransportHelicopter_"):
+			count += 1
+
+	return count
+
+
+func _set_property_if_exists(target: Object, property_name: String, value: Variant) -> void:
+	if target == null:
+		return
+
+	for property_info in target.get_property_list():
+		if String(property_info.get("name", "")) == property_name:
+			target.set(property_name, value)
+			return
 
 
 func _build_session_text() -> String:
@@ -123,6 +348,19 @@ func _sync_players() -> void:
 	for child in players_root.get_children():
 		if not expected.has(child.name):
 			child.queue_free()
+
+	_sync_team_respawn_lives_to_players()
+
+
+func _sync_team_respawn_lives_to_players() -> void:
+	if not multiplayer.is_server():
+		return
+	if players_root == null:
+		return
+
+	for child in players_root.get_children():
+		if child != null and is_instance_valid(child) and child.has_method("_server_sync_team_respawn_lives_state"):
+			child.call("_server_sync_team_respawn_lives_state")
 
 
 func _prepare_vehicle_snapshot_flow() -> void:

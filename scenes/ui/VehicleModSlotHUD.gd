@@ -6,7 +6,9 @@ class_name VehicleModSlotHUD
 @export var ready_text: String = "READY"
 @export var cooldown_prefix: String = "CD"
 @export var max_name_length: int = 12
+@export var mod_icon_base_path: String = "res://asset/ui/mod/"
 
+@onready var mod_texture: TextureRect = %ModTexture
 @onready var mod_name_label: Label = %ModNameLabel
 @onready var mod_type_label: Label = %ModTypeLabel
 @onready var key_label: Label = %KeyLabel
@@ -19,6 +21,9 @@ func set_slot_data(slot_data: Dictionary, is_driver: bool) -> void:
 	if not has_mod:
 		_show_empty_slot()
 		return
+
+	var id_name: String = _get_mod_id_name(slot_data)
+	_refresh_mod_texture(id_name)
 
 	var mod_label: String = str(slot_data.get("mod_label", "Module")).strip_edges()
 	if mod_label.is_empty():
@@ -46,6 +51,7 @@ func set_slot_data(slot_data: Dictionary, is_driver: bool) -> void:
 
 
 func _show_empty_slot() -> void:
+	mod_texture.texture = null
 	mod_name_label.text = empty_text
 	mod_type_label.visible = false
 	mod_type_label.text = ""
@@ -55,6 +61,51 @@ func _show_empty_slot() -> void:
 	cooldown_label.text = ""
 	cooldown_progress.visible = false
 	cooldown_progress.value = 0.0
+
+
+func _get_mod_id_name(slot_data: Dictionary) -> String:
+	var id_name: String = str(slot_data.get("id_name", "")).strip_edges()
+	if not id_name.is_empty():
+		return id_name
+
+	id_name = str(slot_data.get("mod_id", "")).strip_edges()
+	if not id_name.is_empty():
+		return id_name
+
+	id_name = str(slot_data.get("id", "")).strip_edges()
+	return id_name
+
+
+func _refresh_mod_texture(id_name: String) -> void:
+	if id_name.is_empty():
+		mod_texture.texture = null
+		return
+
+	var icon_path: String = _build_mod_icon_path(id_name)
+	if not ResourceLoader.exists(icon_path, "Texture2D"):
+		mod_texture.texture = null
+		push_warning("VehicleModSlotHUD: missing mod icon: %s" % icon_path)
+		return
+
+	var texture_resource: Resource = load(icon_path)
+	var icon_texture: Texture2D = texture_resource as Texture2D
+	if icon_texture == null:
+		mod_texture.texture = null
+		push_warning("VehicleModSlotHUD: invalid mod icon texture: %s" % icon_path)
+		return
+
+	mod_texture.texture = icon_texture
+
+
+func _build_mod_icon_path(id_name: String) -> String:
+	var base_path: String = mod_icon_base_path.strip_edges()
+	if base_path.is_empty():
+		base_path = "res://asset/ui/mod/"
+
+	if not base_path.ends_with("/"):
+		base_path += "/"
+
+	return "%smod_%s.png" % [base_path, id_name]
 
 
 func _refresh_state_display(

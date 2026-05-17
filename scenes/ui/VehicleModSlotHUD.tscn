@@ -1,25 +1,57 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dvelcibd3i2dw"]
 
-[ext_resource type="Script" path="res://scenes/ui/VehicleModSlotHUD.gd" id="1_slot_script"]
+[ext_resource type="Script" uid="uid://cav1oewquo4mi" path="res://scenes/ui/VehicleModSlotHUD.gd" id="1_slot_script"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2dki7"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
-[node name="VehicleModSlotHUD" type="PanelContainer"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w31ch"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13au7"]
+bg_color = Color(0, 0, 0, 0.60784316)
+
+[node name="VehicleModSlotHUD" type="PanelContainer" unique_id=288004406]
+clip_children = 1
+custom_minimum_size = Vector2(64, 64)
 mouse_filter = 2
-custom_minimum_size = Vector2(86, 86)
+theme_override_styles/panel = SubResource("StyleBoxFlat_2dki7")
 script = ExtResource("1_slot_script")
 
-[node name="SlotMargin" type="MarginContainer" parent="."]
+[node name="ModTexture" type="TextureRect" parent="." unique_id=805264199]
+unique_name_in_owner = true
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="CooldownProgress" type="ProgressBar" parent="." unique_id=1201911281]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxEmpty_w31ch")
+theme_override_styles/fill = SubResource("StyleBoxFlat_13au7")
+value = 17.84
+show_percentage = false
+
+[node name="SlotMargin" type="MarginContainer" parent="." unique_id=743910158]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="SlotVBox" type="VBoxContainer" parent="SlotMargin"]
+[node name="SlotVBox" type="VBoxContainer" parent="SlotMargin" unique_id=396360121]
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 0
 alignment = 1
 
-[node name="ModNameLabel" type="Label" parent="SlotMargin/SlotVBox"]
+[node name="ModNameLabel" type="Label" parent="SlotMargin/SlotVBox" unique_id=166774524]
 unique_name_in_owner = true
 layout_mode = 2
 text = "empty"
@@ -27,33 +59,23 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="ModTypeLabel" type="Label" parent="SlotMargin/SlotVBox"]
+[node name="ModTypeLabel" type="Label" parent="SlotMargin/SlotVBox" unique_id=1891803264]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 text = "ACTIVE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="KeyLabel" type="Label" parent="SlotMargin/SlotVBox"]
+[node name="KeyLabel" type="Label" parent="SlotMargin/SlotVBox" unique_id=1066599168]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 text = "[1]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CooldownLabel" type="Label" parent="SlotMargin/SlotVBox"]
+[node name="CooldownLabel" type="Label" parent="SlotMargin/SlotVBox" unique_id=1293162325]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 text = "READY"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="CooldownProgress" type="ProgressBar" parent="SlotMargin/SlotVBox"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
-show_percentage = false

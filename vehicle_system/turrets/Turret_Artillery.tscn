@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvppjv5g8wa6h" path="res://vehicle_system/turrets/VehicleTurretBase.gd" id="1_56wi6"]
 [ext_resource type="PackedScene" uid="uid://c3xwrtxdr2ryw" path="res://scenes/weapons/88Bullet.tscn" id="2_56wi6"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/Tank_Color_Default.tres" id="3_uhnje"]
+[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="3_uhnje"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_njbsc"]
 resource_name = "MasterMat"

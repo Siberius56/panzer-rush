@@ -40,6 +40,13 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 @export var idle_aim_distance: float = 20.0
 @export var aim_point_offset: Vector3 = Vector3(0.0, -0.5, 0.0)
 
+@export_group("Camera Shake")
+@export var camera_shake_enabled: bool = true
+@export_range(0.0, 2.0, 0.01) var camera_shake_intensity: float = 0.34
+@export_range(0.1, 4.0, 0.05) var camera_shake_frequency_multiplier: float = 1.15
+@export var camera_shake_radius: float = 18.0
+@export var camera_shake_falloff: float = 1.15
+
 @export_group("Paths")
 @export var body_path: NodePath = NodePath("Body")
 @export var muzzle_path: NodePath = NodePath("TurretMuzzle")
@@ -467,11 +474,38 @@ func _try_fire(_peer_id: int) -> void:
 
 	_spawn_bullet_fx(shot_origin, shot_direction)
 	_spawn_bullet_fx.rpc(shot_origin, shot_direction)
+	_emit_turret_fire_camera_shake_for_peer(_peer_id, shot_origin)
 
 	if magazine_ammo < ammo_per_shot:
 		if reserve_ammo > 0:
 			reload_turret()
 
+
+func _emit_turret_fire_camera_shake_for_peer(peer_id: int, shot_position: Vector3) -> void:
+	if not camera_shake_enabled:
+		return
+
+	if camera_shake_intensity <= 0.0:
+		return
+
+	if peer_id == multiplayer.get_unique_id():
+		_emit_turret_fire_camera_shake(shot_position)
+	else:
+		_client_emit_turret_fire_camera_shake.rpc_id(peer_id, shot_position)
+
+@rpc("authority", "call_remote", "unreliable")
+func _client_emit_turret_fire_camera_shake(shot_position: Vector3) -> void:
+	_emit_turret_fire_camera_shake(shot_position)
+
+func _emit_turret_fire_camera_shake(shot_position: Vector3) -> void:
+	CameraShakeController.emit_global_shake(
+		get_tree(),
+		shot_position,
+		camera_shake_intensity,
+		camera_shake_radius,
+		camera_shake_falloff,
+		camera_shake_frequency_multiplier
+	)
 
 func _sanitize_ammo_values() -> void:
 	magazine_max_ammo = maxi(magazine_max_ammo, 1)

@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://b3urisa1uyofo"]
+
+[ext_resource type="Script" uid="uid://brw21aujh7jy3" path="res://scenes/weapons/WorldWeapon3D.gd" id="1_al03h"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_al03h"]
+
+[node name="WorldBomb3D" type="RigidBody3D" unique_id=974036771]
+collision_layer = 16
+collision_mask = 9
+mass = 10.0
+contact_monitor = true
+max_contacts_reported = 4
+linear_damp = 0.5
+angular_damp = 1.0
+script = ExtResource("1_al03h")
+editor_weapon_id = "bomb"
+editor_ammo_in_magazine = 0
+editor_reserve_ammo = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=873440532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.008111574, 0)
+shape = SubResource("BoxShape3D_al03h")
+
+[node name="VisualSocket" type="Node3D" parent="." unique_id=110911777]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Label3D" type="Label3D" parent="." unique_id=741685875]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.6315675, 0)
+text = "Weapon"
+font_size = 64

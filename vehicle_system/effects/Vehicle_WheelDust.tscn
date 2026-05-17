@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dslr7j7svjwsl"]
+
+[sub_resource type="StandardMaterial3D" id="WheelDustMaterial"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.42, 0.35994, 0.28139997, 1)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="WheelDustQuad"]
+material = SubResource("WheelDustMaterial")
+size = Vector2(0.22, 0.22)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jv3ik"]
+
+[node name="Vehicle_WheelDust" type="Node3D" unique_id=263896006]
+
+[node name="Particles" type="CPUParticles3D" parent="." unique_id=1579588345]
+transform = Transform3D(0.6, 0, 0, 0, 0.29999998, -0.5196153, 0, 0.5196153, 0.29999998, 0, 0, 0)
+emitting = false
+amount = 30
+preprocess = 0.12
+speed_scale = 1.25
+randomness = 0.7
+mesh = SubResource("WheelDustQuad")
+emission_shape = 1
+emission_sphere_radius = 0.5
+direction = Vector3(0, 0.18, -1)
+spread = 40.0
+gravity = Vector3(0, -15, 0)
+initial_velocity_min = 4.0
+initial_velocity_max = 5.0
+angular_velocity_min = -45.0
+angular_velocity_max = 45.0
+linear_accel_min = -0.08
+linear_accel_max = 0.1
+damping_min = 0.12
+damping_max = 0.35
+scale_amount_min = 0.28
+scale_amount_max = 0.78
+color = Color(0.45, 0.38, 0.28, 0.42)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1463188550]
+visible = false
+mesh = SubResource("SphereMesh_jv3ik")

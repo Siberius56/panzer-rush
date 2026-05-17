@@ -1,12 +1,15 @@
 extends Node
 
 signal snapshot_changed
+signal team_respawn_lives_changed(remaining: int, maximum: int)
 
 var players: Dictionary = {}
 var vehicles: Dictionary = {}
 var pending_lobby_vehicle_state: Dictionary = {}
 var player_snapshot_active: bool = false
 var vehicle_snapshot_active: bool = false
+var max_team_respawn_lives: int = 3
+var team_respawn_lives: int = 3
 
 
 func reset_run_state() -> void:
@@ -14,8 +17,65 @@ func reset_run_state() -> void:
 	vehicles.clear()
 	player_snapshot_active = false
 	vehicle_snapshot_active = false
+	reset_team_respawn_lives()
 	snapshot_changed.emit()
 
+
+
+func reset_team_respawn_lives(maximum: int = -1) -> void:
+	if maximum > 0:
+		max_team_respawn_lives = maximum
+
+	max_team_respawn_lives = max(max_team_respawn_lives, 0)
+	team_respawn_lives = max_team_respawn_lives
+	team_respawn_lives_changed.emit(team_respawn_lives, max_team_respawn_lives)
+	snapshot_changed.emit()
+
+
+func set_team_respawn_lives(remaining: int, maximum: int = -1) -> void:
+	if maximum >= 0:
+		max_team_respawn_lives = maximum
+
+	max_team_respawn_lives = max(max_team_respawn_lives, 0)
+	team_respawn_lives = clampi(remaining, 0, max_team_respawn_lives)
+	team_respawn_lives_changed.emit(team_respawn_lives, max_team_respawn_lives)
+	snapshot_changed.emit()
+
+
+func get_team_respawn_lives() -> int:
+	return team_respawn_lives
+
+
+func get_max_team_respawn_lives() -> int:
+	return max_team_respawn_lives
+
+
+func has_team_respawn_life() -> bool:
+	return team_respawn_lives > 0
+
+
+func consume_team_respawn_life() -> bool:
+	if team_respawn_lives <= 0:
+		return false
+
+	team_respawn_lives -= 1
+	team_respawn_lives_changed.emit(team_respawn_lives, max_team_respawn_lives)
+	snapshot_changed.emit()
+	return true
+
+
+func build_team_respawn_lives_state() -> Dictionary:
+	return {
+		"remaining": team_respawn_lives,
+		"maximum": max_team_respawn_lives
+	}
+
+
+func apply_team_respawn_lives_state(state: Dictionary) -> void:
+	set_team_respawn_lives(
+		int(state.get("remaining", team_respawn_lives)),
+		int(state.get("maximum", max_team_respawn_lives))
+	)
 
 func apply_snapshot(new_players: Dictionary, new_vehicles: Dictionary) -> void:
 	print("> before")
@@ -189,6 +249,17 @@ func apply_vehicle_state_to_node(vehicle_index: int, vehicle: Node) -> void:
 	_apply_vehicle_state_fallback(vehicle, state)
 
 
+
+func _object_has_player_property(player: Node, property_name: String) -> bool:
+	if player == null or not is_instance_valid(player):
+		return false
+
+	for property_data in player.get_property_list():
+		if str(property_data.get("name", "")) == property_name:
+			return true
+
+	return false
+
 func _build_player_state_fallback(player: Node) -> Dictionary:
 	var weapon_slots_value = player.get("weapon_slots")
 	var ammo_reserve_value = player.get("ammo_reserve")
@@ -200,6 +271,7 @@ func _build_player_state_fallback(player: Node) -> Dictionary:
 		"max_health": int(player.get("max_health")),
 		"health": int(player.get("health")),
 		"is_dead": bool(player.get("is_dead")),
+		"is_final_dead": bool(player.get("is_final_dead")) if _object_has_player_property(player, "is_final_dead") else false,
 		"carried_money": int(player.get("carried_money")),
 		"weapon_slots": weapon_slots_value.duplicate(true) if weapon_slots_value is Array else [{}, {}],
 		"current_weapon_slot": int(player.get("current_weapon_slot")),
@@ -212,14 +284,18 @@ func _apply_player_state_fallback(player: Node, state: Dictionary, force_alive: 
 	var maximum: int = int(state.get("max_health", player.get("max_health")))
 	var value: int = int(state.get("health", maximum))
 	var dead_now: bool = bool(state.get("is_dead", false))
+	var final_dead_now: bool = bool(state.get("is_final_dead", false))
 
 	if force_alive:
 		dead_now = false
+		final_dead_now = false
 		value = max(value, 1)
 
 	player.set("max_health", maximum)
 	player.set("health", clampi(value, 0, maximum))
 	player.set("is_dead", dead_now)
+	if _object_has_player_property(player, "is_final_dead"):
+		player.set("is_final_dead", final_dead_now)
 	player.set("carried_money", int(state.get("carried_money", 0)))
 
 	var weapon_slots_value = state.get("weapon_slots", [{}, {}])
