@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ny6lblpkt7ey"]
+
+[ext_resource type="Script" uid="uid://bu6gml4u8ndxe" path="res://scenes/weapons/GravityGunBlast.gd" id="1_script"]
+
+[sub_resource type="SphereShape3D" id="1_shape"]
+radius = 1.35
+
+[sub_resource type="StandardMaterial3D" id="2_mat"]
+albedo_color = Color(0.25, 0.75, 1, 0.35)
+emission_enabled = true
+emission = Color(0.2, 0.7, 1, 1)
+emission_energy_multiplier = 0.7
+
+[sub_resource type="SphereMesh" id="3_mesh"]
+radius = 0.18
+height = 0.36
+radial_segments = 16
+rings = 8
+
+[node name="GravityGunBlast" type="Area3D" unique_id=1600060814]
+collision_layer = 0
+collision_mask = 4294967295
+script = ExtResource("1_script")
+prop_groups = Array[StringName]([&"prop", &"props", &"vehicle", &"player"])
+push_impulse = 300.0
+max_target_speed_after_push = 100.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1827316839]
+shape = SubResource("1_shape")
+
+[node name="VisualCore" type="MeshInstance3D" parent="." unique_id=1900483957]
+material_override = SubResource("2_mat")
+mesh = SubResource("3_mesh")

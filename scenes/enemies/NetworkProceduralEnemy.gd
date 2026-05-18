@@ -53,6 +53,8 @@ enum EnemyState {
 @export var detection_radius: float = 12.0
 @export var damage_retarget_max_distance: float = 18.0
 @export var ally_death_alert_radius: float = 14.0
+@export var detection_requires_line_of_sight: bool = true
+@export_flags_3d_physics var detection_line_of_sight_mask: int = 8 # Godot physics layer 4, decor.
 @export_flags_3d_physics var line_of_sight_mask: int = 0xFFFFFFFF
 
 @export_group("Performance Scans")
@@ -191,6 +193,7 @@ var attack_timer: float = 0.0
 var state_timer: float = 0.0
 var current_state: EnemyState = EnemyState.IDLE
 var current_target: Node3D = null
+var detection_zone_targets: Array[Node3D] = []
 var detected_targets: Array[Node3D] = []
 var forced_alert: bool = false
 var _last_nav_target: Vector3 = Vector3.ZERO
@@ -356,7 +359,8 @@ func _should_run_scheduled_scan() -> bool:
 
 
 func _run_scheduled_scans() -> void:
-	_cleanup_detected_targets()
+	_cleanup_detection_zone_targets()
+	_refresh_visible_detected_targets()
 	_update_enemy_grid_registration(false)
 	_scan_enemy_separation()
 
@@ -855,12 +859,59 @@ func _validate_current_target() -> void:
 		current_target = null
 
 
-func _cleanup_detected_targets() -> void:
+func _cleanup_detection_zone_targets() -> void:
 	var cleaned: Array[Node3D] = []
-	for target in detected_targets:
-		if _is_valid_target(target):
-			cleaned.append(target)
-	detected_targets = cleaned
+	for target in detection_zone_targets:
+		if not _is_valid_target(target):
+			continue
+		if cleaned.has(target):
+			continue
+		cleaned.append(target)
+	detection_zone_targets = cleaned
+
+
+func _refresh_visible_detected_targets() -> void:
+	var visible_targets: Array[Node3D] = []
+	for target in detection_zone_targets:
+		if not _can_detect_target(target):
+			continue
+		visible_targets.append(target)
+	detected_targets = visible_targets
+
+	if current_target != null and not forced_alert and not detected_targets.has(current_target):
+		if _is_valid_target(current_target):
+			_last_known_target_position = current_target.global_position
+			_has_last_known_target_position = true
+			_debug("current target lost detection line of sight, last known=%s" % str(_last_known_target_position))
+		current_target = null
+		_clear_navigation_target()
+
+
+func _cleanup_detected_targets() -> void:
+	_cleanup_detection_zone_targets()
+	_refresh_visible_detected_targets()
+
+
+func _can_detect_target(target: Node3D) -> bool:
+	if not _is_valid_target(target):
+		return false
+	if detection_requires_line_of_sight and not _has_detection_line_of_sight(target):
+		return false
+	return true
+
+
+func _has_detection_line_of_sight(target_body: Node3D) -> bool:
+	var origin: Vector3 = global_position + Vector3.UP * aim_height
+	var target_point: Vector3 = _get_target_aim_point(target_body)
+	var hit: Dictionary = _raycast_with_mask(origin, target_point, detection_line_of_sight_mask, [self, detection_area])
+	if hit.is_empty():
+		return true
+
+	var collider: Node = hit.get("collider") as Node
+	var result: bool = _belongs_to_node(collider, target_body)
+	if not result:
+		_debug("detection line of sight blocked by: %s" % [collider.name if collider != null else "null"])
+	return result
 
 
 func _resolve_detected_target(node: Node) -> Node3D:
@@ -980,7 +1031,11 @@ func _has_line_of_sight(target_body: Node3D, target_point: Vector3) -> bool:
 
 
 func _raycast(from: Vector3, to: Vector3, exclude: Array) -> Dictionary:
-	var query := PhysicsRayQueryParameters3D.create(from, to, line_of_sight_mask)
+	return _raycast_with_mask(from, to, line_of_sight_mask, exclude)
+
+
+func _raycast_with_mask(from: Vector3, to: Vector3, collision_mask: int, exclude: Array) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(from, to, collision_mask)
 	var exclude_rids: Array = []
 	for item in exclude:
 		_collect_collision_rids(item, exclude_rids)
@@ -1694,22 +1749,32 @@ func _on_detection_body_entered(body: Node) -> void:
 	if not _is_valid_target(target):
 		return
 
+	if not detection_zone_targets.has(target):
+		detection_zone_targets.append(target)
+
+	if not _can_detect_target(target):
+		_debug("target entered detection zone but is not visible: %s from body=%s" % [target.name, body.name if body != null else "null"])
+		return
+
 	if not detected_targets.has(target):
 		detected_targets.append(target)
-		_debug("detected target entered: %s from body=%s" % [target.name, body.name if body != null else "null"])
+		_debug("detected visible target entered: %s from body=%s" % [target.name, body.name if body != null else "null"])
 
 	_last_known_target_position = target.global_position
 	_has_last_known_target_position = true
 
 	if current_target == null:
 		current_target = target
-		_debug("current target from detection: %s" % target.name)
+		_debug("current target from visible detection: %s" % target.name)
 
 
 func _on_detection_body_exited(body: Node) -> void:
 	var target := _resolve_detected_target(body)
 	if target == null:
 		return
+
+	if detection_zone_targets.has(target):
+		detection_zone_targets.erase(target)
 
 	if detected_targets.has(target):
 		detected_targets.erase(target)

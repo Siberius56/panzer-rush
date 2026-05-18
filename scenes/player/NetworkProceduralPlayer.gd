@@ -7,6 +7,7 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 const WORLD_WEAPON_SCENE := preload("uid://dha7qfqc5vywa") #preload("res://weapons/WorldWeapon3D.tscn")
 const PISTOL_SCENE := preload("uid://dd33dmmqhjkul") #preload("res://weapons/PistolWeapon.tscn")
 const SMG_SCENE := preload("uid://nykf7fy7m5jg") #preload("res://weapons/SMGWeapon.tscn")
+const GRAVITY_GUN_SCENE = preload("uid://cp3e1snyeddda")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm") #preload("res://weapons/RifleWeapon.tscn")
 const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
 const BOMB_SCENE := preload("res://scenes/weapons/BombWeapon.tscn")
@@ -21,6 +22,15 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export var gravity_strength: float = 24.0
 @export var jump_velocity: float = 8.5
 @export var state_send_interval: float = 0.05
+
+@export_group("Fall Damage")
+@export var fall_damage_enabled: bool = true
+@export var fall_safe_height: float = 3.0
+@export var fall_minor_height: float = 5.0
+@export var fall_minor_damage: int = 10
+@export var fall_lethal_height: float = 10.0
+@export var fall_lethal_damage: int = 100
+@export var fall_min_impact_speed: float = 9.0
 
 @export_group("Health")
 @export var max_health: int = 100
@@ -55,6 +65,7 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export_group("Weapons")
 @export var projectile_team: int = 1
 @export var pickup_radius: float = 2.4
+@export var interaction_radius: float = 2.4
 @export var world_drop_forward_offset: float = 1.0
 @export var world_drop_up_offset: float = 1.25
 
@@ -172,6 +183,10 @@ var camera_spring_length_target: float = 7.0
 var camera_spring_length_tween: Tween = null
 var camera_dof_far_distance_target: float = 16.0
 var camera_dof_far_distance_tween: Tween = null
+
+var _fall_was_airborne: bool = false
+var _fall_start_y: float = 0.0
+var _fall_lowest_velocity_y: float = 0.0
 
 var current_vehicle: Node = null
 var weapon_slot_1: Node = null
@@ -304,6 +319,7 @@ func _ready() -> void:
 	replicated_is_grounded = procedural_animation_grounded
 	replicated_is_moving = procedural_animation_moving
 	replicated_in_vehicle = is_in_vehicle()
+	_reset_fall_damage_tracking()
 	if aim_root != null:
 		replicated_aim_rotation = aim_root.rotation
 	replicated_visual_y = visual_yaw
@@ -438,6 +454,7 @@ func _physics_process(delta: float) -> void:
 	if ui_input_blocked:
 		velocity.x = 0.0
 		velocity.z = 0.0
+		_reset_fall_damage_tracking()
 		_update_procedural_animation(delta)
 		if is_multiplayer_authority():
 			_send_state_if_needed(delta)
@@ -445,6 +462,7 @@ func _physics_process(delta: float) -> void:
 
 	if is_multiplayer_authority() and is_dead:
 		velocity = Vector3.ZERO
+		_reset_fall_damage_tracking()
 		_send_state_if_needed(delta)
 		return
 
@@ -459,9 +477,12 @@ func _physics_process(delta: float) -> void:
 			_update_weapon_input()
 
 		if driving:
+			_reset_fall_damage_tracking()
 			_sync_to_vehicle_seat()
 		else:
+			_update_fall_damage_tracking_before_move()
 			move_and_slide()
+			_update_fall_damage_tracking_after_move()
 
 		_update_procedural_animation(delta)
 		_send_state_if_needed(delta)
@@ -534,6 +555,89 @@ func _update_movement(delta: float) -> void:
 			landing_squash = -0.55
 	else:
 		velocity.y -= gravity_strength * delta
+
+func _reset_fall_damage_tracking() -> void:
+	_fall_was_airborne = false
+	_fall_start_y = global_position.y
+	_fall_lowest_velocity_y = 0.0
+
+func _update_fall_damage_tracking_before_move() -> void:
+	if not fall_damage_enabled or is_dead or is_in_vehicle():
+		_reset_fall_damage_tracking()
+		return
+
+	if _fall_was_airborne:
+		_fall_lowest_velocity_y = min(_fall_lowest_velocity_y, velocity.y)
+
+func _update_fall_damage_tracking_after_move() -> void:
+	if not fall_damage_enabled or is_dead or is_in_vehicle():
+		_reset_fall_damage_tracking()
+		return
+
+	var grounded: bool = is_on_floor()
+
+	if not grounded:
+		if not _fall_was_airborne:
+			_fall_was_airborne = true
+			_fall_start_y = global_position.y
+			_fall_lowest_velocity_y = velocity.y
+		else:
+			_fall_lowest_velocity_y = min(_fall_lowest_velocity_y, velocity.y)
+		return
+
+	if not _fall_was_airborne:
+		_fall_start_y = global_position.y
+		_fall_lowest_velocity_y = 0.0
+		return
+
+	var fall_height: float = max(_fall_start_y - global_position.y, 0.0)
+	var impact_speed: float = max(-_fall_lowest_velocity_y, 0.0)
+	_reset_fall_damage_tracking()
+
+	var fall_damage: int = _get_fall_damage(fall_height, impact_speed)
+	if fall_damage <= 0:
+		return
+
+	_report_fall_damage_to_server(fall_damage, fall_height, impact_speed)
+
+func _get_fall_damage(fall_height: float, impact_speed: float) -> int:
+	if not fall_damage_enabled:
+		return 0
+	if impact_speed < fall_min_impact_speed:
+		return 0
+
+	var safe_height: float = max(fall_safe_height, 0.0)
+	var minor_height: float = max(fall_minor_height, safe_height + 0.01)
+	var lethal_height: float = max(fall_lethal_height, minor_height + 0.01)
+	var minor_damage: float = max(float(fall_minor_damage), 0.0)
+	var lethal_damage: float = max(float(fall_lethal_damage), minor_damage)
+
+	if fall_height <= safe_height:
+		return 0
+
+	if fall_height <= minor_height:
+		var low_t: float = clampf(inverse_lerp(safe_height, minor_height, fall_height), 0.0, 1.0)
+		return max(1, int(round(lerpf(0.0, minor_damage, low_t))))
+
+	var high_t: float = clampf(inverse_lerp(minor_height, lethal_height, fall_height), 0.0, 1.0)
+	var curved_t: float = pow(high_t, 1.35)
+	var damage: float = lerpf(minor_damage, lethal_damage, curved_t)
+
+	if fall_height > lethal_height:
+		var extra_height: float = fall_height - lethal_height
+		damage += extra_height * lethal_damage * 0.18
+
+	return max(1, int(round(damage)))
+
+func _report_fall_damage_to_server(fall_damage: int, fall_height: float, impact_speed: float) -> void:
+	if fall_damage <= 0:
+		return
+
+	if multiplayer.is_server():
+		apply_damage(fall_damage, self)
+		return
+
+	_request_apply_fall_damage_rpc.rpc_id(1, fall_damage, fall_height, impact_speed)
 
 func _update_aim() -> void:
 	if is_in_vehicle():
@@ -685,6 +789,9 @@ func pickup_loot(kind: String, amount: int, _pickup: Node = null) -> bool:
 
 		"repair_tool":
 			return add_ammo("energy", amount)
+		
+		"gravity_gun":
+			return add_ammo("energy", amount)
 
 	return false
 
@@ -750,7 +857,7 @@ func _update_weapon_input() -> void:
 		_request_drop_current_weapon()
 
 	if Input.is_action_just_pressed("interact"):
-		_request_pickup_nearest_weapon()
+		_request_context_interaction()
 
 	var weapon := _get_current_weapon_node()
 	if weapon == null:
@@ -798,6 +905,8 @@ func _get_ammo_type_for_weapon(weapon: WeaponInstance3D) -> String:
 		"shotgun":
 			return "shell"
 		"repair_tool":
+			return "energy"
+		"gravity_gun":
 			return "energy"
 		_:
 			return ""
@@ -1015,6 +1124,67 @@ func _request_drop_current_weapon() -> void:
 		#_server_pickup_weapon(world_weapon.net_id)
 	#else:
 		#_request_pickup_weapon_rpc.rpc_id(1, world_weapon.net_id)
+
+func _request_context_interaction() -> void:
+	if is_dead:
+		return
+
+	if multiplayer.is_server():
+		var did_interact: bool = _server_interact_nearest_gate_button()
+		if not did_interact:
+			_server_pickup_nearest_weapon()
+		return
+
+	_request_context_interaction_rpc.rpc_id(1)
+
+
+func _server_interact_nearest_gate_button() -> bool:
+	if is_dead:
+		return false
+	if not multiplayer.is_server():
+		return false
+
+	var interactable: Node = _find_nearest_gate_button()
+	if interactable == null:
+		return false
+
+	if interactable.has_method("can_interact"):
+		var can_interact_value: bool = bool(interactable.call("can_interact", self))
+		if not can_interact_value:
+			return false
+
+	if interactable.has_method("interact"):
+		return bool(interactable.call("interact", self))
+	if interactable.has_method("activate"):
+		return bool(interactable.call("activate", self))
+	if interactable.has_method("use"):
+		return bool(interactable.call("use", self))
+	if interactable.has_method("press"):
+		return bool(interactable.call("press", self))
+
+	return false
+
+
+func _find_nearest_gate_button() -> Node:
+	var closest: Node = null
+	var closest_distance: float = INF
+	var radius: float = max(interaction_radius, 0.1)
+
+	for node in get_tree().get_nodes_in_group("gate_buttons"):
+		if node == null or not is_instance_valid(node):
+			continue
+		if not (node is Node3D):
+			continue
+
+		var node_3d: Node3D = node as Node3D
+		var distance: float = global_position.distance_to(node_3d.global_position)
+		if distance > radius:
+			continue
+		if distance < closest_distance:
+			closest_distance = distance
+			closest = node
+
+	return closest
 
 func _request_pickup_nearest_weapon() -> void:
 	if is_dead:
@@ -1558,6 +1728,8 @@ func _get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return REPAIR_TOOL_SCENE
 		"bomb":
 			return BOMB_SCENE
+		"gravity_gun":
+			return GRAVITY_GUN_SCENE
 		_:
 			return null
 
@@ -3650,6 +3822,15 @@ func _request_fire_weapon(slot_index: int, shot_origin: Vector3, shot_direction:
 	_server_fire_weapon(slot_index, shot_origin, shot_direction.normalized())
 
 @rpc("any_peer", "call_remote", "reliable")
+func _request_context_interaction_rpc() -> void:
+	if not _is_valid_owner_request("context_interaction"):
+		return
+
+	var did_interact: bool = _server_interact_nearest_gate_button()
+	if not did_interact:
+		_server_pickup_nearest_weapon()
+
+@rpc("any_peer", "call_remote", "reliable")
 func _request_pickup_nearest_weapon_rpc() -> void:
 	if not _is_valid_owner_request("pickup_nearest_weapon"):
 		return
@@ -3765,6 +3946,23 @@ func _receive_team_respawn_lives_state(remaining: int, maximum: int) -> void:
 		return
 
 	_apply_team_respawn_lives_state(remaining, maximum)
+
+
+@rpc("any_peer", "reliable")
+func _request_apply_fall_damage_rpc(fall_damage: int, fall_height: float, impact_speed: float) -> void:
+	if not _is_valid_owner_request("fall_damage"):
+		return
+	if is_dead:
+		return
+	if fall_damage <= 0:
+		return
+
+	# Le serveur recalcule avec ses exports pour éviter un dégât arbitraire envoyé par le client.
+	var server_damage: int = _get_fall_damage(max(fall_height, 0.0), max(impact_speed, 0.0))
+	if server_damage <= 0:
+		return
+
+	apply_damage(server_damage, self)
 
 
 @rpc("any_peer", "reliable")

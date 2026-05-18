@@ -6,10 +6,11 @@ const SMG_SCENE := preload("uid://nykf7fy7m5jg")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm")
 const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
 const BOMB_SCENE := preload("res://scenes/weapons/BombWeapon.tscn")
+const GRAVITY_GUN_SCENE := preload("res://scenes/weapons/GravityGunWeapon.tscn")
 
 @export var state_send_interval: float = 0.05
 
-@export_enum("pistol", "smg", "rifle", "repair_tool", "bomb") var editor_weapon_id: String = "pistol"
+@export_enum("pistol", "smg", "rifle", "repair_tool", "bomb", "gravity_gun") var editor_weapon_id: String = "pistol"
 @export var editor_ammo_in_magazine: int = 12
 @export var editor_reserve_ammo: int = 36
 @export var editor_spawn_on_ready: bool = true
@@ -42,6 +43,8 @@ static func get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return REPAIR_TOOL_SCENE
 		"bomb":
 			return BOMB_SCENE
+		"gravity_gun":
+			return GRAVITY_GUN_SCENE
 		_:
 			return null
 

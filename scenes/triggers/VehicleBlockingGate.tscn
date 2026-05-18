@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://bkhy4unrk7krh"]
+
+[ext_resource type="Script" uid="uid://bleyw224fa54r" path="res://scenes/triggers/VehicleBlockingGate.gd" id="1_gate"]
+[ext_resource type="Script" uid="uid://c1egrs0cttnxk" path="res://scenes/triggers/VehicleGateUnlockButton.gd" id="2_button"]
+[ext_resource type="PackedScene" uid="uid://h8v8os25dggj" path="res://scenes/triggers/SlidingHangarDoor.tscn" id="3_door"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vehicle_area"]
+size = Vector3(1.5, 2, 1.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7lwu4"]
+size = Vector3(2, 0.1, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fdw4c"]
+size = Vector3(1.5, 0.25, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sggua"]
+albedo_color = Color(0.84, 0.21839999, 0.21839999, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_button"]
+size = Vector3(0.7, 0.7, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_button"]
+albedo_color = Color(0.1, 0.45, 0.18, 1)
+roughness = 0.75
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_button_area"]
+size = Vector3(2, 2, 2)
+
+[node name="VehicleBlockingGate" type="Node3D" unique_id=653029018]
+script = ExtResource("1_gate")
+vehicle_open_area_path = NodePath("VehicleOpenButton/VehicleOpenArea")
+
+[node name="Door" parent="." unique_id=336477932 instance=ExtResource("3_door")]
+left_open_position = Vector3(-3, 0, 0)
+right_open_position = Vector3(3, 0, 0)
+
+[node name="VehicleOpenButton" type="Node3D" parent="." unique_id=349418171]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+
+[node name="VehicleOpenArea" type="Area3D" parent="VehicleOpenButton" unique_id=1743771251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+collision_mask = 4278190084
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VehicleOpenButton/VehicleOpenArea" unique_id=482653154]
+shape = SubResource("BoxShape3D_vehicle_area")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VehicleOpenButton" unique_id=1377646946]
+mesh = SubResource("BoxMesh_7lwu4")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="VehicleOpenButton" unique_id=137166776]
+mesh = SubResource("BoxMesh_fdw4c")
+surface_material_override/0 = SubResource("StandardMaterial3D_sggua")
+
+[node name="UnlockButton" type="Node3D" parent="." unique_id=616946492]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 1.2, 4)
+script = ExtResource("2_button")
+debug_button = true
+
+[node name="ButtonMesh" type="MeshInstance3D" parent="UnlockButton" unique_id=1709782263]
+mesh = SubResource("BoxMesh_button")
+surface_material_override/0 = SubResource("StandardMaterial3D_button")
+
+[node name="ActivationArea" type="Area3D" parent="UnlockButton" unique_id=288891563]
+collision_layer = 0
+collision_mask = 4278190081
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="UnlockButton/ActivationArea" unique_id=1329340700]
+shape = SubResource("BoxShape3D_button_area")

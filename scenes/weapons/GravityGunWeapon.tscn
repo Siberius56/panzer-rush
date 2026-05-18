@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://cp3e1snyeddda"]
+
+[ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://ny6lblpkt7ey" path="res://scenes/weapons/GravityGunBlast.tscn" id="2_blast"]
+
+[sub_resource type="StandardMaterial3D" id="1_dark_mat"]
+albedo_color = Color(0.07, 0.075, 0.085, 1)
+
+[sub_resource type="BoxMesh" id="5_handle_mesh"]
+size = Vector3(0.16, 0.18, 0.48)
+
+[sub_resource type="BoxMesh" id="4_body_mesh"]
+size = Vector3(0.24, 0.2, 0.52)
+
+[sub_resource type="StandardMaterial3D" id="3_metal_mat"]
+albedo_color = Color(0.34, 0.36, 0.38, 1)
+
+[sub_resource type="BoxMesh" id="9_stock_mesh"]
+size = Vector3(0.18, 0.16, 0.32)
+
+[sub_resource type="StandardMaterial3D" id="2_blue_mat"]
+albedo_color = Color(0.2, 0.72, 1, 1)
+emission_enabled = true
+emission = Color(0.15, 0.62, 1, 1)
+emission_energy_multiplier = 0.55
+
+[sub_resource type="SphereMesh" id="8_core_mesh"]
+radius = 0.095
+height = 0.19
+radial_segments = 16
+rings = 8
+
+[sub_resource type="CylinderMesh" id="6_barrel_mesh"]
+top_radius = 0.075
+bottom_radius = 0.1
+height = 0.55
+radial_segments = 16
+
+[sub_resource type="TorusMesh" id="7_ring_mesh"]
+inner_radius = 0.1
+outer_radius = 0.15
+rings = 16
+ring_segments = 24
+
+[node name="GravityGunWeapon" type="Node3D" unique_id=900575213]
+script = ExtResource("1_script")
+weapon_id = "gravity_gun"
+weapon_label = "Gravity Gun"
+weapon_local_position = Vector3(0.22, 1.25, -0.28)
+magazine_size = 1
+reload_duration = 1.15
+fire_cooldown = 0.35
+hitscan_range = 1.0
+projectile_damage = 0
+projectile_scene = ExtResource("2_blast")
+camera_shake_intensity = 0.22
+camera_shake_frequency_multiplier = 0.85
+hand_position = Vector3(0.08, -0.02, -0.08)
+back_position = Vector3(0.18, 0.02, 0.08)
+back_rotation_deg = Vector3(-85, 0, 12)
+
+[node name="Handle" type="MeshInstance3D" parent="." unique_id=1603178031]
+transform = Transform3D(1, 0, 0, 0, 0.573576, -0.819152, 0, 0.819152, 0.573576, 0, -0.145, 0.09)
+material_override = SubResource("1_dark_mat")
+mesh = SubResource("5_handle_mesh")
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=211742658]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.18)
+material_override = SubResource("1_dark_mat")
+mesh = SubResource("4_body_mesh")
+
+[node name="Stock" type="MeshInstance3D" parent="." unique_id=1767282159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.16)
+material_override = SubResource("3_metal_mat")
+mesh = SubResource("9_stock_mesh")
+
+[node name="EnergyCore" type="MeshInstance3D" parent="." unique_id=1964892746]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.18)
+material_override = SubResource("2_blue_mat")
+mesh = SubResource("8_core_mesh")
+
+[node name="Barrel" type="MeshInstance3D" parent="." unique_id=1318778511]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.025, -0.57)
+material_override = SubResource("3_metal_mat")
+mesh = SubResource("6_barrel_mesh")
+
+[node name="GravityRing" type="MeshInstance3D" parent="." unique_id=1941409290]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.025, -0.84)
+material_override = SubResource("2_blue_mat")
+mesh = SubResource("7_ring_mesh")
+
+[node name="Muzzle" type="Marker3D" parent="." unique_id=1741852651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -1.96)
+
+[node name="LeftGrip" type="Node3D" parent="." unique_id=681965639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09, -0.005, -0.22)
+
+[node name="RightGrip" type="Node3D" parent="." unique_id=1831495405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.085, -0.035, 0.12)

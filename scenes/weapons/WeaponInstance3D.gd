@@ -53,7 +53,7 @@ var reserve_ammo: int = -1
 func _ready() -> void:
 	if ammo_in_magazine < 0:
 		ammo_in_magazine = magazine_size
-
+	
 	#if reserve_ammo < 0:
 		#reserve_ammo = max_reserve_ammo
 

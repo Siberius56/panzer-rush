@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cusdlnpquk17g"]
 
-[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scripts/weapons/VisualBullet.gd" id="1_bullet"]
+[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scenes/weapons/VisualBullet.gd" id="1_bullet"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_irilk"]
 radius = 0.2607422

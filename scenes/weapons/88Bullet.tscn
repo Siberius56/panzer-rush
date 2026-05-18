@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c3xwrtxdr2ryw"]
 
-[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scripts/weapons/VisualBullet.gd" id="1_1q2uo"]
+[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scenes/weapons/VisualBullet.gd" id="1_1q2uo"]
 [ext_resource type="PackedScene" uid="uid://b6trnxx5qlwc2" path="res://scenes/weapons/88Explosion.tscn" id="2_1q2uo"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_bullet"]

@@ -141,6 +141,16 @@ mod_use_6={
 ]
 }
 
+[layer_names]
+
+3d_physics/layer_1="player"
+3d_physics/layer_2="enemy"
+3d_physics/layer_3="vehicle"
+3d_physics/layer_4="map"
+3d_physics/layer_5="props"
+3d_physics/layer_7="stop vision"
+3d_physics/layer_8="mouse contact"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
