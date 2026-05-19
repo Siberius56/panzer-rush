@@ -106,6 +106,81 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_50soo")
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_npaug"]
+direction = Vector3(0, 1, 0)
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+
+[sub_resource type="Shader" id="Shader_mxha0"]
+code = "shader_type spatial;
+render_mode unshaded, blend_add, depth_draw_never, cull_disabled;
+
+// Expanding circular wave for GPUParticles3D.
+// The animation uses INSTANCE_CUSTOM.y, the particle lifetime phase.
+
+uniform vec4 base_color : source_color = vec4(1.0, 0.42, 0.08, 0.78);
+uniform float radius_start = 0.035;
+uniform float radius_end = 0.485;
+uniform float ring_width = 0.165;
+uniform float outer_sharpness = 0.010;
+uniform float fade_in = 0.070;
+uniform float fade_out_start = 0.700;
+uniform float emission_strength = 1.450;
+uniform float alpha_strength = 1.000;
+
+varying float particle_phase;
+
+void vertex() {
+	particle_phase = INSTANCE_CUSTOM.y;
+}
+
+void fragment() {
+	vec2 centered_uv = UV - vec2(0.5);
+	float dist_from_center = length(centered_uv);
+
+	float phase = clamp(particle_phase, 0.0, 1.0);
+	float progress = smoothstep(0.0, 1.0, phase);
+	float radius = mix(radius_start, radius_end, progress);
+
+	// Sharp outside edge.
+	float outer_mask = 1.0 - smoothstep(radius - outer_sharpness, radius + outer_sharpness, dist_from_center);
+
+	// Interior fades toward the center.
+	float inner_gradient = smoothstep(radius - ring_width, radius, dist_from_center);
+	inner_gradient = pow(inner_gradient, 1.55);
+
+	// Lifetime fade. Appears from center, then fades before the next pulse.
+	float appear = smoothstep(0.0, fade_in, phase);
+	float disappear = 1.0 - smoothstep(fade_out_start, 1.0, phase);
+	float life_alpha = appear * disappear;
+
+	float alpha = clamp(outer_mask * inner_gradient * life_alpha * base_color.a * alpha_strength, 0.0, 1.0);
+
+	ALBEDO = base_color.rgb;
+	EMISSION = base_color.rgb * emission_strength * alpha;
+	ALPHA = alpha;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wave_pulse"]
+render_priority = 1
+shader = SubResource("Shader_mxha0")
+shader_parameter/base_color = Color(1, 0.42, 0.08, 0.78)
+shader_parameter/radius_start = 0.035
+shader_parameter/radius_end = 0.485
+shader_parameter/ring_width = 0.165
+shader_parameter/outer_sharpness = 0.01
+shader_parameter/fade_in = 0.07
+shader_parameter/fade_out_start = 0.7
+shader_parameter/emission_strength = 1.45
+shader_parameter/alpha_strength = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_c3kp2"]
+material = SubResource("ShaderMaterial_wave_pulse")
+size = Vector2(8, 8)
+subdivide_width = 1
+subdivide_depth = 1
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_222s0"]
 albedo_color = Color(0.080000006, 0.089999996, 0.1, 1)
 roughness = 0.78
@@ -342,6 +417,16 @@ transform = Transform3D(0.9659255, -0.12940954, -0.2241438, 0, 0.8660254, -0.499
 [node name="Radar" type="MeshInstance3D" parent="VisualRoot/IntactRoot/Radar_Node" unique_id=607673488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.287158, 0)
 mesh = SubResource("ArrayMesh_npaug")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="VisualRoot/IntactRoot" unique_id=1439839116]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 3.3437116, 0.8737457)
+cast_shadow = 0
+amount = 2
+lifetime = 1.7
+visibility_aabb = AABB(-4.5, -0.25, -4.5, 9, 0.5, 9)
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_npaug")
+draw_pass_1 = SubResource("PlaneMesh_c3kp2")
 
 [node name="DestroyedRoot" type="Node3D" parent="VisualRoot" unique_id=800352743]
 visible = false

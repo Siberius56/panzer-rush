@@ -36,6 +36,11 @@ enum EnemyState {
 @export var vehicle_impact_rotate_to_push_direction: bool = true
 @export var vehicle_impact_clear_target_on_hit: bool = false
 
+@export_group("Gravity Gun Push", "gravity_gun_push_")
+@export var gravity_gun_push_stun_duration: float = 0.22
+@export var gravity_gun_push_max_horizontal_speed: float = 14.0
+@export var gravity_gun_push_vertical_multiplier: float = 1.0
+
 @export_group("Health")
 @export var max_health: int = 30
 @export var armor_rating: int = 0
@@ -216,6 +221,17 @@ var _enemy_grid_cell: Vector2i = Vector2i(2147483647, 2147483647)
 var _registered_in_enemy_grid: bool = false
 var _enemy_separation_velocity: Vector3 = Vector3.ZERO
 
+var _network_zone_active: bool = true
+var _network_zone_saved_process_mode: int = Node.PROCESS_MODE_INHERIT
+var _network_zone_saved_visible: bool = true
+var _network_zone_saved_velocity: Vector3 = Vector3.ZERO
+var _network_zone_saved_collision_layers: Dictionary = {}
+var _network_zone_saved_collision_masks: Dictionary = {}
+var _network_zone_saved_collision_shape_disabled: Dictionary = {}
+var _network_zone_saved_area_monitoring: Dictionary = {}
+var _network_zone_saved_area_monitorable: Dictionary = {}
+var _network_zone_saved_raycast_enabled: Dictionary = {}
+
 var vehicle_impact_timer: float = 0.0
 var vehicle_impact_velocity: Vector3 = Vector3.ZERO
 var vehicle_impact_source: Node = null
@@ -287,7 +303,163 @@ func _exit_tree() -> void:
 		_registered_in_enemy_grid = false
 
 
+func set_network_zone_active(active: bool) -> void:
+	if _network_zone_active == active:
+		return
+
+	if active:
+		_restore_network_zone_active_state()
+	else:
+		_apply_network_zone_inactive_state()
+
+
+func is_network_zone_active() -> bool:
+	return _network_zone_active
+
+
+func _apply_network_zone_inactive_state() -> void:
+	_network_zone_active = false
+	_network_zone_saved_process_mode = int(process_mode)
+	_network_zone_saved_visible = visible
+	_network_zone_saved_velocity = velocity
+
+	if _damage_feedback_tween != null and _damage_feedback_tween.is_valid():
+		_damage_feedback_tween.kill()
+		_damage_feedback_tween = null
+
+	if _registered_in_enemy_grid:
+		_unregister_enemy_from_grid(_enemy_grid_cell)
+		_registered_in_enemy_grid = false
+
+	current_target = null
+	detection_zone_targets.clear()
+	detected_targets.clear()
+	forced_alert = false
+	_has_last_known_target_position = false
+	_enemy_separation_velocity = Vector3.ZERO
+	vehicle_impact_timer = 0.0
+	vehicle_impact_velocity = Vector3.ZERO
+	vehicle_impact_source = null
+	attack_timer = 0.0
+	state_timer = state_send_interval
+	velocity = Vector3.ZERO
+	_set_state(EnemyState.IDLE)
+	_clear_navigation_target()
+
+	_store_and_apply_network_zone_tree_state(self, false)
+	visible = false
+	set_process(false)
+	set_physics_process(false)
+	process_mode = Node.PROCESS_MODE_DISABLED
+
+	replicated_position = global_position
+	replicated_velocity = Vector3.ZERO
+	replicated_yaw = rotation.y
+	replicated_health = health
+	replicated_state = EnemyState.IDLE
+	replicated_is_grounded = true
+	replicated_is_moving = false
+	replicated_aim_target_position = global_position + Vector3.UP * aim_height
+
+
+func _restore_network_zone_active_state() -> void:
+	_network_zone_active = true
+	process_mode = _network_zone_saved_process_mode
+	set_process(true)
+	set_physics_process(true)
+	visible = _network_zone_saved_visible
+	velocity = Vector3.ZERO
+	replicated_position = global_position
+	replicated_velocity = Vector3.ZERO
+	replicated_yaw = rotation.y
+	replicated_health = health
+	replicated_state = EnemyState.IDLE
+	replicated_is_grounded = is_on_floor()
+	replicated_is_moving = false
+	replicated_aim_target_position = global_position + Vector3.UP * aim_height
+	aim_target_position = replicated_aim_target_position
+	last_valid_aim_target_position = aim_target_position
+	state_timer = 0.0
+	attack_timer = 0.0
+	_set_state(EnemyState.IDLE)
+	_clear_navigation_target()
+	_store_and_apply_network_zone_tree_state(self, true)
+
+	if multiplayer.is_server():
+		_update_enemy_grid_registration(true)
+		_send_state_rpc_now()
+
+
+func _store_and_apply_network_zone_tree_state(root: Node, active: bool) -> void:
+	if root == null or not is_instance_valid(root):
+		return
+
+	_apply_network_zone_node_state(root, active)
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		_store_and_apply_network_zone_tree_state(child, active)
+
+
+func _apply_network_zone_node_state(node: Node, active: bool) -> void:
+	var node_id: int = node.get_instance_id()
+
+	if node is CollisionObject3D:
+		var collision_object: CollisionObject3D = node as CollisionObject3D
+		if active:
+			if _network_zone_saved_collision_layers.has(node_id):
+				collision_object.collision_layer = int(_network_zone_saved_collision_layers[node_id])
+			if _network_zone_saved_collision_masks.has(node_id):
+				collision_object.collision_mask = int(_network_zone_saved_collision_masks[node_id])
+		else:
+			if not _network_zone_saved_collision_layers.has(node_id):
+				_network_zone_saved_collision_layers[node_id] = collision_object.collision_layer
+			if not _network_zone_saved_collision_masks.has(node_id):
+				_network_zone_saved_collision_masks[node_id] = collision_object.collision_mask
+			collision_object.collision_layer = 0
+			collision_object.collision_mask = 0
+
+	if node is CollisionShape3D:
+		var collision_shape: CollisionShape3D = node as CollisionShape3D
+		if active:
+			if _network_zone_saved_collision_shape_disabled.has(node_id):
+				collision_shape.disabled = bool(_network_zone_saved_collision_shape_disabled[node_id])
+		else:
+			if not _network_zone_saved_collision_shape_disabled.has(node_id):
+				_network_zone_saved_collision_shape_disabled[node_id] = collision_shape.disabled
+			collision_shape.disabled = true
+
+	if node is Area3D:
+		var area: Area3D = node as Area3D
+		if active:
+			if _network_zone_saved_area_monitoring.has(node_id):
+				area.monitoring = bool(_network_zone_saved_area_monitoring[node_id])
+			if _network_zone_saved_area_monitorable.has(node_id):
+				area.monitorable = bool(_network_zone_saved_area_monitorable[node_id])
+		else:
+			if not _network_zone_saved_area_monitoring.has(node_id):
+				_network_zone_saved_area_monitoring[node_id] = area.monitoring
+			if not _network_zone_saved_area_monitorable.has(node_id):
+				_network_zone_saved_area_monitorable[node_id] = area.monitorable
+			area.monitoring = false
+			area.monitorable = false
+
+	if node is RayCast3D:
+		var raycast: RayCast3D = node as RayCast3D
+		if active:
+			if _network_zone_saved_raycast_enabled.has(node_id):
+				raycast.enabled = bool(_network_zone_saved_raycast_enabled[node_id])
+		else:
+			if not _network_zone_saved_raycast_enabled.has(node_id):
+				_network_zone_saved_raycast_enabled[node_id] = raycast.enabled
+			raycast.enabled = false
+
+
 func _physics_process(delta: float) -> void:
+	if not _network_zone_active:
+		return
+
 	if multiplayer.is_server():
 		_server_update(delta)
 	else:
@@ -559,6 +731,26 @@ func apply_vehicle_push(push_velocity: Vector3, source: Node = null) -> void:
 		_has_last_known_target_position = false
 
 	_debug("vehicle push: velocity=%s source=%s" % [str(vehicle_impact_velocity), source.name if source != null else "null"])
+
+
+func apply_gravity_gun_push(push_velocity: Vector3, from_position: Vector3 = Vector3.ZERO, source_node: Node = null) -> void:
+	if not multiplayer.is_server() or _dying:
+		return
+
+	var adjusted_push: Vector3 = push_velocity
+	adjusted_push.y *= gravity_gun_push_vertical_multiplier
+
+	var horizontal_push: Vector3 = Vector3(adjusted_push.x, 0.0, adjusted_push.z)
+	if gravity_gun_push_max_horizontal_speed > 0.0 and horizontal_push.length() > gravity_gun_push_max_horizontal_speed:
+		horizontal_push = horizontal_push.normalized() * gravity_gun_push_max_horizontal_speed
+		adjusted_push.x = horizontal_push.x
+		adjusted_push.z = horizontal_push.z
+
+	var previous_stun_duration: float = vehicle_impact_stun_duration
+	vehicle_impact_stun_duration = gravity_gun_push_stun_duration
+	apply_vehicle_push(adjusted_push, source_node)
+	vehicle_impact_stun_duration = previous_stun_duration
+
 
 func apply_vehicle_impact_damage(amount: int, source: Node = null) -> void:
 	apply_damage(amount, source)
@@ -2265,6 +2457,8 @@ func _receive_state(
 	aim_target_value: Vector3
 ) -> void:
 	if multiplayer.is_server():
+		return
+	if not _network_zone_active:
 		return
 	replicated_position = position_value
 	replicated_velocity = velocity_value

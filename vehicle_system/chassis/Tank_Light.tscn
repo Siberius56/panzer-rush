@@ -16,9 +16,6 @@
 [ext_resource type="PackedScene" uid="uid://ccvrst0luot23" path="res://vehicle_system/effects/Vehicle_EngineFire.tscn" id="22_engine_fire"]
 [ext_resource type="PackedScene" uid="uid://dslr7j7svjwsl" path="res://vehicle_system/effects/Vehicle_WheelDust.tscn" id="23_wheel_dust"]
 
-[sub_resource type="PhysicsMaterial" id="1"]
-friction = 0.2
-
 [sub_resource type="BoxShape3D" id="2"]
 size = Vector3(2.2891235, 1.4, 3.0295289)
 
@@ -87,7 +84,6 @@ size = Vector3(2.232974, 1, 3.5261698)
 collision_layer = 4
 collision_mask = 12
 mass = 2000.0
-physics_material_override = SubResource("1")
 center_of_mass_mode = 1
 continuous_cd = true
 contact_monitor = true
@@ -211,7 +207,7 @@ mod_scene = ExtResource("11_reactor")
 [node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=1619376301]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, 0.9)
 use_as_steering = true
-wheel_roll_influence = 0.12
+wheel_roll_influence = 0.4
 wheel_radius = 0.48
 wheel_rest_length = 0.18
 wheel_friction_slip = 2.0
@@ -226,7 +222,7 @@ surface_material_override/0 = SubResource("6")
 [node name="FrontRightWheel" type="VehicleWheel3D" parent="." unique_id=887756342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, 0.9)
 use_as_steering = true
-wheel_roll_influence = 0.12
+wheel_roll_influence = 0.4
 wheel_radius = 0.48
 wheel_rest_length = 0.18
 wheel_friction_slip = 2.0
@@ -241,7 +237,7 @@ surface_material_override/0 = SubResource("6")
 [node name="RearLeftWheel" type="VehicleWheel3D" parent="." unique_id=347284515]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, -0.9)
 use_as_traction = true
-wheel_roll_influence = 0.12
+wheel_roll_influence = 0.4
 wheel_radius = 0.48
 wheel_rest_length = 0.18
 wheel_friction_slip = 1.15
@@ -256,7 +252,7 @@ surface_material_override/0 = SubResource("6")
 [node name="RearRightWheel" type="VehicleWheel3D" parent="." unique_id=999012565]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, -0.9)
 use_as_traction = true
-wheel_roll_influence = 0.12
+wheel_roll_influence = 0.4
 wheel_radius = 0.48
 wheel_rest_length = 0.18
 wheel_friction_slip = 1.15

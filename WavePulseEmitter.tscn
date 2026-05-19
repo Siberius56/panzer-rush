@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="Shader" id="Shader_wave_pulse"]
+code = "shader_type spatial;\nrender_mode unshaded, blend_add, depth_draw_never, cull_disabled;\n\n// Expanding circular wave for GPUParticles3D.\n// The animation uses INSTANCE_CUSTOM.y, the particle lifetime phase.\n\nuniform vec4 base_color : source_color = vec4(1.0, 0.42, 0.08, 0.78);\nuniform float radius_start = 0.035;\nuniform float radius_end = 0.485;\nuniform float ring_width = 0.165;\nuniform float outer_sharpness = 0.010;\nuniform float fade_in = 0.070;\nuniform float fade_out_start = 0.700;\nuniform float emission_strength = 1.450;\nuniform float alpha_strength = 1.000;\n\nvarying float particle_phase;\n\nvoid vertex() {\n\tparticle_phase = INSTANCE_CUSTOM.y;\n}\n\nvoid fragment() {\n\tvec2 centered_uv = UV - vec2(0.5);\n\tfloat dist_from_center = length(centered_uv);\n\n\tfloat phase = clamp(particle_phase, 0.0, 1.0);\n\tfloat progress = smoothstep(0.0, 1.0, phase);\n\tfloat radius = mix(radius_start, radius_end, progress);\n\n\t// Sharp outside edge.\n\tfloat outer_mask = 1.0 - smoothstep(radius - outer_sharpness, radius + outer_sharpness, dist_from_center);\n\n\t// Interior fades toward the center.\n\tfloat inner_gradient = smoothstep(radius - ring_width, radius, dist_from_center);\n\tinner_gradient = pow(inner_gradient, 1.55);\n\n\t// Lifetime fade. Appears from center, then fades before the next pulse.\n\tfloat appear = smoothstep(0.0, fade_in, phase);\n\tfloat disappear = 1.0 - smoothstep(fade_out_start, 1.0, phase);\n\tfloat life_alpha = appear * disappear;\n\n\tfloat alpha = clamp(outer_mask * inner_gradient * life_alpha * base_color.a * alpha_strength, 0.0, 1.0);\n\n\tALBEDO = base_color.rgb;\n\tEMISSION = base_color.rgb * emission_strength * alpha;\n\tALPHA = alpha;\n}\n"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wave_pulse"]
+render_priority = 1
+shader = SubResource("Shader_wave_pulse")
+shader_parameter/base_color = Color(1, 0.42, 0.08, 0.78)
+shader_parameter/radius_start = 0.035
+shader_parameter/radius_end = 0.485
+shader_parameter/ring_width = 0.165
+shader_parameter/outer_sharpness = 0.01
+shader_parameter/fade_in = 0.07
+shader_parameter/fade_out_start = 0.7
+shader_parameter/emission_strength = 1.45
+shader_parameter/alpha_strength = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wave_pulse"]
+size = Vector2(8, 8)
+subdivide_width = 1
+subdivide_depth = 1
+material = SubResource("ShaderMaterial_wave_pulse")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wave_pulse"]
+emission_shape = 0
+direction = Vector3(0, 1, 0)
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.0
+initial_velocity_max = 0.0
+angular_velocity_min = 0.0
+angular_velocity_max = 0.0
+linear_accel_min = 0.0
+linear_accel_max = 0.0
+radial_accel_min = 0.0
+radial_accel_max = 0.0
+tangent_accel_min = 0.0
+tangent_accel_max = 0.0
+damping_min = 0.0
+damping_max = 0.0
+scale_min = 1.0
+scale_max = 1.0
+color = Color(1, 1, 1, 1)
+
+[node name="WavePulseEmitter" type="Node3D"]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+cast_shadow = 0
+visibility_aabb = AABB(-4.5, -0.25, -4.5, 9, 0.5, 9)
+amount = 1
+lifetime = 1.35
+one_shot = false
+preprocess = 0.0
+speed_scale = 1.0
+explosiveness = 1.0
+randomness = 0.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_wave_pulse")
+draw_passes = 1
+draw_pass_1 = SubResource("PlaneMesh_wave_pulse")

@@ -24,6 +24,8 @@ const TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH := "res://scenes/enemies/Transpor
 @export var initial_network_zones_to_activate: Array[NodePath] = []
 @export var initial_network_zones_to_deactivate: Array[NodePath] = []
 @export var debug_initial_network_zone_state: bool = false
+@export var initial_network_zone_enemy_group_name: String = "enemies"
+@export var initial_network_zone_enemy_secondary_group_name: String = "enemy"
 
 @export_group("Transport Helicopter Attacks")
 @export var transport_helicopter_scene: PackedScene
@@ -121,11 +123,120 @@ func _set_initial_network_zone_active(zone_node: Node, active: bool) -> void:
 		var state_text: String = "activée" if active else "désactivée"
 		print("[NetworkMain] Zone initiale %s : %s" % [state_text, zone_node.get_path()])
 
-	if not zone_node.has_method("set_network_zone_active"):
-		push_warning("[NetworkMain] La zone ne possède pas set_network_zone_active(active). Ajoute NetworkZone.gd sur : %s" % str(zone_node.get_path()))
+	if zone_node.has_method("set_network_zone_active"):
+		zone_node.call("set_network_zone_active", active)
+	else:
+		push_warning("[NetworkMain] La zone ne possède pas set_network_zone_active(active). Les props ne seront pas gérées par NetworkZone.gd : %s" % str(zone_node.get_path()))
+
+	_set_initial_network_zone_enemies_active(zone_node, active)
+
+
+func _set_initial_network_zone_enemies_active(zone_node: Node, active: bool) -> void:
+	if zone_node == null or not is_instance_valid(zone_node):
 		return
 
-	zone_node.call("set_network_zone_active", active)
+	var zone_enemies: Array[Node] = []
+	var seen: Dictionary = {}
+	_collect_initial_network_zone_enemies(zone_node, zone_enemies, seen)
+
+	for enemy_node in zone_enemies:
+		if enemy_node == null or not is_instance_valid(enemy_node):
+			continue
+		_set_initial_network_zone_enemy_active(enemy_node, active)
+
+	if debug_initial_network_zone_state and zone_enemies.size() > 0:
+		var state_text: String = "activés" if active else "désactivés"
+		print("[NetworkMain] Ennemis de zone initiale %s : %d" % [state_text, zone_enemies.size()])
+
+
+func _collect_initial_network_zone_enemies(root: Node, result: Array[Node], seen: Dictionary) -> void:
+	if root == null or not is_instance_valid(root):
+		return
+
+	if _is_initial_network_zone_enemy_node(root):
+		var enemy_id: int = root.get_instance_id()
+		if not seen.has(enemy_id):
+			seen[enemy_id] = true
+			result.append(root)
+		return
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		_collect_initial_network_zone_enemies(child, result, seen)
+
+
+func _is_initial_network_zone_enemy_node(node: Node) -> bool:
+	if node == null or not is_instance_valid(node):
+		return false
+
+	if not initial_network_zone_enemy_group_name.is_empty() and node.is_in_group(initial_network_zone_enemy_group_name):
+		return true
+
+	if not initial_network_zone_enemy_secondary_group_name.is_empty() and node.is_in_group(initial_network_zone_enemy_secondary_group_name):
+		return true
+
+	return false
+
+
+func _set_initial_network_zone_enemy_active(enemy_node: Node, active: bool) -> void:
+	if enemy_node == null or not is_instance_valid(enemy_node):
+		return
+
+	if enemy_node.has_method("set_network_zone_active"):
+		enemy_node.call("set_network_zone_active", active)
+		return
+
+	_apply_generic_initial_network_zone_enemy_state(enemy_node, active)
+
+
+func _apply_generic_initial_network_zone_enemy_state(enemy_node: Node, active: bool) -> void:
+	if enemy_node == null or not is_instance_valid(enemy_node):
+		return
+
+	if enemy_node is Node3D:
+		(enemy_node as Node3D).visible = active
+
+	if enemy_node is CharacterBody3D:
+		(enemy_node as CharacterBody3D).velocity = Vector3.ZERO
+	elif enemy_node is RigidBody3D:
+		var rigid_body: RigidBody3D = enemy_node as RigidBody3D
+		rigid_body.linear_velocity = Vector3.ZERO
+		rigid_body.angular_velocity = Vector3.ZERO
+		rigid_body.sleeping = not active
+
+	enemy_node.set_process(active)
+	enemy_node.set_physics_process(active)
+	enemy_node.process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
+	_apply_generic_initial_network_zone_enemy_tree_state(enemy_node, active)
+
+
+func _apply_generic_initial_network_zone_enemy_tree_state(root: Node, active: bool) -> void:
+	if root == null or not is_instance_valid(root):
+		return
+
+	if root is CollisionObject3D:
+		var collision_object: CollisionObject3D = root as CollisionObject3D
+		if not active:
+			collision_object.collision_layer = 0
+			collision_object.collision_mask = 0
+
+	if root is CollisionShape3D:
+		(root as CollisionShape3D).disabled = not active
+
+	if root is Area3D:
+		var area: Area3D = root as Area3D
+		area.monitoring = active
+		area.monitorable = active
+
+	if root is RayCast3D:
+		(root as RayCast3D).enabled = active
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		_apply_generic_initial_network_zone_enemy_tree_state(child, active)
+
 
 func _ensure_players_root() -> void:
 	players_root = get_node_or_null("Players") as Node3D

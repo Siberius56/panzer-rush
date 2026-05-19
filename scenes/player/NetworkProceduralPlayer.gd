@@ -23,6 +23,12 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export var jump_velocity: float = 8.5
 @export var state_send_interval: float = 0.05
 
+@export_group("Gravity Gun Push")
+@export var gravity_gun_push_decay: float = 22.0
+@export var gravity_gun_push_max_horizontal_speed: float = 24.0
+@export var gravity_gun_push_max_vertical_speed: float = 12.0
+@export var gravity_gun_push_min_horizontal_speed: float = 0.05
+
 @export_group("Fall Damage")
 @export var fall_damage_enabled: bool = true
 @export var fall_safe_height: float = 3.0
@@ -218,6 +224,7 @@ var procedural_animation_grounded: bool = true
 var procedural_animation_moving: bool = false
 
 var ui_input_blocked: bool = false
+var gravity_gun_external_velocity: Vector3 = Vector3.ZERO
 
 var weapon_slots := [{}, {}]
 var current_weapon_slot: int = 0
@@ -473,6 +480,7 @@ func _physics_process(delta: float) -> void:
 			velocity = Vector3.ZERO
 		else:
 			_update_movement(delta)
+			_apply_gravity_gun_external_velocity(delta)
 			_update_aim()
 			_update_weapon_input()
 
@@ -555,6 +563,80 @@ func _update_movement(delta: float) -> void:
 			landing_squash = -0.55
 	else:
 		velocity.y -= gravity_strength * delta
+
+
+func apply_gravity_gun_push(push_velocity: Vector3, from_position: Vector3 = Vector3.ZERO, source_node: Node = null) -> void:
+	if is_dead or is_in_vehicle():
+		return
+
+	if push_velocity.length_squared() <= 0.0001:
+		return
+
+	# En multijoueur, le projectile physique agit côté serveur.
+	# Le joueur, lui, est contrôlé par son peer d'autorité.
+	# On relaie donc la poussée au peer qui possède réellement ce CharacterBody3D.
+	if multiplayer != null and multiplayer.has_multiplayer_peer() and multiplayer.is_server() and not is_multiplayer_authority():
+		var authority_id: int = get_multiplayer_authority()
+		if authority_id > 0:
+			_receive_gravity_gun_push_rpc.rpc_id(authority_id, push_velocity, from_position)
+		return
+
+	_apply_gravity_gun_push_local(push_velocity)
+
+
+func _apply_gravity_gun_push_local(push_velocity: Vector3) -> void:
+	if is_dead or is_in_vehicle():
+		return
+
+	var horizontal_push: Vector3 = Vector3(push_velocity.x, 0.0, push_velocity.z)
+	var horizontal_speed: float = horizontal_push.length()
+
+	if horizontal_speed > gravity_gun_push_max_horizontal_speed and gravity_gun_push_max_horizontal_speed > 0.0:
+		horizontal_push = horizontal_push.normalized() * gravity_gun_push_max_horizontal_speed
+
+	if horizontal_speed > gravity_gun_push_min_horizontal_speed:
+		var current_horizontal: Vector3 = Vector3(gravity_gun_external_velocity.x, 0.0, gravity_gun_external_velocity.z)
+		gravity_gun_external_velocity.x = current_horizontal.x + horizontal_push.x
+		gravity_gun_external_velocity.z = current_horizontal.z + horizontal_push.z
+
+		var stored_horizontal: Vector3 = Vector3(gravity_gun_external_velocity.x, 0.0, gravity_gun_external_velocity.z)
+		if gravity_gun_push_max_horizontal_speed > 0.0 and stored_horizontal.length() > gravity_gun_push_max_horizontal_speed:
+			stored_horizontal = stored_horizontal.normalized() * gravity_gun_push_max_horizontal_speed
+			gravity_gun_external_velocity.x = stored_horizontal.x
+			gravity_gun_external_velocity.z = stored_horizontal.z
+
+	if push_velocity.y > 0.0:
+		var vertical_push: float = minf(push_velocity.y, gravity_gun_push_max_vertical_speed) if gravity_gun_push_max_vertical_speed > 0.0 else push_velocity.y
+		velocity.y = maxf(velocity.y, vertical_push)
+
+
+func _apply_gravity_gun_external_velocity(delta: float) -> void:
+	if gravity_gun_external_velocity.length_squared() <= 0.0001:
+		gravity_gun_external_velocity = Vector3.ZERO
+		return
+
+	velocity.x += gravity_gun_external_velocity.x
+	velocity.z += gravity_gun_external_velocity.z
+
+	var horizontal_velocity: Vector3 = Vector3(velocity.x, 0.0, velocity.z)
+	var max_horizontal_speed: float = maxf(move_speed + gravity_gun_push_max_horizontal_speed, move_speed)
+	if gravity_gun_push_max_horizontal_speed > 0.0 and horizontal_velocity.length() > max_horizontal_speed:
+		horizontal_velocity = horizontal_velocity.normalized() * max_horizontal_speed
+		velocity.x = horizontal_velocity.x
+		velocity.z = horizontal_velocity.z
+
+	gravity_gun_external_velocity = gravity_gun_external_velocity.move_toward(Vector3.ZERO, gravity_gun_push_decay * delta)
+
+
+@rpc("any_peer", "call_local", "reliable")
+func _receive_gravity_gun_push_rpc(push_velocity: Vector3, from_position: Vector3) -> void:
+	if multiplayer != null and multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		var sender_id: int = multiplayer.get_remote_sender_id()
+		if sender_id != 1:
+			return
+
+	_apply_gravity_gun_push_local(push_velocity)
+
 
 func _reset_fall_damage_tracking() -> void:
 	_fall_was_airborne = false

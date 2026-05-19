@@ -5,6 +5,7 @@ class_name PassageGateRespawnPatch
 
 @export var player_group_name: String = "players"
 @export var enemy_group_name: String = "enemies"
+@export var enemy_secondary_group_name: String = "enemy"
 @export var vehicle_group_name: String = "vehicles"
 
 @export var validation_duration: float = 3.0
@@ -35,6 +36,7 @@ class_name PassageGateRespawnPatch
 
 var _players_inside: Dictionary = {}
 var _enemies_inside: Dictionary = {}
+var _zone_enemy_cache: Dictionary = {}
 var _validation_timer: float = 0.0
 var _validated: bool = false
 
@@ -182,11 +184,137 @@ func _set_network_zone_active(zone_node: Node3D, active: bool) -> void:
 		var state_text: String = "activée" if active else "désactivée"
 		print("[PassageGateRespawnPatch] Zone %s : %s" % [state_text, zone_node.get_path()])
 
-	if not zone_node.has_method("set_network_zone_active"):
-		push_warning("[PassageGateRespawnPatch] La zone %s ne possède pas set_network_zone_active(active). Ajoute NetworkZone.gd dessus." % str(zone_node.get_path()))
+	if zone_node.has_method("set_network_zone_active"):
+		zone_node.call("set_network_zone_active", active)
+	else:
+		push_warning("[PassageGateRespawnPatch] La zone %s ne possède pas set_network_zone_active(active). Les props ne seront pas gérées par NetworkZone.gd." % str(zone_node.get_path()))
+
+	_set_cached_zone_enemies_active(zone_node, active)
+
+
+func _set_cached_zone_enemies_active(zone_node: Node, active: bool) -> void:
+	var zone_enemies: Array[Node] = _get_cached_zone_enemies(zone_node)
+	var valid_enemies: Array[Node] = []
+
+	for enemy_node in zone_enemies:
+		if enemy_node == null or not is_instance_valid(enemy_node):
+			continue
+		valid_enemies.append(enemy_node)
+		_set_zone_enemy_active(enemy_node, active)
+
+	if zone_node != null and is_instance_valid(zone_node):
+		_zone_enemy_cache[zone_node.get_instance_id()] = valid_enemies
+
+	if debug_zone_switch and valid_enemies.size() > 0:
+		var state_text: String = "activés" if active else "désactivés"
+		print("[PassageGateRespawnPatch] Ennemis de zone %s : %d" % [state_text, valid_enemies.size()])
+
+
+func _get_cached_zone_enemies(zone_node: Node) -> Array[Node]:
+	var result: Array[Node] = []
+	if zone_node == null or not is_instance_valid(zone_node):
+		return result
+
+	var zone_id: int = zone_node.get_instance_id()
+	if _zone_enemy_cache.has(zone_id):
+		for cached_enemy in _zone_enemy_cache[zone_id]:
+			if cached_enemy != null and is_instance_valid(cached_enemy):
+				result.append(cached_enemy as Node)
+		return result
+
+	var seen: Dictionary = {}
+	_collect_zone_enemies(zone_node, result, seen)
+	_zone_enemy_cache[zone_id] = result
+	return result
+
+
+func _collect_zone_enemies(root: Node, result: Array[Node], seen: Dictionary) -> void:
+	if root == null or not is_instance_valid(root):
 		return
 
-	zone_node.call("set_network_zone_active", active)
+	if _is_zone_enemy_node(root):
+		var enemy_id: int = root.get_instance_id()
+		if not seen.has(enemy_id):
+			seen[enemy_id] = true
+			result.append(root)
+		return
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		_collect_zone_enemies(child, result, seen)
+
+
+func _is_zone_enemy_node(node: Node) -> bool:
+	if node == null or not is_instance_valid(node):
+		return false
+
+	if not enemy_group_name.is_empty() and node.is_in_group(enemy_group_name):
+		return true
+
+	if not enemy_secondary_group_name.is_empty() and node.is_in_group(enemy_secondary_group_name):
+		return true
+
+	return false
+
+
+func _set_zone_enemy_active(enemy_node: Node, active: bool) -> void:
+	if enemy_node == null or not is_instance_valid(enemy_node):
+		return
+
+	if enemy_node.has_method("set_network_zone_active"):
+		enemy_node.call("set_network_zone_active", active)
+		return
+
+	_apply_generic_enemy_zone_state(enemy_node, active)
+
+
+func _apply_generic_enemy_zone_state(enemy_node: Node, active: bool) -> void:
+	if enemy_node == null or not is_instance_valid(enemy_node):
+		return
+
+	if enemy_node is Node3D:
+		(enemy_node as Node3D).visible = active
+
+	if enemy_node is CharacterBody3D:
+		(enemy_node as CharacterBody3D).velocity = Vector3.ZERO
+	elif enemy_node is RigidBody3D:
+		var rigid_body: RigidBody3D = enemy_node as RigidBody3D
+		rigid_body.linear_velocity = Vector3.ZERO
+		rigid_body.angular_velocity = Vector3.ZERO
+		rigid_body.sleeping = not active
+
+	enemy_node.set_process(active)
+	enemy_node.set_physics_process(active)
+	enemy_node.process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
+	_apply_generic_enemy_zone_tree_state(enemy_node, active)
+
+
+func _apply_generic_enemy_zone_tree_state(root: Node, active: bool) -> void:
+	if root == null or not is_instance_valid(root):
+		return
+
+	if root is CollisionObject3D:
+		var collision_object: CollisionObject3D = root as CollisionObject3D
+		if not active:
+			collision_object.collision_layer = 0
+			collision_object.collision_mask = 0
+
+	if root is CollisionShape3D:
+		(root as CollisionShape3D).disabled = not active
+
+	if root is Area3D:
+		var area: Area3D = root as Area3D
+		area.monitoring = active
+		area.monitorable = active
+
+	if root is RayCast3D:
+		(root as RayCast3D).enabled = active
+
+	for child in root.get_children():
+		if child == null or not is_instance_valid(child):
+			continue
+		_apply_generic_enemy_zone_tree_state(child, active)
 
 
 func reset_passage() -> void:
@@ -584,7 +712,7 @@ func _get_enemy_from_detector(detector: Variant) -> Node:
 
 	var current: Node = detector as Node
 	while current != null:
-		if current.is_in_group(enemy_group_name):
+		if _is_zone_enemy_node(current):
 			return current
 		current = current.get_parent()
 

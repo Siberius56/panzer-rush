@@ -1,33 +1,23 @@
 extends Area3D
 class_name GravityGunBlast
 
-# Cette scène est utilisée comme un projectile classique.
-# Elle expose donc la même méthode fire() que VisualBullet.gd.
+# Projectile du Gravity Gun.
+# Il garde la même méthode fire() que VisualBullet.gd pour rester compatible avec le système d'armes existant.
 
-enum TargetKind {
-	PROP,
-	VEHICLE,
-	CHARACTER,
-}
-
-@export_group("Target Groups")
+@export_group("Gravity Gun Groups")
 @export var prop_groups: Array[StringName] = [&"prop", &"props"]
 @export var vehicle_groups: Array[StringName] = [&"vehicle", &"vehicles"]
-@export var character_groups: Array[StringName] = [&"player", &"players"]
+@export var character_groups: Array[StringName] = [&"player", &"players", &"enemy", &"enemies"]
 @export var deny_group: StringName = &"gravitygun_deny"
 
-@export_group("Push Values")
-# Gardé volontairement pour compatibilité avec ta scène actuelle.
-# Utilisé comme force des props.
+@export_group("Gravity Gun Push")
 @export var push_impulse: float = 300.0
 @export var vehicle_push_impulse: float = 2000.0
 @export var character_push_velocity: float = 16.0
 @export_range(0.0, 1.0, 0.01) var vertical_lift: float = 0.08
-@export var max_target_speed_after_push: float = 24.0
-@export var max_character_speed_after_push: float = 22.0
-
-@export_group("Blast")
 @export var max_targets: int = 16
+@export var max_target_speed_after_push: float = 24.0
+@export var max_character_speed_after_push: float = 24.0
 @export var blast_lifetime: float = 0.12
 @export var physics_frames_before_blast: int = 1
 @export var debug_logs: bool = false
@@ -77,7 +67,6 @@ func fire(
 	_debug("fire pos=%s dir=%s shooter=%s" % [str(global_position), str(direction), shooter.name if shooter != null else "null"])
 
 
-# Compatibilité si un autre code appelle seulement setup(start_pos, dir).
 func setup(start_pos: Vector3, dir: Vector3) -> void:
 	fire(start_pos, dir, team, damage, penetration, tk, shooter, hit_effect_scene)
 
@@ -176,12 +165,7 @@ func _push_if_valid(start_node: Node3D, pushed_targets: Dictionary) -> void:
 	if pushed_targets.size() >= max_targets:
 		return
 
-	var target_info: Dictionary = _find_valid_target_info(start_node)
-	if target_info.is_empty():
-		return
-
-	var target: Node3D = target_info["node"] as Node3D
-	var target_kind: int = int(target_info["target_kind"])
+	var target: Node3D = _find_valid_target_node(start_node)
 	if target == null:
 		return
 
@@ -190,133 +174,103 @@ func _push_if_valid(start_node: Node3D, pushed_targets: Dictionary) -> void:
 		return
 
 	pushed_targets[target_id] = true
-	_push_target(target, start_node, target_kind)
+	_push_target(target, start_node)
 
 
-func _find_valid_target_info(start_node: Node) -> Dictionary:
+func _find_valid_target_node(start_node: Node) -> Node3D:
 	var current: Node = start_node
 	var steps: int = 0
 
 	while current != null and steps < 10:
 		if current.is_in_group(deny_group):
-			return {}
+			return null
 
 		if current is Node3D:
-			var current_node_3d: Node3D = current as Node3D
-
-			# Priorité volontaire : véhicule > personnage > prop.
-			# Comme ça, un véhicule qui aurait aussi le groupe "prop" garde sa force véhicule.
-			if _node_is_in_any_group(current, vehicle_groups):
-				return {"node": current_node_3d, "target_kind": TargetKind.VEHICLE}
-
-			if _node_is_in_any_group(current, character_groups):
-				return {"node": current_node_3d, "target_kind": TargetKind.CHARACTER}
-
-			if _node_is_in_any_group(current, prop_groups):
-				return {"node": current_node_3d, "target_kind": TargetKind.PROP}
+			if _is_in_any_group(current, vehicle_groups):
+				return current as Node3D
+			if _is_in_any_group(current, character_groups):
+				return current as Node3D
+			if _is_in_any_group(current, prop_groups):
+				return current as Node3D
 
 		current = current.get_parent()
 		steps += 1
 
-	return {}
+	return null
 
 
-func _node_is_in_any_group(node: Node, groups: Array[StringName]) -> bool:
-	for group_name in groups:
-		if node.is_in_group(group_name):
-			return true
-	return false
-
-
-func _push_target(target: Node3D, source_node: Node3D, target_kind: int) -> void:
+func _push_target(target: Node3D, source_node: Node3D) -> void:
 	var push_direction: Vector3 = _get_push_direction()
+	var target_type: StringName = _get_target_type(target)
 
-	match target_kind:
-		TargetKind.VEHICLE:
-			_push_rigid_target(target, source_node, push_direction, vehicle_push_impulse)
-		TargetKind.CHARACTER:
-			_push_character_target(target, source_node, push_direction)
-		_:
-			_push_rigid_target(target, source_node, push_direction, push_impulse)
-
-
-func _push_rigid_target(target: Node3D, source_node: Node3D, push_direction: Vector3, impulse_strength: float) -> void:
-	var impulse: Vector3 = push_direction * impulse_strength
-
-	if target.has_method("apply_gravity_gun_impulse"):
-		target.call("apply_gravity_gun_impulse", impulse, global_position)
+	if target_type == &"vehicle":
+		_push_rigid_target(target, source_node, push_direction * vehicle_push_impulse)
 		return
 
-	var rigid_body: RigidBody3D = _find_rigid_body(target)
-	if rigid_body == null:
-		rigid_body = _find_rigid_body(source_node)
-
-	if rigid_body == null:
+	if target_type == &"character":
+		_push_character_target(target, source_node, push_direction * character_push_velocity)
 		return
 
-	if rigid_body.has_method("apply_gravity_gun_impulse"):
-		rigid_body.call("apply_gravity_gun_impulse", impulse, global_position)
-		return
-
-	rigid_body.sleeping = false
-	rigid_body.apply_impulse(impulse, global_position - rigid_body.global_position)
-	_clamp_rigid_body_speed(rigid_body)
+	_push_rigid_target(target, source_node, push_direction * push_impulse)
 
 
-func _push_character_target(target: Node3D, source_node: Node3D, push_direction: Vector3) -> void:
-	var push_velocity: Vector3 = push_direction * character_push_velocity
+func _push_character_target(target: Node3D, source_node: Node3D, push_velocity: Vector3) -> void:
+	if max_character_speed_after_push > 0.0:
+		push_velocity = _clamp_vector_length(push_velocity, max_character_speed_after_push)
 
 	if target.has_method("apply_gravity_gun_push"):
 		target.call("apply_gravity_gun_push", push_velocity, global_position, shooter)
 		return
 
-	var character: CharacterBody3D = _find_character_body(target)
-	if character == null:
-		character = _find_character_body(source_node)
-
-	if character == null:
-		# Sécurité : si un personnage est en réalité un RigidBody3D custom, on tente quand même une impulsion physique.
-		_push_rigid_target(target, source_node, push_direction, push_impulse)
+	if target.has_method("apply_gravity_gun_impulse"):
+		target.call("apply_gravity_gun_impulse", push_velocity, global_position)
 		return
 
-	if character.has_method("apply_gravity_gun_push"):
-		character.call("apply_gravity_gun_push", push_velocity, global_position, shooter)
+	if target is CharacterBody3D:
+		var character: CharacterBody3D = target as CharacterBody3D
+		character.velocity += push_velocity
+		_clamp_character_speed(character)
 		return
 
-	if character.has_method("apply_gravity_gun_impulse"):
-		character.call("apply_gravity_gun_impulse", push_velocity, global_position)
+	if source_node is CharacterBody3D:
+		var source_character: CharacterBody3D = source_node as CharacterBody3D
+		source_character.velocity += push_velocity
+		_clamp_character_speed(source_character)
+
+
+func _push_rigid_target(target: Node3D, source_node: Node3D, impulse: Vector3) -> void:
+	if target.has_method("apply_gravity_gun_impulse"):
+		target.call("apply_gravity_gun_impulse", impulse, global_position)
 		return
 
-	# Fallback générique.
-	# Fonctionne seulement si le script du personnage ne réécrit pas entièrement velocity juste après.
-	character.velocity += push_velocity
-	_clamp_character_speed(character)
+	var rigid_body: RigidBody3D = target as RigidBody3D
+	if rigid_body == null and source_node is RigidBody3D:
+		rigid_body = source_node as RigidBody3D
+
+	if rigid_body != null:
+		rigid_body.sleeping = false
+		rigid_body.apply_impulse(impulse, global_position - rigid_body.global_position)
+		_clamp_rigid_body_speed(rigid_body)
+		return
+
+	# Fallback : certains objets peuvent être groupés en prop tout en étant des CharacterBody3D.
+	if target is CharacterBody3D:
+		_push_character_target(target, source_node, impulse)
 
 
-func _find_rigid_body(start_node: Node) -> RigidBody3D:
-	var current: Node = start_node
-	var steps: int = 0
-
-	while current != null and steps < 10:
-		if current is RigidBody3D:
-			return current as RigidBody3D
-		current = current.get_parent()
-		steps += 1
-
-	return null
+func _get_target_type(target: Node) -> StringName:
+	if _is_in_any_group(target, vehicle_groups):
+		return &"vehicle"
+	if _is_in_any_group(target, character_groups):
+		return &"character"
+	return &"prop"
 
 
-func _find_character_body(start_node: Node) -> CharacterBody3D:
-	var current: Node = start_node
-	var steps: int = 0
-
-	while current != null and steps < 10:
-		if current is CharacterBody3D:
-			return current as CharacterBody3D
-		current = current.get_parent()
-		steps += 1
-
-	return null
+func _is_in_any_group(node: Node, groups: Array[StringName]) -> bool:
+	for group_name in groups:
+		if node.is_in_group(group_name):
+			return true
+	return false
 
 
 func _get_push_direction() -> Vector3:
@@ -348,11 +302,21 @@ func _clamp_character_speed(character: CharacterBody3D) -> void:
 	if max_character_speed_after_push <= 0.0:
 		return
 
-	var current_speed: float = character.velocity.length()
-	if current_speed <= max_character_speed_after_push:
+	var horizontal_velocity: Vector3 = Vector3(character.velocity.x, 0.0, character.velocity.z)
+	if horizontal_velocity.length() <= max_character_speed_after_push:
 		return
 
-	character.velocity = character.velocity.normalized() * max_character_speed_after_push
+	horizontal_velocity = horizontal_velocity.normalized() * max_character_speed_after_push
+	character.velocity.x = horizontal_velocity.x
+	character.velocity.z = horizontal_velocity.z
+
+
+func _clamp_vector_length(value: Vector3, max_length: float) -> Vector3:
+	if max_length <= 0.0:
+		return value
+	if value.length() <= max_length:
+		return value
+	return value.normalized() * max_length
 
 
 func _debug(message: String) -> void:

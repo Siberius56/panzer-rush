@@ -52,7 +52,7 @@ size = Vector3(2.13, 1.05, 0.12)
 
 [node name="Crate_Large" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
 script = ExtResource("1_fpls0")
-max_hp = 15.0
+max_hp = 30.0
 debris_min_impulse = 1.3
 debris_max_impulse = 3.4
 debris_upward_bias = 0.35

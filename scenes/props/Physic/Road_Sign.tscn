@@ -24,7 +24,7 @@ debris_collision_mask = 4278190095
 [node name="IntactBody" type="RigidBody3D" parent="." unique_id=106632416 groups=["destructible_prop_bodies"]]
 collision_layer = 24
 collision_mask = 4294967295
-mass = 12.0
+mass = 40.0
 linear_damp = 0.35
 angular_damp = 0.5
 

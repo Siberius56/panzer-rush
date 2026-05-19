@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://dwpsaqsds3y8g"]
+
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_fjycs"]
+[ext_resource type="PackedScene" uid="uid://bjx62u48e41hx" path="res://container_small.glb" id="2_cao2b"]
+[ext_resource type="Texture2D" uid="uid://b3y6ggoaadr4w" path="res://asset/map/train/Textures/colormap.png" id="3_cao2b"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bkvov"]
+albedo_texture = ExtResource("3_cao2b")
+uv1_scale = Vector3(1, -1, 1)
+uv1_offset = Vector3(-0.29, -2.01, 0)
+
+[sub_resource type="BoxShape3D" id="shape_crate"]
+size = Vector3(2.9787967, 1.7918335, 2.0674255)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g37gu"]
+radius = 0.890625
+height = 3.4399757
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fjycs"]
+albedo_color = Color(0.36838678, 0.2841244, 0.21918058, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_54g8o"]
+material = SubResource("StandardMaterial3D_fjycs")
+size = Vector3(0.18, 0.1, 1.15)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_k10yr"]
+size = Vector3(0.18, 0.12, 1.15)
+
+[node name="Crate_Container_Small" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
+script = ExtResource("1_fjycs")
+max_hp = 15.0
+destroy_when_hp_reaches_zero = false
+debris_min_impulse = 1.3
+debris_max_impulse = 3.4
+debris_upward_bias = 0.35
+debris_torque_impulse = 2.2
+debris_collision_layer = 8
+
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=106632416 groups=["destructible_prop_bodies"]]
+collision_layer = 21
+collision_mask = 4294967295
+mass = 55.0
+linear_damp = 0.35
+angular_damp = 0.5
+
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=861077649]
+
+[node name="container_small" parent="IntactBody/Intact" unique_id=1084477887 instance=ExtResource("2_cao2b")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0.054, 0, -0.091)
+
+[node name="cargo" parent="IntactBody/Intact/container_small" index="0" unique_id=2072349948]
+transform = Transform3D(3.5762787e-07, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, 3.5762787e-07, -0.5527494, -0.4492948, 0.038)
+surface_material_override/0 = SubResource("StandardMaterial3D_bkvov")
+
+[node name="Collision" type="CollisionShape3D" parent="IntactBody" unique_id=1808628591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.119131565, 0.00806278, -0.013607889)
+shape = SubResource("shape_crate")
+
+[node name="Collision2" type="CollisionShape3D" parent="IntactBody" unique_id=349940797]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -0.061002254, 0.008062777, -0.01712647)
+shape = SubResource("CapsuleShape3D_g37gu")
+
+[node name="DebrisRoot" type="Node3D" parent="." unique_id=1062000715]
+visible = false
+
+[node name="CrossPlank" type="RigidBody3D" parent="DebrisRoot" unique_id=2093621406]
+transform = Transform3D(0.6737867, 0, 0.7389259, 0, 1, 0, -0.7389259, 0, 0.6737867, -0.006710708, 0.6637167, 0)
+collision_layer = 0
+collision_mask = 4294967295
+mass = 2.0
+
+[node name="Mesh" type="MeshInstance3D" parent="DebrisRoot/CrossPlank" unique_id=446022163]
+mesh = SubResource("BoxMesh_54g8o")
+
+[node name="Collision" type="CollisionShape3D" parent="DebrisRoot/CrossPlank" unique_id=250854932]
+shape = SubResource("BoxShape3D_k10yr")
+
+[editable path="IntactBody/Intact/container_small"]
