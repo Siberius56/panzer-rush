@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cqq5wb7jd1oye" path="res://asset/map/nature/fence_planks.glb" id="2_6eqeh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_o0upt"]
-size = Vector3(1.3678856, 4.004269, 0.39941406)
+size = Vector3(0.88560295, 4.004269, 0.39941406)
 
 [node name="Fence_Plank_Simple" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
 script = ExtResource("1_d8p0m")
@@ -32,7 +32,7 @@ angular_damp = 0.5
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 2)
 
 [node name="Collision3" type="CollisionShape3D" parent="IntactBody" unique_id=1930164488]
-transform = Transform3D(0, -1.0000001, 0, 1.0000001, 0, 0, 0, 0, 1, -0.0008491315, 0.49528694, 0.076660156)
+transform = Transform3D(0, -1.0000001, 0, 1.0000001, 0, 0, 0, 0, 1, -0.0008491315, 0.2541456, 0.076660156)
 shape = SubResource("BoxShape3D_o0upt")
 
 [node name="DebrisRoot" type="Node3D" parent="." unique_id=1062000715]

@@ -32,6 +32,7 @@ enum Team {
 
 @export_group("Lifetime")
 @export var lifetime: float = 0.15
+@export var lifetime_anim : float = 1.0
 
 @export_group("Camera Shake")
 @export var camera_shake_enabled: bool = true
@@ -69,7 +70,9 @@ func configure_from_projectile(source_damage: int, source_penetration: int, sour
 
 func _physics_process(delta: float) -> void:
 	lifetime -= delta
-	if lifetime <= 0.0:
+	lifetime_anim -= delta
+	
+	if lifetime_anim <= 0.0:
 		queue_free()
 
 
@@ -111,11 +114,13 @@ func _emit_camera_shake() -> void:
 	)
 
 func _on_body_entered(body: Node3D) -> void:
-	_try_damage_from_collider(body)
+	if lifetime > 0.0:
+		_try_damage_from_collider(body)
 
 
 func _on_area_entered(area: Area3D) -> void:
-	_try_damage_from_collider(area)
+	if lifetime > 0.0:
+		_try_damage_from_collider(area)
 
 
 func _damage_current_overlaps() -> void:

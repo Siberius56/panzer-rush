@@ -49,7 +49,7 @@ angular_damp = 0.5
 [node name="container_small" parent="IntactBody/Intact" unique_id=1084477887 instance=ExtResource("2_cao2b")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0.054, 0, -0.091)
 
-[node name="cargo" parent="IntactBody/Intact/container_small" index="0" unique_id=2072349948]
+[node name="cargo" parent="IntactBody/Intact/container_small" index="0" unique_id=1959373850]
 transform = Transform3D(3.5762787e-07, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, 3.5762787e-07, -0.5527494, -0.4492948, 0.038)
 surface_material_override/0 = SubResource("StandardMaterial3D_bkvov")
 

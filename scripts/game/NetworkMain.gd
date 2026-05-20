@@ -370,7 +370,7 @@ func _spawn_transport_helicopter_remote(
 	if helicopter.has_method("setup_transport_helicopter"):
 		helicopter.call("setup_transport_helicopter", spawn_transform, destination_position, unit_set_id)
 		return
-
+	
 	_set_property_if_exists(helicopter, "destination_position", destination_position)
 	_set_property_if_exists(helicopter, "spawn_position", spawn_transform.origin)
 	_set_property_if_exists(helicopter, "unit_set_id", unit_set_id)

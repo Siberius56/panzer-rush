@@ -1,29 +1,15 @@
-[gd_scene format=3 uid="uid://b05w3s4sqvc32"]
+[gd_scene format=3 uid="uid://dl1xskt24a7px"]
 
-[ext_resource type="Script" uid="uid://c61uo3r1fkvwo" path="res://scenes/weapons/ProjectileExplosion.gd" id="1_explosion"]
-[ext_resource type="Texture2D" uid="uid://ddelgvrnyagnr" path="res://asset/fx/textures/fx_flash_radial.png" id="2_jpngp"]
+[ext_resource type="Texture2D" uid="uid://ddelgvrnyagnr" path="res://asset/fx/textures/fx_flash_radial.png" id="1_flash"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_explosion"]
-radius = 2.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_explosion"]
-transparency = 1
-albedo_color = Color(1, 0.45, 0.1, 0.35)
-emission_enabled = true
-emission = Color(1, 0.35, 0.05, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_explosion"]
-radius = 2.5
-height = 5.0
-
-[sub_resource type="Curve" id="Curve_ogtqh"]
+[sub_resource type="Curve" id="Curve_bjwfb"]
 _data = [Vector2(0.74429226, 1), 0.0, -0.03417667, 0, 0, Vector2(1, 0), -6.804013, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="CurveTexture" id="CurveTexture_liuiq"]
-curve = SubResource("Curve_ogtqh")
+[sub_resource type="CurveTexture" id="CurveTexture_14nbk"]
+curve = SubResource("Curve_bjwfb")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_2rlbk"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_spheres"]
 emission_shape_scale = Vector3(1, 0.1, 1)
 emission_shape = 2
 emission_sphere_radius = 0.5
@@ -36,28 +22,28 @@ damping_min = 5.0
 damping_max = 8.0
 scale_min = 0.55
 scale_max = 1.25
-scale_curve = SubResource("CurveTexture_liuiq")
+scale_curve = SubResource("CurveTexture_14nbk")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spheres"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bsjmr"]
 transparency = 1
 vertex_color_use_as_albedo = true
 roughness = 0.75
 
-[sub_resource type="SphereMesh" id="SphereMesh_s7p61"]
-material = SubResource("StandardMaterial3D_spheres")
+[sub_resource type="SphereMesh" id="SphereMesh_white"]
+material = SubResource("StandardMaterial3D_bsjmr")
 radius = 0.45
 height = 0.9
 radial_segments = 16
 rings = 8
 
-[sub_resource type="Curve" id="Curve_3x5xd"]
+[sub_resource type="Curve" id="Curve_npi3h"]
 _data = [Vector2(0.7534247, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -5.7442064, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="CurveTexture" id="CurveTexture_x0qtr"]
-curve = SubResource("Curve_3x5xd")
+[sub_resource type="CurveTexture" id="CurveTexture_sfde3"]
+curve = SubResource("Curve_npi3h")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_eyec3"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_debris"]
 particle_flag_align_y = true
 emission_shape = 1
 emission_sphere_radius = 0.12
@@ -76,44 +62,44 @@ damping_min = 7.0
 damping_max = 11.0
 scale_min = 0.65
 scale_max = 1.65
-scale_curve = SubResource("CurveTexture_x0qtr")
+scale_curve = SubResource("CurveTexture_sfde3")
 color = Color(0.08, 0.08, 0.08, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_debris"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8vf0u"]
 transparency = 1
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.08, 0.08, 0.08, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_c0umf"]
-material = SubResource("StandardMaterial3D_debris")
+[sub_resource type="BoxMesh" id="BoxMesh_debris"]
+material = SubResource("StandardMaterial3D_8vf0u")
 size = Vector3(0.16, 0.16, 0.16)
 
-[sub_resource type="Gradient" id="Gradient_nc2ni"]
+[sub_resource type="Gradient" id="Gradient_flash"]
 offsets = PackedFloat32Array(0, 0.08, 0.32, 1)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 0.82, 0.94, 1, 0.65, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_flash"]
-gradient = SubResource("Gradient_nc2ni")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_15use"]
+gradient = SubResource("Gradient_flash")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6ly5e"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flash"]
 direction = Vector3(0, 1, 0)
 spread = 0.0
 gravity = Vector3(0, 0, 0)
 scale_min = 0.75
 scale_max = 1.15
-color_ramp = SubResource("GradientTexture1D_flash")
+color_ramp = SubResource("GradientTexture1D_15use")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flash"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n0ft2"]
 transparency = 1
 blend_mode = 1
 no_depth_test = true
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("2_jpngp")
+albedo_texture = ExtResource("1_flash")
 billboard_mode = 1
 
-[sub_resource type="QuadMesh" id="QuadMesh_a4byx"]
-material = SubResource("StandardMaterial3D_flash")
+[sub_resource type="QuadMesh" id="QuadMesh_flash"]
+material = SubResource("StandardMaterial3D_n0ft2")
 size = Vector2(5, 5)
 
 [sub_resource type="Animation" id="Animation_explode"]
@@ -181,26 +167,15 @@ tracks/4/keys = {
 "values": [16.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ftf1s"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fx"]
 _data = {
 &"explode": SubResource("Animation_explode")
 }
 
-[node name="ProjectileExplosion" type="Area3D" unique_id=1144352729]
-collision_mask = 4294967295
-monitoring = false
-monitorable = false
-script = ExtResource("1_explosion")
+[node name="ImpactExplosionFX" type="Node3D" unique_id=612363532]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=382472642]
-shape = SubResource("SphereShape3D_explosion")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=700307353]
-visible = false
-material_override = SubResource("StandardMaterial3D_explosion")
-mesh = SubResource("SphereMesh_explosion")
-
-[node name="Ground_White_Spheres" type="GPUParticles3D" parent="." unique_id=1605308496]
+[node name="Ground_White_Spheres" type="GPUParticles3D" parent="." unique_id=419293521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 emitting = false
 amount = 24
 lifetime = 1.1
@@ -208,10 +183,10 @@ one_shot = true
 explosiveness = 1.0
 randomness = 0.8
 visibility_aabb = AABB(-8, -2, -8, 16, 5, 16)
-process_material = SubResource("ParticleProcessMaterial_2rlbk")
-draw_pass_1 = SubResource("SphereMesh_s7p61")
+process_material = SubResource("ParticleProcessMaterial_spheres")
+draw_pass_1 = SubResource("SphereMesh_white")
 
-[node name="Dark_Debris_Cubes" type="GPUParticles3D" parent="." unique_id=709827766]
+[node name="Dark_Debris_Cubes" type="GPUParticles3D" parent="." unique_id=771314577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0)
 emitting = false
 amount = 46
@@ -220,10 +195,10 @@ explosiveness = 1.0
 randomness = 0.7
 fixed_fps = 60
 visibility_aabb = AABB(-6, -3, -6, 12, 7, 12)
-process_material = SubResource("ParticleProcessMaterial_eyec3")
-draw_pass_1 = SubResource("BoxMesh_c0umf")
+process_material = SubResource("ParticleProcessMaterial_debris")
+draw_pass_1 = SubResource("BoxMesh_debris")
 
-[node name="Center_Flash" type="GPUParticles3D" parent="." unique_id=1122415207]
+[node name="Center_Flash" type="GPUParticles3D" parent="." unique_id=1514852456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
 emitting = false
 amount = 3
@@ -232,10 +207,10 @@ one_shot = true
 explosiveness = 1.0
 randomness = 0.25
 fixed_fps = 60
-process_material = SubResource("ParticleProcessMaterial_6ly5e")
-draw_pass_1 = SubResource("QuadMesh_a4byx")
+process_material = SubResource("ParticleProcessMaterial_flash")
+draw_pass_1 = SubResource("QuadMesh_flash")
 
-[node name="CenterFlashLight" type="OmniLight3D" parent="." unique_id=764140459]
+[node name="CenterFlashLight" type="OmniLight3D" parent="." unique_id=1257751099]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 visible = false
 light_color = Color(0.82, 0.93, 1, 1)
@@ -243,6 +218,6 @@ light_energy = 0.0
 light_specular = 0.7
 omni_range = 8.0
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1921067756]
-libraries/ = SubResource("AnimationLibrary_ftf1s")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=222505486]
+libraries/ = SubResource("AnimationLibrary_fx")
 autoplay = &"explode"

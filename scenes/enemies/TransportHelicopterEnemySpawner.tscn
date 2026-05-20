@@ -362,7 +362,7 @@ turn_speed_degrees = 80.0
 [node name="Body" type="Node3D" parent="." unique_id=922234537]
 
 [node name="Body" type="MeshInstance3D" parent="Body" unique_id=212071933]
-transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)
+transform = Transform3D(-2.5, 0, -3.774895e-07, 0, 2.5, 0, 3.774895e-07, 0, -2.5, -0.008339081, 1, 0.08038509)
 mesh = SubResource("ArrayMesh_iyuad")
 surface_material_override/0 = ExtResource("2_rfvhk")
 
@@ -387,27 +387,27 @@ mesh = SubResource("CylinderMesh_rfvhk")
 surface_material_override/0 = SubResource("StandardMaterial3D_dpp2g")
 
 [node name="Antenna" type="MeshInstance3D" parent="Body" unique_id=1024911648]
-transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)
+transform = Transform3D(-2.5, 0, -3.774895e-07, 0, 2.5, 0, 3.774895e-07, 0, -2.5, -0.008339081, 1, 0.08038509)
 mesh = SubResource("ArrayMesh_2xumk")
 surface_material_override/0 = ExtResource("4_qai54")
 
 [node name="Wheels" type="MeshInstance3D" parent="Body" unique_id=11892139]
-transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)
+transform = Transform3D(-2.5, 0, -3.774895e-07, 0, 2.5, 0, 3.774895e-07, 0, -2.5, -0.008339081, 1, 0.08038509)
 mesh = SubResource("ArrayMesh_i2ljl")
 surface_material_override/0 = ExtResource("3_dpp2g")
 
 [node name="Rotors" type="MeshInstance3D" parent="Body" unique_id=642305691]
-transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)
+transform = Transform3D(-2.5, 0, -3.774895e-07, 0, 2.5, 0, 3.774895e-07, 0, -2.5, -0.008339081, 1, 0.08038509)
 mesh = SubResource("ArrayMesh_jalwj")
 surface_material_override/0 = ExtResource("3_dpp2g")
 
 [node name="Motor" type="MeshInstance3D" parent="Body" unique_id=1341927745]
-transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)
+transform = Transform3D(-2.5, 0, -3.774895e-07, 0, 2.5, 0, 3.774895e-07, 0, -2.5, -0.008339081, 1, 0.08038509)
 mesh = SubResource("ArrayMesh_4lj0v")
 surface_material_override/0 = ExtResource("2_rfvhk")
 
 [node name="Windows" type="MeshInstance3D" parent="Body" unique_id=1977576138]
-transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)
+transform = Transform3D(-2.5, 0, -3.774895e-07, 0, 2.5, 0, 3.774895e-07, 0, -2.5, -0.008339081, 1, 0.08038509)
 mesh = SubResource("ArrayMesh_8c5lc")
 surface_material_override/0 = ExtResource("3_dpp2g")
 

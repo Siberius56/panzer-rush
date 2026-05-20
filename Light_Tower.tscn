@@ -1,0 +1,170 @@
+[gd_scene format=3 uid="uid://dk63ole3mu7ww"]
+
+[ext_resource type="Texture2D" uid="uid://ui26ss0ppq1u" path="res://asset/texture/plastic_0010_height_1k.png" id="1_aw782"]
+[ext_resource type="PackedScene" uid="uid://dep62fov0mqrg" path="res://asset/map/factory-kit/pipe-large-bump.glb" id="1_lwc6e"]
+[ext_resource type="Texture2D" uid="uid://cmqw06ya04ram" path="res://asset/texture/plastic_0010_normal_directx_1k.png" id="2_lwc6e"]
+[ext_resource type="Texture2D" uid="uid://c13t0ar22psth" path="res://asset/texture/plastic_0010_roughness_1k.jpg" id="3_cm4se"]
+[ext_resource type="PackedScene" uid="uid://b8n2de3pkx3gn" path="res://asset/map/misc-2/structure-metal.glb" id="4_e81di"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_re4pt"]
+size = Vector3(2.2, 6, 2.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lwc6e"]
+albedo_color = Color(0.27260587, 0.2851, 0.3308892, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ligov"]
+albedo_color = Color(0.46315736, 0.4792894, 0.54364467, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_re4pt"]
+albedo_color = Color(0.33013996, 0.3437264, 0.39837208, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_sm667"]
+top_radius = 0.15
+bottom_radius = 0.15
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3a5s6"]
+albedo_color = Color(0.2829, 0.2913733, 0.41, 1)
+metallic_specular = 0.3
+roughness = 0.7
+normal_texture = ExtResource("2_lwc6e")
+rim_enabled = true
+rim_texture = ExtResource("3_cm4se")
+heightmap_texture = ExtResource("1_aw782")
+stencil_flags = 2
+stencil_outline_thickness = 0.05
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_go0n1"]
+material = SubResource("StandardMaterial3D_3a5s6")
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_i1hlb"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v8him"]
+albedo_color = Color(1, 0.95666665, 0.48000002, 1)
+emission_enabled = true
+emission = Color(1, 0.965, 0.58000004, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="Animation" id="Animation_re4pt"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Light_Base:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.5235988, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_vj2a1"]
+resource_name = "idle"
+length = 8.0
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Light_Base:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 4, 8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.5235988, 0), Vector3(0, -0.5235988, 0), Vector3(0, 0.5235988, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1gh1q"]
+_data = {
+&"RESET": SubResource("Animation_re4pt"),
+&"idle": SubResource("Animation_vj2a1")
+}
+
+[node name="Light_Tower" type="StaticBody3D" unique_id=1670222082]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1974275563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5611115, 0)
+shape = SubResource("BoxShape3D_re4pt")
+
+[node name="Floor_03" type="CSGBox3D" parent="." unique_id=204181466]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0, 0, 0)
+layers = 136
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(3, 1, 3)
+material = SubResource("StandardMaterial3D_lwc6e")
+
+[node name="structure-metal2" parent="." unique_id=1740416849 instance=ExtResource("4_e81di")]
+transform = Transform3D(4.5, 0, 0, 0, 6, 0, 0, 0, 4.5, 0, 0.5, 0)
+
+[node name="structure-metal3" parent="." unique_id=321161478 instance=ExtResource("4_e81di")]
+transform = Transform3D(-4.5, 9.0597484e-07, 0, -6.794811e-07, -6, 0, 0, 0, 4.5, 0, 4.043137, 0)
+
+[node name="structure-metal4" parent="." unique_id=1171213315 instance=ExtResource("4_e81di")]
+transform = Transform3D(4.5, -1.0490733e-06, 0, 7.8680495e-07, 6, 0, 0, 0, 4.5, 0, 2.846137, 0)
+
+[node name="Floor_04" type="CSGBox3D" parent="." unique_id=117840615]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0, 5.416137, 0)
+layers = 136
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(1.784, 0.2, 1.807)
+material = SubResource("StandardMaterial3D_ligov")
+
+[node name="Floor_05" type="CSGBox3D" parent="." unique_id=1256589267]
+transform = Transform3D(-0.70710677, 1.0677015e-07, -0.70710677, -1.509958e-07, -1, 0, -0.70710677, 1.0677015e-07, 0.70710677, 5.0586912e-08, 5.5485477, 0)
+layers = 136
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(0.8, 0.33, 0.8)
+material = SubResource("StandardMaterial3D_re4pt")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1196655010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.885909, 0)
+mesh = SubResource("CylinderMesh_sm667")
+surface_material_override/0 = SubResource("StandardMaterial3D_3a5s6")
+
+[node name="Light_Base" type="Node3D" parent="." unique_id=1965356541]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 0, 6.5147896, 0)
+
+[node name="Light_Angle" type="Node3D" parent="Light_Base" unique_id=1247944786]
+transform = Transform3D(0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0, 0, 1, 0.16439164, 0, 0)
+
+[node name="pipe-large-bump2" parent="Light_Base/Light_Angle" unique_id=1236681724 instance=ExtResource("1_lwc6e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.50195205, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Light_Base/Light_Angle" unique_id=1967744573]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -0.1954636, 7.956807e-09, 0)
+mesh = SubResource("CylinderMesh_go0n1")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Light_Base/Light_Angle" unique_id=1849958524]
+transform = Transform3D(-5.9604645e-08, 1, 0, -1, -5.9604645e-08, 0, 0, 0, 1, 0.47202158, 0.008835195, 0)
+mesh = SubResource("CylinderMesh_i1hlb")
+surface_material_override/0 = SubResource("StandardMaterial3D_v8him")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Light_Base/Light_Angle" unique_id=2035832420]
+transform = Transform3D(-4.371139e-08, 0.42261827, -0.90630776, 0, 0.90630776, 0.42261827, 1, 1.8473232e-08, -3.961597e-08, 0.26949364, 0, 0)
+light_color = Color(1, 0.96800005, 0.52, 1)
+light_energy = 7.0
+spot_range = 30.0
+spot_attenuation = 0.8
+spot_angle = 24.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1315912875]
+libraries/ = SubResource("AnimationLibrary_1gh1q")
+autoplay = &"idle"

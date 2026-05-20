@@ -110,7 +110,7 @@ func _ready() -> void:
 	#add_to_group("prop")
 	_rng.randomize()
 	current_hp = max_hp
-
+	
 	_intact_body = get_node_or_null(intact_body_path) as RigidBody3D
 	_intact_visual_root = get_node_or_null(intact_visual_root_path) as Node3D
 	_main_collision = get_node_or_null(main_collision_path) as CollisionShape3D
@@ -122,6 +122,7 @@ func _ready() -> void:
 		_intact_body.add_to_group("props")
 		_intact_body.add_to_group("prop")
 		_intact_body.set_meta(&"destructible_prop", self)
+		_intact_body.continuous_cd = true
 		_intact_body.collision_mask = _get_physics_mask_with_enemy_rule(_intact_body.collision_mask)
 		_apply_physics_enabled()
 

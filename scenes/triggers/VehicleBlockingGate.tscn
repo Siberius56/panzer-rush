@@ -15,13 +15,19 @@ size = Vector3(2, 0.1, 2)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fdw4c"]
 albedo_color = Color(0.2045252, 0.2244547, 0.27455273, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4vpsq"]
-
 [sub_resource type="BoxMesh" id="BoxMesh_fdw4c"]
 size = Vector3(1.5, 0.25, 1.5)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sggua"]
 albedo_color = Color(1, 0.7529412, 0.26666668, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4vpsq"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sggua"]
+size = Vector3(2.697174, 1.4959717, 1.3443909)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4vpsq"]
+size = Vector3(1.2035294, 1.4959717, 1.2373657)
 
 [sub_resource type="BoxMesh" id="BoxMesh_sggua"]
 size = Vector3(0.9, 0.8, 0.1)
@@ -53,22 +59,34 @@ shape = SubResource("BoxShape3D_vehicle_area")
 mesh = SubResource("BoxMesh_7lwu4")
 surface_material_override/0 = SubResource("StandardMaterial3D_fdw4c")
 
-[node name="indicator-special-arrow2" parent="VehicleOpenButton/MeshInstance3D" unique_id=1375977409 instance=ExtResource("3_sggua")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0.16405773, 0)
-
-[node name="indicator-special-arrow" parent="VehicleOpenButton/MeshInstance3D/indicator-special-arrow2" index="0" unique_id=1871625798]
-transform = Transform3D(1.15, 0, 0, 0, 1.15, 0, 0, 0, 1.15, 0, 0, 0)
-surface_material_override/0 = SubResource("StandardMaterial3D_4vpsq")
-
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="VehicleOpenButton" unique_id=137166776]
 mesh = SubResource("BoxMesh_fdw4c")
 surface_material_override/0 = SubResource("StandardMaterial3D_sggua")
+
+[node name="indicator-special-arrow2" parent="VehicleOpenButton/MeshInstance3D2" unique_id=1375977409 instance=ExtResource("3_sggua")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0.16405773, 0)
+
+[node name="indicator-special-arrow" parent="VehicleOpenButton/MeshInstance3D2/indicator-special-arrow2" index="0" unique_id=1871625798]
+transform = Transform3D(1.15, 0, 0, 0, 1.15, 0, 0, 0, 1.15, 0, 0, 0)
+surface_material_override/0 = SubResource("StandardMaterial3D_4vpsq")
 
 [node name="UnlockButton" type="Node3D" parent="." unique_id=616946492]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -6, 1.2, 8)
 script = ExtResource("2_button")
 button_mesh_path = NodePath("computer-system2/ButtonMesh")
 debug_button = true
+
+[node name="StaticBody3D" type="StaticBody3D" parent="UnlockButton" unique_id=1450547400]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="UnlockButton/StaticBody3D" unique_id=914491878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0027914047, -0.4512329, -0.14958191)
+shape = SubResource("BoxShape3D_sggua")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="UnlockButton/StaticBody3D" unique_id=1634455585]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, -0.70710677, 0, 0.70710677, 0.70710677, -0.0014390945, -0.4512329, 0.035661697)
+shape = SubResource("BoxShape3D_4vpsq")
 
 [node name="computer-system2" parent="UnlockButton" unique_id=177940146 instance=ExtResource("4_fdw4c")]
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, -1.2, 0)
@@ -85,4 +103,4 @@ collision_mask = 4278190081
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("BoxShape3D_button_area")
 
-[editable path="VehicleOpenButton/MeshInstance3D/indicator-special-arrow2"]
+[editable path="VehicleOpenButton/MeshInstance3D2/indicator-special-arrow2"]
