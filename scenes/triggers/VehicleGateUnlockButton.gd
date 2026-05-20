@@ -18,7 +18,7 @@ signal activated(player_node: Node)
 @export var debug_button: bool = false
 
 @export_group("Visual")
-@export var enabled_color: Color = Color(0.1, 0.45, 0.18, 1.0)
+@export var enabled_color: Color = Color(1.0, .85, 0.4, 1.0)
 @export var disabled_color: Color = Color(0.25, 0.25, 0.25, 1.0)
 @export var used_local_offset: Vector3 = Vector3(0.0, -0.08, 0.0)
 @export var used_scale_multiplier: float = 0.9
@@ -144,8 +144,8 @@ func _setup_visual_cache() -> void:
 	if button_mesh == null:
 		return
 
-	_base_mesh_position = button_mesh.position
-	_base_mesh_scale = button_mesh.scale
+	#_base_mesh_position = button_mesh.position
+	#_base_mesh_scale = button_mesh.scale
 
 	var current_material: Material = button_mesh.get_surface_override_material(0)
 	if current_material == null and button_mesh.mesh != null:
@@ -167,12 +167,12 @@ func _apply_used_visual(value: bool) -> void:
 	if _button_material != null:
 		_button_material.albedo_color = disabled_color if value else enabled_color
 
-	if value:
-		button_mesh.position = _base_mesh_position + used_local_offset
-		button_mesh.scale = _base_mesh_scale * used_scale_multiplier
-	else:
-		button_mesh.position = _base_mesh_position
-		button_mesh.scale = _base_mesh_scale
+	#if value:
+		#button_mesh.position = _base_mesh_position + used_local_offset
+		#button_mesh.scale = _base_mesh_scale * used_scale_multiplier
+	#else:
+		#button_mesh.position = _base_mesh_position
+		#button_mesh.scale = _base_mesh_scale
 
 
 func _on_detector_entered(detector: Node) -> void:

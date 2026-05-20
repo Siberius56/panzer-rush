@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://dha0fi4m8yt76" path="res://asset/ui/ammo/ammo_9mm_full.png" id="5_wvanu"]
 [ext_resource type="Texture2D" uid="uid://dcqf5qvc61sww" path="res://asset/ui/ammo/ammo_rocket.png" id="6_wvanu"]
 [ext_resource type="PackedScene" uid="uid://dvelcibd3i2dw" path="res://scenes/ui/VehicleModSlotHUD.tscn" id="9_wvanu"]
+[ext_resource type="Texture2D" uid="uid://drfgli6h142j7" path="res://asset/ui/aim_target.png" id="10_aimreticle"]
+[ext_resource type="Texture2D" uid="uid://c2unrgvjrnd32" path="res://asset/ui/vehicle_turret_reticle.png" id="11_vehicle_reticle"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4kn3h"]
 content_margin_left = 0.0
@@ -1069,6 +1071,43 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 4
 alignment = 1
+
+[node name="AimTargetReticle" type="TextureRect" parent="Root" unique_id=635099999]
+unique_name_in_owner = true
+visible = false
+z_index = 20
+layout_mode = 1
+offset_right = 36.0
+offset_bottom = 36.0
+mouse_filter = 2
+texture = ExtResource("10_aimreticle")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VehicleTurretReticle" type="TextureRect" parent="Root" unique_id=1098689082]
+unique_name_in_owner = true
+visible = false
+z_index = 21
+layout_mode = 1
+offset_right = 48.0
+offset_bottom = 48.0
+mouse_filter = 2
+texture = ExtResource("11_vehicle_reticle")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DamageFeedbackOverlay" type="ColorRect" parent="Root" unique_id=1741973549]
+unique_name_in_owner = true
+visible = false
+z_index = 30
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.06, 0.02, 0.34)
 
 [node name="DeathOverlay" type="Control" parent="Root" unique_id=1480259341]
 unique_name_in_owner = true

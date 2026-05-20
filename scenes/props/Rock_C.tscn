@@ -19,6 +19,8 @@ height = 0.801918
 radius = 0.37695313
 
 [node name="Rock_C" type="StaticBody3D" unique_id=49958975]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1461689295]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9015793, 1.0131304, -0.028022118)

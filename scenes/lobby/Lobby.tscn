@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://ccv88msvp1esx"]
 
 [ext_resource type="Script" uid="uid://bb30nt354apuh" path="res://scenes/lobby/Lobby.gd" id="1_lobby"]
-[ext_resource type="PackedScene" uid="uid://cjv7arc0wkfhi" path="res://asset/map/factory/building-k.glb" id="2_opc5t"]
-[ext_resource type="PackedScene" uid="uid://bk741csbv6524" path="res://asset/map/factory/building-q.glb" id="3_pbg2n"]
+[ext_resource type="PackedScene" uid="uid://cjv7arc0wkfhi" path="res://asset/map/factory-building/building-k.glb" id="2_opc5t"]
+[ext_resource type="PackedScene" uid="uid://bk741csbv6524" path="res://asset/map/factory-building/building-q.glb" id="3_pbg2n"]
 [ext_resource type="PackedScene" uid="uid://cx00hjgvjdfgk" path="res://vehicle_system/chassis/Tank_Medium.tscn" id="5_wp0hx"]
 [ext_resource type="PackedScene" uid="uid://dks54llxvcjhi" path="res://asset/map/misc-2/indicator-special-lines.glb" id="6_lukr2"]
 [ext_resource type="PackedScene" uid="uid://dbn7h5u2r4c67" path="res://asset/map/misc-1/barrel_002.glb" id="6_sqemm"]
@@ -10,8 +10,8 @@
 [ext_resource type="PackedScene" uid="uid://gs021houev1p" path="res://asset/weapon/crate-small.glb" id="8_s8luf"]
 [ext_resource type="PackedScene" uid="uid://qvga6kqmd8f1" path="res://asset/weapon/crate-wide.glb" id="9_mq6cd"]
 [ext_resource type="PackedScene" uid="uid://bdx2ftuivfewd" path="res://asset/map/misc-1/table_001.glb" id="10_2wvlb"]
-[ext_resource type="PackedScene" uid="uid://bicdkqelvgpxi" path="res://asset/map/factory/chimney-medium.glb" id="11_uuuet"]
-[ext_resource type="PackedScene" uid="uid://cuawdsptfumqs" path="res://asset/map/factory/detail-tank.glb" id="12_bf3dp"]
+[ext_resource type="PackedScene" uid="uid://bicdkqelvgpxi" path="res://asset/map/factory-building/chimney-medium.glb" id="11_uuuet"]
+[ext_resource type="PackedScene" uid="uid://cuawdsptfumqs" path="res://asset/map/factory-building/detail-tank.glb" id="12_bf3dp"]
 [ext_resource type="PackedScene" uid="uid://biynj8ou1rl3x" path="res://asset/weapon/grenade-b.glb" id="13_ngadt"]
 [ext_resource type="PackedScene" uid="uid://df17p84dts7kp" path="res://asset/weapon/blaster-b.glb" id="14_lukr2"]
 [ext_resource type="PackedScene" uid="uid://brxh216eqb145" path="res://asset/weapon/blaster-c.glb" id="15_yo5dp"]
@@ -996,7 +996,7 @@ process_material = SubResource("ParticleProcessMaterial_j7bbn")
 draw_pass_1 = SubResource("QuadMesh_u660g")
 
 [node name="Camera3D" type="Camera3D" parent="Node3D" unique_id=1203080746]
-transform = Transform3D(-4.371139e-08, 0.17364806, -0.9848071, 0, 0.9848071, 0.17364806, 1, 7.590398e-09, -4.3047283e-08, -6, 3.5, 0)
+transform = Transform3D(-4.371139e-08, 0.17364806, -0.984807, 0, 0.984807, 0.17364806, 1, 7.590398e-09, -4.304728e-08, -6, 3.5, 0)
 attributes = SubResource("CameraAttributesPractical_34cp8")
 current = true
 fov = 60.0

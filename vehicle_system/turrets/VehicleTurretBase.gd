@@ -276,6 +276,26 @@ func get_current_global_yaw() -> float:
 	return base_yaw + body_node.rotation.y
 
 
+func get_hud_aim_target_position() -> Vector3:
+	return target_aim_world
+
+
+func get_operator_peer_id() -> int:
+	if mount == null:
+		return -1
+	return mount.get_operator_peer_id()
+
+
+func is_local_operator() -> bool:
+	return _is_local_operator()
+
+
+func is_peer_operator(peer_id: int) -> bool:
+	if mount == null:
+		return false
+	return mount.get_operator_peer_id() == peer_id
+
+
 func _is_local_operator() -> bool:
 	if mount == null:
 		return false

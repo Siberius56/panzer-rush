@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://jcjfh1k74hso"]
+
+[ext_resource type="Script" uid="uid://s4fge56f52q3" path="res://scenes/triggers/HelicoDropZone.gd" id="1_e5y7n"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trigger"]
+size = Vector3(8, 4, 8)
+
+[node name="TransportHelicopterDropZone" type="Area3D" unique_id=1612834059]
+collision_mask = 5
+script = ExtResource("1_e5y7n")
+accepted_extra_player_groups = Array[StringName]([&"vehicle", &"player"])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1934182099]
+shape = SubResource("BoxShape3D_trigger")
+debug_color = Color(0.9333333, 1, 0, 1)
+
+[node name="HelicopterSpawn" type="Marker3D" parent="." unique_id=486274952]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -65)
+
+[node name="HelicopterDestination" type="Marker3D" parent="." unique_id=1144332322]

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c23d4w2brqi2u" path="res://asset/map/misc-2/indicator-special-cross.glb" id="2_rfhyr"]
 [ext_resource type="PackedScene" uid="uid://c4nxd06ghh0fu" path="res://asset/map/misc-2/indicator-special-area.glb" id="2_s2yx6"]
 [ext_resource type="PackedScene" uid="uid://h8v8os25dggj" path="res://scenes/triggers/SlidingHangarDoor.tscn" id="2_sliding_door"]
+[ext_resource type="PackedScene" uid="uid://dnq7kmbkjp2vx" path="res://Spawner_Player.tscn" id="6_7bk7q"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_s2yx6"]
 size = Vector3(5, 1, 5)
@@ -34,20 +35,20 @@ surface_material_override/0 = SubResource("StandardMaterial3D_s2yx6")
 [node name="SpawnPoints" type="Node3D" parent="." unique_id=2021538358]
 
 [node name="SpawnA" type="Marker3D" parent="SpawnPoints" unique_id=546583090]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7031784, 2, 0.73673916)
 
 [node name="SpawnB" type="Marker3D" parent="SpawnPoints" unique_id=617342159]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.638715, 2, -1.4580716)
 
 [node name="SpawnC" type="Marker3D" parent="SpawnPoints" unique_id=1775256389]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4128227, 2, -2.7935014)
 
 [node name="SpawnD" type="Marker3D" parent="SpawnPoints" unique_id=163466722]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4657755, 2, 2.0838563)
 
 [node name="Tank_TP" type="Marker3D" parent="." unique_id=1001459706]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1, 0)
 
 [node name="PassageArea" type="Area3D" parent="." unique_id=1868135032]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.8)
@@ -71,3 +72,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
 left_open_position = Vector3(-3, 0, 0)
 right_open_position = Vector3(3, 0, 0)
 start_open = true
+
+[node name="NodeCapture" type="Node3D" parent="." unique_id=1446821589]
+
+[node name="Spawner2" parent="NodeCapture" unique_id=1373455962 instance=ExtResource("6_7bk7q")]
+transform = Transform3D(-1, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -1, 7, 0.5, -2.197)
+
+[node name="Spawner3" parent="NodeCapture" unique_id=1562982521 instance=ExtResource("6_7bk7q")]
+transform = Transform3D(-1, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -1, 7, 0.5, 1.5)

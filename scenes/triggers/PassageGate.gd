@@ -17,6 +17,7 @@ class_name PassageGateRespawnPatch
 @export var rear_door_path: NodePath = ^"RearDoor"
 @export var tank_tp_path: NodePath = ^"%Tank_TP"
 @export var respawn_spawn_points_path: NodePath = ^"SpawnPoints"
+@export var capture_node_path: NodePath = ^"NodeCapture"
 
 @export_group("Zone Network Sync")
 @export var apply_zone_switch_on_validation: bool = true
@@ -33,6 +34,7 @@ class_name PassageGateRespawnPatch
 @onready var rear_door: Node3D = get_node_or_null(rear_door_path) as Node3D
 @onready var tank_tp_marker: Node3D = get_node_or_null(tank_tp_path) as Node3D
 @onready var respawn_spawn_points_root: Node3D = get_node_or_null(respawn_spawn_points_path) as Node3D
+@onready var node_capture : Node3D = get_node_or_null(capture_node_path) as Node3D
 
 var _players_inside: Dictionary = {}
 var _enemies_inside: Dictionary = {}
@@ -59,7 +61,10 @@ func _ready() -> void:
 
 	if rear_door != null:
 		_rear_closed_position = rear_door.global_position
-
+	
+	if is_instance_valid(node_capture):
+		node_capture.hide()
+	
 	_apply_passage_closed_state(true)
 
 
@@ -332,7 +337,9 @@ func _apply_passage_closed_state(immediate: bool) -> void:
 func _apply_passage_validated_state(immediate: bool) -> void:
 	_set_front_door_open(true, immediate)
 	_set_rear_door_open(false, immediate)
-
+	
+	if is_instance_valid(node_capture):
+		node_capture.show()
 
 func get_respawn_spawn_points() -> Array[Node3D]:
 	var result: Array[Node3D] = []

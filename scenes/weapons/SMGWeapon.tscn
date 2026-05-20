@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_8h87y"]
 [ext_resource type="PackedScene" uid="uid://dk7oq8ajhecnw" path="res://asset/weapon/blaster-m.glb" id="2_q2wlv"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/WeaponLaserSight3D.tscn" id="10_laser"]
 
 [sub_resource type="StandardMaterial3D" id="1_mat"]
 albedo_color = Color(0.16, 0.16, 0.16, 1)
@@ -64,3 +65,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.078692734, -0.07827324, -0
 
 [node name="RightGrip" type="Node3D" parent="." unique_id=828302147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08351433, -0.04702282, -0.08533028)
+
+[node name="WeaponLaserSight" parent="." instance=ExtResource("10_laser")]

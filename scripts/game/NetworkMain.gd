@@ -449,7 +449,8 @@ func _sync_players() -> void:
 				var spawn_point: Node3D = spawn_points[spawn_index] as Node3D
 				if spawn_point != null:
 					new_player.global_transform = spawn_point.global_transform
-
+					new_player.rotation = Vector3.ZERO
+			
 			if GameSessionState.has_player_state(peer_id):
 				GameSessionState.apply_player_state_to_node(new_player, force_players_alive_on_level_load)
 		else:

@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal health_changed(current: int, maximum: int)
+signal damage_taken(amount: int)
 signal died
 
 const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.tscn")
@@ -80,6 +81,10 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 @export_flags_3d_physics var aim_collision_mask: int = 0xFFFFFFFF
 @export var aim_min_target_distance: float = 0.05
 @export var visual_aim_min_target_distance: float = 0.05
+
+@export_group("Weapon Laser Sight")
+@export var show_weapon_laser_sight: bool = true
+@export var weapon_laser_min_length: float = 0.05
 
 @export_group("Camera")
 @export var camera_on_foot_spring_length: float = 7.0
@@ -288,6 +293,7 @@ func set_ui_input_blocked(active: bool) -> void:
 		velocity = Vector3.ZERO
 
 func _ready() -> void:
+	
 	procedural_nodes_ready = _validate_procedural_scene_nodes()
 	if not procedural_nodes_ready:
 		set_physics_process(false)
@@ -2902,6 +2908,9 @@ func get_hud_name_marker_position() -> Vector3:
 func get_hud_camera() -> Camera3D:
 	return camera
 
+func get_hud_aim_target_position() -> Vector3:
+	return aim_target_position
+
 
 
 func request_spectate_next() -> void:
@@ -3143,9 +3152,12 @@ func get_weapon_in_slot(slot_index: int) -> Node:
 
 
 func _apply_health_state(value: int, dead_now: bool) -> void:
+	var previous_health: int = health
 	health = clampi(value, 0, max_health)
 	var was_dead: bool = is_dead
 	is_dead = dead_now
+	if health < previous_health:
+		emit_signal("damage_taken", previous_health - health)
 	emit_signal("health_changed", health, max_health)
 
 	if is_dead:
@@ -3634,6 +3646,8 @@ func _update_body_motion(delta: float) -> void:
 
 func _update_weapon_pose(delta: float) -> void:
 	var current_visual_weapon: Node3D = _get_current_held_visual_weapon()
+	_hide_lasers_except(current_visual_weapon)
+
 	if current_visual_weapon == null:
 		_refresh_procedural_hand_grips()
 		return
@@ -3647,6 +3661,7 @@ func _update_weapon_pose(delta: float) -> void:
 		# Elle ne doit pas reprendre l'orientation d'un fusil ou viser la target.
 		if empty_weapon_use_neutral_rotation:
 			current_visual_weapon.rotation = Vector3.ZERO
+		_set_weapon_laser_visible(current_visual_weapon, false)
 		_refresh_procedural_hand_grips()
 		return
 
@@ -3655,14 +3670,74 @@ func _update_weapon_pose(delta: float) -> void:
 	flat_weapon_to_target.y = 0.0
 
 	if flat_weapon_to_target.length() < aim_min_target_distance:
+		_set_weapon_laser_visible(current_visual_weapon, false)
 		return
 
 	if weapon_to_target.length_squared() > 0.001:
 		current_visual_weapon.look_at(aim_target_position, Vector3.UP)
 		current_visual_weapon.rotation.z = 0.0
 
+	_update_current_weapon_laser(current_visual_weapon)
 	_refresh_procedural_hand_grips()
 
+func _update_current_weapon_laser(current_visual_weapon: Node3D) -> void:
+	if current_visual_weapon == null:
+		return
+	if not show_weapon_laser_sight or is_dead or is_in_vehicle():
+		_set_weapon_laser_visible(current_visual_weapon, false)
+		return
+	if not current_visual_weapon.has_method("get_muzzle_transform"):
+		_set_weapon_laser_visible(current_visual_weapon, false)
+		return
+
+	var laser := _get_weapon_laser_node(current_visual_weapon)
+	if laser == null or not laser.has_method("set_laser_segment"):
+		return
+
+	var muzzle_value = current_visual_weapon.call("get_muzzle_transform")
+	if not (muzzle_value is Transform3D):
+		_set_weapon_laser_visible(current_visual_weapon, false)
+		return
+
+	var muzzle_transform: Transform3D = muzzle_value
+	var start_position: Vector3 = muzzle_transform.origin
+	var end_position: Vector3 = aim_target_position
+	if start_position.distance_to(end_position) < weapon_laser_min_length:
+		_set_weapon_laser_visible(current_visual_weapon, false)
+		return
+
+	laser.call("set_laser_segment", start_position, end_position)
+
+func _get_weapon_laser_node(weapon_node: Node) -> Node:
+	if weapon_node == null:
+		return null
+	var laser := weapon_node.get_node_or_null("WeaponLaserSight")
+	if laser != null:
+		return laser
+	laser = weapon_node.get_node_or_null("WeaponLaserSight3D")
+	if laser != null:
+		return laser
+	return null
+
+func _set_weapon_laser_visible(weapon_node: Node, active: bool) -> void:
+	var laser := _get_weapon_laser_node(weapon_node)
+	if laser == null:
+		return
+	if laser.has_method("set_laser_visible"):
+		laser.call("set_laser_visible", active)
+	elif laser is Node3D:
+		(laser as Node3D).visible = active
+
+func _hide_lasers_except(current_visual_weapon: Node3D) -> void:
+	for weapon_node in weapon_nodes:
+		if weapon_node == null or not is_instance_valid(weapon_node):
+			continue
+		if weapon_node == current_visual_weapon:
+			continue
+		_set_weapon_laser_visible(weapon_node, false)
+
+	if empty_weapon_instance != null and empty_weapon_instance != current_visual_weapon:
+		_set_weapon_laser_visible(empty_weapon_instance, false)
 
 func set_weapon_pose(new_weapon_local_position: Vector3, new_left_grip_local_position: Vector3, new_right_grip_local_position: Vector3) -> void:
 	weapon_local_position = new_weapon_local_position

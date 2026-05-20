@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/weapons/WeaponLaserSight3D.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_laser"]
+albedo_color = Color(1, 0.02, 0.02, 0.7)
+emission_enabled = true
+emission = Color(1, 0, 0, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="CylinderMesh" id="mesh_laser"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 1.0
+radial_segments = 8
+
+[node name="WeaponLaserSight" type="Node3D"]
+visible = false
+script = ExtResource("1_script")
+
+[node name="Beam" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("mat_laser")
+mesh = SubResource("mesh_laser")

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_fu457"]
 [ext_resource type="PackedScene" uid="uid://dgniwfvqmskhg" path="res://asset/weapon/blaster-e.glb" id="2_ogcgt"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/WeaponLaserSight3D.tscn" id="10_laser"]
 
 [node name="RifleWeapon" type="Node3D" unique_id=856384940]
 script = ExtResource("1_fu457")
@@ -27,3 +28,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09027201, -0.11542958, -0.
 
 [node name="RightGrip" type="Node3D" parent="." unique_id=2048794060]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08351433, 0, -0.45762655)
+
+[node name="WeaponLaserSight" parent="." instance=ExtResource("10_laser")]

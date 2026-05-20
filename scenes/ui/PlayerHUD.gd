@@ -20,6 +20,17 @@ const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModS
 @export var repair_bar_world_height: float = 2.4
 @export var repair_bar_hide_delay: float = 1.0
 
+@export_group("Aim Feedback")
+@export var show_aim_target_reticle: bool = true
+@export var aim_target_reticle_size: Vector2 = Vector2(64.0, 64.0)
+@export var aim_target_screen_margin: float = 18.0
+@export var show_vehicle_turret_reticle: bool = true
+@export var vehicle_turret_reticle_size: Vector2 = Vector2(64.0, 64.0)
+
+@export_group("Damage Feedback")
+@export var damage_feedback_color: Color = Color(1.0, 0.06, 0.02, 0.34)
+@export var damage_feedback_fade_duration: float = 0.28
+
 
 @onready var hp_label: Label = %HPLabel
 @onready var health_progress_bar: ProgressBar = %HealthProgressBar
@@ -102,6 +113,9 @@ var _weapon_slot_equipped_style: StyleBoxFlat = null
 @onready var repair_target_panel: PanelContainer = %RepairTargetPanel
 @onready var repair_target_label: Label = %RepairTargetLabel
 @onready var repair_target_progress: ProgressBar = %RepairTargetProgress
+@onready var aim_target_reticle: TextureRect = get_node_or_null("%AimTargetReticle") as TextureRect
+@onready var vehicle_turret_reticle: TextureRect = get_node_or_null("%VehicleTurretReticle") as TextureRect
+@onready var damage_feedback_overlay: ColorRect = get_node_or_null("%DamageFeedbackOverlay") as ColorRect
 var respawn_pending: bool = false
 var _name_marker_labels: Dictionary = {}
 var _vehicle_name_marker: Control = null
@@ -109,6 +123,7 @@ var _vehicle_marker_target_id: int = 0
 var _passage_prompt_owner_id: int = 0
 var _repair_target: Node = null
 var _repair_target_hide_timer: float = 0.0
+var _damage_feedback_tween: Tween = null
 
 const SELF_COLOR := "#7CFF7C"
 const EMPTY_SEAT_TEXT := "Libre"
@@ -137,6 +152,8 @@ func _ready() -> void:
 		label.scroll_active = false
 
 	_configure_death_overlay_input()
+	_configure_aim_feedback_nodes()
+	_configure_damage_feedback_nodes()
 
 	if not respawn_button.pressed.is_connected(_on_respawn_button_pressed):
 		respawn_button.pressed.connect(_on_respawn_button_pressed)
@@ -180,6 +197,7 @@ func _process(delta: float) -> void:
 		_refresh_all()
 
 	_update_repair_target_bar(delta)
+	_refresh_aim_target_reticle_from_player()
 
 func _input(event: InputEvent) -> void:
 	if _try_consume_spectate_button_click(event):
@@ -235,11 +253,260 @@ func _set_mouse_filter_ignore(control: Control) -> void:
 
 
 func set_player(p_player: Node) -> void:
+	var damage_callable := Callable(self, "_on_player_damage_taken")
+	if player != null and is_instance_valid(player) and player.has_signal("damage_taken"):
+		if player.is_connected("damage_taken", damage_callable):
+			player.disconnect("damage_taken", damage_callable)
+
 	player = p_player
+
+	if player != null and is_instance_valid(player) and player.has_signal("damage_taken"):
+		if not player.is_connected("damage_taken", damage_callable):
+			player.connect("damage_taken", damage_callable)
+
 	_refresh_all()
 
 func get_player() -> Node:
 	return player
+
+func _configure_aim_feedback_nodes() -> void:
+	_configure_reticle_node(aim_target_reticle, aim_target_reticle_size)
+	_configure_reticle_node(vehicle_turret_reticle, vehicle_turret_reticle_size)
+
+
+func _configure_reticle_node(reticle: TextureRect, reticle_size: Vector2) -> void:
+	if reticle == null:
+		return
+	reticle.visible = false
+	reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	reticle.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	reticle.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	reticle.size = reticle_size
+	reticle.pivot_offset = reticle_size * 0.5
+
+func _configure_damage_feedback_nodes() -> void:
+	if damage_feedback_overlay == null:
+		return
+	damage_feedback_overlay.visible = false
+	damage_feedback_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	damage_feedback_overlay.color = damage_feedback_color
+	damage_feedback_overlay.modulate.a = 0.0
+
+func _on_player_damage_taken(_amount: int) -> void:
+	show_damage_feedback()
+
+func show_damage_feedback() -> void:
+	if damage_feedback_overlay == null:
+		return
+
+	if _damage_feedback_tween != null and _damage_feedback_tween.is_valid():
+		_damage_feedback_tween.kill()
+
+	damage_feedback_overlay.visible = true
+	damage_feedback_overlay.color = damage_feedback_color
+	damage_feedback_overlay.modulate = Color(1.0, 1.0, 1.0, 1.0)
+
+	_damage_feedback_tween = create_tween()
+	_damage_feedback_tween.tween_property(
+		damage_feedback_overlay,
+		"modulate:a",
+		0.0,
+		max(damage_feedback_fade_duration, 0.01)
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_damage_feedback_tween.tween_callback(_hide_damage_feedback_overlay)
+
+func _hide_damage_feedback_overlay() -> void:
+	if damage_feedback_overlay != null:
+		damage_feedback_overlay.visible = false
+
+func _refresh_aim_target_reticle_from_player() -> void:
+	if player == null or not is_instance_valid(player):
+		_hide_aim_target_reticle()
+		_hide_vehicle_turret_reticle()
+		return
+	if bool(player.get("is_dead")):
+		_hide_aim_target_reticle()
+		_hide_vehicle_turret_reticle()
+		return
+
+	var player_data: Dictionary = _get_player_hud_data()
+	var in_vehicle: bool = _is_player_in_vehicle(player_data)
+
+	if in_vehicle:
+		_hide_aim_target_reticle()
+		_refresh_vehicle_turret_reticle(player_data)
+		return
+
+	_hide_vehicle_turret_reticle()
+	_refresh_player_aim_target_reticle()
+
+
+func _refresh_player_aim_target_reticle() -> void:
+	if aim_target_reticle == null:
+		return
+	if not show_aim_target_reticle:
+		_hide_aim_target_reticle()
+		return
+
+	var world_position := Vector3.ZERO
+	if player.has_method("get_hud_aim_target_position"):
+		var aim_value = player.call("get_hud_aim_target_position")
+		if aim_value is Vector3:
+			world_position = aim_value
+		else:
+			_hide_aim_target_reticle()
+			return
+	elif "aim_target_position" in player:
+		var aim_property = player.get("aim_target_position")
+		if aim_property is Vector3:
+			world_position = aim_property
+		else:
+			_hide_aim_target_reticle()
+			return
+	else:
+		_hide_aim_target_reticle()
+		return
+
+	if not _place_reticle_at_world_position(aim_target_reticle, world_position, aim_target_reticle_size):
+		_hide_aim_target_reticle()
+
+
+func _refresh_vehicle_turret_reticle(player_data: Dictionary) -> void:
+	if vehicle_turret_reticle == null:
+		return
+	if not show_vehicle_turret_reticle:
+		_hide_vehicle_turret_reticle()
+		return
+
+	var tracked_vehicle: Node = _get_tracked_vehicle(player_data)
+	var vehicle_data: Dictionary = _get_vehicle_hud_data(player_data, tracked_vehicle)
+	var turret = _find_current_turret(player_data, vehicle_data)
+
+	if not _is_valid_object(turret):
+		# Fallback : certains véhicules exposent seulement le nom de la tourelle au HUD.
+		# Dans ce cas, on affiche tout de même le viseur véhicule à la position souris.
+		var turret_name: String = str(vehicle_data.get("turret_name", ""))
+		if turret_name.is_empty():
+			_hide_vehicle_turret_reticle()
+			return
+		_place_reticle_at_screen_position(vehicle_turret_reticle, get_viewport().get_mouse_position(), vehicle_turret_reticle_size)
+		return
+	if not _turret_is_operated_by_local_player(turret):
+		_hide_vehicle_turret_reticle()
+		return
+
+	var world_position := Vector3.ZERO
+	if turret.has_method("get_hud_aim_target_position"):
+		var aim_value = turret.call("get_hud_aim_target_position")
+		if aim_value is Vector3:
+			world_position = aim_value
+		else:
+			_hide_vehicle_turret_reticle()
+			return
+	else:
+		var aim_property = turret.get("target_aim_world")
+		if aim_property is Vector3:
+			world_position = aim_property
+		else:
+			var replicated_aim_property = turret.get("replicated_aim_world")
+			if replicated_aim_property is Vector3:
+				world_position = replicated_aim_property
+			else:
+				_hide_vehicle_turret_reticle()
+				return
+
+	if not _place_reticle_at_world_position(vehicle_turret_reticle, world_position, vehicle_turret_reticle_size):
+		_hide_vehicle_turret_reticle()
+
+
+func _is_player_in_vehicle(player_data: Dictionary) -> bool:
+	if bool(player_data.get("in_vehicle", false)):
+		return true
+	if player != null and is_instance_valid(player) and player.has_method("is_in_vehicle"):
+		return bool(player.call("is_in_vehicle"))
+	return false
+
+
+func _place_reticle_at_world_position(reticle: TextureRect, world_position: Vector3, requested_size: Vector2) -> bool:
+	if reticle == null:
+		return false
+
+	var camera := _get_hud_camera()
+	if camera == null or camera.is_position_behind(world_position):
+		return false
+
+	var viewport_size := get_viewport().get_visible_rect().size
+	var margin :float = max(aim_target_screen_margin, 0.0)
+	var screen_position := camera.unproject_position(world_position)
+	screen_position.x = clamp(screen_position.x, margin, viewport_size.x - margin)
+	screen_position.y = clamp(screen_position.y, margin, viewport_size.y - margin)
+
+	var final_size := requested_size
+	if final_size.x <= 0.0 or final_size.y <= 0.0:
+		final_size = reticle.size
+	if final_size.x <= 0.0 or final_size.y <= 0.0:
+		final_size = Vector2(36.0, 36.0)
+
+	reticle.size = final_size
+	reticle.pivot_offset = final_size * 0.5
+	reticle.position = screen_position - final_size * 0.5
+	reticle.visible = true
+	return true
+
+
+func _place_reticle_at_screen_position(reticle: TextureRect, screen_position: Vector2, requested_size: Vector2) -> void:
+	if reticle == null:
+		return
+
+	var viewport_size := get_viewport().get_visible_rect().size
+	var margin :float = max(aim_target_screen_margin, 0.0)
+	screen_position.x = clamp(screen_position.x, margin, viewport_size.x - margin)
+	screen_position.y = clamp(screen_position.y, margin, viewport_size.y - margin)
+
+	var final_size := requested_size
+	if final_size.x <= 0.0 or final_size.y <= 0.0:
+		final_size = reticle.size
+	if final_size.x <= 0.0 or final_size.y <= 0.0:
+		final_size = Vector2(48.0, 48.0)
+
+	reticle.size = final_size
+	reticle.pivot_offset = final_size * 0.5
+	reticle.position = screen_position - final_size * 0.5
+	reticle.visible = true
+
+
+func _turret_is_operated_by_local_player(turret: Variant) -> bool:
+	if not _is_valid_object(turret):
+		return false
+
+	if turret.has_method("is_local_operator"):
+		return bool(turret.call("is_local_operator"))
+
+	var local_peer_id := multiplayer.get_unique_id()
+	if turret.has_method("is_peer_operator"):
+		return bool(turret.call("is_peer_operator", local_peer_id))
+	if turret.has_method("is_operated_by_peer"):
+		return bool(turret.call("is_operated_by_peer", local_peer_id))
+	if turret.has_method("get_operator_peer_id"):
+		return int(turret.call("get_operator_peer_id")) == local_peer_id
+
+	var operator_peer_id = turret.get("operator_peer_id")
+	if operator_peer_id is int:
+		return int(operator_peer_id) == local_peer_id
+
+	# Fallback : si le véhicule fournit déjà la tourelle courante au HUD,
+	# on considère qu'elle correspond au siège occupé par le joueur local.
+	return true
+
+
+func _hide_aim_target_reticle() -> void:
+	if aim_target_reticle != null:
+		aim_target_reticle.visible = false
+
+
+func _hide_vehicle_turret_reticle() -> void:
+	if vehicle_turret_reticle != null:
+		vehicle_turret_reticle.visible = false
 
 func show_passage_prompt(message: String, progress: float = -1.0, owner_node: Node = null) -> void:
 	if passage_panel == null or passage_label == null:
@@ -292,6 +559,8 @@ func _refresh_all() -> void:
 		_hide_vehicle_mod_slots()
 		hide_repair_target(true)
 		hide_reload_progress()
+		_hide_aim_target_reticle()
+		_hide_vehicle_turret_reticle()
 		return
 
 	visible = true
@@ -313,6 +582,8 @@ func _refresh_all() -> void:
 		_hide_vehicle_mod_slots()
 		hide_repair_target(true)
 		hide_reload_progress()
+		_hide_aim_target_reticle()
+		_hide_vehicle_turret_reticle()
 		_show_death_overlay(player_data)
 		_refresh_revive_panel(player_data)
 		return
@@ -1927,6 +2198,37 @@ func _find_current_turret(player_data: Dictionary, vehicle_data: Dictionary) -> 
 			var from_player_property = player.get(key)
 			if _is_valid_object(from_player_property):
 				return from_player_property
+
+		var player_interactor = player.get("vehicle_interactor")
+		var from_interactor = _find_turret_on_object(player_interactor, possible_keys)
+		if _is_valid_object(from_interactor):
+			return from_interactor
+
+	return null
+
+
+func _find_turret_on_object(source: Variant, possible_keys: Array[String]) -> Variant:
+	if not _is_valid_object(source):
+		return null
+
+	var possible_methods: Array[String] = [
+		"get_current_turret",
+		"get_controlled_turret",
+		"get_active_turret",
+		"get_mounted_turret",
+		"get_turret",
+	]
+
+	for method_name in possible_methods:
+		if source.has_method(method_name):
+			var method_value = source.call(method_name)
+			if _is_valid_object(method_value):
+				return method_value
+
+	for key in possible_keys:
+		var property_value = source.get(key)
+		if _is_valid_object(property_value):
+			return property_value
 
 	return null
 

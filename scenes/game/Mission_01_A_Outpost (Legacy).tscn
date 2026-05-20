@@ -68,7 +68,7 @@
 [ext_resource type="PackedScene" uid="uid://d2xh1lt8ew0om" path="res://scenes/loot/MoneyPickup.tscn" id="66_62kmw"]
 [ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="67_kocjg"]
 [ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://asset/pastel_vignette.gdshader" id="68_e5btq"]
-[ext_resource type="PackedScene" uid="uid://jcjfh1k74hso" path="res://scenes/triggers/TransportHelicopterDropZone.tscn" id="69_5mxlf"]
+[ext_resource type="PackedScene" uid="uid://jcjfh1k74hso" path="res://scenes/triggers/HelicDropZone.tscn" id="69_5mxlf"]
 [ext_resource type="PackedScene" uid="uid://dgrkfukkjtirx" path="res://scenes/props/Building/Building_Abis.tscn" id="70_en5wi"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_td8tl"]
