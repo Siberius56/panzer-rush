@@ -1,0 +1,1197 @@
+[gd_scene format=3 uid="uid://bbp58qko5nwjp"]
+
+[ext_resource type="Script" uid="uid://cv28p6um33l34" path="res://scripts/game/NetworkMain.gd" id="1_q3e6e"]
+[ext_resource type="Script" uid="uid://c4o6papidkcxp" path="res://scenes/game/NetworkZone.gd" id="3_ouw6b"]
+[ext_resource type="PackedScene" uid="uid://bbo6apchi6rgm" path="res://asset/map/road/bridge-pillar-wide.glb" id="4_u7dqe"]
+[ext_resource type="PackedScene" uid="uid://d3rkidkkcso24" path="res://scenes/props/Container_Blue.tscn" id="5_s2q05"]
+[ext_resource type="PackedScene" uid="uid://dwpsaqsds3y8g" path="res://scenes/props/Physic/Crate_Container_Small.tscn" id="6_sd0pm"]
+[ext_resource type="PackedScene" uid="uid://gepa08i4mciw" path="res://asset/map/road/road-straight.glb" id="7_ac7w1"]
+[ext_resource type="PackedScene" uid="uid://bl4lp7nku65ro" path="res://asset/map/factory-kit/pipe-large-long.glb" id="8_8i6wv"]
+[ext_resource type="PackedScene" uid="uid://bfvj5nl3ky6n7" path="res://asset/map/factory-kit/pipe-large-valve.glb" id="9_u73qx"]
+[ext_resource type="PackedScene" uid="uid://ddwu7klxnc2vg" path="res://asset/map/misc-2/indicator-special-arrow.glb" id="10_aibho"]
+[ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Physic/Crate.tscn" id="11_ekd4f"]
+[ext_resource type="PackedScene" uid="uid://btqlek7ta84pi" path="res://scenes/props/Physic/Crate_Large.tscn" id="12_k6jof"]
+[ext_resource type="PackedScene" uid="uid://cw10ump4t4hnf" path="res://asset/map/plane_noise.glb" id="13_6ho5a"]
+[ext_resource type="PackedScene" uid="uid://cd0kjlhtx6hth" path="res://asset/map/misc-2/rock-sand-a.glb" id="17_yb73o"]
+[ext_resource type="PackedScene" uid="uid://pdfejk3xjkf0" path="res://asset/map/misc-2/rock-sand-b.glb" id="18_g5r3d"]
+[ext_resource type="PackedScene" uid="uid://po2tcypdc88p" path="res://asset/map/misc-2/rock-sand-c.glb" id="19_l3n02"]
+[ext_resource type="PackedScene" uid="uid://c7q0v7edcdhme" path="res://asset/map/road/road-end.glb" id="20_fxnsf"]
+[ext_resource type="Shader" uid="uid://bout2ybxk10m" path="res://asset/shader_ocean.gdshader" id="21_ecw4d"]
+[ext_resource type="Texture2D" uid="uid://bqo4kmjisxvgp" path="res://asset/texture/ocean_shader_00003.png" id="22_6d5s7"]
+[ext_resource type="Texture2D" uid="uid://xp74i6j2lrks" path="res://asset/texture/ocean_shader_00004.png" id="23_aaaep"]
+[ext_resource type="Texture2D" uid="uid://sdmsa2eafwhe" path="res://asset/texture/ocean_shader_00002.png" id="24_8g6a6"]
+[ext_resource type="Texture2D" uid="uid://c56oytkp3ohe7" path="res://asset/texture/ocean_shader_00001.png" id="25_q5xom"]
+[ext_resource type="PackedScene" uid="uid://dp4jt1qet3xpi" path="res://asset/map/road/road-intersection-line.glb" id="27_sdsmh"]
+[ext_resource type="PackedScene" uid="uid://d3sqpgrwux1wu" path="res://asset/map/road/road-bend.glb" id="28_clx6r"]
+[ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="32_cbrl2"]
+[ext_resource type="PackedScene" uid="uid://bbj41t2vseq2" path="res://scenes/enemies/NetworkZombieEnemy.tscn" id="53_pqnt3"]
+[ext_resource type="PackedScene" uid="uid://0lv7orsfam4y" path="res://scenes/triggers/Killzone.tscn" id="70_878j0"]
+[ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="76_em636"]
+[ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://asset/pastel_vignette.gdshader" id="77_0gsk6"]
+[ext_resource type="Script" uid="uid://vfp2lnkr8vd5" path="res://scripts/game/zombie_director/HordeDirectorDemo.gd" id="200_director"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="201_zone"]
+[ext_resource type="Script" uid="uid://uoltysxx0x3w" path="res://scripts/game/zombie_director/HordeDirectorDebugHUD.gd" id="202_hud"]
+[ext_resource type="PackedScene" path="res://scenes/debug/DemoZombiePlaceholder.tscn" id="203_placeholder"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_td8tl"]
+vertices = PackedVector3Array(-2.8027802, 0.87451744, 9.571436, -2.8027802, -1.1254826, 12.721436, 3.1472244, -1.1254826, 12.721436, 3.1472244, 0.87451744, 9.571436, 9.097221, 0.87451744, 2.9214349, 9.097221, 0.87451744, -5.828565, -9.80278, 0.87451744, -5.828565, -9.80278, 0.87451744, 2.9214349, 4.19722, 0.87451744, 9.571436, -3.8527756, 0.87451744, 9.571436, -14.352776, 0.87451744, 3.6214347, -14.352776, 0.87451744, 8.521435, -11.902779, 0.87451744, 8.871435, -10.152779, 0.87451744, 3.6214347, -11.902779, 0.87451744, 14.471436, -4.202774, 0.87451744, 14.471436, 9.44722, 0.87451744, 3.6214347, 4.547226, 0.87451744, 14.471436, 13.647224, 0.87451744, 14.821436, 14.347221, 0.87451744, 14.821436, 13.647224, 0.87451744, 3.6214347, -18.902779, 1.6245174, 58.921432, -18.55278, 1.6245174, 47.371433, -21.002777, 1.6245174, 47.021435, -68.952774, 1.6245174, 58.921432, -21.002777, 1.6245174, 3.6214347, -68.952774, 1.6245174, 3.6214347, 15.747223, 1.6245174, 47.021435, 13.297226, 1.6245174, 47.371433, 13.647224, 1.6245174, 58.921432, 62.647224, 1.6245174, 58.921432, 62.647224, 1.6245174, 47.371433, 60.197227, 1.6245174, 47.021435, 60.197227, 1.6245174, 3.6214347, 15.747223, 1.6245174, 3.6214347, -12.952774, -2.3754826, 15.871435, -13.30278, -2.3754826, 14.471436, -16.80278, -2.3754826, 14.471436, -16.80278, -2.3754826, 24.271435, -13.30278, -2.3754826, 24.621435, 3.497223, -2.3754826, 15.871435, -3.1527786, -2.3754826, 15.871435, 3.3222275, -2.1254826, 14.296436, -2.9777756, -2.1254826, 14.296436, -13.30278, -2.3754826, 33.021435, -3.1527786, -2.1254826, 38.971436, 3.497223, -2.1254826, 38.971436, -3.1527786, -0.87548256, 41.421436, 3.497223, -0.87548256, 41.421436, 4.8972244, -2.3754826, 38.971436, 4.8972244, -2.3754826, 43.871433, 12.247223, -2.3754826, 43.871433, 12.247223, -2.3754826, 15.871435, -4.202774, -2.3754826, 38.971436, 16.44722, -2.3754826, 44.221436, 17.147224, -2.3754826, 45.621433, 17.147224, -2.3754826, 14.471436, 16.44722, -2.3754826, 15.521435, -18.202774, 0.87451744, 32.671436, -14.702774, 0.87451744, 32.321434, -14.702774, 0.87451744, 25.671436, -18.202774, 0.87451744, 25.321436, -19.602776, 0.87451744, 45.971436, -18.202774, 0.87451744, 44.921436, -8.752777, 0.87451744, 45.971436, -8.752777, 0.87451744, 45.271435, -19.602776, 0.87451744, 14.821436, -18.202774, 0.87451744, 14.821436, -3.1527786, 0.87451744, 44.921436, -3.8527756, 0.87451744, 45.271435, 2.0972214, 0.87451744, 46.671436, 2.4472198, 0.87451744, 45.971436, 2.7972183, 0.87451744, 44.45477, 1.3973083, 0.87451744, 44.193344, -2.130722, 0.87451744, 44.232582, 3.8472214, 0.87451744, 45.271435, 14.347221, 0.87451744, 45.971436, 13.647224, 0.87451744, 44.921436, 3.7305527, 0.62451744, 43.988102, -3.1527786, -4.3754826, 18.321436, -3.1527786, -6.1254826, 21.471436, 3.497223, -6.1254826, 21.471436, 3.497223, -4.3754826, 18.321436, -16.80278, -2.3754826, 26.021435, -16.80278, -2.3754826, 31.971436, -15.05278, -2.3754826, 31.971436, -15.05278, -2.3754826, 26.021435, -3.1527786, -6.1254826, 31.971436, -3.1527786, -4.1254826, 35.471436, 3.497223, -4.1254826, 35.471436, 3.497223, -6.1254826, 31.971436, -3.1527786, -5.1254826, 34.304768, 3.497223, -5.1254826, 34.304768, -2.1377792, -5.1254826, 33.686436, -13.652779, -2.3754826, 33.721436, -16.80278, -2.3754826, 33.721436, -16.80278, -2.3754826, 43.871433, -4.55278, -2.3754826, 43.871433, -8.402779, 0.87451744, 59.971436, 2.0972214, 0.87451744, 59.971436, -9.80278, 1.6245174, 58.921432, -9.80278, 1.6245174, 47.371433, 3.497223, 1.6245174, 47.371433, 3.497223, 1.6245174, 58.921432, 49.34722, -0.62548256, 64.52143, 49.34722, -0.62548256, 60.321434, 48.647224, -0.62548256, 61.371437, 32.897224, -0.62548256, 64.52143, 11.19722, -0.62548256, 67.321434, 32.547226, -0.62548256, 67.321434, 10.847221, -0.62548256, 61.371437, -16.102776, -0.62548256, 65.221436, -15.752777, -0.62548256, 61.371437, -49.352776, -0.62548256, 61.371437, -49.352776, -0.62548256, 65.221436, -14.002777, -0.62548256, 65.221436, -13.652779, -0.62548256, 67.321434, 2.0972214, -0.62548256, 66.971436, 2.4472198, -0.62548256, 61.371437, 4.547226, -0.37548256, 67.67143, 4.547226, 0.12451744, 69.77143, 8.747223, 0.12451744, 69.77143, 8.747223, -0.37548256, 67.67143, 63.34722, 0.87451744, 64.52143, 60.197227, 0.87451744, 64.52143, 59.84722, 0.87451744, 65.92143, 58.09722, 0.87451744, 82.37144, 62.997215, 0.87451744, 82.37144, 57.747215, 0.87451744, 65.92143, 65.09722, 0.87451744, 82.37144, 65.44723, 0.87451744, 84.12144, 109.19723, 0.87451744, 64.52143, 61.947227, 0.87451744, 84.471436, 61.947227, 0.87451744, 111.77143, 109.19723, 0.87451744, 111.77143, 33.94722, 0.87451744, 65.92143, 33.94722, 0.87451744, 68.02143, 34.647224, 0.87451744, 68.37144, 34.647224, 0.87451744, 82.37144, -15.752777, 1.1245174, 68.37144, -15.05278, 1.1245174, 68.02143, -15.05278, 1.1245174, 66.62144, -48.302776, 1.1245174, 66.62144, -13.652779, 0.87451744, 94.62144, -14.002777, 0.87451744, 83.77143, -15.752777, 1.1245174, 83.42143, -48.302776, 1.1245174, 83.42143, -53.902775, 0.87451744, 83.77143, -53.552776, 0.87451744, 94.62144, -47.952778, -0.62548256, 66.971436, -47.952778, -0.62548256, 68.37144, -15.402779, -0.62548256, 68.37144, -15.402779, -0.62548256, 66.971436, -2.8027802, 1.1245174, 98.12144, -1.4027786, 0.87451744, 98.471436, -1.0527802, 0.87451744, 98.12144, -13.30278, 0.87451744, 68.721436, -13.30278, 0.87451744, 74.321434, -10.152779, 0.87451744, 74.67143, -8.752777, 0.87451744, 68.721436, -9.452774, 0.87451744, 94.971436, -9.452774, 0.87451744, 82.721436, -8.402779, 0.87451744, 77.821434, -0.0027770996, 0.87451744, 77.471436, -0.0027770996, 0.87451744, 68.721436, -6.30278, 0.87451744, 68.721436, -6.30278, 0.87451744, 77.471436, -9.452774, 1.6245174, 99.87144, -2.8027802, 1.8745174, 100.221436, 0.69721985, 0.87451744, 77.821434, 10.847221, 0.87451744, 70.12144, 10.147224, 0.87451744, 68.721436, 10.147224, 0.87451744, 71.87144, 8.747223, 0.62451744, 71.87144, 4.547226, 0.62451744, 71.87144, 24.847221, 0.87451744, 70.12144, 3.1472244, 0.87451744, 71.87144, 2.797226, 0.87451744, 68.721436, 2.797226, 0.87451744, 77.471436, 32.547226, 0.87451744, 82.37144, 32.547226, 0.87451744, 79.571434, 24.847221, 0.87451744, 79.221436, 24.147224, 0.87451744, 82.37144, 24.497223, 0.87451744, 84.471436, 23.797226, 0.87451744, 84.12144, 30.44722, 6.3745174, 70.471436, 29.397224, 6.3745174, 70.471436, 30.097221, 6.3745174, 76.42143, 32.19722, 6.3745174, 76.42143, 31.147224, 6.3745174, 69.42143, 27.997223, 3.6245174, 70.12144, 26.247223, 3.6245174, 70.12144, 25.897224, 3.6245174, 72.92143, 26.247223, 3.6245174, 78.17143, 29.047226, 3.6245174, 78.17143, 26.597221, 0.87451744, 70.12144, 26.597221, 0.87451744, 71.52143, 31.847221, 0.87451744, 71.52143, 31.847221, 0.87451744, 70.12144, 30.44722, 3.6245174, 76.071434, 31.497223, 3.6245174, 76.071434, 31.147224, 3.6245174, 71.17143, 29.747223, 3.6245174, 70.821434, 26.597221, 0.87451744, 74.67143, 31.847221, 0.87451744, 74.67143, 31.847221, 0.87451744, 73.27143, 26.247223, 0.87451744, 73.62144, -13.30278, 3.6245174, 75.721436, -12.952774, 3.6245174, 82.02143, -10.852776, 3.6245174, 81.67143, -11.55278, 3.6245174, 75.721436, -11.55278, 1.1245174, 77.12144, -11.902779, 1.1245174, 76.071434, -12.952774, 1.1245174, 76.071434, -12.602776, 1.1245174, 81.67143, -11.55278, 1.1245174, 81.67143, 26.597221, 0.87451744, 76.77143, 26.597221, 0.87451744, 77.821434, 31.847221, 0.87451744, 77.821434, 31.847221, 0.87451744, 76.42143, -52.852776, 0.87451744, 132.77144, -52.852776, 0.87451744, 129.97144, -56.002777, 0.87451744, 129.62143, -87.15278, 0.87451744, 132.77144, -56.002777, 0.87451744, 94.971436, -87.15278, 0.87451744, 83.77143, 58.79722, 0.87451744, 112.12144, -1.4027786, 0.87451744, 130.67143, -1.0527802, 0.87451744, 132.77144, 58.79722, 0.87451744, 132.77144, -18.55278, 10.124517, 128.57143, -18.202774, 10.124517, 105.12144, -18.202774, 10.124517, 96.02143, -54.602776, 10.124517, 96.02143, -54.602776, 10.124517, 128.57143, -17.152779, 9.874517, 105.12144, -10.852776, 10.124517, 96.02143, -17.152779, 7.3745174, 114.571434, -10.852776, 7.3745174, 114.571434, -10.852776, 9.624517, 106.13962, -10.852776, 10.124517, 102.766884, -19.602776, 0.87451744, 128.22144, -19.252777, 0.87451744, 117.02143, -19.252777, 0.87451744, 96.37144, -54.252777, 0.87451744, 96.37144, -54.252777, 0.87451744, 128.22144, -17.152779, 0.87451744, 96.37144, -17.152779, 0.87451744, 100.571434, -11.202774, 0.87451744, 100.571434, -11.202774, 0.87451744, 96.37144, -9.452774, 5.8745174, 115.27143, -2.8027802, 5.8745174, 115.62144, -9.452774, 0.87451744, 104.071434, -9.452774, 0.87451744, 116.67143, -3.1527786, 0.87451744, 116.67143, -3.1527786, 0.87451744, 104.071434, -17.152779, 0.87451744, 104.77143, -17.152779, 0.87451744, 116.67143, -11.202774, 0.87451744, 116.67143, -11.202774, 0.87451744, 104.77143, -9.452774, 6.3745174, 117.37144, -2.8027802, 6.3745174, 129.97144, -2.8027802, 6.3745174, 117.21588, -10.852776, 6.6245174, 117.37144, -17.502777, 6.3745174, 129.97144, -17.230553, 6.3745174, 117.99365, -10.852776, 0.87451744, 119.821434, -11.202774, 0.87451744, 118.77143, -17.152779, 0.87451744, 118.77143, -17.152779, 0.87451744, 129.62143, -3.1527786, 0.87451744, 129.62143, -3.1527786, 0.87451744, 119.821434, -1.7527771, 0.87451744, 131.37143, -19.252777, 0.87451744, 131.37143, -19.602776, 0.87451744, 129.97144)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1), PackedInt32Array(3, 0, 4), PackedInt32Array(4, 0, 5), PackedInt32Array(5, 0, 7), PackedInt32Array(5, 7, 6), PackedInt32Array(4, 8, 3), PackedInt32Array(0, 9, 7), PackedInt32Array(11, 10, 12), PackedInt32Array(12, 10, 13), PackedInt32Array(13, 7, 12), PackedInt32Array(12, 7, 9), PackedInt32Array(12, 9, 15), PackedInt32Array(12, 15, 14), PackedInt32Array(8, 4, 16), PackedInt32Array(18, 17, 19), PackedInt32Array(19, 17, 8), PackedInt32Array(19, 8, 16), PackedInt32Array(19, 16, 20), PackedInt32Array(22, 21, 23), PackedInt32Array(23, 21, 24), PackedInt32Array(25, 23, 26), PackedInt32Array(26, 23, 24), PackedInt32Array(28, 27, 29), PackedInt32Array(29, 27, 32), PackedInt32Array(29, 32, 31), PackedInt32Array(29, 31, 30), PackedInt32Array(27, 34, 32), PackedInt32Array(32, 34, 33), PackedInt32Array(36, 35, 37), PackedInt32Array(37, 35, 38), PackedInt32Array(38, 35, 39), PackedInt32Array(1, 2, 43), PackedInt32Array(43, 2, 42), PackedInt32Array(43, 42, 40), PackedInt32Array(43, 40, 41), PackedInt32Array(45, 44, 46), PackedInt32Array(46, 44, 39), PackedInt32Array(46, 48, 45), PackedInt32Array(45, 48, 47), PackedInt32Array(41, 40, 39), PackedInt32Array(39, 40, 46), PackedInt32Array(46, 40, 49), PackedInt32Array(51, 50, 49), PackedInt32Array(41, 39, 35), PackedInt32Array(40, 52, 49), PackedInt32Array(49, 52, 51), PackedInt32Array(45, 53, 44), PackedInt32Array(57, 56, 54), PackedInt32Array(54, 56, 55), PackedInt32Array(60, 59, 61), PackedInt32Array(61, 59, 58), PackedInt32Array(58, 63, 62), PackedInt32Array(65, 64, 63), PackedInt32Array(63, 64, 62), PackedInt32Array(61, 58, 66), PackedInt32Array(66, 58, 62), PackedInt32Array(66, 67, 61), PackedInt32Array(68, 70, 69), PackedInt32Array(48, 73, 47), PackedInt32Array(47, 74, 68), PackedInt32Array(68, 74, 70), PackedInt32Array(70, 73, 71), PackedInt32Array(71, 73, 72), PackedInt32Array(72, 73, 48), PackedInt32Array(73, 74, 47), PackedInt32Array(74, 73, 70), PackedInt32Array(77, 76, 75), PackedInt32Array(75, 76, 71), PackedInt32Array(18, 19, 77), PackedInt32Array(77, 19, 76), PackedInt32Array(71, 72, 75), PackedInt32Array(75, 72, 78), PackedInt32Array(78, 72, 48), PackedInt32Array(82, 81, 79), PackedInt32Array(79, 81, 80), PackedInt32Array(86, 85, 83), PackedInt32Array(83, 85, 84), PackedInt32Array(92, 93, 90), PackedInt32Array(90, 93, 87), PackedInt32Array(87, 93, 91), PackedInt32Array(91, 93, 88), PackedInt32Array(88, 93, 89), PackedInt32Array(89, 93, 92), PackedInt32Array(96, 95, 94), PackedInt32Array(44, 53, 94), PackedInt32Array(94, 53, 97), PackedInt32Array(94, 97, 96), PackedInt32Array(65, 69, 64), PackedInt32Array(64, 69, 70), PackedInt32Array(64, 70, 98), PackedInt32Array(98, 70, 99), PackedInt32Array(101, 100, 22), PackedInt32Array(22, 100, 21), PackedInt32Array(102, 28, 103), PackedInt32Array(103, 28, 29), PackedInt32Array(106, 105, 104), PackedInt32Array(106, 104, 107), PackedInt32Array(107, 109, 108), PackedInt32Array(108, 110, 107), PackedInt32Array(107, 110, 106), PackedInt32Array(114, 113, 111), PackedInt32Array(111, 113, 112), PackedInt32Array(111, 112, 115), PackedInt32Array(117, 116, 115), PackedInt32Array(117, 115, 118), PackedInt32Array(118, 115, 112), PackedInt32Array(122, 121, 119), PackedInt32Array(119, 121, 120), PackedInt32Array(122, 119, 108), PackedInt32Array(108, 119, 117), PackedInt32Array(108, 117, 118), PackedInt32Array(108, 118, 110), PackedInt32Array(124, 123, 125), PackedInt32Array(125, 123, 127), PackedInt32Array(125, 127, 126), PackedInt32Array(126, 128, 125), PackedInt32Array(129, 127, 123), PackedInt32Array(129, 123, 130), PackedInt32Array(130, 123, 131), PackedInt32Array(133, 132, 130), PackedInt32Array(133, 130, 134), PackedInt32Array(134, 130, 131), PackedInt32Array(136, 135, 137), PackedInt32Array(137, 135, 128), PackedInt32Array(138, 137, 126), PackedInt32Array(126, 137, 128), PackedInt32Array(140, 139, 141), PackedInt32Array(141, 139, 142), PackedInt32Array(144, 143, 145), PackedInt32Array(145, 143, 146), PackedInt32Array(146, 143, 147), PackedInt32Array(147, 143, 148), PackedInt32Array(145, 146, 139), PackedInt32Array(139, 146, 142), PackedInt32Array(152, 151, 149), PackedInt32Array(149, 151, 150), PackedInt32Array(155, 154, 153), PackedInt32Array(157, 156, 158), PackedInt32Array(158, 156, 159), PackedInt32Array(143, 144, 160), PackedInt32Array(160, 144, 161), PackedInt32Array(161, 158, 162), PackedInt32Array(162, 158, 159), PackedInt32Array(166, 165, 163), PackedInt32Array(163, 165, 164), PackedInt32Array(161, 162, 166), PackedInt32Array(168, 167, 153), PackedInt32Array(153, 167, 160), PackedInt32Array(166, 163, 169), PackedInt32Array(153, 160, 155), PackedInt32Array(155, 160, 161), PackedInt32Array(155, 161, 166), PackedInt32Array(155, 166, 169), PackedInt32Array(172, 171, 170), PackedInt32Array(174, 120, 173), PackedInt32Array(173, 120, 121), PackedInt32Array(172, 170, 175), PackedInt32Array(178, 177, 176), PackedInt32Array(178, 176, 174), PackedInt32Array(174, 173, 178), PackedInt32Array(180, 179, 181), PackedInt32Array(181, 179, 182), PackedInt32Array(169, 178, 155), PackedInt32Array(155, 178, 184), PackedInt32Array(155, 184, 183), PackedInt32Array(178, 173, 172), PackedInt32Array(175, 181, 182), PackedInt32Array(182, 184, 175), PackedInt32Array(175, 184, 172), PackedInt32Array(172, 184, 178), PackedInt32Array(187, 186, 185), PackedInt32Array(187, 185, 188), PackedInt32Array(188, 185, 189), PackedInt32Array(191, 190, 192), PackedInt32Array(192, 190, 193), PackedInt32Array(193, 190, 194), PackedInt32Array(198, 197, 195), PackedInt32Array(195, 197, 196), PackedInt32Array(200, 199, 201), PackedInt32Array(201, 199, 202), PackedInt32Array(203, 206, 204), PackedInt32Array(204, 206, 205), PackedInt32Array(210, 209, 207), PackedInt32Array(207, 209, 208), PackedInt32Array(212, 211, 213), PackedInt32Array(213, 211, 214), PackedInt32Array(214, 211, 215), PackedInt32Array(217, 216, 218), PackedInt32Array(218, 216, 219), PackedInt32Array(221, 220, 222), PackedInt32Array(222, 220, 223), PackedInt32Array(148, 224, 147), PackedInt32Array(147, 224, 225), PackedInt32Array(222, 223, 224), PackedInt32Array(224, 223, 225), PackedInt32Array(133, 226, 132), PackedInt32Array(132, 226, 183), PackedInt32Array(154, 155, 183), PackedInt32Array(227, 154, 228), PackedInt32Array(228, 154, 183), PackedInt32Array(228, 183, 226), PackedInt32Array(228, 226, 229), PackedInt32Array(231, 230, 232), PackedInt32Array(232, 230, 234), PackedInt32Array(232, 234, 233), PackedInt32Array(231, 232, 235), PackedInt32Array(235, 232, 236), PackedInt32Array(236, 240, 235), PackedInt32Array(235, 240, 239), PackedInt32Array(235, 239, 238), PackedInt32Array(235, 238, 237), PackedInt32Array(242, 241, 243), PackedInt32Array(243, 241, 245), PackedInt32Array(243, 245, 244), PackedInt32Array(249, 248, 246), PackedInt32Array(246, 248, 247), PackedInt32Array(167, 168, 250), PackedInt32Array(250, 168, 251), PackedInt32Array(255, 254, 252), PackedInt32Array(252, 254, 253), PackedInt32Array(259, 258, 256), PackedInt32Array(256, 258, 257), PackedInt32Array(251, 262, 250), PackedInt32Array(250, 262, 260), PackedInt32Array(260, 262, 261), PackedInt32Array(238, 263, 237), PackedInt32Array(237, 263, 265), PackedInt32Array(265, 263, 264), PackedInt32Array(260, 261, 263), PackedInt32Array(263, 261, 264), PackedInt32Array(267, 266, 268), PackedInt32Array(268, 266, 269), PackedInt32Array(271, 270, 266), PackedInt32Array(266, 270, 269), PackedInt32Array(272, 227, 228), PackedInt32Array(272, 228, 273), PackedInt32Array(273, 228, 220), PackedInt32Array(274, 273, 221), PackedInt32Array(221, 273, 220)]
+geometry_parsed_geometry_type = 1
+geometry_collision_mask = 4294901768
+cell_size = 0.35
+detail_sample_distance = 5.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ug7yg"]
+size = Vector3(40, 4, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jytmi"]
+albedo_color = Color(0.8039216, 0.8117647, 0.84705883, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tq13h"]
+size = Vector3(40, 8, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jytmi"]
+size = Vector3(14, 4, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mtlo0"]
+size = Vector3(14, 8, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2uc7g"]
+size = Vector3(14, 4, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oeheb"]
+size = Vector3(14, 8, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7w12i"]
+size = Vector3(22, 4, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pnlfn"]
+size = Vector3(22, 8, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gijje"]
+size = Vector3(8, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f46f2"]
+size = Vector3(8, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7eod3"]
+size = Vector3(1, 1.621582, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4omr8"]
+albedo_color = Color(0.42745098, 0.44313726, 0.5058824, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_46sg2"]
+albedo_color = Color(0.73, 0.64458996, 0.3358, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kwhn4"]
+albedo_color = Color(0.5290667, 0.64, 0.224, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rlgun"]
+albedo_color = Color(0.1632472, 0.5388858, 0.4057284, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2uc7g"]
+size = Vector3(100, 2, 10)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fgnw7"]
+render_priority = 0
+shader = ExtResource("21_ecw4d")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("22_6d5s7")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("25_q5xom")
+shader_parameter/wave_normal_texture = ExtResource("24_8g6a6")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0.04, 0.05)
+shader_parameter/foam_texture = ExtResource("23_aaaep")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_u08q1"]
+material = SubResource("ShaderMaterial_fgnw7")
+size = Vector3(100, 10, 25)
+subdivide_width = 80
+subdivide_height = 10
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d16ra"]
+albedo_color = Color(0.46, 0.30053335, 0.16100001, 1)
+roughness = 0.9
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dbu4j"]
+shader = ExtResource("77_0gsk6")
+shader_parameter/vignette_color = Color(0.835, 0.862, 1, 1)
+shader_parameter/intensity = 0.2000000095
+shader_parameter/radius = 0.55
+shader_parameter/softness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_director_target"]
+transparency = 1
+albedo_color = Color(0.1, 0.45, 1, 0.65)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_director_idle"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_director_horde"]
+transparency = 1
+albedo_color = Color(1, 0.15, 0.08, 0.28)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_director_mixed"]
+transparency = 1
+albedo_color = Color(1, 0.65, 0.05, 0.28)
+
+[node name="Mission_00_DEV_HordeDirector_Demo" type="Node3D" unique_id=794037046]
+script = ExtResource("1_q3e6e")
+
+[node name="SpawnPoints" type="Node3D" parent="." unique_id=1832967375]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.81857, -5.371189, -56.667797)
+
+[node name="SpawnA" type="Marker3D" parent="SpawnPoints" unique_id=789447208]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -80.149956, 7.0489874, 146.53613)
+
+[node name="SpawnB" type="Marker3D" parent="SpawnPoints" unique_id=1093883691]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -77.10301, 7.0489883, 146.46394)
+
+[node name="SpawnC" type="Marker3D" parent="SpawnPoints" unique_id=1874501327]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -81.04054, 7.0489883, 150.3776)
+
+[node name="SpawnD" type="Marker3D" parent="SpawnPoints" unique_id=1809863145]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -77.08701, 7.0489883, 150.16081)
+
+[node name="VehicleSpawns" type="Node3D" parent="." unique_id=1089131327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.81857, -5.371189, -56.667797)
+
+[node name="SpawnA" type="Marker3D" parent="VehicleSpawns" unique_id=1356902959]
+transform = Transform3D(-4.211187e-08, -0.19041494, 0.9817037, -1.6646602e-08, 0.9817037, 0.19041494, -1, -8.323301e-09, -4.4511147e-08, -88.299805, 6.645067, 149.13997)
+
+[node name="SpawnB" type="Marker3D" parent="VehicleSpawns" unique_id=642084212]
+transform = Transform3D(-4.211187e-08, -0.19041494, 0.9817037, -1.6646602e-08, 0.9817037, 0.19041494, -1, -8.323301e-09, -4.4511147e-08, -92.11693, 6.7938843, 143.1782)
+
+[node name="SpawnC" type="Marker3D" parent="VehicleSpawns" unique_id=1680178547]
+transform = Transform3D(-4.211187e-08, -0.19041494, 0.9817037, -1.6646602e-08, 0.9817037, 0.19041494, -1, -8.323301e-09, -4.4511147e-08, -93.022385, 7.0061855, 147.74779)
+
+[node name="SpawnD" type="Marker3D" parent="VehicleSpawns" unique_id=1007199597]
+transform = Transform3D(-4.211187e-08, -0.19041494, 0.9817037, -1.6646602e-08, 0.9817037, 0.19041494, -1, -8.323301e-09, -4.4511147e-08, -91.46185, 6.866249, 149.02457)
+
+[node name="Lighting" type="Node3D" parent="." unique_id=1259765438]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Lighting" unique_id=1822661109]
+unique_name_in_owner = true
+
+[node name="Sun" type="DirectionalLight3D" parent="Lighting" unique_id=495220588]
+transform = Transform3D(0.81915206, 0.4262504, 0.38379753, 0, 0.66913056, -0.74314487, -0.57357645, 0.6087487, 0.54811966, 0, 7, 0)
+light_color = Color(1, 0.93333334, 0.8, 1)
+light_indirect_energy = 0.6
+light_volumetric_fog_energy = 0.35
+light_angular_distance = 2.2
+shadow_enabled = true
+shadow_blur = 1.5
+directional_shadow_mode = 0
+directional_shadow_split_1 = 0.08
+directional_shadow_split_2 = 0.22
+directional_shadow_split_3 = 0.48
+directional_shadow_blend_splits = true
+directional_shadow_fade_start = 0.72
+directional_shadow_max_distance = 32.0
+
+[node name="SoftBlueFill" type="DirectionalLight3D" parent="Lighting" unique_id=134726987]
+transform = Transform3D(0.7071068, -0.45451915, -0.5416752, 0, 0.76604384, -0.6427875, 0.70710707, 0.454519, 0.54167503, 0, 7, 0)
+light_color = Color(0.5616322, 0.69139177, 1, 1)
+light_energy = 0.5
+light_indirect_energy = 0.2
+light_volumetric_fog_energy = 0.0
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1594897149]
+navigation_mesh = SubResource("NavigationMesh_td8tl")
+metadata/_edit_lock_ = true
+
+[node name="01_Forest" type="Node3D" parent="NavigationRegion3D" unique_id=1378300776]
+script = ExtResource("3_ouw6b")
+
+[node name="Base_Storage" type="Node3D" parent="NavigationRegion3D/01_Forest" unique_id=301175548]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 80)
+
+[node name="bridge-pillar-wide21" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1245632920 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -14.5, 0.5, 3.5)
+
+[node name="bridge-pillar-wide38" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1132378660 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -14.5, 0.5, -11)
+
+[node name="bridge-pillar-wide39" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=396983476 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -14.5, 0.5, -3)
+
+[node name="bridge-pillar-wide23" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1624287745 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 24.5, 0.5, 3.5)
+
+[node name="bridge-pillar-wide24" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=183785934 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 42.5, 0.5, 3.5)
+
+[node name="bridge-pillar-wide25" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=858877740 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 33.5, 0.5, 3.5)
+
+[node name="bridge-pillar-wide26" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=136431537 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 52.5, 0.5, 3.5)
+
+[node name="StaticBody3D_Wall_6" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1003167141]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.553642, 1.6884022, 3.431404)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Wall_Right1" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_6" unique_id=1343059383]
+mesh = SubResource("BoxMesh_ug7yg")
+surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_6" unique_id=1773215628]
+shape = SubResource("BoxShape3D_tq13h")
+
+[node name="StaticBody3D_Wall_7" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=665892642]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -14.5, 1.688, -4)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Wall_Left3" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_7" unique_id=240302350]
+mesh = SubResource("BoxMesh_jytmi")
+surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_7" unique_id=1376657696]
+shape = SubResource("BoxShape3D_mtlo0")
+
+[node name="StaticBody3D_Wall_8" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=769514638]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 33.5, 1.688, -4)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_8" unique_id=226310599]
+mesh = SubResource("BoxMesh_2uc7g")
+surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_8" unique_id=789524473]
+shape = SubResource("BoxShape3D_oeheb")
+
+[node name="bridge-pillar-wide31" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1740593725 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 33.5, 0.5, -3)
+
+[node name="bridge-pillar-wide33" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=226950472 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 33.5, 0.5, -11)
+
+[node name="StaticBody3D_Wall_9" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=2120536505]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 22.5, 1.688, -11)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_9" unique_id=375984929]
+mesh = SubResource("BoxMesh_7w12i")
+surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/StaticBody3D_Wall_9" unique_id=637716441]
+shape = SubResource("BoxShape3D_pnlfn")
+
+[node name="bridge-pillar-wide32" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=341947094 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.5, 0.5, -11)
+
+[node name="bridge-pillar-wide34" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1997291800 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 11.5, 0.5, -11)
+
+[node name="Small_Wall1" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=965077891]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.532547, 1, -7.568596)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Wall_Left1" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall1" unique_id=2048974306]
+mesh = SubResource("BoxMesh_gijje")
+surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall1" unique_id=1822425649]
+shape = SubResource("BoxShape3D_f46f2")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall1" unique_id=1201112440]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.099045, 0.20340514, 0)
+shape = SubResource("BoxShape3D_7eod3")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall1" unique_id=1585031060]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9614716, 0.20340514, 4.7683716e-07)
+shape = SubResource("BoxShape3D_7eod3")
+
+[node name="Small_Wall2" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=243481782]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.467453, 1, -7.568596)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Wall_Left1" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall2" unique_id=1281480593]
+mesh = SubResource("BoxMesh_gijje")
+surface_material_override/0 = SubResource("StandardMaterial3D_jytmi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall2" unique_id=1229472390]
+shape = SubResource("BoxShape3D_f46f2")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall2" unique_id=914746384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.099045, 0.20340514, 0)
+shape = SubResource("BoxShape3D_7eod3")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/Base_Storage/Small_Wall2" unique_id=1770527768]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9614716, 0.20340514, 4.7683716e-07)
+shape = SubResource("BoxShape3D_7eod3")
+
+[node name="bridge-pillar-wide40" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1128378244 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(11, 0, 0, 0, 8, 0, 0, 0, 10, -7.5534906, -2, -3.5)
+
+[node name="bridge-pillar-wide41" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1507425280 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(11, 0, 0, 0, 8, 0, 0, 0, 10, 1.4703732, -2, -3.5)
+
+[node name="bridge-pillar-wide42" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1145100213 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(11, 0, 0, 0, 8, 0, 0, 0, 10, -7.552608, -2, -11.5)
+
+[node name="bridge-pillar-wide43" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=2140874441 instance=ExtResource("4_u7dqe")]
+transform = Transform3D(11, 0, 0, 0, 8, 0, 0, 0, 10, 1.4843407, -2, -11.5)
+
+[node name="Floor_01" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=948543635]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -5.3971343, -0.5, -4.0739975)
+layers = 136
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(18.404732, 2, 15.121)
+material = SubResource("StandardMaterial3D_4omr8")
+
+[node name="Floor_02" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=367426559]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 21.682995, -0.5, -4.0739975)
+layers = 136
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(23.808992, 2, 15.121)
+material = SubResource("StandardMaterial3D_4omr8")
+
+[node name="Node3D2" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=980568818 instance=ExtResource("5_s2q05")]
+transform = Transform3D(0.01190282, 0, -0.99992913, 0, 1, 0, 0.99992913, 0, 0.01190282, 29.211895, 0.4829777, -9.177681)
+
+[node name="Node3D6" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=246310358 instance=ExtResource("5_s2q05")]
+transform = Transform3D(-0.99610436, 0, -0.08818147, 0, 1, 0, 0.08818147, 0, -0.99610436, -12.171909, 0.6623805, -1.1769409)
+
+[node name="Node3D3" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=820605750 instance=ExtResource("5_s2q05")]
+transform = Transform3D(0.056692746, 0, -0.9983917, 0, 1, 0, 0.9983917, 0, 0.056692746, 29.15734, 0.4829777, -5.9509277)
+
+[node name="Node3D5" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=397222386 instance=ExtResource("5_s2q05")]
+transform = Transform3D(0.03573686, 0, -0.9993613, 0, 1, 0, 0.9993613, 0, 0.03573686, 29.1821, 0.4829777, -2.8059006)
+
+[node name="Node3D4" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1590803419 instance=ExtResource("5_s2q05")]
+transform = Transform3D(-0.98977375, 0, -0.1426463, 0, 1, 0, 0.1426463, 0, -0.98977375, 30.7115, 3.2146082, -6.6441345)
+
+[node name="Crate_Large3" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=272352681 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3903679, 1.8297101, -8.638313)
+intact_body_path = NodePath("../Crate_Large/IntactBody")
+intact_visual_root_path = NodePath("../Crate_Large/IntactBody/Intact")
+main_collision_path = NodePath("../Crate_Large/IntactBody/Collision")
+debris_root_path = NodePath("../Crate_Large/DebrisRoot")
+
+[node name="Crate_Large6" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=988967429 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -1.3903679, 1.8297101, -6.0035934)
+
+[node name="Crate_Large5" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=675103417 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2679825, -0.38267314, -18.388268)
+
+[node name="Crate_Large7" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1667458450 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(0.8849226, 0, -0.46573806, 0, 1, 0, 0.46573806, 0, 0.8849226, -4.4589143, 1.8297101, -10.366882)
+intact_body_path = NodePath("../Crate_Large2/IntactBody")
+intact_visual_root_path = NodePath("../Crate_Large2/IntactBody/Intact")
+main_collision_path = NodePath("../Crate_Large2/IntactBody/Collision")
+debris_root_path = NodePath("../Crate_Large2/DebrisRoot")
+
+[node name="Crate_Large8" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1647433305 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(0.9773347, 0, -0.21170008, 0, 1, 0, 0.21170008, 0, 0.9773347, -4.8446026, 1.8297101, -16.927551)
+
+[node name="Crate_Large9" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1581023799 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(-0.96761674, 0, -0.25242403, 0, 1, 0, 0.25242403, 0, -0.96761674, -4.885536, 2.1169395, -7.1949463)
+intact_body_path = NodePath("../Crate_Large4/IntactBody")
+intact_visual_root_path = NodePath("../Crate_Large4/IntactBody/Intact")
+main_collision_path = NodePath("../Crate_Large4/IntactBody/Collision")
+debris_root_path = NodePath("../Crate_Large4/DebrisRoot")
+
+[node name="Crate_Large10" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1580471628 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(0.110220015, 0, -0.9939072, 0, 1, 0, 0.9939072, 0, 0.110220015, 14.934188, 1.8297082, -8.252342)
+intact_body_path = NodePath("../Crate_Large4/IntactBody")
+intact_visual_root_path = NodePath("../Crate_Large4/IntactBody/Intact")
+main_collision_path = NodePath("../Crate_Large4/IntactBody/Collision")
+debris_root_path = NodePath("../Crate_Large4/DebrisRoot")
+
+[node name="Crate_Large11" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=2063636487 instance=ExtResource("6_sd0pm")]
+transform = Transform3D(-0.85946, 0, -0.51120305, 0, 1, 0, 0.51120305, 0, -0.85946, 17.452534, 1.8297082, -6.03566)
+intact_body_path = NodePath("../Crate_Large4/IntactBody")
+intact_visual_root_path = NodePath("../Crate_Large4/IntactBody/Intact")
+main_collision_path = NodePath("../Crate_Large4/IntactBody/Collision")
+debris_root_path = NodePath("../Crate_Large4/DebrisRoot")
+
+[node name="road-straight22" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1787361356 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(80, 0, 3.4106053e-14, 0, 6, 0, -4.5474735e-13, 0, 6, -49, 0.5, 10)
+
+[node name="road-straight24" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1392384527 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(40, 0, 3.4106053e-14, 0, 6, 0, -2.2737368e-13, 0, 6, 41.955826, 0.5, 10)
+
+[node name="road-straight25" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=970007792 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(19.5, 0, 3.4106053e-14, 0, 6, 0, -1.1084467e-13, 0, 6, 6.2604303, 0.5, 10)
+
+[node name="Ramp_Base" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=799067978]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.4585075e-07, -0.9659258, 0.25881904, 3.908059e-08, 0.25881904, 0.9659258, 6.793538, -2.7063272, -10.281532)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(6.0022526, 4.5, 8)
+material = SubResource("StandardMaterial3D_4omr8")
+
+[node name="Pipe" type="Node3D" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=742547974]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 0, -2)
+
+[node name="pipe-large-long2" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=1051156139 instance=ExtResource("8_8i6wv")]
+transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, -2.9250336)
+
+[node name="pipe-large-long3" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=1872711345 instance=ExtResource("8_8i6wv")]
+transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, 0.04903412)
+
+[node name="pipe-large-long4" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=1092873526 instance=ExtResource("8_8i6wv")]
+transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, 2.049034)
+
+[node name="pipe-large-long5" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=2132426592 instance=ExtResource("8_8i6wv")]
+transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, 4.049034)
+
+[node name="pipe-large-valve2" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=658003751 instance=ExtResource("9_u73qx")]
+transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, -3.7581425, 0.48165923, -1.4396286)
+
+[node name="indicator-special-arrow2" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1375977409 instance=ExtResource("10_aibho")]
+transform = Transform3D(-1.7484555e-07, 0, -4, 0, 4, 0, 4, 0, -1.7484555e-07, -4.9839396, 0.51, -1.0110779)
+
+[node name="indicator-special-arrow3" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1047379069 instance=ExtResource("10_aibho")]
+transform = Transform3D(-1.7484555e-07, 0, -4, 0, 4, 0, 4, 0, -1.7484555e-07, -1.0869145, 0.51, -1.0110779)
+
+[node name="Crate" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=2134769708 instance=ExtResource("11_ekd4f")]
+transform = Transform3D(0.9579728, 0, 0.28685898, 0, 1, 0, -0.28685898, 0, 0.9579728, 10.718931, 1.1799983, -7.536682)
+
+[node name="Crate2" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=994429957 instance=ExtResource("11_ekd4f")]
+transform = Transform3D(0.9960875, 0, -0.08837277, 0, 1, 0, 0.08837277, 0, 0.9960875, 11.9035845, 1.1799983, -8.712952)
+
+[node name="Crate3" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=1542062517 instance=ExtResource("11_ekd4f")]
+transform = Transform3D(0.079503044, 0, 0.99683464, 0, 1, 0, -0.99683464, 0, 0.079503044, 12.193735, 1.1799983, -6.9943314)
+
+[node name="Crate_Large" parent="NavigationRegion3D/01_Forest/Base_Storage" unique_id=664557108 instance=ExtResource("12_k6jof")]
+transform = Transform3D(0.9907455, 0, -0.13573286, 0, 1, 0, 0.13573286, 0, 0.9907455, 23.141064, 1.1799983, -9.322601)
+
+[node name="plane_noise" parent="NavigationRegion3D/01_Forest" unique_id=1139489821 instance=ExtResource("13_6ho5a")]
+transform = Transform3D(0.5, 0, 0, 0, 0.49999997, 0, 0, 0, 0.49999997, 0, -1.4414434, 66.809)
+
+[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=264337654]
+transform = Transform3D(20, 0, 0, 0, 2, 9.9341065e-08, 0, -3.9736427e-08, 5, 0, 0, 0)
+surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
+
+[node name="Ground" type="Node3D" parent="NavigationRegion3D/01_Forest" unique_id=105646923]
+
+[node name="Floor_01_A2" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=360366747]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -0.30984783, -1.7507324, 60.025043)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(96.849045, 4.501465, 1.1055908)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A18" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=322051424]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -3.2069225, -1.7507329, 52.57784)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(12.532269, 4.501465, 16)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A7" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1395014252]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -31.628607, -1.7507372, 91.87914)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(34.21153, 4.501465, 12.080091)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A10" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1185709680]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -36.670536, 0.6459993, 112.272)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(36.96907, 18.097412, 33.7041)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A11" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=214037748]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -14.24, 0.663, 99.673)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(8, 18.097, 8.453125)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A13" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1701786341]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.4585073e-07, -0.9659258, -0.25881904, -3.9080593e-08, -0.25881904, 0.9659258, -14.23974, 0.60301125, 109.465515)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(8, 14.714, 15.463)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A14" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=792316479]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.4585073e-07, -0.9659258, 0.25881904, 3.90806e-08, 0.25881904, 0.9659258, -6.2287474, -3.9389148, 108.97696)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(8, 14.714, 21.870499)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A12" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=110198304]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -10.529061, 0.9958434, 123.98362)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(16.625977, 9.994629, 12.74707)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A15" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=426912017]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 27.276392, -4.5216813, 90.24999)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(36.61798, 10, 13.702423)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A16" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=2075118810]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -39.42151, -4.5216913, 108.48235)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(96.86253, 10, 50.167145)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A9" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=632650983]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 6.704, -0.5, 78.26)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(6.73, 2, 10.491)
+material = SubResource("StandardMaterial3D_4omr8")
+
+[node name="Floor_01_A8" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=2066541132]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 46.527023, -1.7507342, 89.94448)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(25.654324, 4.501465, 13.093702)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A3" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1738349119]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 14.239796, -1.75073, 29.84161)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(2.5646973, 4.501465, 31)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A4" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1169352006]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -19.310123, -1.7507285, 30.612545)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(3.3192964, 4.501465, 32.54187)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A6" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=677525058]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -13.593664, -1.7507277, 45.730053)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(8.363994, 4.501465, 2.3068542)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A19" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1991671398]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 9.48984, -1.7507273, 45.730053)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(12.811946, 4.501465, 2.3068542)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A17" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1214434056]
+transform = Transform3D(4.371139e-08, -6.600236e-15, -1, -1.509958e-07, -1, 0, -1, 1.509958e-07, -4.371139e-08, -16.00453, -1.7507297, 28.857971)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(7.6501894, 4.501465, 3.857727)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A5" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1054931243]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 0.01272583, -4.671421, 30)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(35, 4, 32)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_B" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=172095717]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, 10.024706, -1.7507342, 11.980625)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(12.136769, 4.501465, 5.875)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01_A" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=673168947]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -7.909811, -1.7507336, 11.980625)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(8.75945, 4.501465, 5.875)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_01" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=242887050]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -0.3875761, -1.7507327, 6.1771765)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(29.014284, 4.5, 5.914551)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_02" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=293560802]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -0.44687462, -1.7507328, -1.6285648)
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(20, 4.5, 9.8)
+material = SubResource("StandardMaterial3D_kwhn4")
+
+[node name="Floor_Outside3" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=2067438656]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -45.057594, -3.8084736, 25.10865)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(43.94348, 10, 48.957)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside10" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=528716151]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -16.266651, -1.7509987, 9.071799)
+layers = 136
+collision_layer = 8
+collision_mask = 0
+size = Vector3(11.119659, 4.5, 10.129387)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside6" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=843926828]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -39.477226, -3.8084755, 53.201214)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(12.787323, 10, 60.117737)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside7" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1584049230]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 33.068962, -3.8084755, 53.239056)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(12.711639, 10, 60.117737)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside4" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=189845216]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 37.980667, -3.8084736, 25.060799)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(43.84778, 10, 45.21393)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside5" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=128784054]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 34.166203, -4.511573, 114.98002)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(37.146362, 10, 50.32721)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside11" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=1132155564]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 84.73994, -4.5115776, 88.164536)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(48.59613, 10, 50.32721)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside8" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=2050230712]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, 46.44903, -4.5115747, 74.5802)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(18.115143, 10, 25.892975)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="Floor_Outside9" type="CSGBox3D" parent="NavigationRegion3D/01_Forest/Ground" unique_id=476217426]
+transform = Transform3D(4.371139e-08, -6.600236e-15, 1, -1.509958e-07, -1, 0, 1, -1.509958e-07, -4.371139e-08, -31.641691, -4.368842, 76.0478)
+layers = 136
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(19.594193, 10, 34.28258)
+material = SubResource("StandardMaterial3D_rlgun")
+
+[node name="River" type="Node3D" parent="NavigationRegion3D/01_Forest" unique_id=1886768477]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 55)
+
+[node name="rock-sand-a3" parent="NavigationRegion3D/01_Forest/River" unique_id=1790427920 instance=ExtResource("17_yb73o")]
+transform = Transform3D(-5.795555, 0, -1.5529149, 0, 6, 0, 1.5529149, 0, -5.795555, 16.722322, -2.2815871, 8.012264)
+
+[node name="rock-sand-b3" parent="NavigationRegion3D/01_Forest/River" unique_id=1423382113 instance=ExtResource("18_g5r3d")]
+transform = Transform3D(-5.795555, 0, -1.5529149, 0, 6, 0, 1.5529149, 0, -5.795555, 21.27053, -1.9677653, 9.974373)
+
+[node name="rock-sand-c4" parent="NavigationRegion3D/01_Forest/River" unique_id=1039029564 instance=ExtResource("19_l3n02")]
+transform = Transform3D(-0.4111212, 0, -5.9858985, 0, 6, 0, 5.9858985, 0, -0.4111212, 12.74494, -1.9677653, 11.930397)
+
+[node name="rock-sand-c5" parent="NavigationRegion3D/01_Forest/River" unique_id=1372323953 instance=ExtResource("19_l3n02")]
+transform = Transform3D(2.2647178, 0, -5.5561724, 0, 3, 0, 5.5561724, 0, 2.2647178, 12.027157, -0.9327264, 7.636009)
+
+[node name="rock-sand-a2" parent="NavigationRegion3D/01_Forest/River" unique_id=110269322 instance=ExtResource("17_yb73o")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -24.374947, -1.7641406, 11.952881)
+
+[node name="rock-sand-b2" parent="NavigationRegion3D/01_Forest/River" unique_id=2115960798 instance=ExtResource("18_g5r3d")]
+transform = Transform3D(6, 0, 0, 0, 3, 0, 0, 0, 6, -16.75893, -0.85167074, 7.2089767)
+
+[node name="rock-sand-c2" parent="NavigationRegion3D/01_Forest/River" unique_id=1712974690 instance=ExtResource("19_l3n02")]
+transform = Transform3D(1.5529144, 0, 5.795555, 0, 6, 0, -5.795555, 0, 1.5529144, -16.408615, -0.85167074, 11.096939)
+
+[node name="rock-sand-c3" parent="NavigationRegion3D/01_Forest/River" unique_id=709251821 instance=ExtResource("19_l3n02")]
+transform = Transform3D(-0.7495056, 0, 5.953003, 0, 8, 0, -5.953003, 0, -0.7495056, -21.116253, -3.3791423, 7.3621063)
+
+[node name="rock-sand-c6" parent="NavigationRegion3D/01_Forest/River" unique_id=1303468938 instance=ExtResource("19_l3n02")]
+transform = Transform3D(5.9996424, 0, 0.065448105, 0, 8, 0, -0.065448105, 0, 5.9996424, -21.578089, -3.8568645, 9.629395)
+
+[node name="Below_River" type="StaticBody3D" parent="NavigationRegion3D/01_Forest/River" unique_id=472242689]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9)
+collision_layer = 15
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/01_Forest/River/Below_River" unique_id=826795066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+shape = SubResource("BoxShape3D_2uc7g")
+
+[node name="River" type="MeshInstance3D" parent="NavigationRegion3D/01_Forest/River" unique_id=945517609]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5.75, 11.513)
+mesh = SubResource("BoxMesh_u08q1")
+
+[node name="Road" type="Node3D" parent="NavigationRegion3D/01_Forest" unique_id=42697103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 55)
+
+[node name="road-end2" parent="NavigationRegion3D/01_Forest/Road" unique_id=1204681403 instance=ExtResource("20_fxnsf")]
+transform = Transform3D(7.8680495e-07, 0, -6, 0, 6, 0, 6, 0, 7.8680495e-07, 18.98776, 0.49953425, 19.220192)
+
+[node name="road-straight23" parent="NavigationRegion3D/01_Forest/Road" unique_id=2108448947 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(1.9470717e-06, 0, -6, 0, 6, 0, 10, 0, 1.1682431e-06, 18.983627, 0.5, 27.050247)
+
+[node name="road-intersection-line8" parent="NavigationRegion3D/01_Forest/Road" unique_id=1623401381 instance=ExtResource("27_sdsmh")]
+transform = Transform3D(-6, 0, -3.0041215e-06, 0, 6, 0, 3.0041215e-06, 0, -6, 18.984734, 0.5, 34.99859)
+
+[node name="road-straight24" parent="NavigationRegion3D/01_Forest/Road" unique_id=699016425 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(-1.0728438e-06, 0, 6, 0, 6, 0, -10, 0, -6.4370647e-07, -6.488491, 0.5, 42.807953)
+
+[node name="road-straight28" parent="NavigationRegion3D/01_Forest/Road" unique_id=1440506830 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(-38, 0, -9.0597484e-07, 0, 6, 0, 5.7378406e-06, 0, -6, -36.65793, 9.704, 45.859)
+
+[node name="road-straight27" parent="NavigationRegion3D/01_Forest/Road" unique_id=491797363 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(-2.25, 0, -9.0597484e-07, 0, 6, 0, 3.3974055e-07, 0, -6, -10.598297, 6.0029454, 65.67575)
+
+[node name="road-straight25" parent="NavigationRegion3D/01_Forest/Road" unique_id=910797202 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(-3.6202316e-06, -9.2075275e-08, 6, -5.6940174, 5.795555, -1.666034e-07, -21.250368, -1.5529139, -9.775241e-07, -6.488491, 3.1559625, 52.081696)
+
+[node name="road-straight26" parent="NavigationRegion3D/01_Forest/Road" unique_id=1176018664 instance=ExtResource("7_ac7w1")]
+transform = Transform3D(-2.583434e-06, -7.97395e-08, 6, 3.882287, 5.795555, 3.444793e-07, -14.488887, 1.5529149, -9.775241e-07, -14.694355, 7.771437, 56.064156)
+
+[node name="road-intersection-line9" parent="NavigationRegion3D/01_Forest/Road" unique_id=1041415016 instance=ExtResource("27_sdsmh")]
+transform = Transform3D(6, 0, 2.479585e-06, 0, 6, 0, -2.479585e-06, 0, 6, -6.4895973, 0.5, 34.9964)
+
+[node name="road-bend14" parent="NavigationRegion3D/01_Forest/Road" unique_id=1013043831 instance=ExtResource("28_clx6r")]
+transform = Transform3D(7.8680495e-07, 0, -6, 0, 6, 0, 6, 0, 7.8680495e-07, -6.4909263, 6.003625, 65.67422)
+
+[node name="road-bend15" parent="NavigationRegion3D/01_Forest/Road" unique_id=975451120 instance=ExtResource("28_clx6r")]
+transform = Transform3D(-6, 0, -5.2453663e-07, 0, 6, 0, 5.2453663e-07, 0, -6, -14.700552, 6.003625, 65.67421)
+
+[node name="road-bend16" parent="NavigationRegion3D/01_Forest/Road" unique_id=1663064573 instance=ExtResource("28_clx6r")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -14.693858, 9.706915, 45.85836)
+
+[node name="Ramp_1" type="CSGBox3D" parent="NavigationRegion3D/01_Forest" unique_id=50605280]
+transform = Transform3D(-1, 1.5099582e-07, 0, -1.3076621e-07, -0.86602545, -0.50000006, -7.549791e-08, -0.50000006, 0.86602545, 0.21817875, -3.7180808, 15.390129)
+layers = 8
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(7.46, 1, 15.076)
+material = SubResource("StandardMaterial3D_d16ra")
+
+[node name="Ramp_2" type="CSGBox3D" parent="NavigationRegion3D/01_Forest" unique_id=1775058820]
+transform = Transform3D(1, -1.07284436e-07, -7.571035e-08, -1.3076621e-07, -0.86602545, -0.50000006, -1.1924868e-08, 0.50000006, -0.86602545, 0.21817875, -3.7180808, 38.333485)
+layers = 8
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(7.46, 1, 15.076)
+material = SubResource("StandardMaterial3D_d16ra")
+
+[node name="Trigger" type="Node3D" parent="." unique_id=985045625]
+
+[node name="Killzone_ALL" parent="Trigger" unique_id=9460405 instance=ExtResource("70_878j0")]
+transform = Transform3D(30, 0, 0, 0, 1, 0, 0, 0, 30, -19.707, -8, 46.541702)
+collision_mask = 1
+
+[node name="Items" type="Node3D" parent="." unique_id=839176017]
+
+[node name="Enemies" type="Node3D" parent="." unique_id=1573742361]
+
+[node name="NetworkZombieEnemy" parent="Enemies" unique_id=2032012782 instance=ExtResource("53_pqnt3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.638344, 5.3562036, 90.15792)
+move_speed = 1.5
+direct_move_distance = 9.0
+enemy_separation_radius = 2.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1361244026]
+
+[node name="NetworkHUD" parent="CanvasLayer" unique_id=1913491278 instance=ExtResource("76_em636")]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=2110257264]
+material = SubResource("ShaderMaterial_dbu4j")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HordeDirectorDebugPanel" type="PanelContainer" parent="CanvasLayer" unique_id=891117141]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -430.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 250.0
+script = ExtResource("202_hud")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/HordeDirectorDebugPanel" unique_id=1143204930]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer" unique_id=964115640]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=268396710]
+layout_mode = 2
+text = "HORDE DIRECTOR - DEBUG"
+
+[node name="StateLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=54493545]
+layout_mode = 2
+text = "État :"
+
+[node name="TimerLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=1661135985]
+layout_mode = 2
+text = "Timer :"
+
+[node name="AliveLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=347032922]
+layout_mode = 2
+text = "Zombies actifs :"
+
+[node name="ZoneLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=1762271420]
+layout_mode = 2
+text = "Zone active :"
+
+[node name="RemainingLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=1371381070]
+layout_mode = 2
+text = "Reste à spawner :"
+
+[node name="EventLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=1140035586]
+layout_mode = 2
+text = "Dernier événement :"
+autowrap_mode = 2
+
+[node name="HintLabel" type="Label" parent="CanvasLayer/HordeDirectorDebugPanel/MarginContainer/VBoxContainer" unique_id=409205528]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DirectorDemoTarget" type="Marker3D" parent="." unique_id=1179689190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72, 7.1, 142)
+
+[node name="TargetDebugMesh" type="CSGSphere3D" parent="DirectorDemoTarget" unique_id=1930269995]
+radius = 1.1
+material = SubResource("StandardMaterial3D_director_target")
+
+[node name="Label3D" type="Label3D" parent="DirectorDemoTarget" unique_id=117912491]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+text = "CIBLE DEBUG
+Utilisée si aucun joueur n'est présent"
+font_size = 40
+outline_size = 10
+
+[node name="ZombieHordeDirector_DEMO" type="Node3D" parent="." unique_id=574520392]
+script = ExtResource("200_director")
+use_placeholder_zombies = false
+placeholder_zombie_scene = ExtResource("203_placeholder")
+zombie_scene = ExtResource("53_pqnt3")
+rest_min_seconds = 12.0
+rest_max_seconds = 22.0
+build_up_seconds = 5.0
+cooldown_seconds = 10.0
+max_alive_zombies = 70
+max_idle_zones_populated_on_ready = 2
+
+[node name="SpawnZones" type="Node3D" parent="ZombieHordeDirector_DEMO" unique_id=1745635484]
+
+[node name="IdleAlreadyPresent_StartRoad" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=663375009 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.85756, 2.3057022, 91.406624)
+script = ExtResource("201_zone")
+zone_label = "IDLE - route de départ"
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=485520966]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_director_idle")
+
+[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=483530924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=1057932797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=228755355]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=517949542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=1392413636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
+
+[node name="IdleAlreadyPresent_BaseStorage" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=890620770 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 80)
+script = ExtResource("201_zone")
+zone_label = "IDLE - base / stockage"
+min_spawn_count = 8
+max_spawn_count = 14
+max_alive_from_zone = 18
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=1112725014]
+size = Vector3(18, 0.12, 14)
+material = SubResource("StandardMaterial3D_director_idle")
+
+[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=333921227]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - base / stockage
+Population placée au lancement.
+Le joueur peut choisir de contourner ou nettoyer."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=592096433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, -4)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=214694524]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -3)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=1793311419]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.801405, 0.20000005, 1.3125763)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=377586767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19859505, 0.20000005, 2.3125763)
+
+[node name="HordeAttack_LeftForest" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=695729265 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 2.0101318, 72)
+script = ExtResource("201_zone")
+zone_label = "HORDE - flanc gauche"
+zone_mode = 1
+min_spawn_count = 12
+max_spawn_count = 22
+max_alive_from_zone = 28
+max_distance_from_target = 140.0
+cooldown_seconds = 55.0
+
+[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=1681902579]
+size = Vector3(20, 0.12, 14)
+material = SubResource("StandardMaterial3D_director_horde")
+
+[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=1059912837]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - flanc gauche
+Spawn dynamique.
+À placer hors champ ou derrière un obstacle."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=2024513183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.2, -4)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=353768218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.2, 5)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=912069366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, -2)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=1919598696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, 4)
+
+[node name="HordeAttack_RoadSide" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=960340302 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2.766817, 100)
+script = ExtResource("201_zone")
+zone_label = "HORDE - route latérale"
+zone_mode = 1
+min_spawn_count = 10
+max_spawn_count = 18
+max_alive_from_zone = 24
+max_distance_from_target = 140.0
+cooldown_seconds = 50.0
+
+[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1912895770]
+size = Vector3(18, 0.12, 12)
+material = SubResource("StandardMaterial3D_director_horde")
+
+[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1681390735]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - route latérale
+Le Director l'utilise pendant BUILD_UP.
+Puis il spawn par salves."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1145035954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1690160488]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=2075963345]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -2)
+
+[node name="MixedCrossing" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=1802921650 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.6224, 4.0951777, 74.810234)
+script = ExtResource("201_zone")
+zone_label = "MIXTE - carrefour"
+zone_mode = 2
+max_spawn_count = 14
+min_distance_from_target = 22.0
+max_distance_from_target = 140.0
+cooldown_seconds = 45.0
+
+[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1763654316]
+size = Vector3(16, 0.12, 16)
+material = SubResource("StandardMaterial3D_director_mixed")
+
+[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1721797232]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "MIXTE - carrefour
+Peut être déjà habité.
+Peut aussi servir de renfort dynamique."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1238467468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=109131698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1600106379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+
+[node name="HordeAttack_EndArea" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=918720470 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 88, 4.6445227, 96)
+script = ExtResource("201_zone")
+zone_label = "HORDE - fin de section"
+zone_mode = 1
+min_spawn_count = 16
+max_spawn_count = 28
+max_alive_from_zone = 34
+min_distance_from_target = 30.0
+max_distance_from_target = 160.0
+cooldown_seconds = 65.0
+
+[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=928804156]
+size = Vector3(24, 0.12, 18)
+material = SubResource("StandardMaterial3D_director_horde")
+
+[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=1806606774]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - fin de section
+Grosse pression avant un passageGate.
+À utiliser avec cooldown long."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=1864776025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=522319440]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=216610861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)
+
+[node name="WorldWeapon3D" parent="." unique_id=2144849267 instance=ExtResource("32_cbrl2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08011818, 0.47831345, 91.05378)
+editor_weapon_id = "smg"
+
+[node name="WorldWeapon3D2" parent="." unique_id=493080299 instance=ExtResource("32_cbrl2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.27911, 0.47831345, 89.061905)
+editor_weapon_id = "smg"
+
+[node name="WorldWeapon3D3" parent="." unique_id=1122983310 instance=ExtResource("32_cbrl2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27910995, 0.47831345, 90.061905)
+editor_weapon_id = "smg"
+
+[node name="WorldWeapon3D4" parent="." unique_id=2051183287 instance=ExtResource("32_cbrl2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.27911, 0.47831345, 91.061905)
+editor_weapon_id = "smg"
+
+[editable path="NavigationRegion3D/01_Forest/plane_noise"]

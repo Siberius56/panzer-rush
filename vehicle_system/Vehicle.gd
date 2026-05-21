@@ -193,6 +193,7 @@ func _ready() -> void:
 	#VehicleState.register_vehicle(self)
 	add_to_group("vehicle")
 	add_to_group("vehicles")
+	_register_self_as_enemy_target()
 	
 	set_multiplayer_authority(1)
 	health = max_health
@@ -2467,8 +2468,32 @@ func _open_loadout_menu_remote() -> void:
 	_open_loadout_menu_local()
 
 
-#func _exit_tree() -> void:
+func _exit_tree() -> void:
+	_unregister_self_as_enemy_target()
 	#VehicleState.unregister_vehicle(self)
+
+
+func _register_self_as_enemy_target() -> void:
+	var target_manager: Node = get_node_or_null("/root/EnemyTargetManager")
+	if target_manager == null:
+		return
+
+	if target_manager.has_method("register_vehicle"):
+		target_manager.call("register_vehicle", self)
+	elif target_manager.has_method("register_target"):
+		target_manager.call("register_target", self)
+
+
+func _unregister_self_as_enemy_target() -> void:
+	var target_manager: Node = get_node_or_null("/root/EnemyTargetManager")
+	if target_manager == null:
+		return
+
+	if target_manager.has_method("unregister_vehicle"):
+		target_manager.call("unregister_vehicle", self)
+	elif target_manager.has_method("unregister_target"):
+		target_manager.call("unregister_target", self)
+
 
 func _get_interactor_for_peer(peer_id: int) -> VehicleInteractor:
 	var player := get_player_node_by_peer_id(peer_id)

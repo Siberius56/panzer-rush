@@ -2680,4 +2680,4 @@ func _on_debug_start_button_up():
 	NetworkManager.set_local_ready(not NetworkManager.is_local_player_ready())
 	
 	if _is_local_host():
-		_network_start_game("res://scenes/game/Mission_01_A_Outpost.tscn")
+		_network_start_game("res://scenes/game/Mission_00_DEV_HordeDirector_Demo.tscn")

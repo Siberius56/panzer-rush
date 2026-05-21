@@ -16,6 +16,8 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
+offset_top = 300.0
+offset_bottom = 300.0
 grow_horizontal = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="Control" unique_id=468451150]

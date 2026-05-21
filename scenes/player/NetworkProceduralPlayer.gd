@@ -358,6 +358,7 @@ func _ready() -> void:
 	ui_input_blocked = false
 	add_to_group("player")
 	add_to_group("players")
+	_register_self_as_enemy_target()
 	health = max_health
 	replicated_position = global_position
 	replicated_velocity = velocity
@@ -387,6 +388,7 @@ func _ready() -> void:
 		_server_sync_team_respawn_lives_state()
 
 func _exit_tree() -> void:
+	_unregister_self_as_enemy_target()
 	if multiplayer.is_server():
 		_server_cancel_revive(false)
 		_server_cancel_revives_targeting(self)
@@ -395,6 +397,28 @@ func _exit_tree() -> void:
 	if hud != null and is_instance_valid(hud):
 		hud.queue_free()
 	hud = null
+
+func _register_self_as_enemy_target() -> void:
+	var target_manager: Node = get_node_or_null("/root/EnemyTargetManager")
+	if target_manager == null:
+		return
+
+	if target_manager.has_method("register_player"):
+		target_manager.call("register_player", self)
+	elif target_manager.has_method("register_target"):
+		target_manager.call("register_target", self)
+
+
+func _unregister_self_as_enemy_target() -> void:
+	var target_manager: Node = get_node_or_null("/root/EnemyTargetManager")
+	if target_manager == null:
+		return
+
+	if target_manager.has_method("unregister_player"):
+		target_manager.call("unregister_player", self)
+	elif target_manager.has_method("unregister_target"):
+		target_manager.call("unregister_target", self)
+
 
 func build_session_state() -> Dictionary:
 	return {

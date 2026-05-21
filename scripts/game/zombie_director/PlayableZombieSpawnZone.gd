@@ -1,0 +1,162 @@
+extends Node3D
+
+# Zone de spawn contrôlée par le HordeDirectorDemo.
+# Usage :
+# - IDLE_PRESENT : zombies déjà présents dans le décor.
+# - HORDE_ATTACK : horde dynamique, hors champ si possible.
+# - MIXED : peut servir aux deux.
+
+class_name PlayableZombieSpawnZone
+
+enum ZoneMode {
+	IDLE_PRESENT,
+	HORDE_ATTACK,
+	MIXED
+}
+
+@export var enabled: bool = true
+@export var zone_label: String = "Spawn Zone"
+@export var zone_mode: ZoneMode = ZoneMode.IDLE_PRESENT
+@export var section_id: int = 0
+
+@export_group("Spawn Count")
+@export var min_spawn_count: int = 6
+@export var max_spawn_count: int = 12
+@export var max_alive_from_zone: int = 20
+
+@export_group("Validation")
+@export var min_distance_from_target: float = 24.0
+@export var max_distance_from_target: float = 120.0
+@export var cooldown_seconds: float = 30.0
+@export var require_not_visible: bool = true
+
+@export_group("Debug")
+@export var show_debug_messages: bool = false
+
+var last_spawn_time_msec: int = -999999999
+var spawned_nodes: Array[Node] = []
+
+
+func _ready() -> void:
+	add_to_group("zombie_spawn_zone")
+	_refresh_debug_label()
+
+
+func can_spawn_idle() -> bool:
+	return zone_mode == ZoneMode.IDLE_PRESENT or zone_mode == ZoneMode.MIXED
+
+
+func can_spawn_attack() -> bool:
+	return zone_mode == ZoneMode.HORDE_ATTACK or zone_mode == ZoneMode.MIXED
+
+
+func get_spawn_points() -> Array[Marker3D]:
+	var result: Array[Marker3D] = []
+	_collect_spawn_points(self, result)
+	return result
+
+
+func is_valid_for_targets(target_positions: Array[Vector3], wants_attack: bool, wanted_section_id: int) -> bool:
+	if not enabled:
+		return false
+
+	if section_id != wanted_section_id:
+		return false
+
+	if wants_attack and not can_spawn_attack():
+		return false
+
+	if not wants_attack and not can_spawn_idle():
+		return false
+
+	if get_alive_spawned_count() >= max_alive_from_zone:
+		return false
+
+	if _is_on_cooldown():
+		return false
+
+	if target_positions.is_empty():
+		return true
+
+	var closest_distance: float = _get_closest_distance_to_targets(target_positions)
+	if closest_distance < min_distance_from_target:
+		return false
+
+	if closest_distance > max_distance_from_target:
+		return false
+
+	return true
+
+
+func register_spawned(node: Node) -> void:
+	if node == null:
+		return
+
+	spawned_nodes.append(node)
+	last_spawn_time_msec = Time.get_ticks_msec()
+
+
+func get_alive_spawned_count() -> int:
+	_cleanup_spawned_nodes()
+	return spawned_nodes.size()
+
+
+func get_mode_text() -> String:
+	if zone_mode == ZoneMode.IDLE_PRESENT:
+		return "Déjà présents"
+	if zone_mode == ZoneMode.HORDE_ATTACK:
+		return "Horde dynamique"
+	return "Mixte"
+
+
+func get_debug_line() -> String:
+	var alive_count: int = get_alive_spawned_count()
+	return "%s | %s | vivants: %d/%d" % [zone_label, get_mode_text(), alive_count, max_alive_from_zone]
+
+
+func mark_used_now() -> void:
+	last_spawn_time_msec = Time.get_ticks_msec()
+
+
+func _collect_spawn_points(root: Node, result: Array[Marker3D]) -> void:
+	for child in root.get_children():
+		if child is Marker3D:
+			result.append(child as Marker3D)
+		_collect_spawn_points(child, result)
+
+
+func _is_on_cooldown() -> bool:
+	if last_spawn_time_msec < 0:
+		return false
+
+	var elapsed_seconds: float = float(Time.get_ticks_msec() - last_spawn_time_msec) / 1000.0
+	return elapsed_seconds < cooldown_seconds
+
+
+func _get_closest_distance_to_targets(target_positions: Array[Vector3]) -> float:
+	var closest_distance: float = 999999.0
+
+	for target_position in target_positions:
+		var distance: float = global_position.distance_to(target_position)
+		if distance < closest_distance:
+			closest_distance = distance
+
+	return closest_distance
+
+
+func _cleanup_spawned_nodes() -> void:
+	var cleaned: Array[Node] = []
+
+	for node in spawned_nodes:
+		if node != null and is_instance_valid(node) and node.is_inside_tree():
+			cleaned.append(node)
+
+	spawned_nodes = cleaned
+
+
+func _refresh_debug_label() -> void:
+	var label: Label3D = get_node_or_null("Label3D") as Label3D
+	if label == null:
+		return
+
+	label.text = "%s\n%s" % [zone_label, get_mode_text()]

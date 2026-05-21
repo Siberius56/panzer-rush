@@ -22,7 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://df7aw0t7aro8r" path="res://asset/map/misc-2/patch-grass.glb" id="11_a60k3"]
 [ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="12_fgnw7"]
 [ext_resource type="PackedScene" uid="uid://d2xh1lt8ew0om" path="res://scenes/loot/MoneyPickup.tscn" id="13_cgyej"]
-[ext_resource type="PackedScene" uid="uid://bd78wreowete4" path="res://scenes/enemies/NetworkProceduralEnemy.tscn" id="14_46sg2"]
+[ext_resource type="PackedScene" uid="uid://bd78wreowete4" path="res://scenes/enemies/NetworkZombieEnemy.tscn" id="14_46sg2"]
 [ext_resource type="PackedScene" uid="uid://c5ygqspl4bdcl" path="res://scenes/props/Tree_Pine_Short.tscn" id="14_766cl"]
 [ext_resource type="PackedScene" uid="uid://dcjlkduw3fqua" path="res://scenes/props/Tree_Pine_Tall.tscn" id="15_766cl"]
 [ext_resource type="PackedScene" uid="uid://cd0kjlhtx6hth" path="res://asset/map/misc-2/rock-sand-a.glb" id="16_54q8m"]
@@ -1520,7 +1520,7 @@ transform = Transform3D(0.9907455, 0, -0.13573286, 0, 1, 0, 0.13573286, 0, 0.990
 [node name="plane_noise" parent="NavigationRegion3D/01_Forest" unique_id=1139489821 instance=ExtResource("9_ng107")]
 transform = Transform3D(0.5, 0, 0, 0, 0.49999997, 0, 0, 0, 0.49999997, 0, -1.4414434, 66.809)
 
-[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=202957429]
+[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=264337654]
 transform = Transform3D(20, 0, 0, 0, 2, 9.9341065e-08, 0, -3.9736427e-08, 5, 0, 0, 0)
 surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
 
@@ -2791,13 +2791,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.586334, 13.113457, 107.55
 [node name="crate-wide2" parent="NavigationRegion3D/01_Forest" unique_id=293644643 instance=ExtResource("54_kn2yd")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 9.262159, 0.52000195, 78.08208)
 
-[node name="crate-wide" parent="NavigationRegion3D/01_Forest/crate-wide2" index="0" unique_id=524523357]
+[node name="crate-wide" parent="NavigationRegion3D/01_Forest/crate-wide2" index="0" unique_id=541943120]
 transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, 1.0214272, 0, -1.6236267)
 
-[node name="lid" parent="NavigationRegion3D/01_Forest/crate-wide2/crate-wide" index="0" unique_id=1331873250]
+[node name="lid" parent="NavigationRegion3D/01_Forest/crate-wide2/crate-wide" index="0" unique_id=766874207]
 transform = Transform3D(-0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, 0, 0, 0, 1, 0.25, 0.19, -5.4143357e-16)
 
-[node name="AnimationPlayer" parent="NavigationRegion3D/01_Forest/crate-wide2" index="1" unique_id=716209920]
+[node name="AnimationPlayer" parent="NavigationRegion3D/01_Forest/crate-wide2" index="1" unique_id=1253150416]
 autoplay = &"open"
 
 [node name="WorldWeapon3D_Gravity1" parent="NavigationRegion3D/01_Forest" unique_id=868807627 instance=ExtResource("12_fgnw7")]
@@ -2813,13 +2813,13 @@ editor_weapon_id = "gravity_gun"
 [node name="crate-wide3" parent="NavigationRegion3D/01_Forest" unique_id=1680618173 instance=ExtResource("54_kn2yd")]
 transform = Transform3D(1.6779872, 0, 1.0882826, 0, 2, 0, -1.0882826, 0, 1.6779872, 3.5951314, -2.5477376, 38.60266)
 
-[node name="crate-wide" parent="NavigationRegion3D/01_Forest/crate-wide3" index="0" unique_id=524523357]
+[node name="crate-wide" parent="NavigationRegion3D/01_Forest/crate-wide3" index="0" unique_id=541943120]
 transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, 1.0214272, 0, -1.6236267)
 
-[node name="lid" parent="NavigationRegion3D/01_Forest/crate-wide3/crate-wide" index="0" unique_id=1331873250]
+[node name="lid" parent="NavigationRegion3D/01_Forest/crate-wide3/crate-wide" index="0" unique_id=766874207]
 transform = Transform3D(-0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, 0, 0, 0, 1, 0.25, 0.19, -5.4143357e-16)
 
-[node name="AnimationPlayer" parent="NavigationRegion3D/01_Forest/crate-wide3" index="1" unique_id=716209920]
+[node name="AnimationPlayer" parent="NavigationRegion3D/01_Forest/crate-wide3" index="1" unique_id=1253150416]
 autoplay = &"open"
 
 [node name="WorldWeapon3D_Gravity3" parent="NavigationRegion3D/01_Forest" unique_id=347110202 instance=ExtResource("12_fgnw7")]
@@ -4239,7 +4239,7 @@ transform = Transform3D(-5.530205, 0, 2.3274095, 0, 6.000002, 0, -2.3274095, 0, 
 [node name="plane_noise" parent="NavigationRegion3D/02_Coast/Water" unique_id=341765422 instance=ExtResource("9_ng107")]
 transform = Transform3D(-2.1855694e-08, -0.12940952, -0.4829629, 0, 0.48296297, -0.12940954, 0.50000006, -5.6566702e-09, -2.1110981e-08, -24.527428, -5.3589387, 6.5742035)
 
-[node name="Plane" parent="NavigationRegion3D/02_Coast/Water/plane_noise" index="0" unique_id=202957429]
+[node name="Plane" parent="NavigationRegion3D/02_Coast/Water/plane_noise" index="0" unique_id=264337654]
 transform = Transform3D(16, 1.5987213e-14, -6.3948846e-14, -8.526513e-14, 3, 1.1920932e-07, 1.7053026e-13, -5.960466e-08, 6, -1.0867615, -2.089893, -3.576294)
 surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
 
@@ -4251,7 +4251,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
 [node name="plane_noise2" parent="NavigationRegion3D/02_Coast/Water" unique_id=79717628 instance=ExtResource("9_ng107")]
 transform = Transform3D(-2.111098e-08, 2.9802322e-08, -0.4999999, 5.65667e-09, 0.5, -1.4901161e-08, 0.5, -5.6566702e-09, -2.1110981e-08, 12.342598, -5.3589463, -23.752121)
 
-[node name="Plane" parent="NavigationRegion3D/02_Coast/Water/plane_noise2" index="0" unique_id=202957429]
+[node name="Plane" parent="NavigationRegion3D/02_Coast/Water/plane_noise2" index="0" unique_id=264337654]
 transform = Transform3D(30, 1.0658141e-13, -1.0658141e-13, -1.0658141e-13, 30, 5.960465e-07, 1.0658141e-13, -5.960465e-07, 30, 28.913239, -2.0013542, -10.868469)
 surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
 
