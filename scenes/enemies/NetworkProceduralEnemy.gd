@@ -76,6 +76,9 @@ enum EnemyState {
 @export_range(0.2, 6.0, 0.1) var enemy_separation_y_tolerance: float = 1.8
 @export_range(1.0, 12.0, 0.25) var enemy_grid_cell_size: float = 4.0
 
+@export_group("Transport Spawn")
+@export_range(0.05, 1.0, 0.01) var transport_spawn_reach_distance: float = 0.25
+
 @export_group("Attack")
 @export var is_melee_attack: bool = false
 @export var aim_height: float = 1.1
@@ -217,9 +220,14 @@ var _visual_root_base_rotation: Vector3 = Vector3.ZERO
 static var _enemy_spatial_grid: Dictionary = {}
 
 var _scan_frame_offset: int = 0
+var _cached_attack_line_of_sight: bool = true
+var _cached_attack_line_of_sight_target_id: int = -1
 var _enemy_grid_cell: Vector2i = Vector2i(2147483647, 2147483647)
 var _registered_in_enemy_grid: bool = false
 var _enemy_separation_velocity: Vector3 = Vector3.ZERO
+var _transport_spawn_deployment_active: bool = false
+var _transport_spawn_deployment_target: Vector3 = Vector3.ZERO
+var _transport_spawn_deployment_time_remaining: float = 0.0
 
 var _network_zone_active: bool = true
 var _network_zone_saved_process_mode: int = Node.PROCESS_MODE_INHERIT
@@ -317,6 +325,37 @@ func is_network_zone_active() -> bool:
 	return _network_zone_active
 
 
+func configure_transport_spawn(
+	spawn_origin_position: Vector3,
+	deployment_target_position: Vector3,
+	deployment_duration: float,
+	attack_lock_duration: float
+) -> void:
+	var resolved_origin_position: Vector3 = deployment_target_position
+	if deployment_target_position.distance_squared_to(spawn_origin_position) <= 0.0001:
+		resolved_origin_position = spawn_origin_position
+
+	_origin_position = resolved_origin_position
+	_last_known_target_position = global_position
+	_has_last_known_target_position = false
+	current_target = null
+	detected_targets.clear()
+	detection_zone_targets.clear()
+	forced_alert = false
+	_reset_attack_line_of_sight_cache()
+	_clear_navigation_target()
+
+	_transport_spawn_deployment_target = deployment_target_position
+	_transport_spawn_deployment_time_remaining = maxf(0.0, deployment_duration)
+	_transport_spawn_deployment_active = _transport_spawn_deployment_time_remaining > 0.0 and _planar_distance_to(deployment_target_position) > transport_spawn_reach_distance
+
+	attack_timer = maxf(attack_timer, attack_lock_duration)
+	aim_target_position = deployment_target_position + Vector3.UP * aim_height
+	last_valid_aim_target_position = aim_target_position
+	replicated_aim_target_position = aim_target_position
+	_set_state(EnemyState.INVESTIGATE)
+
+
 func _apply_network_zone_inactive_state() -> void:
 	_network_zone_active = false
 	_network_zone_saved_process_mode = int(process_mode)
@@ -332,11 +371,14 @@ func _apply_network_zone_inactive_state() -> void:
 		_registered_in_enemy_grid = false
 
 	current_target = null
+	_reset_attack_line_of_sight_cache()
 	detection_zone_targets.clear()
 	detected_targets.clear()
 	forced_alert = false
 	_has_last_known_target_position = false
 	_enemy_separation_velocity = Vector3.ZERO
+	_transport_spawn_deployment_active = false
+	_transport_spawn_deployment_time_remaining = 0.0
 	vehicle_impact_timer = 0.0
 	vehicle_impact_velocity = Vector3.ZERO
 	vehicle_impact_source = null
@@ -476,6 +518,12 @@ func _server_update(delta: float) -> void:
 
 	_apply_gravity(delta)
 
+	if _process_transport_spawn_deployment(delta):
+		move_and_slide()
+		_update_enemy_procedural_animation(delta)
+		_send_server_state(delta)
+		return
+
 	if _process_vehicle_impact_stun(delta):
 		move_and_slide()
 		_update_idle_aim_target()
@@ -507,13 +555,51 @@ func _server_update(delta: float) -> void:
 			if target_id != _last_debug_target_id:
 				_last_debug_target_id = target_id
 				_debug("new combat target: %s" % combat_target.name)
-			_handle_combat_state(combat_target)
+			_handle_combat_state(combat_target, should_run_scheduled_scan)
 
 	_apply_enemy_separation(delta)
 	move_and_slide()
 	_update_enemy_procedural_animation(delta)
 	_send_server_state(delta)
 
+
+func _process_transport_spawn_deployment(delta: float) -> bool:
+	if not _transport_spawn_deployment_active:
+		return false
+
+	_transport_spawn_deployment_time_remaining -= delta
+	_set_state(EnemyState.INVESTIGATE)
+	current_target = null
+	forced_alert = false
+	_has_last_known_target_position = false
+	_reset_attack_line_of_sight_cache()
+	aim_target_position = _transport_spawn_deployment_target + Vector3.UP * aim_height
+	last_valid_aim_target_position = aim_target_position
+
+	var to_target: Vector3 = _transport_spawn_deployment_target - global_position
+	to_target.y = 0.0
+	var planar_distance: float = to_target.length()
+
+	if planar_distance <= transport_spawn_reach_distance or _transport_spawn_deployment_time_remaining <= 0.0:
+		_transport_spawn_deployment_active = false
+		global_position.x = _transport_spawn_deployment_target.x
+		global_position.z = _transport_spawn_deployment_target.z
+		velocity.x = 0.0
+		velocity.z = 0.0
+		_origin_position = _transport_spawn_deployment_target
+		_clear_navigation_target()
+		_seed_detection_targets_from_current_overlaps()
+		return true
+
+	var direction: Vector3 = to_target.normalized()
+	var deployment_speed: float = move_speed
+	if _transport_spawn_deployment_time_remaining > 0.0:
+		deployment_speed = maxf(move_speed, planar_distance / maxf(_transport_spawn_deployment_time_remaining, 0.05))
+	velocity.x = direction.x * deployment_speed
+	velocity.z = direction.z * deployment_speed
+	_face_target(global_position + direction)
+	_clear_navigation_target()
+	return true
 
 
 func _configure_scan_schedule() -> void:
@@ -728,6 +814,7 @@ func apply_vehicle_push(push_velocity: Vector3, source: Node = null) -> void:
 
 	if vehicle_impact_clear_target_on_hit:
 		current_target = null
+		_reset_attack_line_of_sight_cache()
 		_has_last_known_target_position = false
 
 	_debug("vehicle push: velocity=%s source=%s" % [str(vehicle_impact_velocity), source.name if source != null else "null"])
@@ -839,14 +926,14 @@ func _handle_return_to_origin_or_idle() -> void:
 		_clear_navigation_target()
 
 
-func _handle_combat_state(combat_target: Node3D) -> void:
+func _handle_combat_state(combat_target: Node3D, should_run_scheduled_scan: bool) -> void:
 	var target_point: Vector3 = _get_target_aim_point(combat_target)
 	aim_target_position = target_point
 	last_valid_aim_target_position = target_point
 	var distance: float = global_position.distance_to(combat_target.global_position)
 	var has_los: bool = true
 	if attack_requires_line_of_sight:
-		has_los = _has_line_of_sight(combat_target, target_point)
+		has_los = _get_scheduled_attack_line_of_sight(combat_target, target_point, should_run_scheduled_scan)
 	var desired_attack_range: float = attack_range if not is_melee_attack else minf(attack_range, 1.8)
 
 	_face_target(target_point)
@@ -1043,12 +1130,31 @@ func _find_nearest_target(max_distance: float = INF) -> Node3D:
 func _validate_current_target() -> void:
 	if not _is_valid_target(current_target):
 		current_target = null
+		_reset_attack_line_of_sight_cache()
 		return
 
 	var distance := global_position.distance_to(current_target.global_position)
 	if distance > max_target_distance:
 		_debug("target too far, reset")
 		current_target = null
+		_reset_attack_line_of_sight_cache()
+
+
+func _seed_detection_targets_from_current_overlaps() -> void:
+	if detection_area == null:
+		return
+
+	var overlapping_bodies: Array = detection_area.get_overlapping_bodies()
+	for body in overlapping_bodies:
+		var target: Node3D = _resolve_detected_target(body)
+		if not _is_valid_target(target):
+			continue
+
+		if not detection_zone_targets.has(target):
+			detection_zone_targets.append(target)
+
+		if _can_detect_target(target) and not detected_targets.has(target):
+			detected_targets.append(target)
 
 
 func _cleanup_detection_zone_targets() -> void:
@@ -1076,6 +1182,7 @@ func _refresh_visible_detected_targets() -> void:
 			_has_last_known_target_position = true
 			_debug("current target lost detection line of sight, last known=%s" % str(_last_known_target_position))
 		current_target = null
+		_reset_attack_line_of_sight_cache()
 		_clear_navigation_target()
 
 
@@ -1133,6 +1240,7 @@ func _clear_current_target_preserve_memory() -> void:
 		_last_known_target_position = current_target.global_position
 		_has_last_known_target_position = true
 	current_target = null
+	_reset_attack_line_of_sight_cache()
 
 
 func _clear_navigation_target() -> void:
@@ -1207,6 +1315,27 @@ func _apply_aim_dispersion(direction: Vector3) -> Vector3:
 	dir = dir.rotated(Vector3.UP, yaw_offset)
 	dir = dir.rotated(right, pitch_offset)
 	return dir.normalized()
+
+
+func _get_scheduled_attack_line_of_sight(combat_target: Node3D, target_point: Vector3, should_run_scheduled_scan: bool) -> bool:
+	if combat_target == null or not is_instance_valid(combat_target):
+		_reset_attack_line_of_sight_cache()
+		return false
+
+	var target_id: int = combat_target.get_instance_id()
+	var target_changed: bool = target_id != _cached_attack_line_of_sight_target_id
+	if target_changed:
+		_cached_attack_line_of_sight_target_id = target_id
+
+	if target_changed or should_run_scheduled_scan:
+		_cached_attack_line_of_sight = _has_line_of_sight(combat_target, target_point)
+
+	return _cached_attack_line_of_sight
+
+
+func _reset_attack_line_of_sight_cache() -> void:
+	_cached_attack_line_of_sight = true
+	_cached_attack_line_of_sight_target_id = -1
 
 
 func _has_line_of_sight(target_body: Node3D, target_point: Vector3) -> bool:
@@ -1555,6 +1684,7 @@ func set_alert_mode(enabled: bool = true) -> void:
 			_set_state(EnemyState.CHASE)
 	else:
 		current_target = null
+		_reset_attack_line_of_sight_cache()
 		_set_state(EnemyState.IDLE)
 
 
@@ -1977,6 +2107,7 @@ func _on_detection_body_exited(body: Node) -> void:
 		_has_last_known_target_position = true
 		_debug("current target exited detection, last known=%s" % str(_last_known_target_position))
 		current_target = null
+		_reset_attack_line_of_sight_cache()
 		_clear_navigation_target()
 
 

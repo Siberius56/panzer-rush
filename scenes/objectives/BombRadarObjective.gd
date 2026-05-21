@@ -3,12 +3,20 @@ class_name BombRadarObjective
 
 signal armed_state_changed(is_armed: bool, remaining_seconds: float)
 signal destroyed_state_changed(is_destroyed: bool)
+signal objective_registered(objective_id: String, objective_text: String)
+signal objective_completed(objective_id: String)
+signal objectif_completed(objective_id: String)
 
 const DEFAULT_EXPLOSION_SCENE := preload("res://scenes/weapons/ProjectileExplosion.tscn")
 
 @export_group("Objective")
 @export var activation_duration: float = 5.0
 @export var consume_bomb_on_success: bool = true
+
+@export_group("HUD Objective")
+@export var objective_id: String = ""
+@export_multiline var objective_text: String = "Détruire le radar pour permettre l’accès au support aérien."
+@export var register_objective_on_ready: bool = true
 
 @export_group("Explosion")
 @export var explosion_scene: PackedScene = DEFAULT_EXPLOSION_SCENE
@@ -27,10 +35,14 @@ var is_destroyed: bool = false
 var _is_armed: bool = false
 var _remaining_seconds: float = 0.0
 var _tracked_bomb: WorldWeapon3D = null
+var _resolved_objective_id: String = ""
+var _objective_completion_notified: bool = false
 
 
 func _ready() -> void:
 	add_to_group("objective_radar")
+	add_to_group("objective_providers")
+	_resolved_objective_id = _build_objective_id()
 	_remaining_seconds = activation_duration
 
 	if activation_area != null:
@@ -39,6 +51,51 @@ func _ready() -> void:
 		call_deferred("_scan_initial_overlaps")
 
 	_update_countdown_label()
+
+	if register_objective_on_ready:
+		call_deferred("_notify_objective_registered")
+
+
+
+func _build_objective_id() -> String:
+	var clean_id: String = objective_id.strip_edges()
+	if not clean_id.is_empty():
+		return clean_id
+
+	var path_id: String = str(get_path()).replace("/", "_").replace(":", "_")
+	return "%s_%s" % [name, path_id]
+
+
+func get_objective_id() -> String:
+	if _resolved_objective_id.is_empty():
+		_resolved_objective_id = _build_objective_id()
+	return _resolved_objective_id
+
+
+func send_objective_to_hud(hud: Node) -> void:
+	if hud == null or not is_instance_valid(hud):
+		return
+	if not hud.has_method("register_objective"):
+		return
+
+	hud.call("register_objective", get_objective_id(), objective_text, is_destroyed)
+
+
+func _notify_objective_registered() -> void:
+	var id: String = get_objective_id()
+	objective_registered.emit(id, objective_text)
+	get_tree().call_group("player_huds", "register_objective", id, objective_text, is_destroyed)
+
+
+func _notify_objective_completed() -> void:
+	if _objective_completion_notified:
+		return
+
+	_objective_completion_notified = true
+	var id: String = get_objective_id()
+	objective_completed.emit(id)
+	objectif_completed.emit(id)
+	get_tree().call_group("player_huds", "complete_objective", id)
 
 
 func _process(delta: float) -> void:
@@ -224,6 +281,7 @@ func _receive_destroyed_state(value: bool) -> void:
 	_tracked_bomb = null
 	if is_destroyed:
 		_play_dead_animation()
+		_notify_objective_completed()
 
 	_update_countdown_label()
 	destroyed_state_changed.emit(is_destroyed)

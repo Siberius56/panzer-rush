@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/cinematic/CinematicNode.gd" id="1_script"]
+
+[sub_resource type="Animation" id="Animation_reset"]
+resource_name = "RESET"
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_cinematic"]
+resource_name = "cinematic"
+length = 3.0
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_default"]
+_data = {
+&"RESET": SubResource("Animation_reset"),
+&"cinematic": SubResource("Animation_cinematic")
+}
+
+[node name="CinematicNode" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="CinematicCamera" type="Camera3D" parent="." unique_id=2000000001]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 8, 8)
+fov = 55.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2000000002]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_default")
+
+[node name="TransitionCanvasLayer" type="CanvasLayer" parent="." unique_id=2000000003]
+layer = 120
+
+[node name="FadeRect" type="ColorRect" parent="TransitionCanvasLayer" unique_id=2000000004]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

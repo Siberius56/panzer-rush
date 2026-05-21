@@ -365,6 +365,45 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
+
+[node name="ObjectivesPanel" type="PanelContainer" parent="Root" unique_id=1928405101]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 1
+offset_left = 30.0
+offset_top = 288.0
+offset_right = 430.0
+offset_bottom = 348.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_22eb1")
+
+[node name="ObjectivesMargin" type="MarginContainer" parent="Root/ObjectivesPanel" unique_id=1928405102]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="ObjectivesVBox" type="VBoxContainer" parent="Root/ObjectivesPanel/ObjectivesMargin" unique_id=1928405103]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ObjectivesTitleLabel" type="Label" parent="Root/ObjectivesPanel/ObjectivesMargin/ObjectivesVBox" unique_id=1928405104]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Objectifs :"
+
+[node name="ObjectivesRichTextLabel" type="RichTextLabel" parent="Root/ObjectivesPanel/ObjectivesMargin/ObjectivesVBox" unique_id=1928405105]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = ""
+fit_content = true
+scroll_active = false
+
 [node name="CommonPanel" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=1010767737]
 visible = false
 custom_minimum_size = Vector2(320, 0)

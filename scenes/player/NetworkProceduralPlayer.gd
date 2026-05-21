@@ -229,6 +229,7 @@ var procedural_animation_grounded: bool = true
 var procedural_animation_moving: bool = false
 
 var ui_input_blocked: bool = false
+var cinematic_invulnerability_locks: int = 0
 var gravity_gun_external_velocity: Vector3 = Vector3.ZERO
 
 var weapon_slots := [{}, {}]
@@ -291,6 +292,40 @@ func set_ui_input_blocked(active: bool) -> void:
 	ui_input_blocked = active
 	if active:
 		velocity = Vector3.ZERO
+
+
+func set_cinematic_invulnerable(active: bool) -> void:
+	if active:
+		cinematic_invulnerability_locks += 1
+	else:
+		cinematic_invulnerability_locks = maxi(cinematic_invulnerability_locks - 1, 0)
+
+	var is_active: bool = cinematic_invulnerability_locks > 0
+	set_meta("cinematic_invulnerable", is_active)
+
+	if is_active:
+		_reset_fall_damage_tracking()
+
+
+func is_cinematic_invulnerable() -> bool:
+	if cinematic_invulnerability_locks > 0:
+		return true
+
+	if has_meta("cinematic_invulnerable"):
+		return bool(get_meta("cinematic_invulnerable"))
+
+	return false
+
+
+func _can_receive_damage() -> bool:
+	if is_dead:
+		return false
+	if is_cinematic_invulnerable():
+		return false
+	if _is_server_respawn_protected():
+		return false
+
+	return true
 
 func _ready() -> void:
 	
@@ -650,7 +685,7 @@ func _reset_fall_damage_tracking() -> void:
 	_fall_lowest_velocity_y = 0.0
 
 func _update_fall_damage_tracking_before_move() -> void:
-	if not fall_damage_enabled or is_dead or is_in_vehicle():
+	if not fall_damage_enabled or is_dead or is_in_vehicle() or is_cinematic_invulnerable():
 		_reset_fall_damage_tracking()
 		return
 
@@ -658,7 +693,7 @@ func _update_fall_damage_tracking_before_move() -> void:
 		_fall_lowest_velocity_y = min(_fall_lowest_velocity_y, velocity.y)
 
 func _update_fall_damage_tracking_after_move() -> void:
-	if not fall_damage_enabled or is_dead or is_in_vehicle():
+	if not fall_damage_enabled or is_dead or is_in_vehicle() or is_cinematic_invulnerable():
 		_reset_fall_damage_tracking()
 		return
 
@@ -689,7 +724,7 @@ func _update_fall_damage_tracking_after_move() -> void:
 	_report_fall_damage_to_server(fall_damage, fall_height, impact_speed)
 
 func _get_fall_damage(fall_height: float, impact_speed: float) -> int:
-	if not fall_damage_enabled:
+	if not fall_damage_enabled or is_cinematic_invulnerable():
 		return 0
 	if impact_speed < fall_min_impact_speed:
 		return 0
@@ -719,6 +754,8 @@ func _get_fall_damage(fall_height: float, impact_speed: float) -> int:
 
 func _report_fall_damage_to_server(fall_damage: int, fall_height: float, impact_speed: float) -> void:
 	if fall_damage <= 0:
+		return
+	if is_cinematic_invulnerable():
 		return
 
 	if multiplayer.is_server():
@@ -2194,11 +2231,9 @@ func _apply_replicated_state(delta: float) -> void:
 func apply_damage(amount: int, damage_source: Node = null) -> void:
 	if not multiplayer.is_server():
 		return
-	if is_dead:
-		return
 	if amount <= 0:
 		return
-	if _is_server_respawn_protected():
+	if not _can_receive_damage():
 		return
 
 	_server_cancel_revive(true)
@@ -2220,7 +2255,7 @@ func apply_projectile_damage(
 ) -> void:
 	if not multiplayer.is_server():
 		return
-	if is_dead:
+	if not _can_receive_damage():
 		return
 
 	var effective_armor = max(armor_rating - to_projectile_penetration, 0)

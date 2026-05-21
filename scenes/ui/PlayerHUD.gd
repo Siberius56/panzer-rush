@@ -116,6 +116,8 @@ var _weapon_slot_equipped_style: StyleBoxFlat = null
 @onready var aim_target_reticle: TextureRect = get_node_or_null("%AimTargetReticle") as TextureRect
 @onready var vehicle_turret_reticle: TextureRect = get_node_or_null("%VehicleTurretReticle") as TextureRect
 @onready var damage_feedback_overlay: ColorRect = get_node_or_null("%DamageFeedbackOverlay") as ColorRect
+@onready var objectives_panel: PanelContainer = get_node_or_null("%ObjectivesPanel") as PanelContainer
+@onready var objectives_rich_text_label: RichTextLabel = get_node_or_null("%ObjectivesRichTextLabel") as RichTextLabel
 var respawn_pending: bool = false
 var _name_marker_labels: Dictionary = {}
 var _vehicle_name_marker: Control = null
@@ -124,6 +126,8 @@ var _passage_prompt_owner_id: int = 0
 var _repair_target: Node = null
 var _repair_target_hide_timer: float = 0.0
 var _damage_feedback_tween: Tween = null
+var _objectives: Dictionary = {}
+var _objective_order: Array[String] = []
 
 const SELF_COLOR := "#7CFF7C"
 const EMPTY_SEAT_TEXT := "Libre"
@@ -154,6 +158,8 @@ func _ready() -> void:
 	_configure_death_overlay_input()
 	_configure_aim_feedback_nodes()
 	_configure_damage_feedback_nodes()
+	_configure_objective_nodes()
+	call_deferred("_scan_existing_objective_providers")
 
 	if not respawn_button.pressed.is_connected(_on_respawn_button_pressed):
 		respawn_button.pressed.connect(_on_respawn_button_pressed)
@@ -283,6 +289,115 @@ func _configure_reticle_node(reticle: TextureRect, reticle_size: Vector2) -> voi
 	reticle.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	reticle.size = reticle_size
 	reticle.pivot_offset = reticle_size * 0.5
+
+
+func _configure_objective_nodes() -> void:
+	if objectives_panel != null:
+		objectives_panel.visible = false
+		objectives_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	if objectives_rich_text_label != null:
+		objectives_rich_text_label.bbcode_enabled = true
+		objectives_rich_text_label.fit_content = true
+		objectives_rich_text_label.scroll_active = false
+		objectives_rich_text_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	_refresh_objectives_ui()
+
+
+func _scan_existing_objective_providers() -> void:
+	var providers: Array[Node] = get_tree().get_nodes_in_group("objective_providers")
+	for provider: Node in providers:
+		if provider == null or not is_instance_valid(provider):
+			continue
+		if provider.has_method("send_objective_to_hud"):
+			provider.call("send_objective_to_hud", self)
+
+
+func register_objective(objective_id: String, objective_text: String, completed: bool = false) -> void:
+	var clean_id: String = objective_id.strip_edges()
+	var clean_text: String = objective_text.strip_edges()
+	if clean_id.is_empty() or clean_text.is_empty():
+		return
+
+	if not _objectives.has(clean_id):
+		_objective_order.append(clean_id)
+
+	var previous_data: Dictionary = _objectives.get(clean_id, {})
+	var is_completed: bool = completed or bool(previous_data.get("completed", false))
+	_objectives[clean_id] = {
+		"text": clean_text,
+		"completed": is_completed,
+	}
+
+	_refresh_objectives_ui()
+
+
+func complete_objective(objective_id: String) -> void:
+	var clean_id: String = objective_id.strip_edges()
+	if clean_id.is_empty():
+		return
+
+	if not _objectives.has(clean_id):
+		_objective_order.append(clean_id)
+		_objectives[clean_id] = {
+			"text": clean_id,
+			"completed": true,
+		}
+	else:
+		var data: Dictionary = _objectives[clean_id]
+		data["completed"] = true
+		_objectives[clean_id] = data
+
+	_refresh_objectives_ui()
+
+
+func remove_objective(objective_id: String) -> void:
+	var clean_id: String = objective_id.strip_edges()
+	if clean_id.is_empty():
+		return
+
+	_objectives.erase(clean_id)
+	_objective_order.erase(clean_id)
+	_refresh_objectives_ui()
+
+
+func clear_objectives() -> void:
+	_objectives.clear()
+	_objective_order.clear()
+	_refresh_objectives_ui()
+
+
+func _refresh_objectives_ui() -> void:
+	if objectives_panel == null or objectives_rich_text_label == null:
+		return
+
+	var lines: Array[String] = []
+	for objective_id: String in _objective_order:
+		if not _objectives.has(objective_id):
+			continue
+
+		var data: Dictionary = _objectives[objective_id]
+		var text: String = _escape_objective_bbcode(str(data.get("text", "")))
+		var completed: bool = bool(data.get("completed", false))
+		if text.is_empty():
+			continue
+
+		if completed:
+			lines.append("☑ [s]%s[/s]" % text)
+		else:
+			lines.append("☐ %s" % text)
+
+	objectives_panel.visible = not lines.is_empty()
+	objectives_rich_text_label.text = "\n".join(lines)
+
+
+func _escape_objective_bbcode(text: String) -> String:
+	var escaped: String = text.replace("[", "").replace("]", "")
+	escaped = escaped.replace("", "[lb]")
+	escaped = escaped.replace("", "[rb]")
+	return escaped
+
 
 func _configure_damage_feedback_nodes() -> void:
 	if damage_feedback_overlay == null:

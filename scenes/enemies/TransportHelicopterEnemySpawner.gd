@@ -40,6 +40,12 @@ enum FlightState {
 @export var rocket_unit_scene_path: String = "res://scenes/enemies/NetworkRocketEnemy.tscn"
 @export var spawn_grid_columns: int = 4
 @export var spawn_grid_spacing: float = 2.5
+@export_range(0.0, 2.0, 0.05) var spawn_unit_interval: float = 0.25
+@export_range(0.0, 8.0, 0.1) var deployment_min_distance: float = 2.0
+@export_range(0.0, 8.0, 0.1) var deployment_max_distance: float = 3.0
+@export_range(0.0, 3.0, 0.05) var deployment_move_duration: float = 0.75
+@export_range(0.0, 3.0, 0.05) var deployment_attack_lock_duration: float = 0.65
+@export var spawn_ground_offset: float = 0.08
 
 @export_group("Node Paths")
 @export var body_root_path: NodePath = ^"Body"
@@ -51,6 +57,7 @@ var _state: int = FlightState.FLY_TO_DESTINATION
 var _state_time: float = 0.0
 var _sync_accumulator: float = 0.0
 var _units_spawned: bool = false
+var _unit_spawn_sequence_active: bool = false
 var _setup_done: bool = false
 var _current_horizontal_speed: float = 0.0
 var _unit_sequence: int = 1
@@ -89,6 +96,7 @@ func setup_transport_helicopter(
 	_state = FlightState.FLY_TO_DESTINATION
 	_state_time = 0.0
 	_units_spawned = false
+	_unit_spawn_sequence_active = false
 
 	_face_horizontal_target(destination_position)
 
@@ -142,16 +150,16 @@ func _process_descending(delta: float) -> void:
 
 	if _descend_to_ground(delta):
 		_set_state(FlightState.UNLOADING)
-		_spawn_units_once()
+		_start_spawn_units_once()
 
 
 func _process_unloading(_delta: float) -> void:
 	_current_horizontal_speed = 0.0
 
-	if not _units_spawned:
-		_spawn_units_once()
+	if not _units_spawned and not _unit_spawn_sequence_active:
+		_start_spawn_units_once()
 
-	if _state_time >= unload_duration:
+	if _units_spawned and not _unit_spawn_sequence_active and _state_time >= unload_duration:
 		_set_state(FlightState.TAKEOFF_TURN)
 
 
@@ -292,12 +300,16 @@ func _set_state(new_state: int) -> void:
 	_state_time = 0.0
 
 
-func _spawn_units_once() -> void:
-	if _units_spawned:
+func _start_spawn_units_once() -> void:
+	if _units_spawned or _unit_spawn_sequence_active:
 		return
 
 	_units_spawned = true
+	_unit_spawn_sequence_active = true
+	_spawn_units_sequence()
 
+
+func _spawn_units_sequence() -> void:
 	var entries: Array[Dictionary] = _get_unit_entries_for_set(unit_set_id)
 	var total_count: int = _get_total_unit_count(entries)
 	var spawn_index: int = 0
@@ -307,17 +319,43 @@ func _spawn_units_once() -> void:
 		var count: int = int(entry.get("count", 1))
 
 		for local_index in range(count):
+			if not is_inside_tree() or _despawn_requested:
+				_unit_spawn_sequence_active = false
+				return
+
 			var unit_name: String = "%s_Unit_%02d" % [name, spawn_index]
 			var unit_transform: Transform3D = _get_unit_spawn_transform(spawn_index, total_count)
+			var deployment_position: Vector3 = _get_unit_deployment_position(spawn_index, total_count, unit_transform.origin)
 			var unit_id: int = _unit_sequence
 			_unit_sequence += 1
 
 			if multiplayer.multiplayer_peer != null:
-				_spawn_unit_remote.rpc(unit_name, scene_path, unit_transform, unit_id)
+				_spawn_unit_remote.rpc(
+					unit_name,
+					scene_path,
+					unit_transform,
+					unit_id,
+					deployment_position,
+					deployment_move_duration,
+					deployment_attack_lock_duration
+				)
 			else:
-				_spawn_unit_remote(unit_name, scene_path, unit_transform, unit_id)
+				_spawn_unit_remote(
+					unit_name,
+					scene_path,
+					unit_transform,
+					unit_id,
+					deployment_position,
+					deployment_move_duration,
+					deployment_attack_lock_duration
+				)
 
 			spawn_index += 1
+
+			if spawn_unit_interval > 0.0 and spawn_index < total_count:
+				await get_tree().create_timer(spawn_unit_interval).timeout
+
+	_unit_spawn_sequence_active = false
 
 
 func _get_unit_entries_for_set(requested_set_id: String) -> Array[Dictionary]:
@@ -376,7 +414,7 @@ func _get_unit_spawn_transform(spawn_index: int, total_count: int) -> Transform3
 	var spawn_position_on_ground: Vector3 = global_position
 	spawn_position_on_ground += global_transform.basis.x * local_offset.x
 	spawn_position_on_ground += global_transform.basis.z * local_offset.z
-	spawn_position_on_ground.y = _get_ground_y() + 0.08
+	spawn_position_on_ground.y = _get_ground_y() + spawn_ground_offset
 
 	return Transform3D(global_transform.basis, spawn_position_on_ground)
 
@@ -408,12 +446,55 @@ func _get_grid_offset(spawn_index: int, total_count: int) -> Vector3:
 	return Vector3(x, 0.0, z)
 
 
+func _get_unit_deployment_position(spawn_index: int, total_count: int, fallback_position: Vector3) -> Vector3:
+	var safe_total: int = max(1, total_count)
+	var angle: float = (TAU * float(spawn_index)) / float(safe_total)
+	var distance_alpha: float = 0.0
+	if safe_total > 1:
+		distance_alpha = float(spawn_index % 2)
+
+	var min_distance: float = maxf(0.0, deployment_min_distance)
+	var max_distance: float = maxf(min_distance, deployment_max_distance)
+	var deployment_distance: float = lerpf(min_distance, max_distance, distance_alpha)
+
+	if deployment_distance <= 0.01:
+		return fallback_position
+
+	var right_direction: Vector3 = global_transform.basis.x
+	var forward_direction: Vector3 = -global_transform.basis.z
+	right_direction.y = 0.0
+	forward_direction.y = 0.0
+
+	if right_direction.length_squared() <= 0.0001:
+		right_direction = Vector3.RIGHT
+	else:
+		right_direction = right_direction.normalized()
+
+	if forward_direction.length_squared() <= 0.0001:
+		forward_direction = Vector3.FORWARD
+	else:
+		forward_direction = forward_direction.normalized()
+
+	var radial_direction: Vector3 = (right_direction * cos(angle)) + (forward_direction * sin(angle))
+	if radial_direction.length_squared() <= 0.0001:
+		radial_direction = right_direction
+	else:
+		radial_direction = radial_direction.normalized()
+
+	var deployment_position: Vector3 = global_position + (radial_direction * deployment_distance)
+	deployment_position.y = _get_ground_y() + spawn_ground_offset
+	return deployment_position
+
+
 @rpc("authority", "call_local", "reliable")
 func _spawn_unit_remote(
 	unit_name: String,
 	requested_scene_path: String,
 	unit_transform: Transform3D,
-	unit_id: int
+	unit_id: int,
+	deployment_position: Vector3,
+	spawn_deployment_duration: float,
+	spawn_attack_lock_duration: float
 ) -> void:
 	if get_parent() == null:
 		return
@@ -438,10 +519,34 @@ func _spawn_unit_remote(
 	_set_property_if_exists(unit, "enemy_id", unit_id)
 	_set_property_if_exists(unit, "unit_set_id", unit_set_id)
 
+	if unit is Node3D:
+		_apply_spawn_transform_before_entering_tree(unit as Node3D, unit_transform)
+
 	add_sibling(unit)
 
 	if unit is Node3D:
 		(unit as Node3D).global_transform = unit_transform
+
+	if unit.has_method("configure_transport_spawn"):
+		unit.call(
+			"configure_transport_spawn",
+			unit_transform.origin,
+			deployment_position,
+			spawn_deployment_duration,
+			spawn_attack_lock_duration
+		)
+	else:
+		_set_property_if_exists(unit, "attack_timer", spawn_attack_lock_duration)
+
+
+func _apply_spawn_transform_before_entering_tree(unit_node: Node3D, unit_transform: Transform3D) -> void:
+	var parent_node: Node = get_parent()
+	if parent_node is Node3D:
+		var parent_node_3d: Node3D = parent_node as Node3D
+		unit_node.transform = parent_node_3d.global_transform.affine_inverse() * unit_transform
+		return
+
+	unit_node.global_transform = unit_transform
 
 
 func _resolve_unit_scene_path(requested_scene_path: String) -> String:
