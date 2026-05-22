@@ -10,7 +10,7 @@ radius = 1.85
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_x14vd"]
 height = 3.0
-radius = 3.0
+radius = 3.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5jw7k"]
 albedo_color = Color(1, 0.9333334, 0, 1)
@@ -166,8 +166,8 @@ void fragment() {
 render_priority = 1
 shader = SubResource("Shader_mxha0")
 shader_parameter/base_color = Color(1, 0.42, 0.08, 0.78)
-shader_parameter/radius_start = 0.035
-shader_parameter/radius_end = 0.485
+shader_parameter/radius_start = 0.05
+shader_parameter/radius_end = 0.45
 shader_parameter/ring_width = 0.165
 shader_parameter/outer_sharpness = 0.01
 shader_parameter/fade_in = 0.07
@@ -419,7 +419,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.287158, 0)
 mesh = SubResource("ArrayMesh_npaug")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="VisualRoot/IntactRoot" unique_id=1439839116]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 3.3437116, 0.8737457)
+transform = Transform3D(0.8000001, 0, 0, 0, 0.8000001, 0, 0, 0, 0.8000001, 0, 1.5901337, 0.00030246875)
 cast_shadow = 0
 amount = 2
 lifetime = 1.7

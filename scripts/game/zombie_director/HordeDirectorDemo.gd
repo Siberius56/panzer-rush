@@ -27,8 +27,38 @@ enum DirectorState {
 @export_group("Spawn Scenes")
 @export var use_placeholder_zombies: bool = true
 @export var placeholder_zombie_scene: PackedScene
+
+# Ancien champ conservé comme fallback.
+# Si tonfa_enemy_scene n'est pas assignée, zombie_scene sera utilisé comme soldat tonfa par défaut.
 @export var zombie_scene: PackedScene
 @export var enemies_root_path: NodePath = ^"../Enemies"
+
+@export_group("Enemy Scene Auto Load")
+@export var auto_load_enemy_scenes_from_paths: bool = true
+@export_file("*.tscn") var tonfa_enemy_scene_path: String = "res://scenes/enemies/NetworkTonfaEnemy.tscn"
+@export_file("*.tscn") var shield_enemy_scene_path: String = "res://scenes/enemies/NetworkShieldEnemy.tscn"
+@export_file("*.tscn") var rifleman_enemy_scene_path: String = "res://scenes/enemies/NetworkRiflemanEnemy.tscn"
+@export_file("*.tscn") var anti_tank_enemy_scene_path: String = "res://scenes/enemies/NetworkAntiTankEnemy.tscn"
+@export_file("*.tscn") var hammer_enemy_scene_path: String = "res://scenes/enemies/NetworkHammerEnemy.tscn"
+
+@export_group("Enemy Composition")
+@export var use_enemy_composition_for_idle_population: bool = false
+@export var tonfa_enemy_scene: PackedScene
+@export_range(0, 100, 1) var tonfa_weight: int = 55
+@export var shield_enemy_scene: PackedScene
+@export_range(0, 100, 1) var shield_weight: int = 25
+@export var rifleman_enemy_scene: PackedScene
+@export_range(0, 100, 1) var rifleman_weight: int = 15
+@export var anti_tank_enemy_scene: PackedScene
+@export_range(0, 100, 1) var anti_tank_weight: int = 5
+
+@export_group("Super Horde Composition")
+@export var super_horde_extra_minions_min: int = 8
+@export var super_horde_extra_minions_max: int = 16
+@export var allow_hammers_in_super_hordes: bool = true
+@export var hammer_enemy_scene: PackedScene
+@export var super_horde_min_hammers: int = 1
+@export var super_horde_max_hammers: int = 2
 
 @export_group("Targets")
 @export var player_group_name: String = "players"
@@ -82,6 +112,7 @@ var state: DirectorState = DirectorState.REST
 var state_timer: float = 0.0
 var next_spawn_timer: float = 0.0
 var horde_remaining: int = 0
+var super_horde_hammer_remaining: int = 0
 var active_horde_zone: Node = null
 var active_horde_zones: Array[Node] = []
 var active_horde_points_by_zone: Dictionary = {}
@@ -97,6 +128,7 @@ var spawned_zombie_last_combat_time: Dictionary = {}
 func _ready() -> void:
 	add_to_group("horde_director")
 	random.randomize()
+	_auto_load_enemy_scenes()
 	_collect_zones()
 	_schedule_rest()
 
@@ -126,6 +158,7 @@ func get_debug_info() -> Dictionary:
 	info["alive"] = get_alive_zombie_count()
 	info["max_alive"] = max_alive_zombies
 	info["remaining"] = horde_remaining
+	info["hammer_remaining"] = super_horde_hammer_remaining
 	info["active_zone"] = _get_active_zones_text()
 	info["last_event"] = last_event_text
 	info["zones"] = cached_zones.size()
@@ -228,6 +261,7 @@ func _schedule_rest() -> void:
 	active_horde_zones.clear()
 	active_horde_points_by_zone.clear()
 	horde_remaining = 0
+	super_horde_hammer_remaining = 0
 	_emit_event("Repos. Prochaine décision dans %.1f s." % state_timer)
 
 
@@ -274,10 +308,14 @@ func _start_horde() -> void:
 
 	if active_horde_zones.size() > 1:
 		state = DirectorState.SUPER_HORDE
-		horde_remaining = random.randi_range(mega_horde_min_zombies, mega_horde_max_zombies)
+		var base_count: int = random.randi_range(mega_horde_min_zombies, mega_horde_max_zombies)
+		var extra_minion_count: int = _get_super_horde_extra_minion_count()
+		super_horde_hammer_remaining = _get_super_horde_hammer_count()
+		horde_remaining = base_count + extra_minion_count + super_horde_hammer_remaining
 		time_since_last_mega_horde = 0.0
 	else:
 		state = DirectorState.HORDE
+		super_horde_hammer_remaining = 0
 		horde_remaining = _get_zone_spawn_count(active_horde_zones[0])
 
 	state_timer = 0.0
@@ -288,7 +326,7 @@ func _start_horde() -> void:
 			zone.call("mark_used_now")
 
 	if state == DirectorState.SUPER_HORDE:
-		_emit_event("MÉGA HORDE lancée depuis %d zones. Zombies prévus : %d." % [active_horde_zones.size(), horde_remaining])
+		_emit_event("MÉGA HORDE lancée depuis %d zones. Ennemis prévus : %d, hammers : %d." % [active_horde_zones.size(), horde_remaining, super_horde_hammer_remaining])
 	else:
 		_emit_event("Horde lancée depuis : %s. Zombies prévus : %d." % [_get_active_zones_text(), horde_remaining])
 
@@ -352,14 +390,14 @@ func _spawn_one_from_zone(zone: Node, behaviour: String) -> Node:
 	if zone == null or not is_instance_valid(zone):
 		return null
 
-	var scene_to_spawn: PackedScene = _get_scene_to_spawn()
-	if scene_to_spawn == null:
-		_emit_event("Aucune scène de zombie assignée.")
-		return null
-
 	var point: Marker3D = _pick_valid_spawn_point(zone, behaviour == "attack")
 	if point == null:
 		_emit_event("Aucun SpawnPoint valide hors caméra : %s." % _get_zone_name(zone))
+		return null
+
+	var scene_to_spawn: PackedScene = _get_scene_to_spawn(behaviour)
+	if scene_to_spawn == null:
+		_emit_event("Aucune scène d'ennemi assignée.")
 		return null
 
 	var spawn_position: Vector3 = _get_navigation_safe_position(point.global_position)
@@ -832,10 +870,149 @@ func _get_zone_spawn_count(zone: Node) -> int:
 	return random.randi_range(min_count, max_count)
 
 
-func _get_scene_to_spawn() -> PackedScene:
+func _get_scene_to_spawn(behaviour: String) -> PackedScene:
 	if use_placeholder_zombies:
 		return placeholder_zombie_scene
+
+	if behaviour == "attack" and state == DirectorState.SUPER_HORDE:
+		var hammer_scene: PackedScene = _try_get_super_horde_hammer_scene()
+		if hammer_scene != null:
+			return hammer_scene
+
+	if behaviour == "idle" and not use_enemy_composition_for_idle_population:
+		return _get_default_enemy_scene()
+
+	return _get_weighted_standard_enemy_scene()
+
+
+func _auto_load_enemy_scenes() -> void:
+	if not auto_load_enemy_scenes_from_paths:
+		return
+
+	tonfa_enemy_scene = _try_auto_load_enemy_scene(tonfa_enemy_scene, tonfa_enemy_scene_path)
+	shield_enemy_scene = _try_auto_load_enemy_scene(shield_enemy_scene, shield_enemy_scene_path)
+	rifleman_enemy_scene = _try_auto_load_enemy_scene(rifleman_enemy_scene, rifleman_enemy_scene_path)
+	anti_tank_enemy_scene = _try_auto_load_enemy_scene(anti_tank_enemy_scene, anti_tank_enemy_scene_path)
+	hammer_enemy_scene = _try_auto_load_enemy_scene(hammer_enemy_scene, hammer_enemy_scene_path)
+
+	if zombie_scene == null and tonfa_enemy_scene != null:
+		zombie_scene = tonfa_enemy_scene
+
+
+func _try_auto_load_enemy_scene(current_scene: PackedScene, scene_path: String) -> PackedScene:
+	if current_scene != null:
+		return current_scene
+
+	if scene_path.is_empty():
+		return null
+
+	if not ResourceLoader.exists(scene_path):
+		return null
+
+	return ResourceLoader.load(scene_path) as PackedScene
+
+
+func _get_default_enemy_scene() -> PackedScene:
+	if tonfa_enemy_scene != null:
+		return tonfa_enemy_scene
 	return zombie_scene
+
+
+func _get_weighted_standard_enemy_scene() -> PackedScene:
+	var entries: Array[Dictionary] = _get_standard_enemy_entries()
+	if entries.is_empty():
+		return _get_default_enemy_scene()
+
+	var total_weight: int = 0
+	for entry in entries:
+		total_weight += int(entry.get("weight", 0))
+
+	if total_weight <= 0:
+		return _get_default_enemy_scene()
+
+	var roll: int = random.randi_range(1, total_weight)
+	var cursor: int = 0
+
+	for entry in entries:
+		cursor += int(entry.get("weight", 0))
+		if roll <= cursor:
+			return entry.get("scene", null) as PackedScene
+
+	return entries.back().get("scene", null) as PackedScene
+
+
+func _get_standard_enemy_entries() -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	_append_enemy_entry(entries, _get_default_enemy_scene(), tonfa_weight)
+	_append_enemy_entry(entries, shield_enemy_scene, shield_weight)
+	_append_enemy_entry(entries, rifleman_enemy_scene, rifleman_weight)
+	_append_enemy_entry(entries, anti_tank_enemy_scene, anti_tank_weight)
+	return entries
+
+
+func _append_enemy_entry(entries: Array[Dictionary], scene: PackedScene, weight: int) -> void:
+	if scene == null:
+		return
+
+	if weight <= 0:
+		return
+
+	entries.append({
+		"scene": scene,
+		"weight": weight
+	})
+
+
+func _get_super_horde_extra_minion_count() -> int:
+	var min_count: int = max(super_horde_extra_minions_min, 0)
+	var max_count: int = max(super_horde_extra_minions_max, 0)
+
+	if max_count < min_count:
+		max_count = min_count
+
+	return random.randi_range(min_count, max_count)
+
+
+func _get_super_horde_hammer_count() -> int:
+	if not allow_hammers_in_super_hordes:
+		return 0
+
+	if hammer_enemy_scene == null:
+		return 0
+
+	var min_count: int = max(super_horde_min_hammers, 0)
+	var max_count: int = max(super_horde_max_hammers, 0)
+
+	if max_count < min_count:
+		max_count = min_count
+
+	return random.randi_range(min_count, max_count)
+
+
+func _try_get_super_horde_hammer_scene() -> PackedScene:
+	if not allow_hammers_in_super_hordes:
+		return null
+
+	if hammer_enemy_scene == null:
+		return null
+
+	if super_horde_hammer_remaining <= 0:
+		return null
+
+	var slots_left: int = horde_remaining
+	if slots_left < 1:
+		slots_left = 1
+
+	if slots_left <= super_horde_hammer_remaining:
+		super_horde_hammer_remaining -= 1
+		return hammer_enemy_scene
+
+	var hammer_chance: float = clampf(float(super_horde_hammer_remaining) / float(slots_left), 0.0, 1.0)
+	if random.randf() <= hammer_chance:
+		super_horde_hammer_remaining -= 1
+		return hammer_enemy_scene
+
+	return null
 
 
 func _get_enemies_root() -> Node:
@@ -887,6 +1064,8 @@ func _get_next_action_text() -> String:
 	if state == DirectorState.HORDE:
 		return "Spawn par petites salves depuis une zone hors caméra."
 	if state == DirectorState.SUPER_HORDE:
+		if super_horde_hammer_remaining > 0:
+			return "Méga horde : spawn depuis plusieurs zones. Hammers restants : %d." % super_horde_hammer_remaining
 		return "Méga horde : spawn depuis plusieurs zones hors caméra."
 	if state == DirectorState.COOLDOWN:
 		return "Le Director laisse les joueurs respirer."

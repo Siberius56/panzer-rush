@@ -60,7 +60,11 @@ func _update_panel() -> void:
 	timer_label.text = "Timer : %.1f s" % float(info.get("timer", 0.0))
 	alive_label.text = "Zombies actifs : %d / %d" % [int(info.get("alive", 0)), int(info.get("max_alive", 0))]
 	zone_label.text = "Zone active : %s" % str(info.get("active_zone", "Aucune"))
-	remaining_label.text = "Reste à spawner : %d" % int(info.get("remaining", 0))
+	var hammer_remaining: int = int(info.get("hammer_remaining", 0))
+	if hammer_remaining > 0:
+		remaining_label.text = "Reste à spawner : %d | Hammers : %d" % [int(info.get("remaining", 0)), hammer_remaining]
+	else:
+		remaining_label.text = "Reste à spawner : %d" % int(info.get("remaining", 0))
 	event_label.text = "Dernier événement : %s" % str(info.get("last_event", ""))
 	hint_label.text = str(info.get("next_action", ""))
 

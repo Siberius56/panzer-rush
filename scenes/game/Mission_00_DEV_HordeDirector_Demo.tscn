@@ -24,7 +24,12 @@
 [ext_resource type="PackedScene" uid="uid://dp4jt1qet3xpi" path="res://asset/map/road/road-intersection-line.glb" id="27_sdsmh"]
 [ext_resource type="PackedScene" uid="uid://d3sqpgrwux1wu" path="res://asset/map/road/road-bend.glb" id="28_clx6r"]
 [ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="32_cbrl2"]
-[ext_resource type="PackedScene" uid="uid://bbj41t2vseq2" path="res://scenes/enemies/NetworkZombieEnemy.tscn" id="53_pqnt3"]
+[ext_resource type="PackedScene" uid="uid://dtr3vsks0m8ha" path="res://scenes/enemies/NetworkAntiTankEnemy.tscn" id="33_4cdpb"]
+[ext_resource type="PackedScene" uid="uid://bhco65jtlmy2p" path="res://scenes/enemies/NetworkHammerEnemy.tscn" id="34_lcu40"]
+[ext_resource type="PackedScene" uid="uid://bd78wreowete4" path="res://scenes/enemies/NetworkRiflemanEnemy.tscn" id="35_fo8hi"]
+[ext_resource type="PackedScene" uid="uid://bfpc4axn5l5io" path="res://scenes/enemies/NetworkTonfaEnemy.tscn" id="36_tcjqq"]
+[ext_resource type="PackedScene" uid="uid://bwy12lut3bneu" path="res://scenes/enemies/NetworkShieldEnemy.tscn" id="37_lcu40"]
+[ext_resource type="PackedScene" uid="uid://4g474b8gkrh6" path="res://scenes/enemies/NetworkZombieEnemy.tscn" id="53_pqnt3"]
 [ext_resource type="PackedScene" uid="uid://0lv7orsfam4y" path="res://scenes/triggers/Killzone.tscn" id="70_878j0"]
 [ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="76_em636"]
 [ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://asset/pastel_vignette.gdshader" id="77_0gsk6"]
@@ -164,16 +169,16 @@ script = ExtResource("1_q3e6e")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.81857, -5.371189, -56.667797)
 
 [node name="SpawnA" type="Marker3D" parent="SpawnPoints" unique_id=789447208]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -80.149956, 7.0489874, 146.53613)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -71.98164, 7.0489874, 151.05551)
 
 [node name="SpawnB" type="Marker3D" parent="SpawnPoints" unique_id=1093883691]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -77.10301, 7.0489883, 146.46394)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -68.93471, 7.0489883, 150.98332)
 
 [node name="SpawnC" type="Marker3D" parent="SpawnPoints" unique_id=1874501327]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -81.04054, 7.0489883, 150.3776)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -72.87224, 7.0489883, 154.89697)
 
 [node name="SpawnD" type="Marker3D" parent="SpawnPoints" unique_id=1809863145]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -77.08701, 7.0489883, 150.16081)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -68.9187, 7.0489883, 154.68019)
 
 [node name="VehicleSpawns" type="Node3D" parent="." unique_id=1089131327]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.81857, -5.371189, -56.667797)
@@ -466,10 +471,10 @@ transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.311
 transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, 0.04903412)
 
 [node name="pipe-large-long4" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=1092873526 instance=ExtResource("8_8i6wv")]
-transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, 2.049034)
+transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, 6.940363, 0.48167264, 5.98732)
 
 [node name="pipe-large-long5" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=2132426592 instance=ExtResource("8_8i6wv")]
-transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, -3.7552433, 0.48167264, 4.049034)
+transform = Transform3D(-5.7320566e-15, -1, -1.3113416e-07, -4.371139e-08, 1.3113416e-07, -1, 1, 0, -4.371139e-08, 6.940363, 0.48167264, 7.98732)
 
 [node name="pipe-large-valve2" parent="NavigationRegion3D/01_Forest/Base_Storage/Pipe" unique_id=658003751 instance=ExtResource("9_u73qx")]
 transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, -3.7581425, 0.48165923, -1.4396286)
@@ -495,7 +500,7 @@ transform = Transform3D(0.9907455, 0, -0.13573286, 0, 1, 0, 0.13573286, 0, 0.990
 [node name="plane_noise" parent="NavigationRegion3D/01_Forest" unique_id=1139489821 instance=ExtResource("13_6ho5a")]
 transform = Transform3D(0.5, 0, 0, 0, 0.49999997, 0, 0, 0, 0.49999997, 0, -1.4414434, 66.809)
 
-[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=264337654]
+[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=202957429]
 transform = Transform3D(20, 0, 0, 0, 2, 9.9341065e-08, 0, -3.9736427e-08, 5, 0, 0, 0)
 surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
 
@@ -866,7 +871,7 @@ collision_mask = 1
 [node name="Enemies" type="Node3D" parent="." unique_id=1573742361]
 
 [node name="NetworkZombieEnemy" parent="Enemies" unique_id=2032012782 instance=ExtResource("53_pqnt3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.638344, 5.3562036, 90.15792)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.859798, 5.3562036, 92.10262)
 move_speed = 1.5
 direct_move_distance = 9.0
 enemy_separation_radius = 2.0
@@ -967,7 +972,7 @@ max_idle_zones_populated_on_ready = 2
 [node name="SpawnZones" type="Node3D" parent="ZombieHordeDirector_DEMO" unique_id=1745635484]
 
 [node name="IdleAlreadyPresent_StartRoad" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=663375009 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.85756, 2.3057022, 91.406624)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.71372, 2.3057022, 43.48575)
 script = ExtResource("201_zone")
 zone_label = "IDLE - route de départ"
 min_spawn_count = 7
@@ -1003,7 +1008,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
 
 [node name="IdleAlreadyPresent_BaseStorage" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=890620770 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 80)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.808201, 1, 28.97483)
 script = ExtResource("201_zone")
 zone_label = "IDLE - base / stockage"
 min_spawn_count = 8
@@ -1193,5 +1198,24 @@ editor_weapon_id = "smg"
 [node name="WorldWeapon3D4" parent="." unique_id=2051183287 instance=ExtResource("32_cbrl2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.27911, 0.47831345, 91.061905)
 editor_weapon_id = "smg"
+
+[node name="NetworkAntiTankEnemy" parent="." unique_id=812494490 instance=ExtResource("33_4cdpb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.710907, 6.643158, 94.24587)
+weapon_local_position = Vector3(0.22, 1.18, -0.5)
+
+[node name="NetworkHammerEnemy" parent="." unique_id=1363286513 instance=ExtResource("34_lcu40")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.641972, 1.1283163, 92.00883)
+
+[node name="NetworkRiflemanEnemy" parent="." unique_id=1651274459 instance=ExtResource("35_fo8hi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.662445, 1.1283144, 91.93446)
+
+[node name="NetworkTonfaEnemy" parent="." unique_id=1144211930 instance=ExtResource("36_tcjqq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.211964, 1.1283134, 86.86137)
+
+[node name="NetworkShieldEnemy" parent="." unique_id=1917419039 instance=ExtResource("37_lcu40")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.961937, 1.1283153, 95.503395)
+visual_size_scale = 1.0
+aim_height = 1.1
+weapon_local_position = Vector3(0, 1.2, -0.58)
 
 [editable path="NavigationRegion3D/01_Forest/plane_noise"]
