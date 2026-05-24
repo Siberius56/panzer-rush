@@ -203,7 +203,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0
 mesh = SubResource("Mesh_Path_Thin_NS_B")
 
 [node name="MountainPlateau_A_Body" type="StaticBody3D" parent="." unique_id=1394798288]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 4.5, -32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 4.5, -32)
 collision_layer = 8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MountainPlateau_A_Body" unique_id=1771322916]
@@ -233,7 +233,7 @@ shape = SubResource("Shape_MountainPlateau_B")
 mesh = SubResource("Mesh_MountainPlateau_B")
 
 [node name="MountainPlateau_B_Body3" type="StaticBody3D" parent="." unique_id=1165364915]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 3.5, 47)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 3.5, 56)
 collision_layer = 8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MountainPlateau_B_Body3" unique_id=418579040]
