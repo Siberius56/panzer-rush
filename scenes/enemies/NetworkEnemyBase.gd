@@ -21,7 +21,7 @@ enum EnemyState {
 @export_group("Movement")
 @export var move_speed: float = 3.2
 @export var gravity_strength: float = 24.0
-@export var max_target_distance: float = 50.0
+@export var max_target_distance: float = 16.0
 @export var repath_distance: float = 0.8
 @export var direct_move_fallback: bool = true
 @export var chase_stop_distance: float = 1.2
@@ -63,6 +63,11 @@ enum EnemyState {
 @export var detection_requires_line_of_sight: bool = true
 @export_flags_3d_physics var detection_line_of_sight_mask: int = 8 # Godot physics layer 4, decor.
 @export_flags_3d_physics var line_of_sight_mask: int = 0xFFFFFFFF
+
+@export_group("Director Spawn")
+@export var director_idle_spawn_stays_idle_until_alert: bool = true
+@export var director_idle_spawn_ignores_detection: bool = true
+@export var director_attack_spawn_alerts_immediately: bool = true
 
 @export_group("Performance Scans")
 @export_range(1, 120, 1) var scan_interval_frames: int = 20
@@ -240,6 +245,8 @@ var _enemy_separation_velocity: Vector3 = Vector3.ZERO
 var _transport_spawn_deployment_active: bool = false
 var _transport_spawn_deployment_target: Vector3 = Vector3.ZERO
 var _transport_spawn_deployment_time_remaining: float = 0.0
+var _director_spawn_behaviour: String = ""
+var _director_idle_passive: bool = false
 
 var _network_zone_active: bool = true
 var _network_zone_saved_process_mode: int = Node.PROCESS_MODE_INHERIT
@@ -322,6 +329,101 @@ func _exit_tree() -> void:
 	if _registered_in_enemy_grid:
 		_unregister_enemy_from_grid(_enemy_grid_cell)
 		_registered_in_enemy_grid = false
+
+
+func setup_director_demo(behaviour: String, target_position: Vector3) -> void:
+	set_spawn_behaviour(behaviour)
+
+	if String(behaviour).strip_edges().to_lower() == "attack":
+		set_target_position(target_position)
+
+
+func set_spawn_behaviour(behaviour: String) -> void:
+	var normalized_behaviour: String = String(behaviour).strip_edges().to_lower()
+	_director_spawn_behaviour = normalized_behaviour
+
+	match normalized_behaviour:
+		"idle":
+			_apply_director_idle_spawn_mode()
+		"attack", "horde", "super_horde":
+			_apply_director_attack_spawn_mode()
+		_:
+			_director_idle_passive = false
+
+
+func set_target_position(target_position: Vector3) -> void:
+	if not multiplayer.is_server():
+		return
+
+	_director_idle_passive = false
+	forced_alert = director_attack_spawn_alerts_immediately
+	_last_known_target_position = target_position
+	_has_last_known_target_position = true
+	_reset_attack_line_of_sight_cache()
+	_clear_navigation_target()
+
+	var nearest_target: Node3D = _find_nearest_target(max_target_distance)
+	if nearest_target != null:
+		_force_alert_target(nearest_target)
+	else:
+		aim_target_position = target_position + Vector3.UP * aim_height
+		last_valid_aim_target_position = aim_target_position
+		_set_state(EnemyState.INVESTIGATE)
+
+
+func set_target(target: Node) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var target_node: Node3D = _resolve_target_candidate(target)
+	if target_node == null:
+		return
+
+	_director_idle_passive = false
+	_force_alert_target(target_node)
+
+
+func alert_from_director() -> void:
+	set_alert_mode(true)
+
+
+func is_director_idle_passive() -> bool:
+	return _director_idle_passive
+
+
+func _apply_director_idle_spawn_mode() -> void:
+	_director_idle_passive = director_idle_spawn_stays_idle_until_alert
+	current_target = null
+	forced_alert = false
+	detection_zone_targets.clear()
+	detected_targets.clear()
+	_has_last_known_target_position = false
+	_reset_attack_line_of_sight_cache()
+	_clear_navigation_target()
+	velocity.x = 0.0
+	velocity.z = 0.0
+	_set_state(EnemyState.IDLE)
+
+
+func _apply_director_attack_spawn_mode() -> void:
+	_director_idle_passive = false
+	forced_alert = director_attack_spawn_alerts_immediately
+	_reset_attack_line_of_sight_cache()
+	_clear_navigation_target()
+
+
+func _process_director_idle_passive_state(_delta: float) -> void:
+	current_target = null
+	forced_alert = false
+	detection_zone_targets.clear()
+	detected_targets.clear()
+	_has_last_known_target_position = false
+	_reset_attack_line_of_sight_cache()
+	_clear_navigation_target()
+	_update_idle_aim_target()
+	_set_state(EnemyState.IDLE)
+	velocity.x = 0.0
+	velocity.z = 0.0
 
 
 func set_network_zone_active(active: bool) -> void:
@@ -540,6 +642,13 @@ func _server_update(delta: float) -> void:
 	if _process_vehicle_impact_stun(delta):
 		move_and_slide()
 		_update_idle_aim_target()
+		_update_enemy_procedural_animation(delta)
+		_send_server_state(delta)
+		return
+
+	if _director_idle_passive:
+		_process_director_idle_passive_state(delta)
+		move_and_slide()
 		_update_enemy_procedural_animation(delta)
 		_send_server_state(delta)
 		return
@@ -1117,6 +1226,10 @@ func _spawn_attack_projectile_local(spawn_position: Vector3, direction: Vector3)
 
 
 func _acquire_target(allow_global_scan: bool = true) -> void:
+	if _director_idle_passive and director_idle_spawn_ignores_detection:
+		current_target = null
+		return
+
 	var best_target: Node3D = null
 	var best_distance := INF
 
@@ -1227,6 +1340,9 @@ func _validate_current_target() -> void:
 
 
 func _seed_detection_targets_from_current_overlaps() -> void:
+	if _director_idle_passive and director_idle_spawn_ignores_detection:
+		return
+
 	if detection_area == null:
 		return
 
@@ -1255,6 +1371,12 @@ func _cleanup_detection_zone_targets() -> void:
 
 
 func _refresh_visible_detected_targets() -> void:
+	if _director_idle_passive and director_idle_spawn_ignores_detection:
+		detection_zone_targets.clear()
+		detected_targets.clear()
+		current_target = null
+		return
+
 	var visible_targets: Array[Node3D] = []
 	for target in detection_zone_targets:
 		if not _can_detect_target(target):
@@ -1583,6 +1705,7 @@ func _force_alert_target(target: Node3D) -> void:
 	if not _is_valid_target(target):
 		return
 
+	_director_idle_passive = false
 	current_target = target
 	forced_alert = true
 	_last_known_target_position = target.global_position
@@ -1758,6 +1881,8 @@ func _play_damage_feedback_local(hit_direction: Vector3 = Vector3.ZERO) -> void:
 
 
 func set_alert_mode(enabled: bool = true) -> void:
+	if enabled:
+		_director_idle_passive = false
 	forced_alert = enabled
 	if not multiplayer.is_server():
 		return
@@ -2153,6 +2278,9 @@ func _connect_detection_signals() -> void:
 
 
 func _on_detection_body_entered(body: Node) -> void:
+	if _director_idle_passive and director_idle_spawn_ignores_detection:
+		return
+
 	var target := _resolve_detected_target(body)
 	if not _is_valid_target(target):
 		return

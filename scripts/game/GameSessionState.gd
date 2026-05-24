@@ -2,6 +2,9 @@ extends Node
 
 signal snapshot_changed
 signal team_respawn_lives_changed(remaining: int, maximum: int)
+signal horde_director_changed(director: Node)
+signal horde_spawn_zone_registered(zone: Node)
+signal horde_spawn_zone_unregistered(zone: Node)
 
 var players: Dictionary = {}
 var vehicles: Dictionary = {}
@@ -11,6 +14,9 @@ var vehicle_snapshot_active: bool = false
 var max_team_respawn_lives: int = 3
 var team_respawn_lives: int = 3
 
+var horde_director: Node = null
+var horde_spawn_zones: Array[Node] = []
+
 
 func reset_run_state() -> void:
 	players.clear()
@@ -19,6 +25,98 @@ func reset_run_state() -> void:
 	vehicle_snapshot_active = false
 	reset_team_respawn_lives()
 	snapshot_changed.emit()
+
+
+func set_horde_director(director: Node) -> void:
+	if director == null or not is_instance_valid(director):
+		return
+
+	horde_director = director
+	_cleanup_horde_spawn_zones()
+
+	if horde_director.has_method("clear_registered_spawn_zones"):
+		horde_director.call("clear_registered_spawn_zones")
+
+	for zone in horde_spawn_zones:
+		if _is_valid_horde_spawn_zone(zone) and horde_director.has_method("register_spawn_zone"):
+			horde_director.call("register_spawn_zone", zone)
+
+	horde_director_changed.emit(horde_director)
+
+
+func clear_horde_director(director: Node = null) -> void:
+	if director != null and horde_director != director:
+		return
+
+	horde_director = null
+	horde_director_changed.emit(null)
+
+
+func get_horde_director() -> Node:
+	if horde_director != null and is_instance_valid(horde_director) and horde_director.is_inside_tree():
+		return horde_director
+	horde_director = null
+	return null
+
+
+func register_horde_spawn_zone(zone: Node) -> bool:
+	if not _is_valid_horde_spawn_zone(zone):
+		return false
+
+	_cleanup_horde_spawn_zones()
+	if not horde_spawn_zones.has(zone):
+		horde_spawn_zones.append(zone)
+		horde_spawn_zone_registered.emit(zone)
+
+	var director: Node = get_horde_director()
+	if director != null and director.has_method("register_spawn_zone"):
+		director.call("register_spawn_zone", zone)
+
+	return true
+
+
+func unregister_horde_spawn_zone(zone: Node) -> void:
+	if zone == null:
+		return
+
+	if horde_spawn_zones.has(zone):
+		horde_spawn_zones.erase(zone)
+		horde_spawn_zone_unregistered.emit(zone)
+
+	var director: Node = get_horde_director()
+	if director != null and director.has_method("unregister_spawn_zone"):
+		director.call("unregister_spawn_zone", zone)
+
+
+func get_horde_spawn_zones() -> Array[Node]:
+	_cleanup_horde_spawn_zones()
+	return horde_spawn_zones.duplicate()
+
+
+func clear_horde_spawn_zones() -> void:
+	for zone in horde_spawn_zones.duplicate():
+		unregister_horde_spawn_zone(zone)
+	horde_spawn_zones.clear()
+
+
+func _cleanup_horde_spawn_zones() -> void:
+	var cleaned: Array[Node] = []
+	for zone in horde_spawn_zones:
+		if _is_valid_horde_spawn_zone(zone):
+			cleaned.append(zone)
+	horde_spawn_zones = cleaned
+
+
+func _is_valid_horde_spawn_zone(zone: Node) -> bool:
+	if zone == null:
+		return false
+	if not is_instance_valid(zone):
+		return false
+	if not zone.is_inside_tree():
+		return false
+	if zone.has_method("get_spawn_points"):
+		return true
+	return zone.is_in_group("zombie_spawn_zone")
 
 
 

@@ -1,0 +1,207 @@
+[gd_scene format=3 uid="uid://1ysm4xmerk2h"]
+
+[ext_resource type="Script" uid="uid://cw501aeyfhwaf" path="res://scenes/procedural_generation/scripts/LevelPOI.gd" id="1_poi_script"]
+[ext_resource type="PackedScene" uid="uid://b7nrdtsfjnycv" path="res://scenes/objectives/BombRadarObjective.tscn" id="2_m0se2"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_mq65v"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mq65v"]
+size = Vector3(60, 10, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0s338"]
+albedo_color = Color(0.8, 0.55, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_TownGround"]
+material = SubResource("StandardMaterial3D_0s338")
+size = Vector3(60, 10, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_path"]
+albedo_color = Color(0.33, 0.26, 0.17, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Road_NS"]
+material = SubResource("Mat_path")
+size = Vector3(8, 0.12, 60)
+
+[sub_resource type="BoxMesh" id="Mesh_Road_EW"]
+material = SubResource("Mat_path")
+size = Vector3(60, 0.12, 8)
+
+[sub_resource type="StandardMaterial3D" id="Mat_building"]
+albedo_color = Color(0.25, 0.25, 0.28, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_House_A"]
+material = SubResource("Mat_building")
+size = Vector3(10, 6, 10)
+
+[sub_resource type="BoxShape3D" id="Shape_House_A"]
+size = Vector3(10, 6, 10)
+
+[sub_resource type="BoxMesh" id="Mesh_House_B"]
+material = SubResource("Mat_building")
+size = Vector3(12, 7, 10)
+
+[sub_resource type="BoxShape3D" id="Shape_House_B"]
+size = Vector3(12, 7, 10)
+
+[sub_resource type="BoxMesh" id="Mesh_House_C"]
+material = SubResource("Mat_building")
+size = Vector3(12, 6, 12)
+
+[sub_resource type="BoxShape3D" id="Shape_House_C"]
+size = Vector3(12, 6, 12)
+
+[sub_resource type="BoxMesh" id="Mesh_Shop"]
+material = SubResource("Mat_building")
+size = Vector3(16, 7, 10)
+
+[sub_resource type="BoxShape3D" id="Shape_Shop"]
+size = Vector3(16, 7, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u4aqn"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[node name="POI_Town" type="Node3D" unique_id=1885426124]
+script = ExtResource("1_poi_script")
+poi_id = "POI_Town"
+poi_type = "town"
+poi_tags = PackedStringArray("land", "town")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=975364367]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1533470903]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+shape = SubResource("BoxShape3D_mq65v")
+
+[node name="TownGround" type="MeshInstance3D" parent="." unique_id=156949899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+mesh = SubResource("Mesh_TownGround")
+
+[node name="Road_NS" type="MeshInstance3D" parent="." unique_id=295404522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("Mesh_Road_NS")
+
+[node name="Road_EW" type="MeshInstance3D" parent="." unique_id=1848802245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("Mesh_Road_EW")
+
+[node name="House_A_Body" type="StaticBody3D" parent="." unique_id=838028974]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3, -10)
+collision_layer = 8
+
+[node name="House_A" type="MeshInstance3D" parent="House_A_Body" unique_id=1456702246]
+mesh = SubResource("Mesh_House_A")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_A_Body" unique_id=1956937183]
+shape = SubResource("Shape_House_A")
+
+[node name="House_A_Body2" type="StaticBody3D" parent="." unique_id=468471846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 3, -10)
+collision_layer = 8
+
+[node name="House_A" type="MeshInstance3D" parent="House_A_Body2" unique_id=1765059599]
+mesh = SubResource("Mesh_House_A")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_A_Body2" unique_id=497835828]
+shape = SubResource("Shape_House_A")
+
+[node name="House_A_Body3" type="StaticBody3D" parent="." unique_id=944350430]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3, -23)
+collision_layer = 8
+
+[node name="House_A" type="MeshInstance3D" parent="House_A_Body3" unique_id=1874520408]
+mesh = SubResource("Mesh_House_A")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_A_Body3" unique_id=1314079483]
+shape = SubResource("Shape_House_A")
+
+[node name="House_B_Body" type="StaticBody3D" parent="." unique_id=504506536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.5, -10)
+collision_layer = 8
+
+[node name="House_B" type="MeshInstance3D" parent="House_B_Body" unique_id=1185527885]
+mesh = SubResource("Mesh_House_B")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_B_Body" unique_id=517316161]
+shape = SubResource("Shape_House_B")
+
+[node name="House_B_Body2" type="StaticBody3D" parent="." unique_id=82420771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.5, -23)
+collision_layer = 8
+
+[node name="House_B" type="MeshInstance3D" parent="House_B_Body2" unique_id=1628062079]
+mesh = SubResource("Mesh_House_B")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_B_Body2" unique_id=1627377359]
+shape = SubResource("Shape_House_B")
+
+[node name="House_B_Body3" type="StaticBody3D" parent="." unique_id=519484531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 3.5, -23)
+collision_layer = 8
+
+[node name="House_B" type="MeshInstance3D" parent="House_B_Body3" unique_id=971259021]
+mesh = SubResource("Mesh_House_B")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_B_Body3" unique_id=168104077]
+shape = SubResource("Shape_House_B")
+
+[node name="House_C_Body" type="StaticBody3D" parent="." unique_id=1102114435]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, 16)
+collision_layer = 8
+
+[node name="House_C" type="MeshInstance3D" parent="House_C_Body" unique_id=1406364593]
+mesh = SubResource("Mesh_House_C")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="House_C_Body" unique_id=251443342]
+shape = SubResource("Shape_House_C")
+
+[node name="Shop_Body" type="StaticBody3D" parent="." unique_id=1475439003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3.5, 10)
+collision_layer = 8
+
+[node name="Shop" type="MeshInstance3D" parent="Shop_Body" unique_id=199964315]
+mesh = SubResource("Mesh_Shop")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop_Body" unique_id=1864599218]
+shape = SubResource("Shape_Shop")
+
+[node name="BombRadarObjective" parent="." unique_id=1176266720 instance=ExtResource("2_m0se2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -8)
+objective_text = "Sauvez la ville."
+
+[node name="POI_Town_Center" type="Node3D" parent="." unique_id=1961418034 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("3_mq65v")
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_Town_Center" unique_id=781207523]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_u4aqn")
+
+[node name="Label3D" type="Label3D" parent="POI_Town_Center" unique_id=218780009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_Town_Center" unique_id=1892811936]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_Town_Center" unique_id=424196778]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_Town_Center" unique_id=1636476413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_Town_Center" unique_id=338764176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)

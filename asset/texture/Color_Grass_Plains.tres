@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://drnm2vj2w35h4"]
+
+[ext_resource type="Shader" uid="uid://barkppwwuw15" path="res://asset/texture/TreeLeaf_Shader.gdshader" id="1_ti54w"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ti54w")
+shader_parameter/leaf_color = Color(0.2871333, 0.59, 0.1357, 1)
+shader_parameter/wind_strength = 0.50000002375
+shader_parameter/wind_speed = 1.4
+shader_parameter/wind_scale = 1.8
+shader_parameter/gust_strength = 0.08
+shader_parameter/gust_speed = 0.6
+shader_parameter/gust_scale = 4.0
+shader_parameter/wind_direction = Vector2(1, 0)
+shader_parameter/vertical_flutter = 0.150000007125
+shader_parameter/height_influence = 1.4000000665

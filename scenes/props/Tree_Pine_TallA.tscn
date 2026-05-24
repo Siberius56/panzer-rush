@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bs70gkkk72cmt"]
+
+[ext_resource type="ArrayMesh" uid="uid://be8ld64q78jfn" path="res://asset/map/nature/obj/tree_pineTallA_detailed.obj" id="1_k3mfr"]
+[ext_resource type="Material" uid="uid://wpx57b0q3xp" path="res://asset/texture/Color_Tree_Wood.tres" id="2_c271u"]
+[ext_resource type="Material" uid="uid://clx562ubrlxfy" path="res://asset/texture/Color_Tree_DarkLeaf.tres" id="3_x5sjs"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1niyt"]
+height = 4.0
+radius = 0.6
+
+[node name="Tree_Pine_TallA" type="StaticBody3D" unique_id=49958975]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1461689295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("CylinderShape3D_1niyt")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1789481405]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
+mesh = ExtResource("1_k3mfr")
+surface_material_override/0 = ExtResource("2_c271u")
+surface_material_override/1 = ExtResource("3_x5sjs")

@@ -1,0 +1,519 @@
+[gd_scene format=3 uid="uid://vg2uemvefmjk"]
+
+[ext_resource type="Script" uid="uid://cw501aeyfhwaf" path="res://scenes/procedural_generation/scripts/LevelPOI.gd" id="1_poi_script"]
+[ext_resource type="Material" uid="uid://1xxp5pltlv00" path="res://asset/texture/Color_Gray.tres" id="2_4q5k6"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_6bx6r"]
+[ext_resource type="PackedScene" uid="uid://b1l3aed24h3ub" path="res://asset/map/road/road-crossing.glb" id="7_6c6cu"]
+[ext_resource type="PackedScene" uid="uid://gog7afquco10" path="res://asset/map/road/road-driveway-double-barrier.glb" id="8_4dpcr"]
+[ext_resource type="PackedScene" uid="uid://bbo6apchi6rgm" path="res://asset/map/road/bridge-pillar-wide.glb" id="8_6c6cu"]
+[ext_resource type="PackedScene" uid="uid://c7q0v7edcdhme" path="res://asset/map/road/road-end.glb" id="9_ij5gm"]
+[ext_resource type="PackedScene" uid="uid://cuawdsptfumqs" path="res://asset/map/factory-building/detail-tank.glb" id="10_6c6cu"]
+[ext_resource type="PackedScene" uid="uid://gepa08i4mciw" path="res://asset/map/road/road-straight.glb" id="10_e5h8s"]
+[ext_resource type="PackedScene" uid="uid://bhapqo4w02pvu" path="res://scenes/objectives/AirportObjective.tscn" id="10_vyryo"]
+[ext_resource type="PackedScene" uid="uid://cp3o2d2kduimw" path="res://asset/map/road/road-square.glb" id="11_uo1v0"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6bx6r"]
+size = Vector3(60, 10, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jp1py"]
+material = ExtResource("2_4q5k6")
+size = Vector3(60, 10, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_runway"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Runway"]
+material = SubResource("Mat_runway")
+size = Vector3(10, 0.1, 54)
+
+[sub_resource type="BoxMesh" id="BoxMesh_uo1v0"]
+material = SubResource("Mat_runway")
+size = Vector3(12, 0.1, 32)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ynsvw"]
+material = SubResource("Mat_runway")
+size = Vector3(10, 0.1, 32)
+
+[sub_resource type="BoxShape3D" id="Shape_Tower"]
+size = Vector3(8, 16, 8)
+
+[sub_resource type="StandardMaterial3D" id="Mat_building"]
+albedo_color = Color(0.25, 0.25, 0.28, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Tower"]
+material = SubResource("Mat_building")
+size = Vector3(8, 16, 8)
+
+[sub_resource type="StandardMaterial3D" id="Mat_metal"]
+albedo_color = Color(0.38, 0.4, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4q5k6"]
+material = SubResource("Mat_metal")
+size = Vector3(19, 7, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vyryo"]
+material = SubResource("Mat_metal")
+size = Vector3(19, 12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6c6cu"]
+material = SubResource("Mat_metal")
+size = Vector3(12, 7, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4dpcr"]
+material = ExtResource("2_4q5k6")
+size = Vector3(7, 7, 1)
+
+[sub_resource type="BoxShape3D" id="Shape_Hangar_A"]
+size = Vector3(18, 7, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4dpcr"]
+size = Vector3(26, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ij5gm"]
+size = Vector3(26, 4, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e5h8s"]
+albedo_color = Color(0.8039216, 0.8117647, 0.84705883, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6c6cu"]
+size = Vector3(34, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_e5h8s"]
+size = Vector3(34, 4, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cjs2e"]
+size = Vector3(16, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1i5ub"]
+size = Vector3(16, 4, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uo1v0"]
+size = Vector3(59, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cjs2e"]
+size = Vector3(59, 4, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2p3ao"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[node name="POI_Airport" type="Node3D" unique_id=751855774]
+script = ExtResource("1_poi_script")
+poi_id = "POI_Airport"
+poi_type = "airport"
+poi_tags = PackedStringArray("land", "military")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=908823621]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1883766335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+shape = SubResource("BoxShape3D_6bx6r")
+
+[node name="Ground" type="Node3D" parent="." unique_id=377944766]
+
+[node name="AirportGround" type="MeshInstance3D" parent="Ground" unique_id=1093888325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+mesh = SubResource("BoxMesh_jp1py")
+
+[node name="Runway" type="Node3D" parent="." unique_id=731189714]
+
+[node name="road-crossing2" parent="Runway" unique_id=909479230 instance=ExtResource("7_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0.1, -16)
+
+[node name="road-driveway-double-barrier2" parent="Runway" unique_id=153076344 instance=ExtResource("8_4dpcr")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.999586, 0.020000458, -21.06886)
+
+[node name="road-driveway-double-barrier3" parent="Runway" unique_id=553606708 instance=ExtResource("8_4dpcr")]
+transform = Transform3D(-4.0000005, 0, 6.928203, 0, 8, 0, -6.928203, 0, -4.0000005, -8.857312, 0.020000458, -15.961988)
+
+[node name="road-end2" parent="Runway" unique_id=1346696842 instance=ExtResource("9_ij5gm")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0.1, -22)
+
+[node name="road-end3" parent="Runway" unique_id=938041827 instance=ExtResource("9_ij5gm")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 4, 0.1, 22)
+
+[node name="road-crossing3" parent="Runway" unique_id=1531129851 instance=ExtResource("7_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0.1, 0)
+
+[node name="road-crossing4" parent="Runway" unique_id=1887339178 instance=ExtResource("7_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0.1, 16)
+
+[node name="road-straight3" parent="Runway" unique_id=758447800 instance=ExtResource("10_e5h8s")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0, -8)
+
+[node name="road-crossing5" parent="Runway" unique_id=1359332888 instance=ExtResource("7_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0, -16)
+
+[node name="road-end4" parent="Runway" unique_id=2012814324 instance=ExtResource("9_ij5gm")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0, -22)
+
+[node name="road-straight5" parent="Runway" unique_id=1839007813 instance=ExtResource("10_e5h8s")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0.1, -8)
+
+[node name="road-crossing6" parent="Runway" unique_id=80546186 instance=ExtResource("7_6c6cu")]
+transform = Transform3D(3.9999998, 0, -6.928203, 0, 8, 0, 6.928203, 0, 3.9999998, 1.75, 0, 2.4592924)
+
+[node name="road-crossing7" parent="Runway" unique_id=344669924 instance=ExtResource("7_6c6cu")]
+transform = Transform3D(3.9999998, 0, -6.928203, 0, 8, 0, 6.928203, 0, 3.9999998, -6.25, 0, -11.397114)
+
+[node name="road-end5" parent="Runway" unique_id=308769514 instance=ExtResource("9_ij5gm")]
+transform = Transform3D(3.9999998, 0, -6.928203, 0, 8, 0, 6.928203, 0, 3.9999998, -9.25, 0, -16.593266)
+
+[node name="road-straight6" parent="Runway" unique_id=1249036644 instance=ExtResource("10_e5h8s")]
+transform = Transform3D(3.9999998, 0, -6.928203, 0, 8, 0, 6.928203, 0, 3.9999998, -2.25, 0, -4.468911)
+
+[node name="road-straight4" parent="Runway" unique_id=1333857411 instance=ExtResource("10_e5h8s")]
+transform = Transform3D(-3.496911e-07, 0, -8, 0, 8, 0, 8, 0, -3.496911e-07, 4, 0.1, 8)
+
+[node name="road-square2" parent="Runway" unique_id=485829790 instance=ExtResource("11_uo1v0")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 14.489804, 0.01999855, 13.199205)
+
+[node name="road-square3" parent="Runway" unique_id=1241165424 instance=ExtResource("11_uo1v0")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 14.489804, 0.01999855, 22.199205)
+
+[node name="Runway_Concrete1" type="MeshInstance3D" parent="Runway" unique_id=85186823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.01, 0)
+mesh = SubResource("Mesh_Runway")
+
+[node name="Runway_Concrete3" type="MeshInstance3D" parent="Runway" unique_id=627366130]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.01, 11)
+mesh = SubResource("BoxMesh_uo1v0")
+
+[node name="Runway_Concrete2" type="MeshInstance3D" parent="Runway" unique_id=593153386]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, -3.8463173, 0.01, -6.9743843)
+mesh = SubResource("BoxMesh_ynsvw")
+
+[node name="Building" type="Node3D" parent="." unique_id=1043888213]
+
+[node name="Tower_Body" type="StaticBody3D" parent="Building" unique_id=1916429136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 8, -12)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Building/Tower_Body" unique_id=1829075708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+shape = SubResource("Shape_Tower")
+
+[node name="Tower" type="MeshInstance3D" parent="Building/Tower_Body" unique_id=1628349077]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+mesh = SubResource("Mesh_Tower")
+
+[node name="Hangar_A_Body" type="StaticBody3D" parent="Building" unique_id=578864223]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.5, 10)
+collision_layer = 8
+
+[node name="Hangar_A" type="MeshInstance3D" parent="Building/Hangar_A_Body" unique_id=1745139551]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
+mesh = SubResource("BoxMesh_4q5k6")
+
+[node name="Hangar_A6" type="MeshInstance3D" parent="Building/Hangar_A_Body" unique_id=397618966]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 4, 0)
+mesh = SubResource("BoxMesh_vyryo")
+
+[node name="Hangar_A2" type="MeshInstance3D" parent="Building/Hangar_A_Body" unique_id=1826048536]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -9, 0, 0)
+mesh = SubResource("BoxMesh_6c6cu")
+
+[node name="Hangar_A3" type="MeshInstance3D" parent="Building/Hangar_A_Body" unique_id=2040336824]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9, 0, 0)
+mesh = SubResource("BoxMesh_6c6cu")
+
+[node name="Hangar_A4" type="MeshInstance3D" parent="Building/Hangar_A_Body" unique_id=1600802874]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 5.97701, 0, -5.353861)
+mesh = SubResource("BoxMesh_4dpcr")
+
+[node name="Hangar_A5" type="MeshInstance3D" parent="Building/Hangar_A_Body" unique_id=801599624]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -5.939314, 0, -5.353861)
+mesh = SubResource("BoxMesh_4dpcr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Building/Hangar_A_Body" unique_id=1951755711]
+shape = SubResource("Shape_Hangar_A")
+
+[node name="Wall" type="Node3D" parent="." unique_id=1291518348]
+
+[node name="Corner_1" type="Node3D" parent="Wall" unique_id=1784867701]
+
+[node name="bridge-pillar-wide28" parent="Wall/Corner_1" unique_id=341947094 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+
+[node name="bridge-pillar-wide29" parent="Wall/Corner_1" unique_id=11799905 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+
+[node name="bridge-pillar-wide49" parent="Wall/Corner_1" unique_id=1912409274 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+
+[node name="bridge-pillar-wide69" parent="Wall/Corner_1" unique_id=1949393815 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Wall/Corner_1" unique_id=2080470487]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/Corner_1/StaticBody3D11" unique_id=532891150]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_4dpcr")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/Corner_1/StaticBody3D11" unique_id=1219285244]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_ij5gm")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="bridge-pillar-wide30" parent="Wall/Corner_1" unique_id=23115047 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide48" parent="Wall/Corner_1" unique_id=1231250390 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide47" parent="Wall/Corner_1" unique_id=1195670998 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Wall/Corner_1" unique_id=573198027]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 12.513412, 1.7084022, 29.459768)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/Corner_1/StaticBody3D16" unique_id=1367029828]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_6c6cu")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/Corner_1/StaticBody3D16" unique_id=86594741]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_e5h8s")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="Corner_2" type="Node3D" parent="Wall" unique_id=271674788]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="bridge-pillar-wide28" parent="Wall/Corner_2" unique_id=603638217 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 4.4999995)
+
+[node name="bridge-pillar-wide29" parent="Wall/Corner_2" unique_id=118927778 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 13.5)
+
+[node name="bridge-pillar-wide49" parent="Wall/Corner_2" unique_id=208825655 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 21.5)
+
+[node name="bridge-pillar-wide69" parent="Wall/Corner_2" unique_id=317424080 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Wall/Corner_2" unique_id=988463511]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 21.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/Corner_2/StaticBody3D11" unique_id=2145078147]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_cjs2e")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/Corner_2/StaticBody3D11" unique_id=1469522144]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_1i5ub")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="bridge-pillar-wide30" parent="Wall/Corner_2" unique_id=1863621019 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide48" parent="Wall/Corner_2" unique_id=798886337 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide47" parent="Wall/Corner_2" unique_id=869589888 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Wall/Corner_2" unique_id=192580057]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/Corner_2/StaticBody3D16" unique_id=1434766804]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_4dpcr")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/Corner_2/StaticBody3D16" unique_id=1633115588]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_ij5gm")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="Corner_3" type="Node3D" parent="Wall" unique_id=1409570620]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="bridge-pillar-wide28" parent="Wall/Corner_3" unique_id=206608735 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+
+[node name="bridge-pillar-wide29" parent="Wall/Corner_3" unique_id=1688022858 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+
+[node name="bridge-pillar-wide49" parent="Wall/Corner_3" unique_id=1256271314 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+
+[node name="bridge-pillar-wide69" parent="Wall/Corner_3" unique_id=1961140571 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Wall/Corner_3" unique_id=1807345627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/Corner_3/StaticBody3D11" unique_id=1941328988]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_4dpcr")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/Corner_3/StaticBody3D11" unique_id=2127354709]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_ij5gm")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="bridge-pillar-wide30" parent="Wall/Corner_3" unique_id=343112949 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 19.5, 0.52, 29.513)
+
+[node name="bridge-pillar-wide48" parent="Wall/Corner_3" unique_id=329584408 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 9.513411, 0.52, 29.513412)
+
+[node name="bridge-pillar-wide47" parent="Wall/Corner_3" unique_id=1407222424 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 0, 0.52, 29.513)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Wall/Corner_3" unique_id=2128296708]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 1.708, 29.46)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/Corner_3/StaticBody3D16" unique_id=490432544]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_uo1v0")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/Corner_3/StaticBody3D16" unique_id=536566767]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_cjs2e")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="bridge-pillar-wide29" parent="Wall" unique_id=130064230 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(1.0490733e-06, 0, 8, 0, 8, 0, -8, 0, 1.0490733e-06, 9.500004, 0.52, -29.499998)
+
+[node name="bridge-pillar-wide49" parent="Wall" unique_id=1553455047 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(1.0490733e-06, 0, 8, 0, 8, 0, -8, 0, 1.0490733e-06, 19.500004, 0.52, -29.499998)
+
+[node name="bridge-pillar-wide69" parent="Wall" unique_id=2131620414 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(1.0490733e-06, 0, 8, 0, 8, 0, -8, 0, 1.0490733e-06, 29.500004, 0.52, -29.499996)
+
+[node name="bridge-pillar-wide30" parent="Wall" unique_id=222009378 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-8, 0, 6.9938216e-07, 0, 8, 0, -6.9938216e-07, 0, -8, 29.513412, 0.52, -21.513409)
+
+[node name="bridge-pillar-wide48" parent="Wall" unique_id=1254173593 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-8, 0, 6.9938216e-07, 0, 8, 0, -6.9938216e-07, 0, -8, 29.513412, 0.52, -12.513407)
+
+[node name="bridge-pillar-wide47" parent="Wall" unique_id=235449376 instance=ExtResource("8_6c6cu")]
+transform = Transform3D(-8, 0, 6.9938216e-07, 0, 8, 0, -6.9938216e-07, 0, -8, 29.51341, 0.52, -3.5134068)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Wall" unique_id=51060743]
+transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 29.45977, 1.7084022, -16.513409)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/StaticBody3D16" unique_id=1892331580]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_4dpcr")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Wall/StaticBody3D16" unique_id=1737761215]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_ij5gm")
+surface_material_override/0 = SubResource("StandardMaterial3D_e5h8s")
+
+[node name="POI_Airport_West" type="Node3D" parent="." unique_id=775460774 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 1, -10)
+script = ExtResource("3_6bx6r")
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_Airport_West" unique_id=1918084044]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_2p3ao")
+
+[node name="Label3D" type="Label3D" parent="POI_Airport_West" unique_id=348676027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_Airport_West" unique_id=1644836764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_Airport_West" unique_id=1345469579]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_Airport_West" unique_id=1510354568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_Airport_West" unique_id=614293636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
+
+[node name="POI_Airport_East" type="Node3D" parent="." unique_id=89452520 groups=["zombie_spawn_zone"]]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 8, 1, 0)
+script = ExtResource("3_6bx6r")
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_Airport_East" unique_id=59008540]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_2p3ao")
+
+[node name="Label3D" type="Label3D" parent="POI_Airport_East" unique_id=851656233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_Airport_East" unique_id=1443108699]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_Airport_East" unique_id=279338659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_Airport_East" unique_id=1781500421]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_Airport_East" unique_id=1437565196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
+
+[node name="AirportObjective" parent="." unique_id=1366891921 instance=ExtResource("10_vyryo")]
+
+[node name="Plane_01" parent="AirportObjective/Targets" parent_id_path=PackedInt32Array(1366891921, 2073077779) index="0" unique_id=2132412150]
+transform = Transform3D(-0.9999304, 0, 0.011799201, 0, 1, 0, -0.011799201, 0, -0.9999304, -10.5, 0, 0)
+
+[node name="Plane_02" parent="AirportObjective/Targets" parent_id_path=PackedInt32Array(1366891921, 2073077779) index="1" unique_id=1061791860]
+transform = Transform3D(-0.9997959, 0, 0.020205453, 0, 1, 0, -0.020205453, 0, -0.9997959, -18.5, 0, 0)
+
+[node name="AirportPlaneTarget" parent="AirportObjective/Targets" parent_id_path=PackedInt32Array(1366891921, 2073077779) index="2" unique_id=1795258964]
+transform = Transform3D(-0.2588191, 0, -0.9659258, 0, 1, 0, 0.9659258, 0, -0.2588191, 14.466866, 0, 13.154263)
+
+[node name="AirportPlaneTarget2" parent="AirportObjective/Targets" parent_id_path=PackedInt32Array(1366891921, 2073077779) index="3" unique_id=429096843]
+transform = Transform3D(0.052074634, 0, -0.9986432, 0, 1, 0, 0.9986432, 0, 0.052074634, 14.157547, 0, 22.088745)
+
+[node name="detail-tank2" parent="." unique_id=74371133 instance=ExtResource("10_6c6cu")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 16, 0, 6)
+
+[node name="detail-tank3" parent="." unique_id=769346913 instance=ExtResource("10_6c6cu")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 16, 0, 2)
+
+[node name="detail-tank4" parent="." unique_id=377747450 instance=ExtResource("10_6c6cu")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 16, 0, -2)
+
+[node name="detail-tank5" parent="." unique_id=668393680 instance=ExtResource("10_6c6cu")]
+transform = Transform3D(-2.6226832e-07, 0, -6, 0, 6, 0, 6, 0, -2.6226832e-07, -25, 0, 7)
+
+[editable path="AirportObjective"]

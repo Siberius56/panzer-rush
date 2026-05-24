@@ -12,23 +12,6 @@
 [ext_resource type="Texture2D" uid="uid://drfgli6h142j7" path="res://asset/ui/aim_target.png" id="10_aimreticle"]
 [ext_resource type="Texture2D" uid="uid://c2unrgvjrnd32" path="res://asset/ui/vehicle_turret_reticle.png" id="11_vehicle_reticle"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4kn3h"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
-expand_margin_left = 96.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wvanu"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-corner_radius_top_right = 128
-corner_radius_bottom_right = 128
-expand_margin_left = 100.0
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eqrcx"]
 content_margin_left = 2.0
 content_margin_top = 2.0
@@ -68,6 +51,23 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4kn3h"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
+expand_margin_left = 96.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wvanu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+corner_radius_top_right = 128
+corner_radius_bottom_right = 128
+expand_margin_left = 100.0
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_844kx"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -78,6 +78,17 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_22eb1"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cl36r"]
 content_margin_left = 0.0
@@ -126,7 +137,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.1, 0.1, 0.1, 0.60784316)
+bg_color = Color(0.1, 0.1, 0.1, 0)
 corner_radius_top_left = 32
 corner_radius_top_right = 32
 corner_radius_bottom_right = 32
@@ -138,17 +149,6 @@ content_margin_top = 2.0
 content_margin_right = 2.0
 content_margin_bottom = 2.0
 bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_22eb1"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
 corner_radius_top_left = 32
 corner_radius_top_right = 32
 corner_radius_bottom_right = 32
@@ -183,73 +183,31 @@ mouse_filter = 2
 [node name="OnFootPanel" type="MarginContainer" parent="Root" unique_id=1400163101]
 unique_name_in_owner = true
 layout_mode = 1
-offset_top = 30.0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -238.0
 offset_right = 552.0
-offset_bottom = 268.0
+grow_vertical = 0
 mouse_filter = 2
 theme_override_constants/margin_bottom = 10
 
 [node name="LeftVBox" type="VBoxContainer" parent="Root/OnFootPanel" unique_id=85744788]
 custom_minimum_size = Vector2(384, 0)
 layout_mode = 2
-theme_override_constants/separation = -4
 
-[node name="OnFootPanel" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=1033469617]
-self_modulate = Color(1, 1, 1, 0)
-custom_minimum_size = Vector2(320, 164)
+[node name="MarginContainer2" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=1522763245]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_4kn3h")
-
-[node name="OnFootMargin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel" unique_id=1135009053]
-custom_minimum_size = Vector2(512, 0)
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 12
-
-[node name="OnFootVBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin" unique_id=527225305]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Panel_Mask" type="Panel" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1492439129]
-clip_children = 1
-custom_minimum_size = Vector2(390, 160)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_wvanu")
-
-[node name="Panel_Back" type="Panel" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask" unique_id=884399994]
-custom_minimum_size = Vector2(380, 128)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -40.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_4kn3h")
-
-[node name="MarginContainer" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask" unique_id=1522763245]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 0
+theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 58
 theme_override_constants/margin_bottom = 12
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer" unique_id=385451704]
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2" unique_id=385451704]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="HealthProgressBar" type="ProgressBar" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer" unique_id=190024948]
+[node name="HealthProgressBar" type="ProgressBar" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer" unique_id=190024948]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
@@ -259,7 +217,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_1bolx")
 value = 45.0
 show_percentage = false
 
-[node name="HealthLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/HealthProgressBar" unique_id=169429897]
+[node name="HealthLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/HealthProgressBar" unique_id=169429897]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -272,14 +230,14 @@ text = "6/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="WeaponSlotsHBox" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer" unique_id=632272740]
+[node name="WeaponSlotsHBox" type="HBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer" unique_id=632272740]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 78)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_constants/separation = 12
 
-[node name="Weapon1Slot" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox" unique_id=1878343279]
+[node name="Weapon1Slot" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox" unique_id=1878343279]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(208, 96)
 layout_mode = 2
@@ -288,18 +246,18 @@ size_flags_vertical = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_weapon_slot")
 
-[node name="Weapon1Margin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot" unique_id=817063111]
+[node name="Weapon1Margin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon1Slot" unique_id=817063111]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 0
 
-[node name="Weapon1VBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin" unique_id=1372238261]
+[node name="Weapon1VBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin" unique_id=1372238261]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Weapon1TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin/Weapon1VBox" unique_id=1981379899]
+[node name="Weapon1TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin/Weapon1VBox" unique_id=1981379899]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -307,7 +265,7 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Weapon1AmmoLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin/Weapon1VBox" unique_id=1849774440]
+[node name="Weapon1AmmoLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon1Slot/Weapon1Margin/Weapon1VBox" unique_id=1849774440]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 18)
 layout_mode = 2
@@ -318,7 +276,7 @@ text = "666"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Weapon2Slot" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox" unique_id=311131073]
+[node name="Weapon2Slot" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox" unique_id=311131073]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(112, 49.39)
 layout_mode = 2
@@ -327,18 +285,18 @@ size_flags_vertical = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_weapon_slot")
 
-[node name="Weapon2Margin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot" unique_id=282976799]
+[node name="Weapon2Margin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon2Slot" unique_id=282976799]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 4
 
-[node name="Weapon2VBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin" unique_id=531783785]
+[node name="Weapon2VBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin" unique_id=531783785]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Weapon2TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin/Weapon2VBox" unique_id=647448776]
+[node name="Weapon2TextureRect" type="TextureRect" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin/Weapon2VBox" unique_id=647448776]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 42)
 layout_mode = 2
@@ -347,7 +305,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Weapon2AmmoLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask/MarginContainer/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin/Weapon2VBox" unique_id=1664702418]
+[node name="Weapon2AmmoLabel" type="Label" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/VBoxContainer/WeaponSlotsHBox/Weapon2Slot/Weapon2Margin/Weapon2VBox" unique_id=1664702418]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(60, 18)
@@ -359,50 +317,54 @@ text = "666"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Control" type="Control" parent="Root/OnFootPanel/LeftVBox/OnFootPanel" unique_id=1218693596]
+[node name="OnFootPanel" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2" unique_id=1033469617]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(320, 164)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4kn3h")
+
+[node name="OnFootMargin" type="MarginContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/OnFootPanel" unique_id=1135009053]
+visible = false
+custom_minimum_size = Vector2(512, 0)
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="OnFootVBox" type="VBoxContainer" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/OnFootPanel/OnFootMargin" unique_id=527225305]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Panel_Mask" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/OnFootPanel/OnFootMargin/OnFootVBox" unique_id=1492439129]
+clip_children = 1
+custom_minimum_size = Vector2(390, 160)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_wvanu")
+
+[node name="Panel_Back" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/OnFootPanel/OnFootMargin/OnFootVBox/Panel_Mask" unique_id=884399994]
+visible = false
+custom_minimum_size = Vector2(380, 128)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_4kn3h")
+
+[node name="Control" type="Control" parent="Root/OnFootPanel/LeftVBox/MarginContainer2/OnFootPanel" unique_id=1218693596]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-
-
-[node name="ObjectivesPanel" type="PanelContainer" parent="Root" unique_id=1928405101]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(380, 0)
-layout_mode = 1
-offset_left = 30.0
-offset_top = 288.0
-offset_right = 430.0
-offset_bottom = 348.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_22eb1")
-
-[node name="ObjectivesMargin" type="MarginContainer" parent="Root/ObjectivesPanel" unique_id=1928405102]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
-
-[node name="ObjectivesVBox" type="VBoxContainer" parent="Root/ObjectivesPanel/ObjectivesMargin" unique_id=1928405103]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ObjectivesTitleLabel" type="Label" parent="Root/ObjectivesPanel/ObjectivesMargin/ObjectivesVBox" unique_id=1928405104]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Objectifs :"
-
-[node name="ObjectivesRichTextLabel" type="RichTextLabel" parent="Root/ObjectivesPanel/ObjectivesMargin/ObjectivesVBox" unique_id=1928405105]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(350, 0)
-layout_mode = 2
-mouse_filter = 2
-bbcode_enabled = true
-text = ""
-fit_content = true
-scroll_active = false
 
 [node name="CommonPanel" type="PanelContainer" parent="Root/OnFootPanel/LeftVBox" unique_id=1010767737]
 visible = false
@@ -441,7 +403,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 24
-columns = 4
+columns = 6
 
 [node name="Panel_Money" type="Panel" parent="Root/OnFootPanel/LeftVBox/MarginContainer/Ressource" unique_id=72789225]
 unique_name_in_owner = true
@@ -662,6 +624,43 @@ theme_override_font_sizes/font_size = 24
 text = "9999"
 vertical_alignment = 2
 
+[node name="ObjectivesPanel" type="PanelContainer" parent="Root" unique_id=1928405101]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 1
+offset_left = 30.0
+offset_top = 288.0
+offset_right = 430.0
+offset_bottom = 348.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_22eb1")
+
+[node name="ObjectivesMargin" type="MarginContainer" parent="Root/ObjectivesPanel" unique_id=1928405102]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="ObjectivesVBox" type="VBoxContainer" parent="Root/ObjectivesPanel/ObjectivesMargin" unique_id=1928405103]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ObjectivesTitleLabel" type="Label" parent="Root/ObjectivesPanel/ObjectivesMargin/ObjectivesVBox" unique_id=1928405104]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Objectifs :"
+
+[node name="ObjectivesRichTextLabel" type="RichTextLabel" parent="Root/ObjectivesPanel/ObjectivesMargin/ObjectivesVBox" unique_id=1928405105]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
 [node name="RightMargin" type="MarginContainer" parent="Root" unique_id=492481391]
 layout_mode = 1
 anchors_preset = 1
@@ -729,6 +728,12 @@ theme_override_constants/outline_size = 4
 text = "Essence 0/0  |  Conso 0/s"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="VehicleSpeedLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Vitesse : 0 km/h"
 
 [node name="CurrentSeatLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=975744003]
 unique_name_in_owner = true

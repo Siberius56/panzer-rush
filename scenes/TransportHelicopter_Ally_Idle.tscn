@@ -455,6 +455,7 @@ _data = {
 [node name="TransportHelicopterEnemySpawner" type="Node3D" unique_id=1279489855]
 
 [node name="Body" type="Node3D" parent="." unique_id=922234537]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 
 [node name="Body" type="MeshInstance3D" parent="Body" unique_id=212071933]
 transform = Transform3D(-1.7, 0, -2.5669289e-07, 0, 1.7, 0, 2.5669289e-07, 0, -1.7, -0.008339081, 0, 0.08038509)

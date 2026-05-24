@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://wpx57b0q3xp"]
+
+[resource]
+resource_name = "woodBarkDark"
+albedo_color = Color(0.82, 0.55541337, 0.4592, 1)
+metallic = 1.0

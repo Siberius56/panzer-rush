@@ -1,0 +1,132 @@
+[gd_scene format=3 uid="uid://c1o7gt7typo25"]
+
+[ext_resource type="Script" uid="uid://dbiabg3bjeylo" path="res://scenes/procedural_generation/scripts/LevelSecondaryPOI.gd" id="1_poi_script"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="2_gmx7m"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_wood"]
+albedo_color = Color(0.26, 0.16, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_DockDeck"]
+material = SubResource("Mat_wood")
+size = Vector3(10, 0.5, 5)
+
+[sub_resource type="BoxShape3D" id="Shape_DockDeck"]
+size = Vector3(10, 0.5, 5)
+
+[sub_resource type="BoxMesh" id="Mesh_Pier_A"]
+material = SubResource("Mat_wood")
+size = Vector3(1, 1.5, 5)
+
+[sub_resource type="BoxShape3D" id="Shape_Pier_A"]
+size = Vector3(1, 1.5, 5)
+
+[sub_resource type="BoxMesh" id="Mesh_Pier_B"]
+material = SubResource("Mat_wood")
+size = Vector3(1, 1.5, 5)
+
+[sub_resource type="BoxShape3D" id="Shape_Pier_B"]
+size = Vector3(1, 1.5, 5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_blue"]
+albedo_color = Color(0.05, 0.13, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Boat"]
+material = SubResource("Mat_blue")
+size = Vector3(5, 0.9, 2.5)
+
+[sub_resource type="BoxShape3D" id="Shape_Boat"]
+size = Vector3(5, 0.9, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wffu6"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[node name="POI_RiverFishingDock" type="Node3D" unique_id=279788164]
+script = ExtResource("1_poi_script")
+poi_id = "secondary_river_dock"
+poi_type = "secondary_water"
+poi_tags = PackedStringArray("water", "river", "land")
+secondary_placement_type = "river"
+secondary_rotation_mode = "follow socket"
+requires_water_near_poi = true
+required_water_type = "river"
+
+[node name="DockDeck" type="MeshInstance3D" parent="." unique_id=1792611353]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -4)
+mesh = SubResource("Mesh_DockDeck")
+
+[node name="DockDeck_Body" type="StaticBody3D" parent="." unique_id=2142813721]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -4)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DockDeck_Body" unique_id=694457899]
+shape = SubResource("Shape_DockDeck")
+
+[node name="Pier_A" type="MeshInstance3D" parent="." unique_id=1261800542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.75, 0)
+mesh = SubResource("Mesh_Pier_A")
+
+[node name="Pier_A_Body" type="StaticBody3D" parent="." unique_id=758007318]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.75, 0)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pier_A_Body" unique_id=1627646809]
+shape = SubResource("Shape_Pier_A")
+
+[node name="Pier_B" type="MeshInstance3D" parent="." unique_id=733322369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.75, 0)
+mesh = SubResource("Mesh_Pier_B")
+
+[node name="Pier_B_Body" type="StaticBody3D" parent="." unique_id=862146878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.75, 0)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pier_B_Body" unique_id=1818200187]
+shape = SubResource("Shape_Pier_B")
+
+[node name="Boat" type="MeshInstance3D" parent="." unique_id=1976186328]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 4)
+mesh = SubResource("Mesh_Boat")
+
+[node name="Boat_Body" type="StaticBody3D" parent="." unique_id=1196616005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 4)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Boat_Body" unique_id=808166890]
+shape = SubResource("Shape_Boat")
+
+[node name="POI_RiverFishing" type="Node3D" parent="." unique_id=1652102953 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -12)
+script = ExtResource("2_gmx7m")
+min_spawn_count = 2
+max_spawn_count = 5
+max_alive_from_zone = 10
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_RiverFishing" unique_id=489928516]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_wffu6")
+
+[node name="Label3D" type="Label3D" parent="POI_RiverFishing" unique_id=1783445602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_RiverFishing" unique_id=101149685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_RiverFishing" unique_id=745235101]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_RiverFishing" unique_id=1350362842]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_RiverFishing" unique_id=774729406]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)

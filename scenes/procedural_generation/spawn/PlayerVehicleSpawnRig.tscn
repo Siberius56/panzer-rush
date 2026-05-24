@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://cjjpkdoh41543"]
+
+[ext_resource type="Script" uid="uid://1ucs7m0x27aq" path="res://scenes/procedural_generation/scripts/PlayerVehicleSpawnRig.gd" id="1_spawn_script"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_spawn"]
+albedo_color = Color(0.12, 0.42, 0.62, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_SpawnPad"]
+material = SubResource("Mat_spawn")
+size = Vector3(18, 0.25, 18)
+
+[sub_resource type="StandardMaterial3D" id="Mat_metal"]
+albedo_color = Color(0.38, 0.4, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_VehiclePad_A"]
+material = SubResource("Mat_metal")
+size = Vector3(6, 0.18, 6)
+
+[sub_resource type="BoxMesh" id="Mesh_VehiclePad_B"]
+material = SubResource("Mat_metal")
+size = Vector3(6, 0.18, 6)
+
+[node name="PlayerVehicleSpawnRig" type="Node3D" unique_id=1184003027]
+script = ExtResource("1_spawn_script")
+
+[node name="SpawnPad" type="MeshInstance3D" parent="." unique_id=832810233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("Mesh_SpawnPad")
+
+[node name="VehiclePad_A" type="MeshInstance3D" parent="." unique_id=1255290435]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.1, 5)
+mesh = SubResource("Mesh_VehiclePad_A")
+
+[node name="VehiclePad_B" type="MeshInstance3D" parent="." unique_id=34815742]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.1, 5)
+mesh = SubResource("Mesh_VehiclePad_B")
+
+[node name="SpawnPoints" type="Node3D" parent="." unique_id=303063077]
+
+[node name="PlayerSpawn_01" type="Node3D" parent="SpawnPoints" unique_id=731593092]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.45, -5)
+
+[node name="PlayerSpawn_02" type="Node3D" parent="SpawnPoints" unique_id=2083253262]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.45, -5)
+
+[node name="PlayerSpawn_03" type="Node3D" parent="SpawnPoints" unique_id=320277738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.45, 0)
+
+[node name="PlayerSpawn_04" type="Node3D" parent="SpawnPoints" unique_id=3233498]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.45, 0)
+
+[node name="VehicleSpawns" type="Node3D" parent="." unique_id=1951919902]
+
+[node name="VehicleSpawn_01" type="Node3D" parent="VehicleSpawns" unique_id=1117860079]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -5, 0.45, 5)
+
+[node name="VehicleSpawn_02" type="Node3D" parent="VehicleSpawns" unique_id=142321028]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 5, 0.45, 5)

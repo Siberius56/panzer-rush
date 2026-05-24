@@ -137,7 +137,6 @@ floor_max_angle = 1.3962634
 script = ExtResource("1_enemy")
 debug_logs = false
 move_speed = 2.15
-max_target_distance = 60.0
 use_direct_move_when_close = true
 direct_move_distance = 2.5
 max_health = 10

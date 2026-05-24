@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://i8vn2pte3jw9q"]
+[gd_scene format=3 uid="uid://bi2wvlyvx46q7"]
 
-[ext_resource type="Script" path="res://scenes/weapons/VisualBullet.gd" id="1_bullet"]
+[ext_resource type="Script" uid="uid://bs32uenhl1arv" path="res://scenes/weapons/VisualBullet.gd" id="1_bullet"]
+[ext_resource type="PackedScene" uid="uid://b05w3s4sqvc32" path="res://scenes/weapons/ProjectileExplosion.tscn" id="2_rmgte"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Rocket"]
 albedo_color = Color(1, 0.45, 0.08, 1)
@@ -8,39 +9,40 @@ emission_enabled = true
 emission = Color(1, 0.25, 0.02, 1)
 emission_energy_multiplier = 1.6
 
-[sub_resource type="StandardMaterial3D" id="Mat_RocketDark"]
-albedo_color = Color(0.08, 0.08, 0.09, 1)
-metallic_specular = 0.45
-roughness = 0.35
-
 [sub_resource type="CapsuleMesh" id="Mesh_Rocket"]
 radius = 0.18
 height = 0.9
 radial_segments = 12
 
-[sub_resource type="BoxMesh" id="Mesh_Fin"]
-size = Vector3(0.08, 0.20, 0.22)
+[sub_resource type="StandardMaterial3D" id="Mat_RocketDark"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+metallic_specular = 0.45
+roughness = 0.35
 
-[node name="VisualRocket" type="Area3D"]
+[sub_resource type="BoxMesh" id="Mesh_Fin"]
+size = Vector3(0.08, 0.2, 0.22)
+
+[node name="VisualRocket" type="Area3D" unique_id=716190694]
 monitorable = false
 script = ExtResource("1_bullet")
-speed = 16.0
+speed = 22.0
 lifetime = 3.2
+hit_effect_scene = ExtResource("2_rmgte")
 debug_logs = false
 
-[node name="RocketBody" type="MeshInstance3D" parent="."]
+[node name="RocketBody" type="MeshInstance3D" parent="." unique_id=1455831775]
 transform = Transform3D(1.9106855e-15, -4.371139e-08, -1, -1, -4.371139e-08, 0, -4.371139e-08, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("Mat_Rocket")
 cast_shadow = 0
 mesh = SubResource("Mesh_Rocket")
 
-[node name="FinLeft" type="MeshInstance3D" parent="."]
+[node name="FinLeft" type="MeshInstance3D" parent="." unique_id=1457714708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0, 0.32)
 material_override = SubResource("Mat_RocketDark")
 cast_shadow = 0
 mesh = SubResource("Mesh_Fin")
 
-[node name="FinRight" type="MeshInstance3D" parent="."]
+[node name="FinRight" type="MeshInstance3D" parent="." unique_id=533352487]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0, 0.32)
 material_override = SubResource("Mat_RocketDark")
 cast_shadow = 0

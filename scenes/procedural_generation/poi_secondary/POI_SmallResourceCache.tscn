@@ -1,0 +1,131 @@
+[gd_scene format=3 uid="uid://cmacdaqfx1r0j"]
+
+[ext_resource type="Script" uid="uid://dbiabg3bjeylo" path="res://scenes/procedural_generation/scripts/LevelSecondaryPOI.gd" id="1_poi_script"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="2_quyps"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_wood"]
+albedo_color = Color(0.26, 0.16, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Crate_A"]
+material = SubResource("Mat_wood")
+size = Vector3(3, 1.5, 3)
+
+[sub_resource type="BoxShape3D" id="Shape_Crate_A"]
+size = Vector3(3, 1.5, 3)
+
+[sub_resource type="BoxMesh" id="Mesh_Crate_B"]
+material = SubResource("Mat_wood")
+size = Vector3(2.5, 1, 2.5)
+
+[sub_resource type="BoxShape3D" id="Shape_Crate_B"]
+size = Vector3(2.5, 1, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_metal"]
+albedo_color = Color(0.45, 0.45, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Barrel_A"]
+material = SubResource("Mat_metal")
+size = Vector3(2, 2, 2)
+
+[sub_resource type="BoxShape3D" id="Shape_Barrel_A"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="Mat_red"]
+albedo_color = Color(0.45, 0.08, 0.05, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_MarkerPole"]
+material = SubResource("Mat_red")
+size = Vector3(0.5, 5, 0.5)
+
+[sub_resource type="BoxShape3D" id="Shape_MarkerPole"]
+size = Vector3(0.5, 5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rmxun"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[node name="POI_SmallResourceCache" type="Node3D" unique_id=2011708018]
+script = ExtResource("1_poi_script")
+poi_id = "secondary_resource_cache"
+poi_type = "secondary_loot"
+poi_tags = PackedStringArray("land", "forest", "plain", "military")
+
+[node name="Crate_A" type="MeshInstance3D" parent="." unique_id=609680520]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.75, 0)
+mesh = SubResource("Mesh_Crate_A")
+
+[node name="Crate_A_Body" type="StaticBody3D" parent="." unique_id=1572919104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.75, 0)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Crate_A_Body" unique_id=78996941]
+shape = SubResource("Shape_Crate_A")
+
+[node name="Crate_B" type="MeshInstance3D" parent="." unique_id=1313462301]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 2)
+mesh = SubResource("Mesh_Crate_B")
+
+[node name="Crate_B_Body" type="StaticBody3D" parent="." unique_id=506532899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 2)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Crate_B_Body" unique_id=967557702]
+shape = SubResource("Shape_Crate_B")
+
+[node name="Barrel_A" type="MeshInstance3D" parent="." unique_id=188640208]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, -3)
+mesh = SubResource("Mesh_Barrel_A")
+
+[node name="Barrel_A_Body" type="StaticBody3D" parent="." unique_id=2111377400]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, -3)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Barrel_A_Body" unique_id=2113390471]
+shape = SubResource("Shape_Barrel_A")
+
+[node name="MarkerPole" type="MeshInstance3D" parent="." unique_id=1270847773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -5)
+mesh = SubResource("Mesh_MarkerPole")
+
+[node name="MarkerPole_Body" type="StaticBody3D" parent="." unique_id=1498012928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -5)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MarkerPole_Body" unique_id=1879567325]
+shape = SubResource("Shape_MarkerPole")
+
+[node name="POI_Small_Resource_Cache" type="Node3D" parent="." unique_id=118265811 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("2_quyps")
+min_spawn_count = 2
+max_spawn_count = 5
+max_alive_from_zone = 10
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_Small_Resource_Cache" unique_id=1355003148]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_rmxun")
+
+[node name="Label3D" type="Label3D" parent="POI_Small_Resource_Cache" unique_id=1166833124]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_Small_Resource_Cache" unique_id=1703345925]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_Small_Resource_Cache" unique_id=1110474257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_Small_Resource_Cache" unique_id=1980414666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_Small_Resource_Cache" unique_id=960643033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)

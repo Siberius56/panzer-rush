@@ -324,7 +324,7 @@ surface_material_override/0 = SubResource("Mat_Head")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, 1.43, -0.06)
 
 [node name="blaster-h2" parent="VisualRoot/Weapon" unique_id=1283352312 instance=ExtResource("6_tja3g")]
-transform = Transform3D(2.05, 0, 0, 0, 1.75, 0, 0, 0, 2.85, 0, -0.03, -0.40)
+transform = Transform3D(2.05, 0, 0, 0, 1.75, 0, 0, 0, 2.85, 0, -0.03, -0.4)
 
 [node name="RifleBody" type="MeshInstance3D" parent="VisualRoot/Weapon" unique_id=469380781]
 visible = false
@@ -359,7 +359,7 @@ surface_material_override/0 = SubResource("Mat_Dark")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, -0.16, -0.38)
 
 [node name="RightGrip" type="Marker3D" parent="VisualRoot/Weapon" unique_id=543679057]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10, -0.20, 0.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, -0.2, 0.02)
 
 [node name="Muzzle" type="Marker3D" parent="VisualRoot/Weapon" unique_id=1086827089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, -1.34)

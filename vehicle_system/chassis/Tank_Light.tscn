@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bytk1jj0bwgrs" path="res://vehicle_system/tank_Bulb.tscn" id="3_a3h3n"]
 [ext_resource type="PackedScene" uid="uid://85fhv522s8eo" path="res://asset/map/misc-2/barrel.glb" id="3_bshfi"]
 [ext_resource type="PackedScene" uid="uid://c3kpi687gtclf" path="res://vehicle_system/turrets/Turret_Light.tscn" id="4_3ojlu"]
+[ext_resource type="Material" uid="uid://dsjewtabdjc2h" path="res://asset/texture/Color_Default_Dark.tres" id="8_7n6k5"]
 [ext_resource type="PackedScene" path="res://vehicle_system/mods/VehicleModMount.tscn" id="10_modmount"]
 [ext_resource type="PackedScene" uid="uid://doahk7r5nqif3" path="res://vehicle_system/mods/examples/ReactorMod.tscn" id="11_reactor"]
 [ext_resource type="PackedScene" uid="uid://dx1yvenaokhcd" path="res://vehicle_system/mods/examples/AmmoPackMod.tscn" id="14_ammo"]
@@ -17,7 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://dslr7j7svjwsl" path="res://vehicle_system/effects/Vehicle_WheelDust.tscn" id="23_wheel_dust"]
 
 [sub_resource type="BoxShape3D" id="2"]
-size = Vector3(2.2891235, 1.4, 3.0295289)
+size = Vector3(2.2891235, 1.4, 2.9172943)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_itmxt"]
 resource_name = "MasterMat"
@@ -89,7 +90,7 @@ continuous_cd = true
 contact_monitor = true
 max_contacts_reported = 16
 linear_damp = 0.08
-angular_damp = 0.18
+angular_damp = 0.32
 script = ExtResource("1")
 vehicle_display_name = "Light Tank"
 chassis_id = "light_tank"
@@ -97,11 +98,22 @@ chassis_price = 1200
 chassis_trade_in_value = 900
 engine_force_forward = 8200.0
 engine_force_reverse = 3500.0
+max_steering_deg = 42.0
+steering_speed = 3.6
+max_forward_speed = 13.5
+max_reverse_speed = 6.0
+speed_limit_soft_zone = 1.8
+speed_steering_reference = 13.5
+min_steering_factor_at_max_speed = 0.42
+min_steering_response_at_max_speed = 0.5
+high_speed_stability_enabled = false
+high_speed_lateral_damping = 1.0
+high_speed_yaw_damping = 1.1
 visual_idle_shake_rotation_degrees = 0.3
 visual_idle_critical_shake_rotation_degrees = 1.8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009307861, 1.2991391, 0.0065979958)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009307861, 1.2991391, 0.0028429031)
 shape = SubResource("2")
 
 [node name="EngineDamageSmoke" parent="." unique_id=1494191944 groups=["vehicle_engine_damage_smoke"] instance=ExtResource("21_engine_smoke")]
@@ -127,25 +139,34 @@ mesh = SubResource("ArrayMesh_785wl")
 surface_material_override/0 = ExtResource("2_be308")
 
 [node name="barrel2" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1258258365 instance=ExtResource("3_bshfi")]
-transform = Transform3D(1.25, -5.4639244e-08, -5.463924e-08, -5.4639244e-08, -5.4639234e-08, -1.25, 5.463924e-08, 1.25, -5.463924e-08, 0.7444445, 0.7506562, -0.51295817)
+transform = Transform3D(1.25, -5.4639248e-08, -5.4639244e-08, -5.4639248e-08, -5.4639234e-08, -1.25, 5.4639244e-08, 1.25, -5.4639244e-08, 0.71944666, 0.75065625, -0.51295817)
 
 [node name="barrel3" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=824926015 instance=ExtResource("3_bshfi")]
-transform = Transform3D(1.25, -5.4639244e-08, -5.463924e-08, -5.4639244e-08, -5.4639234e-08, -1.25, 5.463924e-08, 1.25, -5.463924e-08, 0.7444445, 0.7506562, 0.023681456)
+transform = Transform3D(1.25, -5.463925e-08, -5.4639248e-08, -5.463925e-08, -5.4639234e-08, -1.25, 5.4639248e-08, 1.25, -5.4639248e-08, 0.71944666, 0.7496694, 0.023681456)
 
 [node name="barrel4" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1040396634 instance=ExtResource("3_bshfi")]
-transform = Transform3D(-1.25, 5.463924e-08, -5.463924e-08, -5.4639234e-08, 5.463923e-08, 1.25, 5.4639234e-08, 1.25, -5.4639234e-08, -0.7444445, 0.7506562, -0.51295817)
+transform = Transform3D(-1.25, 5.4639244e-08, -5.4639244e-08, -5.4639234e-08, 5.463923e-08, 1.25, 5.4639234e-08, 1.25, -5.4639234e-08, -0.7175871, 0.75065625, -0.51295817)
 
 [node name="barrel5" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1663058580 instance=ExtResource("3_bshfi")]
-transform = Transform3D(-1.25, 5.463924e-08, -5.463924e-08, -5.4639234e-08, 5.463923e-08, 1.25, 5.4639234e-08, 1.25, -5.4639234e-08, -0.7444445, 0.7506562, 0.023681456)
+transform = Transform3D(-1.25, 5.4639244e-08, -5.4639244e-08, -5.4639234e-08, 5.463923e-08, 1.25, 5.4639234e-08, 1.25, -5.4639234e-08, -0.7175871, 0.75065625, 0.023681456)
 
 [node name="box_bevel2" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=76553973 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.19444445, 0, 0, 0, 0.16666669, 0, 0, 0, 0.1388889, 0.25, 0.8822223, -0.4688889)
 
+[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel2" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("8_7n6k5")
+
 [node name="box_bevel3" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=898445028 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.19444445, 0, 0, 0, 0.16666669, 0, 0, 0, 0.1388889, -0.25, 0.8822223, -0.4688889)
 
+[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel3" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("8_7n6k5")
+
 [node name="box_bevel4" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1851600694 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.2777778, 0, 0, 0, 0.06566757, 0.05130513, 0, -0.05130513, 0.06566757, 6.6227386e-08, 0.82819796, 0.6057321)
+
+[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel4" index="0" unique_id=1933577301]
+surface_material_override/0 = ExtResource("8_7n6k5")
 
 [node name="Tank_Bulb1" parent="BodyVisualRoot/EngineShakeRoot" unique_id=827648905 instance=ExtResource("3_a3h3n")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.78, 0.602, 1.29)
@@ -207,12 +228,11 @@ mod_scene = ExtResource("11_reactor")
 [node name="FrontLeftWheel" type="VehicleWheel3D" parent="." unique_id=1619376301]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, 0.9)
 use_as_steering = true
-wheel_roll_influence = 0.4
+wheel_roll_influence = 0.25
 wheel_radius = 0.48
-wheel_rest_length = 0.18
-wheel_friction_slip = 2.0
-suspension_stiffness = 59.0
-damping_compression = 0.15
+wheel_friction_slip = 1.0
+suspension_stiffness = 30.0
+suspension_max_force = 9000.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="FrontLeftWheel" unique_id=5496198]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
@@ -222,12 +242,11 @@ surface_material_override/0 = SubResource("6")
 [node name="FrontRightWheel" type="VehicleWheel3D" parent="." unique_id=887756342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, 0.9)
 use_as_steering = true
-wheel_roll_influence = 0.4
+wheel_roll_influence = 0.25
 wheel_radius = 0.48
-wheel_rest_length = 0.18
-wheel_friction_slip = 2.0
-suspension_stiffness = 59.0
-damping_compression = 0.15
+wheel_friction_slip = 1.0
+suspension_stiffness = 30.0
+suspension_max_force = 9000.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="FrontRightWheel" unique_id=1299802971]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
@@ -237,12 +256,11 @@ surface_material_override/0 = SubResource("6")
 [node name="RearLeftWheel" type="VehicleWheel3D" parent="." unique_id=347284515]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, -0.9)
 use_as_traction = true
-wheel_roll_influence = 0.4
+wheel_roll_influence = 0.25
 wheel_radius = 0.48
-wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
-suspension_stiffness = 59.0
-damping_compression = 0.15
+wheel_friction_slip = 1.0
+suspension_stiffness = 30.0
+suspension_max_force = 9000.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RearLeftWheel" unique_id=192094562]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
@@ -252,12 +270,11 @@ surface_material_override/0 = SubResource("6")
 [node name="RearRightWheel" type="VehicleWheel3D" parent="." unique_id=999012565]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, -0.9)
 use_as_traction = true
-wheel_roll_influence = 0.4
+wheel_roll_influence = 0.25
 wheel_radius = 0.48
-wheel_rest_length = 0.18
-wheel_friction_slip = 1.15
-suspension_stiffness = 59.0
-damping_compression = 0.15
+wheel_friction_slip = 1.0
+suspension_stiffness = 30.0
+suspension_max_force = 9000.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RearRightWheel" unique_id=386629346]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
@@ -285,3 +302,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.5, 0)
 
 [connection signal="body_entered" from="UseArea" to="." method="_on_use_area_body_entered"]
 [connection signal="body_exited" from="UseArea" to="." method="_on_use_area_body_exited"]
+
+[editable path="BodyVisualRoot/EngineShakeRoot/Body/box_bevel2"]
+[editable path="BodyVisualRoot/EngineShakeRoot/Body/box_bevel3"]
+[editable path="BodyVisualRoot/EngineShakeRoot/Body/box_bevel4"]

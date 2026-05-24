@@ -23,17 +23,11 @@
 [ext_resource type="Texture2D" uid="uid://c56oytkp3ohe7" path="res://asset/texture/ocean_shader_00001.png" id="25_q5xom"]
 [ext_resource type="PackedScene" uid="uid://dp4jt1qet3xpi" path="res://asset/map/road/road-intersection-line.glb" id="27_sdsmh"]
 [ext_resource type="PackedScene" uid="uid://d3sqpgrwux1wu" path="res://asset/map/road/road-bend.glb" id="28_clx6r"]
-[ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="32_cbrl2"]
-[ext_resource type="PackedScene" uid="uid://dtr3vsks0m8ha" path="res://scenes/enemies/NetworkAntiTankEnemy.tscn" id="33_4cdpb"]
-[ext_resource type="PackedScene" uid="uid://bhco65jtlmy2p" path="res://scenes/enemies/NetworkHammerEnemy.tscn" id="34_lcu40"]
-[ext_resource type="PackedScene" uid="uid://bd78wreowete4" path="res://scenes/enemies/NetworkRiflemanEnemy.tscn" id="35_fo8hi"]
-[ext_resource type="PackedScene" uid="uid://bfpc4axn5l5io" path="res://scenes/enemies/NetworkTonfaEnemy.tscn" id="36_tcjqq"]
-[ext_resource type="PackedScene" uid="uid://bwy12lut3bneu" path="res://scenes/enemies/NetworkShieldEnemy.tscn" id="37_lcu40"]
 [ext_resource type="PackedScene" uid="uid://4g474b8gkrh6" path="res://scenes/enemies/NetworkZombieEnemy.tscn" id="53_pqnt3"]
 [ext_resource type="PackedScene" uid="uid://0lv7orsfam4y" path="res://scenes/triggers/Killzone.tscn" id="70_878j0"]
 [ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="76_em636"]
 [ext_resource type="Shader" uid="uid://bqnj12xicl2pw" path="res://asset/pastel_vignette.gdshader" id="77_0gsk6"]
-[ext_resource type="Script" uid="uid://vfp2lnkr8vd5" path="res://scripts/game/zombie_director/HordeDirectorDemo.gd" id="200_director"]
+[ext_resource type="Script" uid="uid://vfp2lnkr8vd5" path="res://scripts/game/zombie_director/HordeDirector.gd" id="200_director"]
 [ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="201_zone"]
 [ext_resource type="Script" uid="uid://uoltysxx0x3w" path="res://scripts/game/zombie_director/HordeDirectorDebugHUD.gd" id="202_hud"]
 [ext_resource type="PackedScene" path="res://scenes/debug/DemoZombiePlaceholder.tscn" id="203_placeholder"]
@@ -500,7 +494,7 @@ transform = Transform3D(0.9907455, 0, -0.13573286, 0, 1, 0, 0.13573286, 0, 0.990
 [node name="plane_noise" parent="NavigationRegion3D/01_Forest" unique_id=1139489821 instance=ExtResource("13_6ho5a")]
 transform = Transform3D(0.5, 0, 0, 0, 0.49999997, 0, 0, 0, 0.49999997, 0, -1.4414434, 66.809)
 
-[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=202957429]
+[node name="Plane" parent="NavigationRegion3D/01_Forest/plane_noise" index="0" unique_id=264337654]
 transform = Transform3D(20, 0, 0, 0, 2, 9.9341065e-08, 0, -3.9736427e-08, 5, 0, 0, 0)
 surface_material_override/0 = SubResource("StandardMaterial3D_46sg2")
 
@@ -870,12 +864,6 @@ collision_mask = 1
 
 [node name="Enemies" type="Node3D" parent="." unique_id=1573742361]
 
-[node name="NetworkZombieEnemy" parent="Enemies" unique_id=2032012782 instance=ExtResource("53_pqnt3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.859798, 5.3562036, 92.10262)
-move_speed = 1.5
-direct_move_distance = 9.0
-enemy_separation_radius = 2.0
-
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1361244026]
 
 [node name="NetworkHUD" parent="CanvasLayer" unique_id=1913491278 instance=ExtResource("76_em636")]
@@ -897,6 +885,7 @@ offset_top = 20.0
 offset_right = -20.0
 offset_bottom = 250.0
 script = ExtResource("202_hud")
+director_path = NodePath("../../HordeDirector")
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/HordeDirectorDebugPanel" unique_id=1143204930]
 layout_mode = 2
@@ -957,7 +946,7 @@ Utilisée si aucun joueur n'est présent"
 font_size = 40
 outline_size = 10
 
-[node name="ZombieHordeDirector_DEMO" type="Node3D" parent="." unique_id=574520392]
+[node name="HordeDirector" type="Node3D" parent="." unique_id=574520392]
 script = ExtResource("200_director")
 use_placeholder_zombies = false
 placeholder_zombie_scene = ExtResource("203_placeholder")
@@ -969,9 +958,9 @@ cooldown_seconds = 10.0
 max_alive_zombies = 70
 max_idle_zones_populated_on_ready = 2
 
-[node name="SpawnZones" type="Node3D" parent="ZombieHordeDirector_DEMO" unique_id=1745635484]
+[node name="SpawnZones" type="Node3D" parent="HordeDirector" unique_id=1745635484]
 
-[node name="IdleAlreadyPresent_StartRoad" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=663375009 groups=["zombie_spawn_zone"]]
+[node name="IdleAlreadyPresent_StartRoad" type="Node3D" parent="HordeDirector/SpawnZones" unique_id=663375009 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.71372, 2.3057022, 43.48575)
 script = ExtResource("201_zone")
 zone_label = "IDLE - route de départ"
@@ -981,11 +970,11 @@ min_distance_from_target = 0.0
 max_distance_from_target = 999.0
 cooldown_seconds = 40.0
 
-[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=485520966]
+[node name="DebugArea" type="CSGBox3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=485520966]
 size = Vector3(16, 0.12, 12)
 material = SubResource("StandardMaterial3D_director_idle")
 
-[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=483530924]
+[node name="Label3D" type="Label3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=483530924]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
 billboard = 1
 no_depth_test = true
@@ -995,19 +984,19 @@ Ils servent à rendre la zone habitée."
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=1057932797]
+[node name="SpawnPoint_01" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=1057932797]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=228755355]
+[node name="SpawnPoint_02" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=228755355]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=517949542]
+[node name="SpawnPoint_03" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=517949542]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
 
-[node name="SpawnPoint_04" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=1392413636]
+[node name="SpawnPoint_04" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_StartRoad" unique_id=1392413636]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
 
-[node name="IdleAlreadyPresent_BaseStorage" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=890620770 groups=["zombie_spawn_zone"]]
+[node name="IdleAlreadyPresent_BaseStorage" type="Node3D" parent="HordeDirector/SpawnZones" unique_id=890620770 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.808201, 1, 28.97483)
 script = ExtResource("201_zone")
 zone_label = "IDLE - base / stockage"
@@ -1018,11 +1007,11 @@ min_distance_from_target = 0.0
 max_distance_from_target = 999.0
 cooldown_seconds = 40.0
 
-[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=1112725014]
+[node name="DebugArea" type="CSGBox3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=1112725014]
 size = Vector3(18, 0.12, 14)
 material = SubResource("StandardMaterial3D_director_idle")
 
-[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=333921227]
+[node name="Label3D" type="Label3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=333921227]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 billboard = 1
 no_depth_test = true
@@ -1032,19 +1021,19 @@ Le joueur peut choisir de contourner ou nettoyer."
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=592096433]
+[node name="SpawnPoint_01" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=592096433]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, -4)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=214694524]
+[node name="SpawnPoint_02" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=214694524]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -3)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=1793311419]
+[node name="SpawnPoint_03" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=1793311419]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.801405, 0.20000005, 1.3125763)
 
-[node name="SpawnPoint_04" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=377586767]
+[node name="SpawnPoint_04" type="Marker3D" parent="HordeDirector/SpawnZones/IdleAlreadyPresent_BaseStorage" unique_id=377586767]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19859505, 0.20000005, 2.3125763)
 
-[node name="HordeAttack_LeftForest" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=695729265 groups=["zombie_spawn_zone"]]
+[node name="HordeAttack_LeftForest" type="Node3D" parent="HordeDirector/SpawnZones" unique_id=695729265 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 2.0101318, 72)
 script = ExtResource("201_zone")
 zone_label = "HORDE - flanc gauche"
@@ -1055,11 +1044,11 @@ max_alive_from_zone = 28
 max_distance_from_target = 140.0
 cooldown_seconds = 55.0
 
-[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=1681902579]
+[node name="DebugArea" type="CSGBox3D" parent="HordeDirector/SpawnZones/HordeAttack_LeftForest" unique_id=1681902579]
 size = Vector3(20, 0.12, 14)
 material = SubResource("StandardMaterial3D_director_horde")
 
-[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=1059912837]
+[node name="Label3D" type="Label3D" parent="HordeDirector/SpawnZones/HordeAttack_LeftForest" unique_id=1059912837]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 billboard = 1
 no_depth_test = true
@@ -1069,19 +1058,19 @@ Spawn dynamique.
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=2024513183]
+[node name="SpawnPoint_01" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_LeftForest" unique_id=2024513183]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.2, -4)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=353768218]
+[node name="SpawnPoint_02" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_LeftForest" unique_id=353768218]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.2, 5)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=912069366]
+[node name="SpawnPoint_03" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_LeftForest" unique_id=912069366]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, -2)
 
-[node name="SpawnPoint_04" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_LeftForest" unique_id=1919598696]
+[node name="SpawnPoint_04" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_LeftForest" unique_id=1919598696]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, 4)
 
-[node name="HordeAttack_RoadSide" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=960340302 groups=["zombie_spawn_zone"]]
+[node name="HordeAttack_RoadSide" type="Node3D" parent="HordeDirector/SpawnZones" unique_id=960340302 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2.766817, 100)
 script = ExtResource("201_zone")
 zone_label = "HORDE - route latérale"
@@ -1092,11 +1081,11 @@ max_alive_from_zone = 24
 max_distance_from_target = 140.0
 cooldown_seconds = 50.0
 
-[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1912895770]
+[node name="DebugArea" type="CSGBox3D" parent="HordeDirector/SpawnZones/HordeAttack_RoadSide" unique_id=1912895770]
 size = Vector3(18, 0.12, 12)
 material = SubResource("StandardMaterial3D_director_horde")
 
-[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1681390735]
+[node name="Label3D" type="Label3D" parent="HordeDirector/SpawnZones/HordeAttack_RoadSide" unique_id=1681390735]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 billboard = 1
 no_depth_test = true
@@ -1106,16 +1095,16 @@ Puis il spawn par salves."
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1145035954]
+[node name="SpawnPoint_01" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_RoadSide" unique_id=1145035954]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=1690160488]
+[node name="SpawnPoint_02" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_RoadSide" unique_id=1690160488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 4)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_RoadSide" unique_id=2075963345]
+[node name="SpawnPoint_03" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_RoadSide" unique_id=2075963345]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -2)
 
-[node name="MixedCrossing" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=1802921650 groups=["zombie_spawn_zone"]]
+[node name="MixedCrossing" type="Node3D" parent="HordeDirector/SpawnZones" unique_id=1802921650 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.6224, 4.0951777, 74.810234)
 script = ExtResource("201_zone")
 zone_label = "MIXTE - carrefour"
@@ -1125,11 +1114,11 @@ min_distance_from_target = 22.0
 max_distance_from_target = 140.0
 cooldown_seconds = 45.0
 
-[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1763654316]
+[node name="DebugArea" type="CSGBox3D" parent="HordeDirector/SpawnZones/MixedCrossing" unique_id=1763654316]
 size = Vector3(16, 0.12, 16)
 material = SubResource("StandardMaterial3D_director_mixed")
 
-[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1721797232]
+[node name="Label3D" type="Label3D" parent="HordeDirector/SpawnZones/MixedCrossing" unique_id=1721797232]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 billboard = 1
 no_depth_test = true
@@ -1139,16 +1128,16 @@ Peut aussi servir de renfort dynamique."
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1238467468]
+[node name="SpawnPoint_01" type="Marker3D" parent="HordeDirector/SpawnZones/MixedCrossing" unique_id=1238467468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=109131698]
+[node name="SpawnPoint_02" type="Marker3D" parent="HordeDirector/SpawnZones/MixedCrossing" unique_id=109131698]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/MixedCrossing" unique_id=1600106379]
+[node name="SpawnPoint_03" type="Marker3D" parent="HordeDirector/SpawnZones/MixedCrossing" unique_id=1600106379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
 
-[node name="HordeAttack_EndArea" type="Node3D" parent="ZombieHordeDirector_DEMO/SpawnZones" unique_id=918720470 groups=["zombie_spawn_zone"]]
+[node name="HordeAttack_EndArea" type="Node3D" parent="HordeDirector/SpawnZones" unique_id=918720470 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 88, 4.6445227, 96)
 script = ExtResource("201_zone")
 zone_label = "HORDE - fin de section"
@@ -1160,11 +1149,11 @@ min_distance_from_target = 30.0
 max_distance_from_target = 160.0
 cooldown_seconds = 65.0
 
-[node name="DebugArea" type="CSGBox3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=928804156]
+[node name="DebugArea" type="CSGBox3D" parent="HordeDirector/SpawnZones/HordeAttack_EndArea" unique_id=928804156]
 size = Vector3(24, 0.12, 18)
 material = SubResource("StandardMaterial3D_director_horde")
 
-[node name="Label3D" type="Label3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=1806606774]
+[node name="Label3D" type="Label3D" parent="HordeDirector/SpawnZones/HordeAttack_EndArea" unique_id=1806606774]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 billboard = 1
 no_depth_test = true
@@ -1174,48 +1163,13 @@ Grosse pression avant un passageGate.
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=1864776025]
+[node name="SpawnPoint_01" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_EndArea" unique_id=1864776025]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=522319440]
+[node name="SpawnPoint_02" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_EndArea" unique_id=522319440]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="ZombieHordeDirector_DEMO/SpawnZones/HordeAttack_EndArea" unique_id=216610861]
+[node name="SpawnPoint_03" type="Marker3D" parent="HordeDirector/SpawnZones/HordeAttack_EndArea" unique_id=216610861]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)
-
-[node name="WorldWeapon3D" parent="." unique_id=2144849267 instance=ExtResource("32_cbrl2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08011818, 0.47831345, 91.05378)
-editor_weapon_id = "smg"
-
-[node name="WorldWeapon3D2" parent="." unique_id=493080299 instance=ExtResource("32_cbrl2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.27911, 0.47831345, 89.061905)
-editor_weapon_id = "smg"
-
-[node name="WorldWeapon3D3" parent="." unique_id=1122983310 instance=ExtResource("32_cbrl2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27910995, 0.47831345, 90.061905)
-editor_weapon_id = "smg"
-
-[node name="WorldWeapon3D4" parent="." unique_id=2051183287 instance=ExtResource("32_cbrl2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.27911, 0.47831345, 91.061905)
-editor_weapon_id = "smg"
-
-[node name="NetworkAntiTankEnemy" parent="." unique_id=812494490 instance=ExtResource("33_4cdpb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.710907, 6.643158, 94.24587)
-weapon_local_position = Vector3(0.22, 1.18, -0.5)
-
-[node name="NetworkHammerEnemy" parent="." unique_id=1363286513 instance=ExtResource("34_lcu40")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.641972, 1.1283163, 92.00883)
-
-[node name="NetworkRiflemanEnemy" parent="." unique_id=1651274459 instance=ExtResource("35_fo8hi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.662445, 1.1283144, 91.93446)
-
-[node name="NetworkTonfaEnemy" parent="." unique_id=1144211930 instance=ExtResource("36_tcjqq")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.211964, 1.1283134, 86.86137)
-
-[node name="NetworkShieldEnemy" parent="." unique_id=1917419039 instance=ExtResource("37_lcu40")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.961937, 1.1283153, 95.503395)
-visual_size_scale = 1.0
-aim_height = 1.1
-weapon_local_position = Vector3(0, 1.2, -0.58)
 
 [editable path="NavigationRegion3D/01_Forest/plane_noise"]

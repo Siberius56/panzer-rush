@@ -1,295 +1,197 @@
-extends StaticBody3D
-class_name BombRadarObjective
+extends Node3D
 
-signal armed_state_changed(is_armed: bool, remaining_seconds: float)
-signal destroyed_state_changed(is_destroyed: bool)
+# BombRadarObjective.gd
+# Fichier complet à remplacer.
+# Godot 4.x / 4.6
+#
+# Rôle :
+# - S'enregistre comme provider d'objectif.
+# - Affiche l'objectif dans les HUD des joueurs.
+# - Termine l'objectif quand complete_objective() est appelé.
+# - Résiste à la régénération procédurale, même si le node est supprimé pendant un call_deferred.
+
 signal objective_registered(objective_id: String, objective_text: String)
 signal objective_completed(objective_id: String)
-signal objectif_completed(objective_id: String)
-
-const DEFAULT_EXPLOSION_SCENE := preload("res://scenes/weapons/ProjectileExplosion.tscn")
+signal objective_removed(objective_id: String)
 
 @export_group("Objective")
-@export var activation_duration: float = 5.0
-@export var consume_bomb_on_success: bool = true
-
-@export_group("HUD Objective")
 @export var objective_id: String = ""
-@export_multiline var objective_text: String = "Détruire le radar pour permettre l’accès au support aérien."
-@export var register_objective_on_ready: bool = true
+@export var objective_text: String = "Destroy the radar"
+@export var completed_text: String = "Radar destroyed"
+@export var register_on_ready: bool = true
+@export var remove_from_hud_on_exit: bool = true
 
-@export_group("Explosion")
-@export var explosion_scene: PackedScene = DEFAULT_EXPLOSION_SCENE
-@export var bomb_explosion_damage: int = 120
-@export var radar_explosion_damage: int = 80
-@export var explosion_penetration: int = 0
-@export var explosion_team: int = 0
-@export var explosion_tk: bool = true
-@export var radar_explosion_offset: Vector3 = Vector3(0.0, 1.1, 0.0)
-
-@onready var activation_area: Area3D = %ActivationArea
-@onready var countdown_label: Label3D = %CountdownLabel
-@onready var animation_player: AnimationPlayer = %AnimationPlayer
+@export_group("Optional Target")
+@export var target_node_path: NodePath
+@export var auto_complete_when_target_exits_tree: bool = false
 
 var is_destroyed: bool = false
-var _is_armed: bool = false
-var _remaining_seconds: float = 0.0
-var _tracked_bomb: WorldWeapon3D = null
-var _resolved_objective_id: String = ""
-var _objective_completion_notified: bool = false
+var _is_registered: bool = false
+var _target_node: Node = null
 
 
 func _ready() -> void:
-	add_to_group("objective_radar")
 	add_to_group("objective_providers")
-	_resolved_objective_id = _build_objective_id()
-	_remaining_seconds = activation_duration
 
-	if activation_area != null:
-		activation_area.body_entered.connect(_on_activation_body_entered)
-		activation_area.body_exited.connect(_on_activation_body_exited)
-		call_deferred("_scan_initial_overlaps")
+	_connect_optional_target()
 
-	_update_countdown_label()
-
-	if register_objective_on_ready:
-		call_deferred("_notify_objective_registered")
+	if register_on_ready:
+		call_deferred("_deferred_register_objective")
 
 
+func _exit_tree() -> void:
+	# Quand la map est régénérée, le POI et ses objectifs peuvent disparaître.
+	# On tente de retirer proprement l'objectif du HUD, sans crasher si l'arbre n'existe déjà plus.
+	if remove_from_hud_on_exit and _is_registered and not is_destroyed:
+		_safe_call_player_huds("unregister_objective", [get_objective_id()])
+		objective_removed.emit(get_objective_id())
 
-func _build_objective_id() -> String:
-	var clean_id: String = objective_id.strip_edges()
-	if not clean_id.is_empty():
-		return clean_id
-
-	var path_id: String = str(get_path()).replace("/", "_").replace(":", "_")
-	return "%s_%s" % [name, path_id]
+	_is_registered = false
+	_target_node = null
 
 
 func get_objective_id() -> String:
-	if _resolved_objective_id.is_empty():
-		_resolved_objective_id = _build_objective_id()
-	return _resolved_objective_id
+	if not objective_id.strip_edges().is_empty():
+		return objective_id.strip_edges()
+
+	# ID stable par défaut, assez lisible dans le debug.
+	# Le chemin peut changer après génération, donc on inclut aussi le nom.
+	var path_text: String = ""
+	if is_inside_tree():
+		path_text = str(get_path())
+	else:
+		path_text = name
+
+	return "%s_%d" % [name, path_text.hash()]
 
 
-func send_objective_to_hud(hud: Node) -> void:
-	if hud == null or not is_instance_valid(hud):
+func get_objective_text() -> String:
+	return objective_text
+
+
+func is_objective_completed() -> bool:
+	return is_destroyed
+
+
+func register_objective_now() -> void:
+	_deferred_register_objective()
+
+
+func complete_objective() -> void:
+	if is_destroyed:
 		return
-	if not hud.has_method("register_objective"):
+
+	is_destroyed = true
+	objective_completed.emit(get_objective_id())
+
+	_safe_call_player_huds("complete_objective", [get_objective_id(), completed_text])
+	_safe_call_player_huds("set_objective_completed", [get_objective_id(), true])
+	_safe_call_player_huds("update_objective_status", [get_objective_id(), true])
+
+
+func fail_or_remove_objective() -> void:
+	# Utile si un objectif devient invalide sans être complété.
+	if not _is_registered:
 		return
 
-	hud.call("register_objective", get_objective_id(), objective_text, is_destroyed)
+	_safe_call_player_huds("unregister_objective", [get_objective_id()])
+	objective_removed.emit(get_objective_id())
+	_is_registered = false
 
 
-func _notify_objective_registered() -> void:
+func reset_objective() -> void:
+	is_destroyed = false
+	_is_registered = false
+	_deferred_register_objective()
+
+
+# Aliases pratiques, pour éviter de casser si une scène appelle déjà un ancien nom.
+func notify_destroyed() -> void:
+	complete_objective()
+
+
+func mark_completed() -> void:
+	complete_objective()
+
+
+func set_completed(value: bool = true) -> void:
+	if value:
+		complete_objective()
+	else:
+		is_destroyed = false
+		_safe_call_player_huds("set_objective_completed", [get_objective_id(), false])
+		_safe_call_player_huds("update_objective_status", [get_objective_id(), false])
+
+
+func _deferred_register_objective() -> void:
+	# Sécurité essentielle.
+	# Si la map est régénérée avant l'exécution du call_deferred, le node n'est plus dans l'arbre.
+	if not is_inside_tree():
+		return
+
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return
+
 	var id: String = get_objective_id()
+	if id.strip_edges().is_empty():
+		return
+
+	_is_registered = true
 	objective_registered.emit(id, objective_text)
-	get_tree().call_group("player_huds", "register_objective", id, objective_text, is_destroyed)
+
+	_safe_call_player_huds("register_objective", [id, objective_text, is_destroyed])
+	_safe_call_player_huds("set_objective_completed", [id, is_destroyed])
+	_safe_call_player_huds("update_objective_status", [id, is_destroyed])
 
 
-func _notify_objective_completed() -> void:
-	if _objective_completion_notified:
+func _connect_optional_target() -> void:
+	if target_node_path.is_empty():
 		return
 
-	_objective_completion_notified = true
-	var id: String = get_objective_id()
-	objective_completed.emit(id)
-	objectif_completed.emit(id)
-	get_tree().call_group("player_huds", "complete_objective", id)
-
-
-func _process(delta: float) -> void:
-	if not multiplayer.is_server():
+	_target_node = get_node_or_null(target_node_path)
+	if _target_node == null:
 		return
 
-	if is_destroyed:
+	# Support de plusieurs noms de signaux possibles selon tes objets.
+	_try_connect_signal(_target_node, "objective_completed", Callable(self, "complete_objective"))
+	_try_connect_signal(_target_node, "destroyed", Callable(self, "complete_objective"))
+	_try_connect_signal(_target_node, "died", Callable(self, "complete_objective"))
+	_try_connect_signal(_target_node, "tree_exiting", Callable(self, "_on_target_tree_exiting"))
+
+
+func _on_target_tree_exiting() -> void:
+	if auto_complete_when_target_exits_tree:
+		complete_objective()
+	else:
+		fail_or_remove_objective()
+
+
+func _try_connect_signal(source: Object, signal_name: String, target_callable: Callable) -> void:
+	if source == null:
+		return
+	if not source.has_signal(signal_name):
+		return
+	if source.is_connected(signal_name, target_callable):
 		return
 
-	if not _is_armed:
+	source.connect(signal_name, target_callable)
+
+
+func _safe_call_player_huds(method_name: String, args: Array = []) -> void:
+	if not is_inside_tree():
 		return
 
-	if not _is_valid_tracked_bomb_inside():
-		_cancel_arming()
+	var tree: SceneTree = get_tree()
+	if tree == null:
 		return
 
-	_remaining_seconds = maxf(_remaining_seconds - delta, 0.0)
-	_update_countdown_label()
-	_receive_armed_state.rpc(true, _remaining_seconds)
+	for hud_node: Node in tree.get_nodes_in_group("player_huds"):
+		if hud_node == null:
+			continue
+		if not is_instance_valid(hud_node):
+			continue
+		if not hud_node.has_method(method_name):
+			continue
 
-	if _remaining_seconds <= 0.0:
-		_complete_objective()
-
-
-func _scan_initial_overlaps() -> void:
-	if activation_area == null:
-		return
-
-	for body in activation_area.get_overlapping_bodies():
-		_try_track_bomb(body)
-		if _tracked_bomb != null:
-			return
-
-
-func _on_activation_body_entered(body: Node3D) -> void:
-	_try_track_bomb(body)
-
-
-func _on_activation_body_exited(body: Node3D) -> void:
-	if _tracked_bomb == null:
-		return
-
-	if body == _tracked_bomb:
-		_cancel_arming()
-
-
-func _try_track_bomb(body: Node) -> void:
-	if is_destroyed:
-		return
-
-	if not multiplayer.is_server():
-		return
-
-	var bomb: WorldWeapon3D = _find_bomb_from_node(body)
-	if bomb == null:
-		return
-
-	_tracked_bomb = bomb
-	_start_arming()
-
-
-func _find_bomb_from_node(node: Node) -> WorldWeapon3D:
-	var current: Node = node
-	while current != null:
-		if current is WorldWeapon3D:
-			var world_weapon: WorldWeapon3D = current as WorldWeapon3D
-			if world_weapon.has_method("is_objective_bomb") and world_weapon.call("is_objective_bomb") == true:
-				return world_weapon
-		current = current.get_parent()
-
-	return null
-
-
-func _start_arming() -> void:
-	if _is_armed:
-		return
-
-	_is_armed = true
-	_remaining_seconds = activation_duration
-	_update_countdown_label()
-	_receive_armed_state.rpc(true, _remaining_seconds)
-
-
-func _cancel_arming() -> void:
-	if not _is_armed:
-		return
-
-	_is_armed = false
-	_remaining_seconds = activation_duration
-	_tracked_bomb = null
-	_update_countdown_label()
-	_receive_armed_state.rpc(false, _remaining_seconds)
-
-
-func _is_valid_tracked_bomb_inside() -> bool:
-	if _tracked_bomb == null or not is_instance_valid(_tracked_bomb):
-		return false
-
-	if activation_area == null:
-		return false
-
-	return activation_area.get_overlapping_bodies().has(_tracked_bomb)
-
-
-func _complete_objective() -> void:
-	if is_destroyed:
-		return
-
-	var bomb_position: Vector3 = global_position
-	if _tracked_bomb != null and is_instance_valid(_tracked_bomb):
-		bomb_position = _tracked_bomb.global_position
-
-	_spawn_objective_explosion.rpc(bomb_position, bomb_explosion_damage)
-
-	if consume_bomb_on_success and _tracked_bomb != null and is_instance_valid(_tracked_bomb):
-		_tracked_bomb.despawn()
-
-	_set_destroyed(true)
-	_spawn_objective_explosion.rpc(global_position + radar_explosion_offset, radar_explosion_damage)
-
-
-func _set_destroyed(value: bool) -> void:
-	if is_destroyed == value:
-		return
-
-	is_destroyed = value
-	_is_armed = false
-	_remaining_seconds = 0.0
-	_tracked_bomb = null
-	_update_countdown_label()
-	_receive_destroyed_state.rpc(is_destroyed)
-
-
-func _play_dead_animation() -> void:
-	if animation_player == null:
-		return
-
-	if animation_player.has_animation("dead"):
-		animation_player.play("dead")
-
-
-func _update_countdown_label() -> void:
-	if countdown_label == null:
-		return
-
-	if is_destroyed:
-		countdown_label.visible = false
-		return
-
-	countdown_label.visible = _is_armed
-	if _is_armed:
-		countdown_label.text = "%.1f" % _remaining_seconds
-
-
-func _spawn_explosion_local(position: Vector3, damage_amount: int) -> void:
-	if explosion_scene == null:
-		return
-
-	var explosion: Node = explosion_scene.instantiate()
-	if explosion == null:
-		return
-
-	get_tree().current_scene.add_child(explosion)
-	if explosion is Node3D:
-		(explosion as Node3D).global_position = position
-
-	if explosion.has_method("configure_from_projectile"):
-		explosion.call("configure_from_projectile", damage_amount, explosion_penetration, explosion_team, explosion_tk, self)
-	elif "damage" in explosion:
-		explosion.set("damage", damage_amount)
-
-
-@rpc("authority", "call_local", "reliable")
-func _spawn_objective_explosion(position: Vector3, damage_amount: int) -> void:
-	_spawn_explosion_local(position, damage_amount)
-
-
-@rpc("authority", "call_local", "reliable")
-func _receive_destroyed_state(value: bool) -> void:
-	is_destroyed = value
-	_is_armed = false
-	_remaining_seconds = 0.0
-	_tracked_bomb = null
-	if is_destroyed:
-		_play_dead_animation()
-		_notify_objective_completed()
-
-	_update_countdown_label()
-	destroyed_state_changed.emit(is_destroyed)
-
-
-@rpc("authority", "call_local", "unreliable_ordered")
-func _receive_armed_state(value: bool, remaining: float) -> void:
-	_is_armed = value
-	_remaining_seconds = remaining
-	_update_countdown_label()
-	armed_state_changed.emit(_is_armed, _remaining_seconds)
+		hud_node.callv(method_name, args)

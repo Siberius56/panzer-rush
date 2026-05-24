@@ -1,6 +1,7 @@
 extends Node3D
 
-# Zone de spawn contrôlée par le HordeDirectorDemo.
+# Zone de spawn contrôlée par le HordeDirector.
+# Le nom affiché est automatiquement basé sur le nom du node.
 # Usage :
 # - IDLE_PRESENT : zombies déjà présents dans le décor.
 # - HORDE_ATTACK : horde dynamique, hors champ si possible.
@@ -15,7 +16,6 @@ enum ZoneMode {
 }
 
 @export var enabled: bool = true
-@export var zone_label: String = "Spawn Zone"
 @export var zone_mode: ZoneMode = ZoneMode.IDLE_PRESENT
 @export var section_id: int = 0
 
@@ -40,6 +40,32 @@ var spawned_nodes: Array[Node] = []
 func _ready() -> void:
 	add_to_group("zombie_spawn_zone")
 	_refresh_debug_label()
+	call_deferred("_register_to_horde_director")
+
+
+func _exit_tree() -> void:
+	_unregister_from_horde_director()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PATH_RENAMED:
+		_refresh_debug_label()
+
+
+func _register_to_horde_director() -> void:
+	if not is_inside_tree():
+		return
+	if GameSessionState == null:
+		return
+	if GameSessionState.has_method("register_horde_spawn_zone"):
+		GameSessionState.call("register_horde_spawn_zone", self)
+
+
+func _unregister_from_horde_director() -> void:
+	if GameSessionState == null:
+		return
+	if GameSessionState.has_method("unregister_horde_spawn_zone"):
+		GameSessionState.call("unregister_horde_spawn_zone", self)
 
 
 func can_spawn_idle() -> bool:
@@ -101,6 +127,10 @@ func get_alive_spawned_count() -> int:
 	return spawned_nodes.size()
 
 
+func get_zone_label() -> String:
+	return String(name)
+
+
 func get_mode_text() -> String:
 	if zone_mode == ZoneMode.IDLE_PRESENT:
 		return "Déjà présents"
@@ -111,7 +141,7 @@ func get_mode_text() -> String:
 
 func get_debug_line() -> String:
 	var alive_count: int = get_alive_spawned_count()
-	return "%s | %s | vivants: %d/%d" % [zone_label, get_mode_text(), alive_count, max_alive_from_zone]
+	return "%s | %s | vivants: %d/%d" % [get_zone_label(), get_mode_text(), alive_count, max_alive_from_zone]
 
 
 func mark_used_now() -> void:
@@ -119,7 +149,7 @@ func mark_used_now() -> void:
 
 
 func _collect_spawn_points(root: Node, result: Array[Marker3D]) -> void:
-	for child in root.get_children():
+	for child: Node in root.get_children():
 		if child is Marker3D:
 			result.append(child as Marker3D)
 		_collect_spawn_points(child, result)
@@ -136,7 +166,7 @@ func _is_on_cooldown() -> bool:
 func _get_closest_distance_to_targets(target_positions: Array[Vector3]) -> float:
 	var closest_distance: float = 999999.0
 
-	for target_position in target_positions:
+	for target_position: Vector3 in target_positions:
 		var distance: float = global_position.distance_to(target_position)
 		if distance < closest_distance:
 			closest_distance = distance
@@ -147,7 +177,7 @@ func _get_closest_distance_to_targets(target_positions: Array[Vector3]) -> float
 func _cleanup_spawned_nodes() -> void:
 	var cleaned: Array[Node] = []
 
-	for node in spawned_nodes:
+	for node: Node in spawned_nodes:
 		if node != null and is_instance_valid(node) and node.is_inside_tree():
 			cleaned.append(node)
 
@@ -159,4 +189,4 @@ func _refresh_debug_label() -> void:
 	if label == null:
 		return
 
-	label.text = "%s\n%s" % [zone_label, get_mode_text()]
+	label.text = "%s\n%s" % [get_zone_label(), get_mode_text()]

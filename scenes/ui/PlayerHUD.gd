@@ -31,6 +31,10 @@ const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModS
 @export var damage_feedback_color: Color = Color(1.0, 0.06, 0.02, 0.34)
 @export var damage_feedback_fade_duration: float = 0.28
 
+@export_group("Objectives")
+@export var auto_remove_missing_objectives: bool = true
+@export var objective_cleanup_interval: float = 0.25
+
 
 @onready var hp_label: Label = %HPLabel
 @onready var health_progress_bar: ProgressBar = %HealthProgressBar
@@ -65,6 +69,7 @@ const VEHICLE_MOD_SLOT_SCENE: PackedScene = preload("res://scenes/ui/VehicleModS
 @onready var vehicle_health_label = %VehicleHealthLabel
 @onready var vehicle_fuel_progress_bar: ProgressBar = %VehicleFuelProgress
 @onready var vehicle_fuel_value_label: Label = %VehicleFuelValueLabel
+@onready var vehicle_speed_label: Label = get_node_or_null("%VehicleSpeedLabel") as Label
 @onready var current_seat_label: Label = %CurrentSeatLabel
 @onready var seat_1_label: RichTextLabel = %Seat1Label
 @onready var seat_2_label: RichTextLabel = %Seat2Label
@@ -128,6 +133,7 @@ var _repair_target_hide_timer: float = 0.0
 var _damage_feedback_tween: Tween = null
 var _objectives: Dictionary = {}
 var _objective_order: Array[String] = []
+var _objective_cleanup_timer: float = 0.0
 
 const SELF_COLOR := "#7CFF7C"
 const EMPTY_SEAT_TEXT := "Libre"
@@ -193,6 +199,7 @@ func _ready() -> void:
 	_setup_weapon_slot_styles()
 	_clear_editor_vehicle_mod_slots()
 	_hide_vehicle_fuel_bar()
+	_hide_vehicle_speed_label()
 	_hide_vehicle_mod_slots()
 	_hide_tank_health_bar()
 	_hide_vehicle_name_marker()
@@ -204,6 +211,7 @@ func _process(delta: float) -> void:
 
 	_update_repair_target_bar(delta)
 	_refresh_aim_target_reticle_from_player()
+	_update_objective_cleanup(delta)
 
 func _input(event: InputEvent) -> void:
 	if _try_consume_spectate_button_click(event):
@@ -306,7 +314,14 @@ func _configure_objective_nodes() -> void:
 
 
 func _scan_existing_objective_providers() -> void:
-	var providers: Array[Node] = get_tree().get_nodes_in_group("objective_providers")
+	if not is_inside_tree():
+		return
+
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return
+
+	var providers: Array[Node] = tree.get_nodes_in_group("objective_providers")
 	for provider: Node in providers:
 		if provider == null or not is_instance_valid(provider):
 			continue
@@ -366,6 +381,64 @@ func clear_objectives() -> void:
 	_objectives.clear()
 	_objective_order.clear()
 	_refresh_objectives_ui()
+
+
+func _update_objective_cleanup(delta: float) -> void:
+	if not auto_remove_missing_objectives:
+		return
+	if _objectives.is_empty():
+		return
+
+	_objective_cleanup_timer -= delta
+	if _objective_cleanup_timer > 0.0:
+		return
+
+	_objective_cleanup_timer = max(objective_cleanup_interval, 0.05)
+	_remove_missing_objectives_from_hud()
+
+
+func _remove_missing_objectives_from_hud() -> void:
+	if not is_inside_tree():
+		return
+
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return
+
+	var active_objective_ids: Dictionary = {}
+	var providers: Array[Node] = tree.get_nodes_in_group("objective_providers")
+	for provider: Node in providers:
+		var provider_id: String = _read_objective_id_from_provider(provider)
+		if not provider_id.is_empty():
+			active_objective_ids[provider_id] = true
+
+	var removed_any: bool = false
+	var order_copy: Array[String] = _objective_order.duplicate()
+	for objective_id: String in order_copy:
+		if not _objectives.has(objective_id):
+			continue
+		if active_objective_ids.has(objective_id):
+			continue
+
+		_objectives.erase(objective_id)
+		_objective_order.erase(objective_id)
+		removed_any = true
+
+	if removed_any:
+		_refresh_objectives_ui()
+
+
+func _read_objective_id_from_provider(provider: Node) -> String:
+	if provider == null or not is_instance_valid(provider):
+		return ""
+
+	var value: Variant = null
+	if provider.has_method("get_objective_id"):
+		value = provider.call("get_objective_id")
+	else:
+		value = provider.get("objective_id")
+
+	return str(value).strip_edges()
 
 
 func _refresh_objectives_ui() -> void:
@@ -671,6 +744,7 @@ func _refresh_all() -> void:
 		_hide_vehicle_name_marker()
 		_hide_tank_health_bar()
 		_hide_vehicle_fuel_bar()
+		_hide_vehicle_speed_label()
 		_hide_vehicle_mod_slots()
 		hide_repair_target(true)
 		hide_reload_progress()
@@ -694,6 +768,7 @@ func _refresh_all() -> void:
 		on_foot_panel.visible = false
 		vehicle_panel.visible = false
 		_hide_vehicle_fuel_bar()
+		_hide_vehicle_speed_label()
 		_hide_vehicle_mod_slots()
 		hide_repair_target(true)
 		hide_reload_progress()
@@ -715,6 +790,7 @@ func _refresh_all() -> void:
 	vehicle_panel.visible = in_vehicle
 	if not in_vehicle:
 		_hide_vehicle_fuel_bar()
+		_hide_vehicle_speed_label()
 		_hide_vehicle_mod_slots()
 
 func _show_death_overlay(player_data: Dictionary) -> void:
@@ -1999,6 +2075,7 @@ func _refresh_vehicle(player_data: Dictionary, tracked_vehicle: Node = null) -> 
 	var seats: Array = vehicle_data.get("seats", [])
 
 	_refresh_vehicle_fuel_bar(vehicle_data, tracked_vehicle)
+	_refresh_vehicle_speed_label(vehicle_data, tracked_vehicle)
 	_refresh_vehicle_mod_slots(vehicle_data)
 
 	vehicle_name_label.text = vehicle_name
@@ -2077,6 +2154,59 @@ func _hide_vehicle_fuel_bar() -> void:
 		vehicle_fuel_value_label.text = ""
 
 
+func _refresh_vehicle_speed_label(vehicle_data: Dictionary, tracked_vehicle: Node = null) -> void:
+	if vehicle_speed_label == null:
+		return
+
+	var speed_kmh: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+		"speed_kmh",
+		"current_speed_kmh",
+		"vehicle_speed_kmh",
+	], INF)
+
+	if speed_kmh == INF:
+		var speed_ms: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+			"speed",
+			"current_speed",
+			"vehicle_speed",
+		], INF)
+		if speed_ms == INF and tracked_vehicle != null and is_instance_valid(tracked_vehicle):
+			speed_ms = _read_vehicle_speed(tracked_vehicle)
+		if speed_ms == INF:
+			_hide_vehicle_speed_label()
+			return
+		speed_kmh = speed_ms * 3.6
+
+	var max_speed_kmh: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+		"max_forward_speed_kmh",
+		"max_speed_kmh",
+		"vehicle_max_speed_kmh",
+	], INF)
+	if max_speed_kmh == INF:
+		var max_speed_ms: float = _read_float_from_vehicle_sources(vehicle_data, tracked_vehicle, [
+			"max_forward_speed",
+			"max_speed",
+			"vehicle_max_speed",
+		], INF)
+		if max_speed_ms != INF:
+			max_speed_kmh = max_speed_ms * 3.6
+
+	vehicle_speed_label.visible = true
+	if max_speed_kmh != INF and max_speed_kmh > 0.0:
+		vehicle_speed_label.text = "Vitesse : %d km/h / %d km/h" % [
+			roundi(speed_kmh),
+			roundi(max_speed_kmh),
+		]
+	else:
+		vehicle_speed_label.text = "Vitesse : %d km/h" % roundi(speed_kmh)
+
+
+func _hide_vehicle_speed_label() -> void:
+	if vehicle_speed_label != null:
+		vehicle_speed_label.visible = false
+		vehicle_speed_label.text = ""
+
+
 func _get_current_fuel_consumption(vehicle_data: Dictionary, tracked_vehicle: Node, current_fuel: float) -> float:
 	var direct_consumption: float = _read_float_from_dictionary(vehicle_data, [
 		"current_fuel_consumption",
@@ -2111,18 +2241,26 @@ func _get_current_fuel_consumption(vehicle_data: Dictionary, tracked_vehicle: No
 	var speed: float = _read_vehicle_speed(tracked_vehicle)
 	var min_speed: float = _read_float_from_object(tracked_vehicle, "fuel_min_speed_to_consume", 0.0)
 
-	if drive_input > 0.01 and speed > min_speed:
+	if speed != INF and drive_input > 0.01 and speed > min_speed:
 		return base_consumption * drive_input
 
 	return 0.0
 
 
 func _read_vehicle_speed(tracked_vehicle: Node) -> float:
+	if tracked_vehicle == null or not is_instance_valid(tracked_vehicle):
+		return INF
+
+	if tracked_vehicle.has_method("get_current_speed"):
+		var method_speed = tracked_vehicle.call("get_current_speed")
+		if method_speed is int or method_speed is float:
+			return float(method_speed)
+
 	var linear_velocity_value: Variant = tracked_vehicle.get("linear_velocity")
 	if linear_velocity_value is Vector3:
 		var velocity: Vector3 = linear_velocity_value
 		return velocity.length()
-	return 0.0
+	return INF
 
 
 func _read_float_from_vehicle_sources(vehicle_data: Dictionary, tracked_vehicle: Node, keys: Array[String], fallback: float) -> float:

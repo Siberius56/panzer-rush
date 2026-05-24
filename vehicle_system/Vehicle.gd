@@ -32,12 +32,28 @@ var available_chassis_entries: Array[Dictionary] = []
 @export var idle_brake_force: float = 40.0
 @export var max_steering_deg: float = 50.0
 @export var steering_speed: float = 4.8
-@export var downforce_strength: float = 20.0
+@export var downforce_strength: float = 0.0
 @export var invert_steering: bool = true
 
+@export_group("Drive Limits")
+@export var max_forward_speed: float = 16.0
+@export var max_reverse_speed: float = 7.0
+@export var speed_limit_soft_zone: float = 2.0
+@export var speed_limit_brake_force: float = 0.0
+@export var speed_limit_velocity_damping: float = 4.5
+
+@export_group("Drive Assistance")
+@export var speed_steering_reference: float = 16.0
+@export_range(0.1, 1.0, 0.01) var min_steering_factor_at_max_speed: float = 0.38
+@export_range(0.1, 1.0, 0.01) var min_steering_response_at_max_speed: float = 0.45
+@export var high_speed_stability_enabled: bool = true
+@export var high_speed_stability_min_speed: float = 5.0
+@export var high_speed_lateral_damping: float = 1.15
+@export var high_speed_yaw_damping: float = 1.25
+
 @export_group("Fuel")
-@export var max_fuel: float = 600.0
-@export var current_fuel: float = 600.0
+@export var max_fuel: float = 1200.0
+@export var current_fuel: float = 1200.0
 @export var fuel_consumption_per_second: float = 3.0
 @export var fuel_min_speed_to_consume: float = 0.2
 
@@ -82,6 +98,8 @@ var state_timer: float = 0.0
 
 var replicated_position: Vector3 = Vector3.ZERO
 var replicated_rotation: Quaternion = Quaternion.IDENTITY
+var replicated_linear_velocity: Vector3 = Vector3.ZERO
+var replicated_angular_velocity: Vector3 = Vector3.ZERO
 var replicated_steering: float = 0.0
 var replicated_engine_force: float = 0.0
 var replicated_brake: float = 0.0
@@ -220,6 +238,8 @@ func _ready() -> void:
 	
 	replicated_position = global_position
 	replicated_rotation = global_basis.get_rotation_quaternion()
+	replicated_linear_velocity = linear_velocity
+	replicated_angular_velocity = angular_velocity
 	replicated_steering = steering
 	replicated_engine_force = engine_force
 	replicated_brake = brake
@@ -441,6 +461,7 @@ func _client_physics(_delta: float) -> void:
 
 
 func get_hud_data_for_player(player: Node) -> Dictionary:
+	var current_speed: float = get_current_speed()
 	var out := {
 		"vehicle_name": vehicle_display_name,
 		"health": health,
@@ -448,6 +469,12 @@ func get_hud_data_for_player(player: Node) -> Dictionary:
 		"current_fuel": current_fuel,
 		"max_fuel": max_fuel,
 		"fuel_ratio": get_fuel_ratio(),
+		"speed": current_speed,
+		"speed_kmh": current_speed * 3.6,
+		"current_speed": current_speed,
+		"current_speed_kmh": current_speed * 3.6,
+		"max_forward_speed": max_forward_speed,
+		"max_forward_speed_kmh": max_forward_speed * 3.6,
 		"current_seat_name": "",
 		"current_seat_index": -1,
 		"is_driver": false,
@@ -800,6 +827,53 @@ func get_fuel_ratio() -> float:
 	return clampf(current_fuel / max_fuel, 0.0, 1.0)
 
 
+func get_current_speed() -> float:
+	var velocity: Vector3 = _get_current_velocity_for_display()
+	velocity.y = 0.0
+	return velocity.length()
+
+
+func get_current_speed_kmh() -> float:
+	return get_current_speed() * 3.6
+
+
+func get_current_forward_speed() -> float:
+	var velocity: Vector3 = _get_current_velocity_for_display()
+	velocity.y = 0.0
+	var forward_axis: Vector3 = _get_horizontal_forward_axis()
+	return velocity.dot(forward_axis)
+
+
+func _get_current_velocity_for_display() -> Vector3:
+	if multiplayer.is_server():
+		return linear_velocity
+
+	if replicated_linear_velocity.length_squared() > 0.0001:
+		return replicated_linear_velocity
+
+	return linear_velocity
+
+
+func _get_horizontal_velocity() -> Vector3:
+	return Vector3(linear_velocity.x, 0.0, linear_velocity.z)
+
+
+func _get_horizontal_forward_axis() -> Vector3:
+	var axis: Vector3 = global_basis * Vector3.MODEL_FRONT
+	axis.y = 0.0
+	if axis.length_squared() <= 0.0001:
+		return Vector3.MODEL_FRONT
+	return axis.normalized()
+
+
+func _get_horizontal_right_axis() -> Vector3:
+	var axis: Vector3 = global_basis.x
+	axis.y = 0.0
+	if axis.length_squared() <= 0.0001:
+		return Vector3.RIGHT
+	return axis.normalized()
+
+
 func _cache_visual_idle_shake_base_transform() -> void:
 	if visual_idle_shake_root == null:
 		visual_idle_shake_root = get_node_or_null(visual_idle_shake_root_path) as Node3D
@@ -1041,12 +1115,16 @@ func _update_drive_controls(delta: float) -> void:
 		steering = current_steering
 		return
 
+	var speed: float = _get_horizontal_velocity().length()
+	var steering_speed_ratio: float = _get_speed_steering_ratio(speed)
+	var steering_factor: float = lerpf(1.0, min_steering_factor_at_max_speed, steering_speed_ratio)
+	var steering_response: float = lerpf(1.0, min_steering_response_at_max_speed, steering_speed_ratio)
 	var steering_sign: float = -1.0 if invert_steering else 1.0
-	var target_steering: float = deg_to_rad(max_steering_deg) * steer_input * steering_sign
-	current_steering = move_toward(current_steering, target_steering, steering_speed * delta)
+	var target_steering: float = deg_to_rad(max_steering_deg * steering_factor) * steer_input * steering_sign
+	current_steering = move_toward(current_steering, target_steering, steering_speed * steering_response * delta)
 	steering = current_steering
 
-	var forward_speed: float = linear_velocity.dot(global_basis * Vector3.MODEL_FRONT)
+	var forward_speed: float = linear_velocity.dot(_get_horizontal_forward_axis())
 	var has_drive_input: bool = absf(drive_input) > 0.05
 	engine_force = 0.0
 	brake = 0.0
@@ -1057,16 +1135,17 @@ func _update_drive_controls(delta: float) -> void:
 		if forward_speed < -1.0:
 			brake = brake_force
 		else:
-			engine_force = engine_force_forward * drive_input
+			var forward_limit_factor: float = _get_speed_limit_engine_factor(forward_speed, max_forward_speed)
+			engine_force = engine_force_forward * drive_input * forward_limit_factor
 	elif drive_input < -0.05:
 		if forward_speed > 1.0:
 			brake = brake_force
 		else:
-			engine_force = -engine_force_reverse * absf(drive_input)
+			var reverse_limit_factor: float = _get_speed_limit_engine_factor(absf(forward_speed), max_reverse_speed)
+			engine_force = -engine_force_reverse * absf(drive_input) * reverse_limit_factor
 	else:
 		brake = idle_brake_force
 
-	var speed: float = linear_velocity.length()
 	if absf(engine_force) > 0.0 and speed > fuel_min_speed_to_consume:
 		consume_fuel(absf(drive_input) * fuel_consumption_per_second * delta)
 		if not has_fuel():
@@ -1074,9 +1153,98 @@ func _update_drive_controls(delta: float) -> void:
 			drive_input = 0.0
 			brake = idle_brake_force
 
+	_apply_forward_speed_limit(delta)
+
 	if downforce_strength > 0.0:
 		if speed > 0.1:
 			apply_central_force(-global_basis.y * speed * downforce_strength)
+
+	_apply_high_speed_stability(delta, speed)
+
+
+func _apply_forward_speed_limit(delta: float) -> void:
+	if speed_limit_velocity_damping <= 0.0:
+		return
+
+	var forward_axis: Vector3 = _get_horizontal_forward_axis()
+	var forward_speed: float = linear_velocity.dot(forward_axis)
+
+	if max_forward_speed > 0.0 and forward_speed > max_forward_speed:
+		var excess_speed: float = forward_speed - max_forward_speed
+		var speed_reduction: float = minf(excess_speed, speed_limit_velocity_damping * delta)
+		var reduced_forward_velocity: Vector3 = linear_velocity - forward_axis * speed_reduction
+		reduced_forward_velocity.y = linear_velocity.y
+		linear_velocity = reduced_forward_velocity
+		return
+
+	if max_reverse_speed > 0.0 and forward_speed < -max_reverse_speed:
+		var reverse_excess_speed: float = absf(forward_speed) - max_reverse_speed
+		var reverse_speed_reduction: float = minf(reverse_excess_speed, speed_limit_velocity_damping * delta)
+		var reduced_reverse_velocity: Vector3 = linear_velocity + forward_axis * reverse_speed_reduction
+		reduced_reverse_velocity.y = linear_velocity.y
+		linear_velocity = reduced_reverse_velocity
+
+
+func _get_speed_steering_ratio(speed: float) -> float:
+	var reference_speed: float = speed_steering_reference
+	if reference_speed <= 0.0:
+		reference_speed = max_forward_speed
+	if reference_speed <= 0.0:
+		return 0.0
+	return clampf(speed / reference_speed, 0.0, 1.0)
+
+
+func _get_speed_limit_engine_factor(current_speed: float, target_speed: float) -> float:
+	if target_speed <= 0.0:
+		return 1.0
+
+	var positive_speed: float = absf(current_speed)
+	if positive_speed >= target_speed:
+		return 0.0
+
+	var soft_zone: float = maxf(speed_limit_soft_zone, 0.01)
+	var soft_start_speed: float = maxf(target_speed - soft_zone, 0.0)
+	if positive_speed <= soft_start_speed:
+		return 1.0
+
+	return 1.0 - clampf((positive_speed - soft_start_speed) / soft_zone, 0.0, 1.0)
+
+
+func _apply_high_speed_stability(delta: float, speed: float) -> void:
+	if not high_speed_stability_enabled:
+		return
+	if speed <= high_speed_stability_min_speed:
+		return
+
+	var reference_speed: float = speed_steering_reference
+	if reference_speed <= 0.0:
+		reference_speed = max_forward_speed
+	if reference_speed <= high_speed_stability_min_speed:
+		reference_speed = high_speed_stability_min_speed + 0.01
+
+	var stability_ratio: float = clampf(
+		(speed - high_speed_stability_min_speed) / (reference_speed - high_speed_stability_min_speed),
+		0.0,
+		1.0
+	)
+
+	if high_speed_lateral_damping > 0.0:
+		var right_axis: Vector3 = _get_horizontal_right_axis()
+		var lateral_speed: float = linear_velocity.dot(right_axis)
+		if absf(lateral_speed) > 0.01:
+			var damped_velocity: Vector3 = linear_velocity + (-right_axis * lateral_speed * high_speed_lateral_damping * stability_ratio * delta)
+			damped_velocity.y = linear_velocity.y
+			linear_velocity = damped_velocity
+
+	if high_speed_yaw_damping > 0.0:
+		var local_angular_velocity: Vector3 = global_basis.inverse() * angular_velocity
+		if absf(local_angular_velocity.y) > 0.01:
+			local_angular_velocity.y = move_toward(
+				local_angular_velocity.y,
+				0.0,
+				high_speed_yaw_damping * stability_ratio * delta
+			)
+			angular_velocity = global_basis * local_angular_velocity
 
 
 func is_damage_absorbed() -> bool:
@@ -1287,7 +1455,7 @@ func _try_enemy_soft_impact(body: Node, speed: float, delta: float) -> void:
 	if target == null:
 		return
 	
-	print("tank push")
+	#print("tank push")
 	_apply_enemy_soft_push(target, speed, delta)
 
 	if _is_impact_target_on_cooldown(target):
@@ -1297,7 +1465,7 @@ func _try_enemy_soft_impact(body: Node, speed: float, delta: float) -> void:
 	if damage <= 0:
 		return
 	
-	print("tank damage")
+	#print("tank damage")
 	_register_impact_hit(target)
 	_apply_impact_damage_to_target(target, damage)
 
@@ -1654,7 +1822,7 @@ func _apply_impact_damage_to_target(target: Node, amount: int) -> void:
 		impulse = linear_velocity.normalized() * float(amount)
 
 	if _try_call_damage_method(target, &"apply_vehicle_impact_damage", [amount, self]):
-		print("apply damage from vehicle")
+		#print("apply damage from vehicle")
 		apply_projectile_damage(5)
 		return
 	else:
@@ -2439,6 +2607,14 @@ func _sync_vehicle_state(
 		max_fuel = maxf(synced_max_fuel, 0.0)
 	if synced_current_fuel >= 0.0:
 		current_fuel = clampf(synced_current_fuel, 0.0, max_fuel)
+
+	replicated_position = new_transform.origin
+	replicated_rotation = new_transform.basis.get_rotation_quaternion()
+	replicated_linear_velocity = new_linear_velocity
+	replicated_angular_velocity = new_angular_velocity
+	replicated_steering = new_steering
+	replicated_engine_force = new_engine_force
+	replicated_brake = new_brake
 
 	if state_buffer.is_empty():
 		global_transform = new_transform

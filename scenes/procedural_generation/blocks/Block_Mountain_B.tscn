@@ -1,0 +1,560 @@
+[gd_scene format=3 uid="uid://bous1acnqpthg"]
+
+[ext_resource type="Script" uid="uid://oitpxmk5cpyb" path="res://scenes/procedural_generation/scripts/LevelBlock.gd" id="1_block_script"]
+[ext_resource type="Script" uid="uid://pxtolgq38hhe" path="res://scenes/procedural_generation/scripts/SecondaryPOISocket.gd" id="2_u7o03"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_ht2g3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ht2g3"]
+size = Vector3(200, 10, 70)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f1fvh"]
+size = Vector3(200, 10, 70)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8eaa5"]
+size = Vector3(200, 10, 200)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qwsxo"]
+size = Vector3(70, 10, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3polh"]
+size = Vector3(70, 10, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_terrain_mountain"]
+albedo_color = Color(0.25, 0.25, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Terrain"]
+material = SubResource("Mat_terrain_mountain")
+size = Vector3(200, 10, 70)
+
+[sub_resource type="BoxMesh" id="BoxMesh_msjvt"]
+material = SubResource("Mat_terrain_mountain")
+size = Vector3(200, 10, 200)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qwsxo"]
+material = SubResource("Mat_terrain_mountain")
+size = Vector3(70, 10, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_path"]
+albedo_color = Color(0.33, 0.26, 0.17, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Path_Wide_Diagonal_Helper"]
+material = SubResource("Mat_path")
+size = Vector3(0.1, 0.06, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u7o03"]
+albedo_color = Color(0.33, 0.26, 0.17, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ht2g3"]
+material = SubResource("StandardMaterial3D_u7o03")
+size = Vector3(10, 0.07, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_f1fvh"]
+material = SubResource("StandardMaterial3D_u7o03")
+size = Vector3(10, 0.07, 30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8eaa5"]
+material = SubResource("StandardMaterial3D_u7o03")
+size = Vector3(10, 0.07, 40)
+
+[sub_resource type="BoxMesh" id="Mesh_Path_Thin_NS_A"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.07, 50)
+
+[sub_resource type="BoxMesh" id="Mesh_Path_Thin_NS_B"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.07, 70)
+
+[sub_resource type="BoxShape3D" id="Shape_MountainPlateau_A"]
+size = Vector3(38, 9, 32)
+
+[sub_resource type="StandardMaterial3D" id="Mat_obstacle"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_MountainPlateau_A"]
+material = SubResource("Mat_obstacle")
+size = Vector3(38, 9, 32)
+
+[sub_resource type="BoxShape3D" id="Shape_MountainPlateau_B"]
+size = Vector3(30, 7, 42)
+
+[sub_resource type="BoxMesh" id="Mesh_MountainPlateau_B"]
+material = SubResource("Mat_obstacle")
+size = Vector3(30, 7, 42)
+
+[sub_resource type="BoxShape3D" id="Shape_RockWall_A"]
+size = Vector3(80, 5, 12)
+
+[sub_resource type="BoxMesh" id="Mesh_RockWall_A"]
+material = SubResource("Mat_obstacle")
+size = Vector3(80, 5, 12)
+
+[sub_resource type="StandardMaterial3D" id="Mat_poi"]
+albedo_color = Color(0.8, 0.55, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_POI_Reserved"]
+material = SubResource("Mat_poi")
+size = Vector3(60, 0.08, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ht2g3"]
+albedo_color = Color(1, 0.6, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1fvh"]
+transparency = 1
+albedo_color = Color(1, 0.15, 0.08, 0.28)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8eaa5"]
+transparency = 1
+albedo_color = Color(1, 0.65, 0.05, 0.28)
+
+[node name="Block_Mountain_B" type="Node3D" unique_id=2090355490]
+script = ExtResource("1_block_script")
+block_id = "Block_Mountain_B"
+block_type = "mountain"
+compatible_poi_tags = PackedStringArray("mountain", "military", "silo")
+north_side_profile = "road split"
+east_side_profile = "road center"
+south_side_profile = "road center"
+west_side_profile = "road center"
+
+[node name="Ground_Body" type="StaticBody3D" parent="." unique_id=843674024]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=1948591372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.8, 65)
+shape = SubResource("BoxShape3D_ht2g3")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground_Body" unique_id=1707324555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.8, -65)
+shape = SubResource("BoxShape3D_f1fvh")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground_Body" unique_id=1700728861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -9.8, 0)
+shape = SubResource("BoxShape3D_8eaa5")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground_Body" unique_id=1309282690]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, -4.8, 0)
+shape = SubResource("BoxShape3D_qwsxo")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground_Body" unique_id=2129251585]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, -4.8, 0)
+shape = SubResource("BoxShape3D_3polh")
+
+[node name="Ground" type="Node3D" parent="." unique_id=137375502]
+
+[node name="Terrain" type="MeshInstance3D" parent="Ground" unique_id=155250983]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 65)
+mesh = SubResource("Mesh_Terrain")
+
+[node name="Terrain2" type="MeshInstance3D" parent="Ground" unique_id=749356031]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, -65)
+mesh = SubResource("Mesh_Terrain")
+
+[node name="Terrain5" type="MeshInstance3D" parent="Ground" unique_id=266726368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+mesh = SubResource("BoxMesh_msjvt")
+
+[node name="Terrain3" type="MeshInstance3D" parent="Ground" unique_id=1932256890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, -5, 0)
+mesh = SubResource("BoxMesh_qwsxo")
+
+[node name="Terrain4" type="MeshInstance3D" parent="Ground" unique_id=1224887244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, -5, 0)
+mesh = SubResource("BoxMesh_qwsxo")
+
+[node name="Vegetation" type="Node3D" parent="." unique_id=733148599]
+
+[node name="Road" type="Node3D" parent="." unique_id=570565922]
+
+[node name="Path_Wide_Diagonal_Helper" type="MeshInstance3D" parent="." unique_id=1597316967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("Mesh_Path_Wide_Diagonal_Helper")
+
+[node name="Path_Thin_NS_A3" type="MeshInstance3D" parent="." unique_id=1629707408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.685806, 0.06, -89.706635)
+mesh = SubResource("BoxMesh_ht2g3")
+
+[node name="Path_Thin_NS_B2" type="MeshInstance3D" parent="." unique_id=498829151]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.41176, 0.06, -85)
+mesh = SubResource("BoxMesh_f1fvh")
+
+[node name="Path_Thin_NS_B3" type="MeshInstance3D" parent="." unique_id=719237787]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 19.411758, 0.06, -75)
+mesh = SubResource("BoxMesh_f1fvh")
+
+[node name="Path_Thin_NS_B4" type="MeshInstance3D" parent="." unique_id=577990698]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20.869198, 0.06, -75)
+mesh = SubResource("BoxMesh_8eaa5")
+
+[node name="Path_Thin_NS_A" type="MeshInstance3D" parent="." unique_id=933909569]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -55)
+mesh = SubResource("Mesh_Path_Thin_NS_A")
+
+[node name="Path_Thin_NS_B" type="MeshInstance3D" parent="." unique_id=2056869597]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 65, 0, 0)
+mesh = SubResource("Mesh_Path_Thin_NS_B")
+
+[node name="Path_Thin_NS_B5" type="MeshInstance3D" parent="." unique_id=1855757602]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -65, 0, 0)
+mesh = SubResource("Mesh_Path_Thin_NS_B")
+
+[node name="Path_Thin_NS_B6" type="MeshInstance3D" parent="." unique_id=711706338]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 65)
+mesh = SubResource("Mesh_Path_Thin_NS_B")
+
+[node name="MountainPlateau_A_Body" type="StaticBody3D" parent="." unique_id=1394798288]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 4.5, -32)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MountainPlateau_A_Body" unique_id=1771322916]
+shape = SubResource("Shape_MountainPlateau_A")
+
+[node name="MountainPlateau_A" type="MeshInstance3D" parent="MountainPlateau_A_Body" unique_id=183887774]
+mesh = SubResource("Mesh_MountainPlateau_A")
+
+[node name="MountainPlateau_B_Body" type="StaticBody3D" parent="." unique_id=926374371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 3.5, -43)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MountainPlateau_B_Body" unique_id=1133821561]
+shape = SubResource("Shape_MountainPlateau_B")
+
+[node name="MountainPlateau_B" type="MeshInstance3D" parent="MountainPlateau_B_Body" unique_id=1219575016]
+mesh = SubResource("Mesh_MountainPlateau_B")
+
+[node name="MountainPlateau_B_Body2" type="StaticBody3D" parent="." unique_id=1168226039]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -77, 3.5, 25)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MountainPlateau_B_Body2" unique_id=1840627790]
+shape = SubResource("Shape_MountainPlateau_B")
+
+[node name="MountainPlateau_B" type="MeshInstance3D" parent="MountainPlateau_B_Body2" unique_id=654051921]
+mesh = SubResource("Mesh_MountainPlateau_B")
+
+[node name="MountainPlateau_B_Body3" type="StaticBody3D" parent="." unique_id=1165364915]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 3.5, 47)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MountainPlateau_B_Body3" unique_id=418579040]
+shape = SubResource("Shape_MountainPlateau_B")
+
+[node name="MountainPlateau_B" type="MeshInstance3D" parent="MountainPlateau_B_Body3" unique_id=450447072]
+mesh = SubResource("Mesh_MountainPlateau_B")
+
+[node name="RockWall_A_Body" type="StaticBody3D" parent="." unique_id=278169697]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 2.5, 46)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RockWall_A_Body" unique_id=579096614]
+shape = SubResource("Shape_RockWall_A")
+
+[node name="RockWall_A" type="MeshInstance3D" parent="RockWall_A_Body" unique_id=1745858149]
+mesh = SubResource("Mesh_RockWall_A")
+
+[node name="POISocket" type="Node3D" parent="." unique_id=1689938030]
+
+[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="." unique_id=1006204787]
+visible = false
+mesh = SubResource("Mesh_POI_Reserved")
+
+[node name="SpawnSockets" type="Node3D" parent="." unique_id=1401063954]
+
+[node name="Spawn_A" type="Node3D" parent="SpawnSockets" unique_id=929323941]
+transform = Transform3D(0.7071069, 0, 0.70710665, 0, 1, 0, -0.70710665, 0, 0.7071069, -26.080162, 0.4, 63.787277)
+
+[node name="Spawn_B" type="Node3D" parent="SpawnSockets" unique_id=770314490]
+transform = Transform3D(0.7071069, 0, -0.70710665, 0, 1, 0, 0.70710665, 0, 0.7071069, 80.17583, 0.4, -77.24881)
+
+[node name="Walls_Limit" type="Node3D" parent="." unique_id=747073368]
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Walls_Limit" unique_id=250831038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0, -55)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Walls_Limit" unique_id=78632320]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -99, 0, 55)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="Walls_Limit" unique_id=1153738670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99, 0, -54.5)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="Walls_Limit" unique_id=687988597]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 99, 0, 54.5)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Walls_Limit" unique_id=756502293]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55, 0, 99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="Walls_Limit" unique_id=426231142]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55, 0, 99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="Walls_Limit" unique_id=667850003]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -75, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 50)
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="Walls_Limit" unique_id=753373078]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 50)
+
+[node name="CSGBox3D12" type="CSGBox3D" parent="Walls_Limit" unique_id=202875528]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 75, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 50)
+
+[node name="POISocket_Side1" type="Node3D" parent="." unique_id=1879034853]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.357727, 0.25, -73.4984)
+script = ExtResource("2_u7o03")
+
+[node name="POISocket_Side2" type="Node3D" parent="." unique_id=957075152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.64227, 0.25, 63.501602)
+script = ExtResource("2_u7o03")
+
+[node name="POISocket_Side3" type="Node3D" parent="." unique_id=1825442360]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.35773, 0.25, 74.5016)
+script = ExtResource("2_u7o03")
+
+[node name="Connectors" type="Node3D" parent="." unique_id=450266454]
+
+[node name="North" type="Node3D" parent="Connectors" unique_id=1354268125]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -100)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/North" unique_id=1852373165]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 99)
+material = SubResource("StandardMaterial3D_ht2g3")
+
+[node name="East" type="Node3D" parent="Connectors" unique_id=1712235648]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0.4, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/East" unique_id=745786499]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_ht2g3")
+
+[node name="South" type="Node3D" parent="Connectors" unique_id=1156213716]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 100)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/South" unique_id=1274214798]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_ht2g3")
+
+[node name="West" type="Node3D" parent="Connectors" unique_id=101022267]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0.4, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/West" unique_id=644618183]
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_ht2g3")
+
+[node name="SpawnZones" type="Node3D" parent="." unique_id=615962787]
+
+[node name="Mountain_B_South_Horde2" type="Node3D" parent="SpawnZones" unique_id=1438243642 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2.0101318, 77)
+script = ExtResource("3_ht2g3")
+zone_mode = 1
+min_spawn_count = 12
+max_spawn_count = 22
+max_alive_from_zone = 28
+max_distance_from_target = 140.0
+cooldown_seconds = 55.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Mountain_B_South_Horde2" unique_id=413143171]
+size = Vector3(20, 0.12, 14)
+material = SubResource("StandardMaterial3D_f1fvh")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Mountain_B_South_Horde2" unique_id=710357659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - flanc gauche
+Spawn dynamique.
+À placer hors champ ou derrière un obstacle."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde2" unique_id=657917994]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.2, -4)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde2" unique_id=600954410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.2, 5)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde2" unique_id=1300779066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, -2)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde2" unique_id=1716703127]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, 4)
+
+[node name="Mountain_B_South_Horde" type="Node3D" parent="SpawnZones" unique_id=1095318329 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2.766817, 60)
+script = ExtResource("3_ht2g3")
+zone_mode = 1
+min_spawn_count = 10
+max_spawn_count = 18
+max_alive_from_zone = 24
+max_distance_from_target = 140.0
+cooldown_seconds = 50.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Mountain_B_South_Horde" unique_id=1888642794]
+size = Vector3(18, 0.12, 12)
+material = SubResource("StandardMaterial3D_f1fvh")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Mountain_B_South_Horde" unique_id=2024846902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - route latérale
+Le Director l'utilise pendant BUILD_UP.
+Puis il spawn par salves."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde" unique_id=1586072607]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde" unique_id=1037947702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Mountain_B_South_Horde" unique_id=437774995]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -2)
+
+[node name="Mountain_B_East_Mixed" type="Node3D" parent="SpawnZones" unique_id=2106592894 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6224, 4.0951777, 2.810234)
+script = ExtResource("3_ht2g3")
+zone_mode = 2
+max_spawn_count = 14
+min_distance_from_target = 22.0
+max_distance_from_target = 140.0
+cooldown_seconds = 45.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Mountain_B_East_Mixed" unique_id=739307468]
+size = Vector3(16, 0.12, 16)
+material = SubResource("StandardMaterial3D_8eaa5")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Mountain_B_East_Mixed" unique_id=1349219796]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "MIXTE - carrefour
+Peut être déjà habité.
+Peut aussi servir de renfort dynamique."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Mountain_B_East_Mixed" unique_id=59837180]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Mountain_B_East_Mixed" unique_id=1454098288]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Mountain_B_East_Mixed" unique_id=589037044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+
+[node name="Mountain_B_North_Horde" type="Node3D" parent="SpawnZones" unique_id=2040329528 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.6445227, -56)
+script = ExtResource("3_ht2g3")
+zone_mode = 1
+min_spawn_count = 16
+max_spawn_count = 28
+max_alive_from_zone = 34
+min_distance_from_target = 30.0
+max_distance_from_target = 160.0
+cooldown_seconds = 65.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Mountain_B_North_Horde" unique_id=1541666972]
+size = Vector3(24, 0.12, 18)
+material = SubResource("StandardMaterial3D_f1fvh")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Mountain_B_North_Horde" unique_id=608662980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - fin de section
+Grosse pression avant un passageGate.
+À utiliser avec cooldown long."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Mountain_B_North_Horde" unique_id=1270733753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Mountain_B_North_Horde" unique_id=440096263]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Mountain_B_North_Horde" unique_id=842623865]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)
+
+[node name="Mountain_B_West_Horde2" type="Node3D" parent="SpawnZones" unique_id=537908790 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -79, 4.6445227, -31)
+script = ExtResource("3_ht2g3")
+zone_mode = 1
+min_spawn_count = 16
+max_spawn_count = 28
+max_alive_from_zone = 34
+min_distance_from_target = 30.0
+max_distance_from_target = 160.0
+cooldown_seconds = 65.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Mountain_B_West_Horde2" unique_id=1476302458]
+size = Vector3(24, 0.12, 18)
+material = SubResource("StandardMaterial3D_f1fvh")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Mountain_B_West_Horde2" unique_id=768880891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - fin de section
+Grosse pression avant un passageGate.
+À utiliser avec cooldown long."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Mountain_B_West_Horde2" unique_id=870486725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Mountain_B_West_Horde2" unique_id=654483599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Mountain_B_West_Horde2" unique_id=1010377417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)

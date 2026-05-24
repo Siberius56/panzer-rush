@@ -1,0 +1,620 @@
+[gd_scene format=3 uid="uid://cdsjs3uaig5au"]
+
+[ext_resource type="Script" uid="uid://oitpxmk5cpyb" path="res://scenes/procedural_generation/scripts/LevelBlock.gd" id="1_block_script"]
+[ext_resource type="Shader" uid="uid://bout2ybxk10m" path="res://asset/shader_ocean.gdshader" id="2_0hp0h"]
+[ext_resource type="Script" uid="uid://pxtolgq38hhe" path="res://scenes/procedural_generation/scripts/SecondaryPOISocket.gd" id="2_tvdin"]
+[ext_resource type="Texture2D" uid="uid://bqo4kmjisxvgp" path="res://asset/texture/ocean_shader_00003.png" id="3_1ista"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_h8ymr"]
+[ext_resource type="Texture2D" uid="uid://xp74i6j2lrks" path="res://asset/texture/ocean_shader_00004.png" id="4_cmnos"]
+[ext_resource type="Texture2D" uid="uid://sdmsa2eafwhe" path="res://asset/texture/ocean_shader_00002.png" id="5_sp78h"]
+[ext_resource type="Texture2D" uid="uid://c56oytkp3ohe7" path="res://asset/texture/ocean_shader_00001.png" id="6_1edxd"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0hp0h"]
+size = Vector3(200, 10, 200)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1ista"]
+size = Vector3(200, 10, 92)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cmnos"]
+size = Vector3(105, 10, 92)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sp78h"]
+size = Vector3(35, 10, 92)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1edxd"]
+size = Vector3(60, 10, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_agt2a"]
+size = Vector3(60, 10, 12)
+
+[sub_resource type="StandardMaterial3D" id="Mat_terrain_plain"]
+albedo_color = Color(0.22, 0.38, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_agt2a"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(200, 10, 200)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gcsy1"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(200, 10, 92)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nr768"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(105, 10, 92)
+
+[sub_resource type="BoxMesh" id="BoxMesh_41xqx"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(35, 10, 92)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ie655"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(60, 10, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_g6ofr"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(60, 10, 12)
+
+[sub_resource type="StandardMaterial3D" id="Mat_water"]
+albedo_color = Color(0.05, 0.18, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5sgua"]
+material = SubResource("Mat_water")
+size = Vector3(16, 5, 200)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i7e1h"]
+render_priority = 0
+shader = ExtResource("2_0hp0h")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_1ista")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_1edxd")
+shader_parameter/wave_normal_texture = ExtResource("5_sp78h")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0, -0.05)
+shader_parameter/foam_texture = ExtResource("4_cmnos")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_path"]
+albedo_color = Color(0.33, 0.26, 0.17, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Bridge_Wide"]
+material = SubResource("Mat_path")
+size = Vector3(30, 0.1, 12)
+
+[sub_resource type="BoxMesh" id="Mesh_Path_Wide_EW"]
+material = SubResource("Mat_path")
+size = Vector3(200, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0hp0h"]
+material = SubResource("Mat_path")
+size = Vector3(80, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1ista"]
+material = SubResource("Mat_path")
+size = Vector3(50, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_i7e1h"]
+material = SubResource("Mat_path")
+size = Vector3(60, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cmnos"]
+material = SubResource("Mat_path")
+size = Vector3(40, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sp78h"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.06, 8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1edxd"]
+material = SubResource("Mat_path")
+size = Vector3(40, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cfkkv"]
+material = SubResource("Mat_path")
+size = Vector3(32, 0.06, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rdwfh"]
+material = SubResource("Mat_path")
+size = Vector3(44, 0.06, 10)
+
+[sub_resource type="BoxShape3D" id="Shape_SmallHill_A"]
+size = Vector3(16, 2.5, 18)
+
+[sub_resource type="StandardMaterial3D" id="Mat_obstacle"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_SmallHill_A"]
+material = SubResource("Mat_obstacle")
+size = Vector3(16, 2.5, 18)
+
+[sub_resource type="BoxShape3D" id="Shape_SmallHill_B"]
+size = Vector3(18, 2, 14)
+
+[sub_resource type="BoxMesh" id="Mesh_SmallHill_B"]
+material = SubResource("Mat_obstacle")
+size = Vector3(18, 2, 14)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tvdin"]
+albedo_color = Color(1, 0.6, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bms1v"]
+transparency = 1
+albedo_color = Color(1, 0.15, 0.08, 0.28)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3jeqi"]
+transparency = 1
+albedo_color = Color(1, 0.65, 0.05, 0.28)
+
+[node name="Block_Plains_River_B" type="Node3D" unique_id=1055869106]
+script = ExtResource("1_block_script")
+block_id = "Block_Plains_River_B"
+block_type = "plains_river"
+compatible_poi_tags = PackedStringArray("land", "plain", "water", "town", "military")
+has_water_near_poi = true
+poi_water_type = "river"
+north_side_profile = "river"
+east_side_profile = "road center"
+south_side_profile = "river"
+west_side_profile = "road center"
+
+[node name="Ground_Body" type="StaticBody3D" parent="." unique_id=921944452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=1656740906]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -9.8, -1.9073486e-06)
+shape = SubResource("BoxShape3D_0hp0h")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground_Body" unique_id=1246127305]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 54, -4.8, 1.9073486e-06)
+shape = SubResource("BoxShape3D_1ista")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground_Body" unique_id=1903621850]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -54, -4.8, 47.5)
+shape = SubResource("BoxShape3D_cmnos")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground_Body" unique_id=163546329]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -54, -4.8, -82.5)
+shape = SubResource("BoxShape3D_sp78h")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground_Body" unique_id=1493223408]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -90, -4.8, -35)
+shape = SubResource("BoxShape3D_1edxd")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="Ground_Body" unique_id=453778672]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -14, -4.8, -35)
+shape = SubResource("BoxShape3D_agt2a")
+
+[node name="Ground" type="Node3D" parent="." unique_id=754900970]
+
+[node name="Terrain0" type="MeshInstance3D" parent="Ground" unique_id=397969072]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -10, -1.9073486e-06)
+mesh = SubResource("BoxMesh_agt2a")
+
+[node name="Terrain1" type="MeshInstance3D" parent="Ground" unique_id=1397509294]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 54, -5, 1.9073486e-06)
+mesh = SubResource("BoxMesh_gcsy1")
+
+[node name="Terrain2" type="MeshInstance3D" parent="Ground" unique_id=1765133828]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -54, -5, 47.5)
+mesh = SubResource("BoxMesh_nr768")
+
+[node name="Terrain3" type="MeshInstance3D" parent="Ground" unique_id=1857193673]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -54, -5, -82.5)
+mesh = SubResource("BoxMesh_41xqx")
+
+[node name="Terrain4" type="MeshInstance3D" parent="Ground" unique_id=617533075]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -90, -5, -35)
+mesh = SubResource("BoxMesh_ie655")
+
+[node name="Terrain5" type="MeshInstance3D" parent="Ground" unique_id=630839614]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -14, -5, -35)
+mesh = SubResource("BoxMesh_g6ofr")
+
+[node name="River" type="Node3D" parent="." unique_id=2104765831]
+
+[node name="River_Visual3" type="MeshInstance3D" parent="River" unique_id=85084016]
+transform = Transform3D(-1, -1.131334e-08, -2.9802322e-08, -1.131334e-08, 1, -1.489429e-09, 2.9802322e-08, -1.48943e-09, -1, 0, -5, 0)
+mesh = SubResource("BoxMesh_5sgua")
+surface_material_override/0 = SubResource("ShaderMaterial_i7e1h")
+
+[node name="Road" type="Node3D" parent="." unique_id=1857941831]
+
+[node name="Bridge_Wide" type="MeshInstance3D" parent="Road" unique_id=423136746]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.26504135, 0.1, 0)
+mesh = SubResource("Mesh_Bridge_Wide")
+
+[node name="Bridge_Wide2" type="MeshInstance3D" parent="Road" unique_id=124526224]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.26504135, 0.1, 70)
+mesh = SubResource("Mesh_Bridge_Wide")
+
+[node name="Path_Wide_EW" type="MeshInstance3D" parent="Road" unique_id=1564405746]
+mesh = SubResource("Mesh_Path_Wide_EW")
+
+[node name="Path_Wide_EW2" type="MeshInstance3D" parent="Road" unique_id=1403411266]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 76, 0, 45)
+mesh = SubResource("BoxMesh_0hp0h")
+
+[node name="Path_Wide_EW3" type="MeshInstance3D" parent="Road" unique_id=963714844]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32, 0, -45)
+mesh = SubResource("BoxMesh_0hp0h")
+
+[node name="Path_Wide_EW4" type="MeshInstance3D" parent="Road" unique_id=1645062790]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 64, 0, -30)
+mesh = SubResource("BoxMesh_1ista")
+
+[node name="Path_Wide_EW11" type="MeshInstance3D" parent="Road" unique_id=1789189895]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -28, 0, 35)
+mesh = SubResource("BoxMesh_i7e1h")
+
+[node name="Path_Wide_EW6" type="MeshInstance3D" parent="Road" unique_id=1596355534]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 82, 0, -65)
+mesh = SubResource("BoxMesh_cmnos")
+
+[node name="Path_Wide_EW7" type="MeshInstance3D" parent="Road" unique_id=864654803]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 73, 0, -50)
+mesh = SubResource("BoxMesh_sp78h")
+
+[node name="Path_Wide_EW5" type="MeshInstance3D" parent="Road" unique_id=821596073]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 0, -80)
+mesh = SubResource("BoxMesh_1edxd")
+
+[node name="Path_Wide_EW8" type="MeshInstance3D" parent="Road" unique_id=1950226581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 0, 80)
+mesh = SubResource("BoxMesh_1edxd")
+
+[node name="Path_Wide_EW9" type="MeshInstance3D" parent="Road" unique_id=1475885153]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 70)
+mesh = SubResource("BoxMesh_cfkkv")
+
+[node name="Path_Wide_EW10" type="MeshInstance3D" parent="Road" unique_id=1062876868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, 70)
+mesh = SubResource("BoxMesh_rdwfh")
+
+[node name="SmallHill_A_Body" type="StaticBody3D" parent="." unique_id=1199994481]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 1.25, 20)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SmallHill_A_Body" unique_id=642057963]
+shape = SubResource("Shape_SmallHill_A")
+
+[node name="SmallHill_A" type="MeshInstance3D" parent="SmallHill_A_Body" unique_id=323004734]
+mesh = SubResource("Mesh_SmallHill_A")
+
+[node name="SmallHill_A_Body2" type="StaticBody3D" parent="." unique_id=309116844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 79, 1.25, -34)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SmallHill_A_Body2" unique_id=1568077864]
+shape = SubResource("Shape_SmallHill_A")
+
+[node name="SmallHill_A2" type="MeshInstance3D" parent="SmallHill_A_Body2" unique_id=960097027]
+mesh = SubResource("Mesh_SmallHill_A")
+
+[node name="SmallHill_B_Body" type="StaticBody3D" parent="." unique_id=879625428]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 1, 40)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SmallHill_B_Body" unique_id=1293220348]
+shape = SubResource("Shape_SmallHill_B")
+
+[node name="SmallHill_B" type="MeshInstance3D" parent="SmallHill_B_Body" unique_id=1568330185]
+mesh = SubResource("Mesh_SmallHill_B")
+
+[node name="POISocket" type="Node3D" parent="." unique_id=367396677]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44.34877, 0.25, -32.85006)
+
+[node name="SpawnSockets" type="Node3D" parent="." unique_id=1695568011]
+
+[node name="Spawn_A" type="Node3D" parent="SpawnSockets" unique_id=977722022]
+transform = Transform3D(0.7071069, 0, 0.70710665, 0, 1, 0, -0.70710665, 0, 0.7071069, -58, 0.4, 52)
+
+[node name="Spawn_B" type="Node3D" parent="SpawnSockets" unique_id=186335938]
+transform = Transform3D(0.7071069, 0, -0.70710665, 0, 1, 0, 0.70710665, 0, 0.7071069, 56, 0.4, -52)
+
+[node name="Connectors" type="Node3D" parent="." unique_id=154302352]
+
+[node name="North" type="Node3D" parent="Connectors" unique_id=1417836616]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -100)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/North" unique_id=855081984]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_tvdin")
+
+[node name="East" type="Node3D" parent="Connectors" unique_id=1328967074]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0.4, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/East" unique_id=981337944]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_tvdin")
+
+[node name="South" type="Node3D" parent="Connectors" unique_id=863892242]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 100)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/South" unique_id=1408110547]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_tvdin")
+
+[node name="West" type="Node3D" parent="Connectors" unique_id=413378559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0.4, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/West" unique_id=495296706]
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_tvdin")
+
+[node name="Walls_Limit" type="Node3D" parent="." unique_id=703839911]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Walls_Limit" unique_id=1952264641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0, -61.999996)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Walls_Limit" unique_id=1939049727]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -99, 0, 62)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="Walls_Limit" unique_id=1087555102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99, 0, -62)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="Walls_Limit" unique_id=2075799211]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 99, 0, 62)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Walls_Limit" unique_id=382040570]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Walls_Limit" unique_id=152240511]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Walls_Limit" unique_id=211977855]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55, 0, 99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="Walls_Limit" unique_id=922596026]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55, 0, 99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="POISocket_Side1" type="Node3D" parent="." unique_id=719191015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62.642273, 0.25, 69.5016)
+script = ExtResource("2_tvdin")
+
+[node name="POISocket_Side2" type="Node3D" parent="." unique_id=1379837657]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 10.357727, 0.25, -31.498398)
+script = ExtResource("2_tvdin")
+secondary_socket_environment = "river"
+rotation_mode_override = "follow socket"
+
+[node name="POISocket_Side3" type="Node3D" parent="." unique_id=768553066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.357727, 0.25, 65.5016)
+script = ExtResource("2_tvdin")
+
+[node name="POISocket_Side4" type="Node3D" parent="." unique_id=1176318292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67.35773, 0.25, -65.4984)
+script = ExtResource("2_tvdin")
+
+[node name="SpawnZones" type="Node3D" parent="." unique_id=907018010]
+
+[node name="Plans_River_B_West_Horde" type="Node3D" parent="SpawnZones" unique_id=1345116410 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46, 2.0101318, 56)
+script = ExtResource("3_h8ymr")
+zone_mode = 1
+min_spawn_count = 12
+max_spawn_count = 22
+max_alive_from_zone = 28
+max_distance_from_target = 140.0
+cooldown_seconds = 55.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=508499034]
+size = Vector3(20, 0.12, 14)
+material = SubResource("StandardMaterial3D_bms1v")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=106586136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - flanc gauche
+Spawn dynamique.
+À placer hors champ ou derrière un obstacle."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=1361458686]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.2, -4)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=1483768529]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.2, 5)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=868419222]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, -2)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=1624922551]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, 4)
+
+[node name="Plans_River_B_South_Horde" type="Node3D" parent="SpawnZones" unique_id=20598959 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 2.766817, 40)
+script = ExtResource("3_h8ymr")
+zone_mode = 1
+min_spawn_count = 10
+max_spawn_count = 18
+max_alive_from_zone = 24
+max_distance_from_target = 140.0
+cooldown_seconds = 50.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_South_Horde" unique_id=1228347107]
+size = Vector3(18, 0.12, 12)
+material = SubResource("StandardMaterial3D_bms1v")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_South_Horde" unique_id=559748872]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - route latérale
+Le Director l'utilise pendant BUILD_UP.
+Puis il spawn par salves."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_South_Horde" unique_id=271689521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_South_Horde" unique_id=1194247023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_South_Horde" unique_id=1188596063]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -2)
+
+[node name="Plans_River_B_Right_Mixed" type="Node3D" parent="SpawnZones" unique_id=1993406346 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.6224, 4.0951777, -28.189766)
+script = ExtResource("3_h8ymr")
+zone_mode = 2
+max_spawn_count = 14
+min_distance_from_target = 22.0
+max_distance_from_target = 140.0
+cooldown_seconds = 45.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=1183420360]
+size = Vector3(16, 0.12, 16)
+material = SubResource("StandardMaterial3D_3jeqi")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=125519327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "MIXTE - carrefour
+Peut être déjà habité.
+Peut aussi servir de renfort dynamique."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=704452478]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=32186022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=2001875667]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+
+[node name="Plans_River_B_Right_Mixed2" type="Node3D" parent="SpawnZones" unique_id=562533931 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.377602, 4.0951777, 12.810234)
+script = ExtResource("3_h8ymr")
+zone_mode = 2
+max_spawn_count = 14
+min_distance_from_target = 22.0
+max_distance_from_target = 140.0
+cooldown_seconds = 45.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=218935012]
+size = Vector3(16, 0.12, 16)
+material = SubResource("StandardMaterial3D_3jeqi")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=1105916901]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "MIXTE - carrefour
+Peut être déjà habité.
+Peut aussi servir de renfort dynamique."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=1939805013]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=51881503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=1367006827]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+
+[node name="Plans_River_B_North_Horde" type="Node3D" parent="SpawnZones" unique_id=1114721347 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 4.6445227, -77)
+script = ExtResource("3_h8ymr")
+zone_mode = 1
+min_spawn_count = 16
+max_spawn_count = 28
+max_alive_from_zone = 34
+min_distance_from_target = 30.0
+max_distance_from_target = 160.0
+cooldown_seconds = 65.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=2140615085]
+size = Vector3(24, 0.12, 18)
+material = SubResource("StandardMaterial3D_bms1v")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=1533592976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - fin de section
+Grosse pression avant un passageGate.
+À utiliser avec cooldown long."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=1758155090]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=1527547405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=59970497]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)

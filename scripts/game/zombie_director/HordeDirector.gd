@@ -1,6 +1,6 @@
 extends Node3D
 
-# Director de démonstration inspiré d'un AI Director.
+# Director de horde inspiré d'un AI Director.
 # Il sépare clairement :
 # - les zombies déjà présents dans le décor.
 # - les hordes dynamiques qui arrivent pendant le niveau.
@@ -25,9 +25,6 @@ enum DirectorState {
 @export var current_section_id: int = 0
 
 @export_group("Spawn Scenes")
-@export var use_placeholder_zombies: bool = true
-@export var placeholder_zombie_scene: PackedScene
-
 # Ancien champ conservé comme fallback.
 # Si tonfa_enemy_scene n'est pas assignée, zombie_scene sera utilisé comme soldat tonfa par défaut.
 @export var zombie_scene: PackedScene
@@ -99,6 +96,8 @@ enum DirectorState {
 @export var despawn_old_sections: bool = true
 @export var sections_to_keep_behind: int = 0
 @export var despawn_only_director_spawned: bool = false
+@export var cleanup_far_zombies_only_when_above_limit: bool = true
+@export var debug_print_cleanup_reasons: bool = true
 
 @export_group("Limits")
 @export var max_alive_zombies: int = 80
@@ -118,6 +117,8 @@ var active_horde_zones: Array[Node] = []
 var active_horde_points_by_zone: Dictionary = {}
 var last_event_text: String = "Initialisation"
 var cached_zones: Array[Node] = []
+var initial_idle_population_done: bool = false
+var waiting_for_idle_population_deferred: bool = false
 var random: RandomNumberGenerator = RandomNumberGenerator.new()
 var time_since_last_mega_horde: float = 999999.0
 var cleanup_timer: float = 0.0
@@ -129,13 +130,15 @@ func _ready() -> void:
 	add_to_group("horde_director")
 	random.randomize()
 	_auto_load_enemy_scenes()
+	_register_in_game_session_state()
 	_collect_zones()
 	_schedule_rest()
-
-	if idle_population_on_ready:
-		_spawn_initial_idle_population()
-
+	_schedule_initial_idle_population_once()
 	_emit_event("Director prêt. Zones trouvées : %d" % cached_zones.size())
+
+
+func _exit_tree() -> void:
+	_unregister_from_game_session_state()
 
 
 func _process(delta: float) -> void:
@@ -151,6 +154,7 @@ func _process(delta: float) -> void:
 
 
 func get_debug_info() -> Dictionary:
+	_prune_cached_zones()
 	var info: Dictionary = {}
 	info["state"] = get_state_text()
 	info["state_key"] = get_state_key()
@@ -369,21 +373,39 @@ func _spawn_initial_idle_population() -> void:
 		if populated_count >= max_idle_zones_populated_on_ready:
 			return
 
+		if get_alive_zombie_count() >= max_alive_zombies:
+			_emit_event("Population idle stoppée. Limite globale atteinte : %d/%d." % [get_alive_zombie_count(), max_alive_zombies])
+			return
+
 		if zone == null or not is_instance_valid(zone):
 			continue
 
 		if not zone.has_method("can_spawn_idle") or not zone.call("can_spawn_idle"):
 			continue
 
-		var spawn_count: int = _get_zone_spawn_count(zone)
+		var requested_spawn_count: int = _get_zone_spawn_count(zone)
+		var remaining_budget: int = max_alive_zombies - get_alive_zombie_count()
+		var spawn_count: int = clampi(requested_spawn_count, 0, remaining_budget)
+		if spawn_count <= 0:
+			return
+
+		var actual_spawn_count: int = 0
 		for index in range(spawn_count):
-			_spawn_one_from_zone(zone, "idle")
+			var spawned: Node = _spawn_one_from_zone(zone, "idle")
+			if spawned != null:
+				actual_spawn_count += 1
+
+		if actual_spawn_count <= 0:
+			continue
 
 		if zone.has_method("mark_used_now"):
 			zone.call("mark_used_now")
 
 		populated_count += 1
-		_emit_event("Population idle : %s, %d zombies." % [_get_zone_name(zone), spawn_count])
+		if actual_spawn_count < requested_spawn_count:
+			_emit_event("Population idle : %s, %d/%d zombies. Budget global atteint." % [_get_zone_name(zone), actual_spawn_count, requested_spawn_count])
+		else:
+			_emit_event("Population idle : %s, %d zombies." % [_get_zone_name(zone), actual_spawn_count])
 
 
 func _spawn_one_from_zone(zone: Node, behaviour: String) -> Node:
@@ -457,22 +479,156 @@ func _register_spawned_zombie(zombie: Node) -> void:
 		zombie.call("set_spawned_section_id", current_section_id)
 
 
+func register_spawn_zone(zone: Node) -> void:
+	if zone == null or not is_instance_valid(zone):
+		return
+	if not _is_valid_spawn_zone_node(zone):
+		return
+
+	_prune_cached_zones()
+	if not cached_zones.has(zone):
+		cached_zones.append(zone)
+		_emit_event("Zone enregistrée : %s. Total : %d" % [_get_zone_name(zone), cached_zones.size()])
+
+	_schedule_initial_idle_population_once()
+
+
+func unregister_spawn_zone(zone: Node) -> void:
+	if zone == null:
+		return
+
+	if cached_zones.has(zone):
+		cached_zones.erase(zone)
+
+	if active_horde_zone == zone:
+		active_horde_zone = null
+
+	if active_horde_zones.has(zone):
+		active_horde_zones.erase(zone)
+
+	if is_instance_valid(zone):
+		active_horde_points_by_zone.erase(zone.get_instance_id())
+
+	if cached_zones.is_empty():
+		initial_idle_population_done = false
+		waiting_for_idle_population_deferred = false
+
+
+func refresh_registered_spawn_zones() -> void:
+	_collect_zones()
+	_schedule_initial_idle_population_once()
+
+
+func clear_registered_spawn_zones() -> void:
+	cached_zones.clear()
+	active_horde_zone = null
+	active_horde_zones.clear()
+	active_horde_points_by_zone.clear()
+	initial_idle_population_done = false
+	waiting_for_idle_population_deferred = false
+
+
+func _register_in_game_session_state() -> void:
+	if GameSessionState == null:
+		return
+	if GameSessionState.has_method("set_horde_director"):
+		GameSessionState.call("set_horde_director", self)
+
+
+func _unregister_from_game_session_state() -> void:
+	if GameSessionState == null:
+		return
+	if GameSessionState.has_method("clear_horde_director"):
+		GameSessionState.call("clear_horde_director", self)
+
+
+func _schedule_initial_idle_population_once() -> void:
+	if not idle_population_on_ready:
+		return
+	if initial_idle_population_done:
+		return
+	if waiting_for_idle_population_deferred:
+		return
+
+	waiting_for_idle_population_deferred = true
+	call_deferred("_try_spawn_initial_idle_population_once")
+
+
+func _try_spawn_initial_idle_population_once() -> void:
+	waiting_for_idle_population_deferred = false
+	if initial_idle_population_done:
+		return
+
+	_prune_cached_zones()
+	if cached_zones.is_empty():
+		return
+
+	initial_idle_population_done = true
+	_spawn_initial_idle_population()
+
+
 func _collect_zones() -> void:
 	cached_zones.clear()
 
-	for node in get_tree().get_nodes_in_group("zombie_spawn_zone"):
-		if node != null and is_instance_valid(node):
-			cached_zones.append(node)
+	if GameSessionState != null and GameSessionState.has_method("get_horde_spawn_zones"):
+		var session_zones: Array = GameSessionState.call("get_horde_spawn_zones")
+		for zone in session_zones:
+			_add_zone_if_valid(zone)
+
+	var tree: SceneTree = get_tree()
+	if tree != null:
+		for node in tree.get_nodes_in_group("zombie_spawn_zone"):
+			_add_zone_if_valid(node)
 
 	if cached_zones.is_empty():
 		_collect_zones_from_children(self)
+
+	_prune_cached_zones()
 
 
 func _collect_zones_from_children(root: Node) -> void:
 	for child in root.get_children():
 		if child != null and child.is_in_group("zombie_spawn_zone"):
-			cached_zones.append(child)
+			_add_zone_if_valid(child)
 		_collect_zones_from_children(child)
+
+
+func _add_zone_if_valid(zone: Variant) -> void:
+	if not (zone is Node):
+		return
+	var zone_node: Node = zone as Node
+	if not _is_valid_spawn_zone_node(zone_node):
+		return
+	if cached_zones.has(zone_node):
+		return
+	cached_zones.append(zone_node)
+
+
+func _is_valid_spawn_zone_node(zone: Node) -> bool:
+	if zone == null or not is_instance_valid(zone):
+		return false
+	if not zone.is_inside_tree():
+		return false
+	if zone.has_method("get_spawn_points"):
+		return true
+	return zone.is_in_group("zombie_spawn_zone")
+
+
+func _prune_cached_zones() -> void:
+	var cleaned: Array[Node] = []
+	for zone in cached_zones:
+		if _is_valid_spawn_zone_node(zone):
+			cleaned.append(zone)
+	cached_zones = cleaned
+
+	var cleaned_active: Array[Node] = []
+	for zone in active_horde_zones:
+		if _is_valid_spawn_zone_node(zone):
+			cleaned_active.append(zone)
+	active_horde_zones = cleaned_active
+
+	if active_horde_zone != null and not _is_valid_spawn_zone_node(active_horde_zone):
+		active_horde_zone = null
 
 
 func _pick_valid_zone(wants_attack: bool) -> Node:
@@ -503,6 +659,7 @@ func _pick_valid_zones_for_mega_horde() -> Array[Node]:
 
 
 func _get_valid_zones(wants_attack: bool) -> Array[Node]:
+	_prune_cached_zones()
 	var target_positions: Array[Vector3] = _get_target_positions()
 	var candidates: Array[Node] = []
 
@@ -691,20 +848,30 @@ func _update_cleanup(delta: float) -> void:
 
 func cleanup_far_or_old_zombies() -> void:
 	var zombies: Array[Node] = _get_zombie_nodes_for_cleanup()
+	var alive_count: int = zombies.size()
 	var removed_count: int = 0
+	var reasons: Dictionary = {}
 
 	for zombie in zombies:
 		if not (zombie is Node3D):
 			continue
 
 		var zombie_3d: Node3D = zombie as Node3D
-		if _can_despawn_zombie(zombie_3d):
-			_unregister_spawned_zombie(zombie_3d)
-			zombie_3d.queue_free()
-			removed_count += 1
+		var despawn_reason: String = _get_despawn_reason(zombie_3d, alive_count)
+		if despawn_reason.is_empty():
+			continue
+
+		_unregister_spawned_zombie(zombie_3d)
+		zombie_3d.queue_free()
+		removed_count += 1
+		alive_count = max(alive_count - 1, 0)
+		reasons[despawn_reason] = int(reasons.get(despawn_reason, 0)) + 1
 
 	if removed_count > 0:
-		_emit_event("Cleanup : %d zombies despawn." % removed_count)
+		if debug_print_cleanup_reasons:
+			_emit_event("Cleanup : %d zombies despawn. Raisons : %s." % [removed_count, _format_cleanup_reasons(reasons)])
+		else:
+			_emit_event("Cleanup : %d zombies despawn." % removed_count)
 
 
 func _get_zombie_nodes_for_cleanup() -> Array[Node]:
@@ -741,27 +908,49 @@ func _get_zombie_nodes_for_cleanup() -> Array[Node]:
 
 
 func _can_despawn_zombie(zombie: Node3D) -> bool:
+	return not _get_despawn_reason(zombie, get_alive_zombie_count()).is_empty()
+
+
+func _get_despawn_reason(zombie: Node3D, current_alive_count: int) -> String:
 	if zombie == null or not is_instance_valid(zombie):
-		return false
+		return ""
 
 	if avoid_visible_spawns and not _is_spawn_position_hidden_from_all_players(zombie.global_position):
-		return false
+		return ""
 
 	if zombie.has_method("is_in_combat"):
 		if zombie.call("is_in_combat"):
-			return false
+			return ""
 
 	if zombie.has_method("is_recently_damaged"):
 		if zombie.call("is_recently_damaged"):
-			return false
+			return ""
 
 	if despawn_old_sections and _is_zombie_behind_progression(zombie):
-		return true
+		return "old_section"
 
-	if _get_distance_to_closest_target(zombie.global_position) > despawn_distance:
-		return true
+	var is_far_from_players: bool = _get_distance_to_closest_target(zombie.global_position) > despawn_distance
+	if not is_far_from_players:
+		return ""
 
-	return false
+	if cleanup_far_zombies_only_when_above_limit and current_alive_count <= max_alive_zombies:
+		return ""
+
+	if current_alive_count > max_alive_zombies:
+		return "above_limit_far"
+
+	return "far_distance"
+
+
+func _format_cleanup_reasons(reasons: Dictionary) -> String:
+	if reasons.is_empty():
+		return "aucune"
+
+	var parts: Array[String] = []
+	for key: Variant in reasons.keys():
+		parts.append("%s=%d" % [String(key), int(reasons[key])])
+
+	return ", ".join(parts)
 
 
 func _is_zombie_behind_progression(zombie: Node) -> bool:
@@ -871,9 +1060,6 @@ func _get_zone_spawn_count(zone: Node) -> int:
 
 
 func _get_scene_to_spawn(behaviour: String) -> PackedScene:
-	if use_placeholder_zombies:
-		return placeholder_zombie_scene
-
 	if behaviour == "attack" and state == DirectorState.SUPER_HORDE:
 		var hammer_scene: PackedScene = _try_get_super_horde_hammer_scene()
 		if hammer_scene != null:
@@ -1075,4 +1261,4 @@ func _get_next_action_text() -> String:
 func _emit_event(text: String) -> void:
 	last_event_text = text
 	if debug_print_events:
-		print("[HordeDirectorDemo] %s" % text)
+		print("[HordeDirector] %s" % text)

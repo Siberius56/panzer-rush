@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bhapqo4w02pvu"]
+
+[ext_resource type="Script" uid="uid://brimx44lug1m2" path="res://scenes/objectives/AirportObjective.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://0p0f4h46h5bi" path="res://scenes/objectives/AirportPlaneTarget.tscn" id="2_plane"]
+[ext_resource type="PackedScene" uid="uid://drnoo5vv0ru6x" path="res://scenes/objectives/AirportHelicoTarget.tscn" id="3_8j6gk"]
+
+[node name="AirportObjective" type="Node3D" unique_id=1346927131]
+script = ExtResource("1_script")
+
+[node name="Targets" type="Node3D" parent="." unique_id=2073077779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="Plane_01" parent="Targets" unique_id=2132412150 instance=ExtResource("2_plane")]
+transform = Transform3D(0.9689124, 0, 0.24740396, 0, 1, 0, -0.24740396, 0, 0.9689124, -7.5, 0, -4)
+target_id = "plane_01"
+
+[node name="Plane_02" parent="Targets" unique_id=1061791860 instance=ExtResource("2_plane")]
+transform = Transform3D(-0.9709582, 0, -0.23924923, 0, 1, 0, 0.23924923, 0, -0.9709582, 7.5, 0, 4)
+target_id = "plane_02"
+
+[node name="AirportPlaneTarget" parent="Targets" unique_id=1795258964 instance=ExtResource("3_8j6gk")]
+transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 3.1506958, 0, -5.491699)
+
+[node name="AirportPlaneTarget2" parent="Targets" unique_id=429096843 instance=ExtResource("3_8j6gk")]
+transform = Transform3D(0.49999997, 0, 0.86602545, 0, 1, 0, -0.86602545, 0, 0.49999997, -5.945801, 0, 4.557251)

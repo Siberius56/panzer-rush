@@ -243,6 +243,96 @@ dof_blur_far_enabled = true
 dof_blur_far_distance = 20.0
 dof_blur_amount = 0.15
 
+[sub_resource type="Shader" id="Shader_PostProcessEdges"]
+code = "shader_type spatial;
+
+render_mode unshaded, cull_disabled, depth_test_disabled, fog_disabled;
+
+uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap;
+uniform sampler2D depth_texture : hint_depth_texture, filter_nearest;
+uniform sampler2D normal_roughness_texture : hint_normal_roughness_texture, filter_nearest;
+
+uniform float edge_width : hint_range(0.5, 5.0) = 1.25;
+
+uniform float depth_threshold : hint_range(0.0001, 0.1) = 0.006;
+uniform float normal_threshold : hint_range(0.01, 2.0) = 0.22;
+
+uniform float edge_strength : hint_range(0.0, 1.0) = 0.9;
+uniform vec3 edge_color : source_color = vec3(0.015, 0.01, 0.018);
+
+void vertex() {
+	POSITION = vec4(VERTEX.xy, 1.0, 1.0);
+}
+
+float get_depth(vec2 uv) {
+	return texture(depth_texture, uv).r;
+}
+
+vec3 get_normal(vec2 uv) {
+	vec3 normal = texture(normal_roughness_texture, uv).xyz;
+	normal = normal * 2.0 - 1.0;
+	return normalize(normal);
+}
+
+void fragment() {
+	vec2 uv = SCREEN_UV;
+	vec2 pixel_size = edge_width / VIEWPORT_SIZE.xy;
+
+	vec3 base_color = texture(screen_texture, uv).rgb;
+
+	float center_depth = get_depth(uv);
+	vec3 center_normal = get_normal(uv);
+
+	float depth_edge = 0.0;
+	float normal_edge = 0.0;
+
+	vec2 offsets[8] = vec2[](
+		vec2(-1.0, -1.0),
+		vec2( 0.0, -1.0),
+		vec2( 1.0, -1.0),
+		vec2(-1.0,  0.0),
+		vec2( 1.0,  0.0),
+		vec2(-1.0,  1.0),
+		vec2( 0.0,  1.0),
+		vec2( 1.0,  1.0)
+	);
+
+	for (int i = 0; i < 8; i++) {
+		vec2 sample_uv = uv + offsets[i] * pixel_size;
+
+		float sample_depth = get_depth(sample_uv);
+		vec3 sample_normal = get_normal(sample_uv);
+
+		float depth_difference = abs(center_depth - sample_depth);
+		float normal_difference = distance(center_normal, sample_normal);
+
+		depth_edge = max(depth_edge, depth_difference);
+		normal_edge = max(normal_edge, normal_difference);
+	}
+
+	float depth_line = step(depth_threshold, depth_edge);
+	float normal_line = step(normal_threshold, normal_edge);
+
+	float edge_mask = max(depth_line, normal_line);
+
+	vec3 final_color = mix(base_color, edge_color, edge_mask * edge_strength);
+
+	ALBEDO = final_color;
+	ALPHA = 1.0;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_PostProcessEdges"]
+render_priority = 127
+shader = SubResource("Shader_PostProcessEdges")
+shader_parameter/edge_width = 1.0
+shader_parameter/depth_threshold = 0.08
+shader_parameter/normal_threshold = 0.35
+shader_parameter/edge_strength = 0.9
+shader_parameter/edge_color = Color(0.015, 0.01, 0.018, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_PostProcessEdges"]
+size = Vector2(2, 2)
+
 [node name="NetworkProceduralPlayer" type="CharacterBody3D" unique_id=1893229279 groups=["ally"]]
 collision_mask = 31
 floor_constant_speed = true
@@ -424,5 +514,12 @@ spring_length = 7.0
 [node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D" unique_id=1141068449]
 attributes = SubResource("CameraAttributesPractical_6qof4")
 fov = 55.0
+
+[node name="EdgePostProcessQuad" type="MeshInstance3D" parent="CameraRig/SpringArm3D/Camera3D" unique_id=1173311561]
+visible = false
+material_override = SubResource("ShaderMaterial_PostProcessEdges")
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_PostProcessEdges")
 
 [node name="Stage_Enviro" parent="." unique_id=668883432 instance=ExtResource("8_wt3kc")]

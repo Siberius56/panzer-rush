@@ -1,0 +1,310 @@
+[gd_scene format=3 uid="uid://b2lmqof6q0ayu"]
+
+[ext_resource type="Script" uid="uid://cw501aeyfhwaf" path="res://scenes/procedural_generation/scripts/LevelPOI.gd" id="1_poi_script"]
+[ext_resource type="PackedScene" uid="uid://dnu1jguec4q0c" path="res://asset/map/misc-2/Silo_Missile.glb" id="2_1d1x2"]
+[ext_resource type="PackedScene" uid="uid://b7nrdtsfjnycv" path="res://scenes/objectives/BombRadarObjective.tscn" id="2_f3dgt"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_5olyn"]
+[ext_resource type="Material" uid="uid://dwrumrmkhcq7y" path="res://asset/texture/Color_Blue.tres" id="3_erbcn"]
+[ext_resource type="PackedScene" uid="uid://cuawdsptfumqs" path="res://asset/map/factory-building/detail-tank.glb" id="4_stlgv"]
+[ext_resource type="PackedScene" uid="uid://vywtkjm3peqj" path="res://scenes/props/Building/Building_B.tscn" id="5_4uq57"]
+[ext_resource type="PackedScene" uid="uid://c6v3jt4gchee" path="res://scenes/props/Building/Building_MilitaryBase_A.tscn" id="7_5lkuq"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5olyn"]
+size = Vector3(60, 10, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1d1x2"]
+size = Vector3(46, 10, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_erbcn"]
+size = Vector3(46, 10, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_stlgv"]
+size = Vector3(46, 10, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5lkuq"]
+size = Vector3(46, 10, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4uq57"]
+size = Vector3(46, 10, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dcai8"]
+size = Vector3(46, 10, 14)
+
+[sub_resource type="StandardMaterial3D" id="Mat_poi"]
+albedo_color = Color(0.8, 0.55, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1d1x2"]
+material = SubResource("Mat_poi")
+size = Vector3(60, 10, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5olyn"]
+material = SubResource("Mat_poi")
+size = Vector3(46, 10, 14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_erbcn"]
+material = SubResource("Mat_poi")
+size = Vector3(46, 10, 14)
+
+[sub_resource type="StandardMaterial3D" id="Mat_metal"]
+albedo_color = Color(0.38, 0.4, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_MissilePlaceholder"]
+material = SubResource("Mat_metal")
+size = Vector3(7, 18, 7)
+
+[sub_resource type="BoxShape3D" id="Shape_SiloBase"]
+size = Vector3(14, 3, 14)
+
+[sub_resource type="BoxShape3D" id="Shape_MissilePlaceholder"]
+size = Vector3(7, 18, 7)
+
+[sub_resource type="BoxMesh" id="Mesh_SiloBase"]
+material = SubResource("Mat_metal")
+size = Vector3(14, 3, 14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5lkuq"]
+material = SubResource("Mat_metal")
+size = Vector3(5, 1, 18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_elgoe"]
+size = Vector3(5, 1, 18)
+
+[sub_resource type="BoxMesh" id="Mesh_FuelTanks"]
+material = SubResource("Mat_metal")
+size = Vector3(10, 8, 10)
+
+[sub_resource type="BoxShape3D" id="Shape_FuelTanks"]
+size = Vector3(10, 8, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1d1x2"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[node name="POI_MissileSilo" type="Node3D" unique_id=1947352527]
+script = ExtResource("1_poi_script")
+poi_id = "POI_MissileSilo"
+poi_type = "missile_silo"
+poi_tags = PackedStringArray("silo", "military")
+
+[node name="Ground_Body" type="StaticBody3D" parent="." unique_id=269187708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=548065673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.02, 0)
+shape = SubResource("BoxShape3D_5olyn")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground_Body" unique_id=1197157543]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, -5.02, -23)
+shape = SubResource("BoxShape3D_1d1x2")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground_Body" unique_id=641897332]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 23, -5.02, -7)
+shape = SubResource("BoxShape3D_erbcn")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground_Body" unique_id=965611881]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 7, -5.02, 23)
+shape = SubResource("BoxShape3D_stlgv")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground_Body" unique_id=1913986345]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, -23, -5.02, 7)
+shape = SubResource("BoxShape3D_5lkuq")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="Ground_Body" unique_id=506142958]
+transform = Transform3D(1, -2.1855694e-08, -1.6898933e-07, -6.556708e-08, 0.8660254, -0.5, 1.572769e-07, 0.5, 0.8660254, 0, -7.83, -12.5)
+shape = SubResource("BoxShape3D_4uq57")
+
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="Ground_Body" unique_id=1168281969]
+transform = Transform3D(-1, -2.1855707e-08, 9.3279e-08, -6.5567086e-08, 0.8660254, -0.5, -6.985414e-08, -0.5, -0.8660254, 0, -7.83, 12.5)
+shape = SubResource("BoxShape3D_dcai8")
+
+[node name="Ground" type="Node3D" parent="." unique_id=1294688184]
+
+[node name="ConcreteGround" type="MeshInstance3D" parent="Ground" unique_id=1360121739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+mesh = SubResource("BoxMesh_1d1x2")
+
+[node name="ConcreteGround2" type="MeshInstance3D" parent="Ground" unique_id=2101706662]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, -5, -23)
+mesh = SubResource("BoxMesh_5olyn")
+
+[node name="ConcreteGround3" type="MeshInstance3D" parent="Ground" unique_id=1498761662]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 23, -5, -7)
+mesh = SubResource("BoxMesh_5olyn")
+
+[node name="ConcreteGround4" type="MeshInstance3D" parent="Ground" unique_id=365131587]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 7, -5, 23)
+mesh = SubResource("BoxMesh_5olyn")
+
+[node name="ConcreteGround5" type="MeshInstance3D" parent="Ground" unique_id=820081070]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, -23, -5, 7)
+mesh = SubResource("BoxMesh_5olyn")
+
+[node name="ConcreteGround6" type="MeshInstance3D" parent="Ground" unique_id=1898606940]
+transform = Transform3D(1, -2.1855694e-08, -1.6898933e-07, -6.556708e-08, 0.8660254, -0.5, 1.572769e-07, 0.5, 0.8660254, 0, -7.81, -12.5)
+mesh = SubResource("BoxMesh_erbcn")
+
+[node name="ConcreteGround7" type="MeshInstance3D" parent="Ground" unique_id=1330971306]
+transform = Transform3D(-1, -2.1855707e-08, 9.3279e-08, -6.5567086e-08, 0.8660254, -0.5, -6.985414e-08, -0.5, -0.8660254, 0, -7.81, 12.5)
+mesh = SubResource("BoxMesh_erbcn")
+
+[node name="Building" type="Node3D" parent="." unique_id=1838013306]
+
+[node name="SiloBase_Body" type="StaticBody3D" parent="Building" unique_id=1234310767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.5, 0)
+collision_layer = 8
+
+[node name="MissilePlaceholder" type="MeshInstance3D" parent="Building/SiloBase_Body" unique_id=1981503463]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+visible = false
+mesh = SubResource("Mesh_MissilePlaceholder")
+
+[node name="Node3D" type="Node3D" parent="Building/SiloBase_Body" unique_id=330617624]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -2, 0)
+
+[node name="Silo_Missile" parent="Building/SiloBase_Body/Node3D" unique_id=1594215768 instance=ExtResource("2_1d1x2")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -19.855469, -18.466919, 34.80127)
+
+[node name="Silo_RocketLiftOff" parent="Building/SiloBase_Body/Node3D/Silo_Missile" index="0" unique_id=785549785]
+surface_material_override/0 = ExtResource("3_erbcn")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Building/SiloBase_Body" unique_id=1156993763]
+shape = SubResource("Shape_SiloBase")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Building/SiloBase_Body" unique_id=1466885675]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+shape = SubResource("Shape_MissilePlaceholder")
+
+[node name="SiloBase" type="MeshInstance3D" parent="Building/SiloBase_Body" unique_id=1075866982]
+mesh = SubResource("Mesh_SiloBase")
+
+[node name="detail-tank2" parent="Building" unique_id=74371133 instance=ExtResource("4_stlgv")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 25, 1, -8.619141)
+
+[node name="detail-tank3" parent="Building" unique_id=655544005 instance=ExtResource("4_stlgv")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 25, 1, -5.619141)
+
+[node name="detail-tank4" parent="Building" unique_id=1770475257 instance=ExtResource("4_stlgv")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 25, 1, -2.619141)
+
+[node name="detail-tank5" parent="Building" unique_id=280248298 instance=ExtResource("4_stlgv")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 25, 1, -21.282143)
+
+[node name="detail-tank6" parent="Building" unique_id=1563585679 instance=ExtResource("4_stlgv")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 25, 1, -18.282143)
+
+[node name="detail-tank7" parent="Building" unique_id=444487980 instance=ExtResource("4_stlgv")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 25, 1, -15.282144)
+
+[node name="Platform" type="StaticBody3D" parent="Building" unique_id=1853981329]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.001127, -0.54224014, -7.9692583)
+collision_layer = 8
+
+[node name="FuelTanks" type="MeshInstance3D" parent="Building/Platform" unique_id=1529931785]
+mesh = SubResource("BoxMesh_5lkuq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Building/Platform" unique_id=1152856250]
+shape = SubResource("BoxShape3D_elgoe")
+
+[node name="FuelTanks_Body1" type="StaticBody3D" parent="Building" unique_id=676468103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -3, -19)
+collision_layer = 8
+
+[node name="FuelTanks" type="MeshInstance3D" parent="Building/FuelTanks_Body1" unique_id=1092149451]
+mesh = SubResource("Mesh_FuelTanks")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Building/FuelTanks_Body1" unique_id=983824552]
+shape = SubResource("Shape_FuelTanks")
+
+[node name="FuelTanks_Body2" type="StaticBody3D" parent="Building" unique_id=1505517155]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -3, -6)
+collision_layer = 8
+
+[node name="FuelTanks" type="MeshInstance3D" parent="Building/FuelTanks_Body2" unique_id=1316545275]
+mesh = SubResource("Mesh_FuelTanks")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Building/FuelTanks_Body2" unique_id=878081257]
+shape = SubResource("Shape_FuelTanks")
+
+[node name="Building_B" parent="Building" unique_id=455294865 instance=ExtResource("5_4uq57")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 22.324997, 0.18657103, 21.608276)
+
+[node name="BombRadarObjective" parent="." unique_id=1176266720 instance=ExtResource("2_f3dgt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.15078, 3.8146973e-06, 3.2417927)
+objective_text = "Détruire silo"
+
+[node name="POI_Missile_Silo_West" type="Node3D" parent="." unique_id=1582097720 groups=["zombie_spawn_zone"]]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -23, 1, 6)
+script = ExtResource("3_5olyn")
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_Missile_Silo_West" unique_id=2018538899]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_1d1x2")
+
+[node name="Label3D" type="Label3D" parent="POI_Missile_Silo_West" unique_id=1102208676]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_Missile_Silo_West" unique_id=655758817]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_Missile_Silo_West" unique_id=523899706]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_Missile_Silo_West" unique_id=1422086464]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_Missile_Silo_West" unique_id=1448529902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
+
+[node name="POI_Missile_Silo_West2" type="Node3D" parent="." unique_id=2043713887 groups=["zombie_spawn_zone"]]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 23, 1, 12)
+script = ExtResource("3_5olyn")
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_Missile_Silo_West2" unique_id=250802021]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_1d1x2")
+
+[node name="Label3D" type="Label3D" parent="POI_Missile_Silo_West2" unique_id=858139853]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_Missile_Silo_West2" unique_id=1141016371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_Missile_Silo_West2" unique_id=854737205]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_Missile_Silo_West2" unique_id=1107505301]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_Missile_Silo_West2" unique_id=1470555855]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
+
+[node name="Building_Hangar_A" parent="." unique_id=59821034 instance=ExtResource("7_5lkuq")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -21.025507, 0.1, -15.246199)
+
+[editable path="Building/SiloBase_Body/Node3D/Silo_Missile"]

@@ -1,0 +1,686 @@
+[gd_scene format=3 uid="uid://15idkeyw31h"]
+
+[ext_resource type="Script" uid="uid://cw501aeyfhwaf" path="res://scenes/procedural_generation/scripts/LevelPOI.gd" id="1_poi_script"]
+[ext_resource type="Material" uid="uid://1xxp5pltlv00" path="res://asset/texture/Color_Gray.tres" id="2_5rav7"]
+[ext_resource type="PackedScene" uid="uid://b7nrdtsfjnycv" path="res://scenes/objectives/BombRadarObjective.tscn" id="2_o3eod"]
+[ext_resource type="Script" uid="uid://c4o6papidkcxp" path="res://scenes/game/NetworkZone.gd" id="2_uelin"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_dh1hi"]
+[ext_resource type="PackedScene" uid="uid://dp4jt1qet3xpi" path="res://asset/map/road/road-intersection-line.glb" id="4_bd3e6"]
+[ext_resource type="PackedScene" uid="uid://gepa08i4mciw" path="res://asset/map/road/road-straight.glb" id="5_8k1xu"]
+[ext_resource type="PackedScene" uid="uid://cc4jpr8s0m2m" path="res://scenes/props/Physic/Light_Street.tscn" id="6_ohm6j"]
+[ext_resource type="PackedScene" uid="uid://dxg6ye53rg5gu" path="res://scenes/props/Construction_Cone.tscn" id="7_ghfes"]
+[ext_resource type="PackedScene" uid="uid://npi3yjore66q" path="res://scenes/props/Building/Building_A.tscn" id="8_sem8g"]
+[ext_resource type="PackedScene" uid="uid://d3rkidkkcso24" path="res://scenes/props/Container_Blue.tscn" id="9_s33xo"]
+[ext_resource type="Material" uid="uid://dj0ns6v46j1to" path="res://asset/texture/Color_Concrete_Gray.tres" id="9_uelin"]
+[ext_resource type="PackedScene" uid="uid://ckx8m86n2p24f" path="res://scenes/props/Physic/Barrier_Concrete.tscn" id="10_i7rwj"]
+[ext_resource type="PackedScene" uid="uid://d3sqpgrwux1wu" path="res://asset/map/road/road-bend.glb" id="11_3voem"]
+[ext_resource type="PackedScene" uid="uid://c6v3jt4gchee" path="res://scenes/props/Building/Building_MilitaryBase_A.tscn" id="11_5rav7"]
+[ext_resource type="PackedScene" uid="uid://cdfsoh484um4y" path="res://scenes/props/Physic/Light_Street_cross.tscn" id="12_f3da7"]
+[ext_resource type="PackedScene" uid="uid://c1pm2d2gqlvyj" path="res://scenes/props/Physic/Wood_Plank.tscn" id="13_s42au"]
+[ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Physic/Crate.tscn" id="14_xgfru"]
+[ext_resource type="PackedScene" uid="uid://btqlek7ta84pi" path="res://scenes/props/Physic/Crate_Large.tscn" id="15_uij31"]
+[ext_resource type="PackedScene" uid="uid://bbo6apchi6rgm" path="res://asset/map/road/bridge-pillar-wide.glb" id="19_dviti"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dh1hi"]
+size = Vector3(60, 10, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b3sps"]
+material = ExtResource("2_5rav7")
+size = Vector3(60, 10, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5rav7"]
+size = Vector3(26, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_655l5"]
+size = Vector3(26, 4, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dwg10"]
+albedo_color = Color(0.8039216, 0.8117647, 0.84705883, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b3sps"]
+transparency = 1
+albedo_color = Color(0.1, 0.75, 0.25, 0.28)
+
+[node name="POI_MilitaryBase" type="Node3D" unique_id=313851998]
+script = ExtResource("1_poi_script")
+poi_id = "POI_MilitaryBase"
+poi_type = "military_base"
+poi_tags = PackedStringArray("land", "military")
+
+[node name="Ground_Body" type="StaticBody3D" parent="." unique_id=976757531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=1547383203]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+shape = SubResource("BoxShape3D_dh1hi")
+
+[node name="Ground" type="Node3D" parent="." unique_id=1745538487]
+
+[node name="ConcreteGround" type="MeshInstance3D" parent="Ground" unique_id=1206635924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+mesh = SubResource("BoxMesh_b3sps")
+
+[node name="Building" type="Node3D" parent="." unique_id=1934916294]
+
+[node name="Building_Hangar_A2" parent="Building" unique_id=336370479 instance=ExtResource("11_5rav7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.22271, 0.120019525, -20.373966)
+
+[node name="Road" type="Node3D" parent="." unique_id=86665436]
+
+[node name="road-intersection-line2" parent="Road" unique_id=745380943 instance=ExtResource("4_bd3e6")]
+transform = Transform3D(-2.6226832e-07, 0, -6, 0, 6, 0, 6, 0, -2.6226832e-07, 0, 0, 0)
+
+[node name="road-intersection-line5" parent="Road" unique_id=383133498 instance=ExtResource("4_bd3e6")]
+transform = Transform3D(-6, 0, 5.2453663e-07, 0, 6, 0, -5.2453663e-07, 0, -6, -20, 0, 0)
+
+[node name="road-straight2" parent="Road" unique_id=1839007813 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(-1.1802075e-06, 0, -6, 0, 6, 0, 27, 0, -2.6226832e-07, 0, 0, 16.5)
+
+[node name="road-straight3" parent="Road" unique_id=1798886478 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(-4.371139e-07, 0, -6, 0, 6, 0, 10, 0, -2.6226832e-07, 0, 0, -25.020569)
+
+[node name="road-straight12" parent="Road" unique_id=1440062469 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(14, 0, 0, 0, 6, 0, 0, 0, 6, -10, 0, -17.5)
+
+[node name="road-straight6" parent="Road" unique_id=165298143 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(-2.6226832e-07, 0, -6, 0, 6, 0, 6, 0, -2.6226832e-07, 0, 0, -5.7905884)
+
+[node name="road-straight4" parent="Road" unique_id=387782570 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(7, 0, -3.59011e-14, 0, 6, 0, 4.1884617e-14, 0, 6, -26.5, 0, 0)
+
+[node name="road-straight14" parent="Road" unique_id=1244788271 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(14, 0, -3.59011e-14, 0, 6, 0, 8.3769234e-14, 0, 6, -10, 0, 0)
+
+[node name="road-intersection-line3" parent="Road" unique_id=1937000153 instance=ExtResource("4_bd3e6")]
+transform = Transform3D(-2.6226832e-07, 0, 6, 0, 6, 0, -6, 0, -2.6226832e-07, -0.002, 0, -11.5)
+
+[node name="road-intersection-line4" parent="Road" unique_id=1943580209 instance=ExtResource("4_bd3e6")]
+transform = Transform3D(7.8680495e-07, 0, -6, 0, 6, 0, 6, 0, 7.8680495e-07, -0.002, 0, -17.5)
+
+[node name="road-straight13" parent="Road" unique_id=1497921656 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(2.2878094e-06, 0, -6, 0, 6, 0, 11.75, 0, 1.1682431e-06, -20, 0, -8.752)
+
+[node name="road-bend7" parent="Road" unique_id=808014221 instance=ExtResource("11_3voem")]
+transform = Transform3D(-1.3113415e-06, 0, 6, 0, 6, 0, -6, 0, -1.3113415e-06, -20, 0, -17.5)
+
+[node name="road-straight15" parent="Road" unique_id=1389014824 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(-2.4041265e-07, 0, -6, 0, 6, 0, 5.5, 0, -2.6226832e-07, 21, 0, -5.75)
+
+[node name="road-straight16" parent="Road" unique_id=1844567542 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(-15, 0, -9.0597484e-07, 0, 6, 0, 2.264937e-06, 0, -6, 10.5, 0, -11.5)
+
+[node name="road-bend8" parent="Road" unique_id=1131511056 instance=ExtResource("11_3voem")]
+transform = Transform3D(6, 0, 1.0490733e-06, 0, 6, 0, -1.0490733e-06, 0, 6, 21, 0, -11.5)
+
+[node name="road-straight17" parent="Road" unique_id=549190092 instance=ExtResource("5_8k1xu")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 27, 0, 0)
+
+[node name="road-bend9" parent="Road" unique_id=124293140 instance=ExtResource("11_3voem")]
+transform = Transform3D(-6, 0, -1.5736098e-06, 0, 6, 0, 1.5736098e-06, 0, -6, 21, 0, 0)
+
+[node name="Street_Light1" parent="Road" unique_id=1108256052 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, 17)
+
+[node name="Street_Light2" parent="Road" unique_id=1391967829 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, 25)
+
+[node name="Street_Light3" parent="Road" unique_id=674440032 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, 1)
+
+[node name="Street_Light4" parent="Road" unique_id=1116072972 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, 9)
+
+[node name="Street_Light5" parent="Road" unique_id=696846238 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, -15)
+
+[node name="Street_Light6" parent="Road" unique_id=1369155180 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, -7)
+
+[node name="Street_Light8" parent="Road" unique_id=89794318 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 0.52, -23)
+
+[node name="Street_Light7" parent="Road" unique_id=454307238 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -14.5, 0.52, -4)
+
+[node name="Street_Light9" parent="Road" unique_id=2092893208 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -5.5, 0.52, -4)
+
+[node name="Street_Light10" parent="Road" unique_id=384394911 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -23.5, 0.52, -4)
+
+[node name="Street_Light15" parent="Road" unique_id=1967629424 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0.52, -14)
+
+[node name="Street_Light16" parent="Road" unique_id=589253143 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 24.5, 0.52, -7)
+
+[node name="Street_Light17" parent="Road" unique_id=1367941387 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.52, -14)
+
+[node name="Street_Light13" parent="Road" unique_id=1898671175 instance=ExtResource("6_ohm6j")]
+transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, 11.5, 0.52, -8)
+
+[node name="Walls" type="Node3D" parent="." unique_id=849292099]
+
+[node name="Corner_1" type="Node3D" parent="Walls" unique_id=1691967321]
+
+[node name="bridge-pillar-wide28" parent="Walls/Corner_1" unique_id=619700784 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+
+[node name="bridge-pillar-wide29" parent="Walls/Corner_1" unique_id=149096756 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+
+[node name="bridge-pillar-wide49" parent="Walls/Corner_1" unique_id=341947094 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+
+[node name="bridge-pillar-wide69" parent="Walls/Corner_1" unique_id=1781306893 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_1" unique_id=1698244545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_1/StaticBody3D11" unique_id=509883163]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_1/StaticBody3D11" unique_id=1576282193]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="bridge-pillar-wide30" parent="Walls/Corner_1" unique_id=13587932 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide48" parent="Walls/Corner_1" unique_id=1926567150 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide47" parent="Walls/Corner_1" unique_id=2130295628 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_1" unique_id=2105913014]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_1/StaticBody3D16" unique_id=378432687]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_1/StaticBody3D16" unique_id=1505570648]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="Corner_2" type="Node3D" parent="Walls" unique_id=168881540]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="bridge-pillar-wide28" parent="Walls/Corner_2" unique_id=1928967826 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+
+[node name="bridge-pillar-wide29" parent="Walls/Corner_2" unique_id=2141149869 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+
+[node name="bridge-pillar-wide49" parent="Walls/Corner_2" unique_id=159480895 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+
+[node name="bridge-pillar-wide69" parent="Walls/Corner_2" unique_id=1017676081 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_2" unique_id=1034474568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_2/StaticBody3D11" unique_id=597012727]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_2/StaticBody3D11" unique_id=2143504654]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="bridge-pillar-wide30" parent="Walls/Corner_2" unique_id=2103375196 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide48" parent="Walls/Corner_2" unique_id=924291381 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide47" parent="Walls/Corner_2" unique_id=629476710 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_2" unique_id=1286945631]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_2/StaticBody3D16" unique_id=1164558211]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_2/StaticBody3D16" unique_id=1328113670]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="Corner_3" type="Node3D" parent="Walls" unique_id=344210347]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="bridge-pillar-wide28" parent="Walls/Corner_3" unique_id=260399290 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+
+[node name="bridge-pillar-wide29" parent="Walls/Corner_3" unique_id=1404621459 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+
+[node name="bridge-pillar-wide49" parent="Walls/Corner_3" unique_id=17457759 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+
+[node name="bridge-pillar-wide69" parent="Walls/Corner_3" unique_id=811368744 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_3" unique_id=406487295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_3/StaticBody3D11" unique_id=648740949]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_3/StaticBody3D11" unique_id=624213781]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="bridge-pillar-wide30" parent="Walls/Corner_3" unique_id=1095607371 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide48" parent="Walls/Corner_3" unique_id=1563589804 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide47" parent="Walls/Corner_3" unique_id=476244452 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_3" unique_id=602304737]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_3/StaticBody3D16" unique_id=932818647]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_3/StaticBody3D16" unique_id=2099227564]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="Corner_4" type="Node3D" parent="Walls" unique_id=1743668890]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, 0)
+
+[node name="bridge-pillar-wide28" parent="Walls/Corner_4" unique_id=891638788 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+
+[node name="bridge-pillar-wide29" parent="Walls/Corner_4" unique_id=343110011 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+
+[node name="bridge-pillar-wide49" parent="Walls/Corner_4" unique_id=585610621 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+
+[node name="bridge-pillar-wide69" parent="Walls/Corner_4" unique_id=759379857 instance=ExtResource("19_dviti")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+
+[node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_4" unique_id=1048516373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_4/StaticBody3D11" unique_id=2050738049]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_4/StaticBody3D11" unique_id=1686003441]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="bridge-pillar-wide30" parent="Walls/Corner_4" unique_id=1268120695 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide48" parent="Walls/Corner_4" unique_id=608064737 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+
+[node name="bridge-pillar-wide47" parent="Walls/Corner_4" unique_id=382514289 instance=ExtResource("19_dviti")]
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+
+[node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_4" unique_id=777147313]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Corner_4/StaticBody3D16" unique_id=175794653]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_5rav7")
+
+[node name="Wall_Right3" type="MeshInstance3D" parent="Walls/Corner_4/StaticBody3D16" unique_id=172190455]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_655l5")
+surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
+
+[node name="01_Container" type="Node3D" parent="." unique_id=1310836055]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.163971, 0.02, 16.394184)
+
+[node name="Floor_02" type="CSGBox3D" parent="01_Container" unique_id=521355488]
+transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -4, 0.17799948, 0)
+layers = 136
+use_collision = true
+collision_layer = 136
+collision_mask = 0
+size = Vector3(25, 1, 25)
+material = ExtResource("9_uelin")
+
+[node name="RigidBody3D1" parent="01_Container" unique_id=1144813020 instance=ExtResource("7_ghfes")]
+transform = Transform3D(-0.70710677, 0, -0.7071068, 0, 1, 0, 0.7071068, 0, -0.70710677, -11.55793, 0.7675271, 3.096632)
+
+[node name="RigidBody3D2" parent="01_Container" unique_id=281601999 instance=ExtResource("7_ghfes")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.182679, 0.7675271, 3.3913727)
+
+[node name="RigidBody3D5" parent="01_Container" unique_id=1848820129 instance=ExtResource("7_ghfes")]
+transform = Transform3D(0.95406795, 0, 0.29959032, 0, 1, 0, -0.29959032, 0, 0.95406795, 3.4435635, 0.7675271, 4.3746376)
+
+[node name="RigidBody3D6" parent="01_Container" unique_id=1180511091 instance=ExtResource("7_ghfes")]
+transform = Transform3D(0.95406795, 0, 0.29959032, 0, 1, 0, -0.29959032, 0, 0.95406795, -14.435257, 0.7675271, -7.0947113)
+
+[node name="RigidBody3D7" parent="01_Container" unique_id=1844748067 instance=ExtResource("7_ghfes")]
+transform = Transform3D(0.98652935, 0, 0.16358422, 0, 1, 0, -0.16358422, 0, 0.98652935, -14.43261, 0.7675271, -5.85347)
+
+[node name="RigidBody3D3" parent="01_Container" unique_id=49118028 instance=ExtResource("7_ghfes")]
+transform = Transform3D(-0.98111415, 0, -0.19342963, 0, 1, 0, 0.19342963, 0, -0.98111415, -10.759474, 0.7675266, 0.69542885)
+
+[node name="RigidBody3D4" parent="01_Container" unique_id=610215394 instance=ExtResource("7_ghfes")]
+transform = Transform3D(-0.9659258, 0, -0.2588191, 0, 1, 0, 0.2588191, 0, -0.9659258, -11.631517, 0.7675271, 1.8207474)
+
+[node name="Node3D" parent="01_Container" unique_id=980568818 instance=ExtResource("9_s33xo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.539566, 0.6623805, 2.7573166)
+
+[node name="Node3D2" parent="01_Container" unique_id=686576577 instance=ExtResource("9_s33xo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3312473, 0.6623805, 2.9506836)
+
+[node name="Node3D3" parent="01_Container" unique_id=643249106 instance=ExtResource("9_s33xo")]
+transform = Transform3D(0.9983917, 0, 0.056692787, 0, 1, 0, -0.056692787, 0, 0.9983917, -0.858551, 0.6623805, 2.747635)
+
+[node name="Node3D5" parent="01_Container" unique_id=1284586624 instance=ExtResource("9_s33xo")]
+transform = Transform3D(-0.05669283, 0, 0.9983917, 0, 1, 0, -0.9983917, 0, -0.05669283, -11.445652, 0.6623805, -9.634033)
+
+[node name="Node3D6" parent="01_Container" unique_id=1292839402 instance=ExtResource("9_s33xo")]
+transform = Transform3D(0.017103355, 0, 0.9998538, 0, 1, 0, -0.9998538, 0, 0.017103355, -0.48073196, 0.6623805, -9.762779)
+
+[node name="Node3D7" parent="01_Container" unique_id=1604376428 instance=ExtResource("9_s33xo")]
+transform = Transform3D(0.99563557, 0, -0.09332634, 0, 1, 0, 0.09332634, 0, 0.99563557, 5.047064, 0.6623805, -7.28238)
+
+[node name="Node3D10" parent="01_Container" unique_id=1345384364 instance=ExtResource("9_s33xo")]
+transform = Transform3D(-0.99992985, 0, 0.011850422, 0, 1, 0, -0.011850422, 0, -0.99992985, 5.7610044, 0.6623805, 7.4897003)
+
+[node name="Node3D4" parent="01_Container" unique_id=1938362971 instance=ExtResource("9_s33xo")]
+transform = Transform3D(-0.05669283, 0, 0.9983917, 0, 1, 0, -0.9983917, 0, -0.05669283, -4.8561516, 3.4078448, 4.183178)
+
+[node name="Barrier_Concrete" parent="01_Container" unique_id=1968880502 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7774506, 0.6776486, 10.353966)
+
+[node name="Barrier_Concrete2" parent="01_Container" unique_id=713901003 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.9995778, 0, 0.029055642, 0, 1, 0, -0.029055642, 0, 0.9995778, -15.64106, 0.6776486, -1.3581924)
+
+[node name="Barrier_Concrete3" parent="01_Container" unique_id=843069990 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.99993885, 0, -0.011065165, 0, 1, 0, 0.011065165, 0, 0.99993885, 7.7765503, 0.6776486, 7.9546547)
+
+[node name="Barrier_Concrete4" parent="01_Container" unique_id=796178802 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.99993885, 0, -0.011065165, 0, 1, 0, 0.011065165, 0, 0.99993885, 7.785185, 0.6776486, 5.4557686)
+
+[node name="Barrier_Concrete5" parent="01_Container" unique_id=1253483058 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.9417879, 0, 0.33620784, 0, 1, 0, -0.33620784, 0, 0.9417879, 7.4187965, 0.6776486, 2.9855385)
+
+[node name="Barrier_Concrete6" parent="01_Container" unique_id=62654926 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.8891211, 0, 0.4576722, 0, 1, 0, -0.4576722, 0, -0.8891211, 7.1562195, 0.6776486, -4.6284943)
+
+[node name="Barrier_Concrete7" parent="01_Container" unique_id=642906616 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.5335407, 0.6776486, -6.619972)
+
+[node name="Barrier_Concrete8" parent="01_Container" unique_id=2054990600 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.5748825, 0.6776486, -9.0733795)
+
+[node name="Barrier_Concrete9" parent="01_Container" unique_id=75554858 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.562151, 0.6776486, -11.327988)
+
+[node name="Barrier_Concrete10" parent="01_Container" unique_id=766439058 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.015881807, 0, -0.9998739, 0, 1, 0, 0.9998739, 0, 0.015881807, 5.6696854, 0.6776486, -11.966095)
+
+[node name="Barrier_Concrete11" parent="01_Container" unique_id=1772206483 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.015881807, 0, -0.9998739, 0, 1, 0, 0.9998739, 0, 0.015881807, -1.0473938, 0.6776486, -11.966095)
+
+[node name="Barrier_Concrete12" parent="01_Container" unique_id=712993853 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.04208493, 0, -0.99911404, 0, 1, 0, 0.99911404, 0, -0.04208493, 1.2837067, 0.6776486, -11.888809)
+
+[node name="Barrier_Concrete13" parent="01_Container" unique_id=1208368140 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.04208493, 0, -0.99911404, 0, 1, 0, 0.99911404, 0, -0.04208493, -8.244942, 0.6776486, -11.877907)
+
+[node name="Barrier_Concrete18" parent="01_Container" unique_id=1755083962 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.039242353, 0, -0.9992297, 0, 1, 0, 0.9992297, 0, 0.039242353, -10.7706375, 0.6776486, -11.907455)
+
+[node name="Barrier_Concrete19" parent="01_Container" unique_id=533494563 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.015637489, 0, -0.99987775, 0, 1, 0, 0.99987775, 0, 0.015637489, -12.849512, 0.6776486, -11.851547)
+
+[node name="Barrier_Concrete20" parent="01_Container" unique_id=977594505 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.011885436, 0, -0.9999294, 0, 1, 0, 0.9999294, 0, -0.011885436, -15.213654, 0.6776486, -11.860184)
+
+[node name="Barrier_Concrete14" parent="01_Container" unique_id=2121889410 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999114, 0, -0.042084977, 0, 1, 0, 0.042084977, 0, 0.999114, -15.82003, 0.6776486, -10.229904)
+
+[node name="Barrier_Concrete15" parent="01_Container" unique_id=328590359 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.86322, 0.6776486, -7.843788)
+
+[node name="Barrier_Concrete16" parent="01_Container" unique_id=143805364 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.786835, 0.6776486, -5.520874)
+
+[node name="Barrier_Concrete21" parent="01_Container" unique_id=1797901345 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.9995778, 0, 0.029055642, 0, 1, 0, -0.029055642, 0, 0.9995778, -15.718334, 0.6776486, 8.230301)
+
+[node name="Barrier_Concrete22" parent="01_Container" unique_id=590916228 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.787735, 0.6776486, 1.6555939)
+
+[node name="Barrier_Concrete23" parent="01_Container" unique_id=114555897 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.711353, 0.6776486, 3.9785156)
+
+[node name="Barrier_Concrete24" parent="01_Container" unique_id=1419413589 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.9995778, 0, 0.029055642, 0, 1, 0, -0.029055642, 0, 0.9995778, -15.7437935, 0.6776486, 10.496269)
+
+[node name="Barrier_Concrete26" parent="01_Container" unique_id=2130381475 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.029055685, 0, 0.9995778, 0, 1, 0, -0.9995778, 0, -0.029055685, -14.498169, 0.6776486, 11.994308)
+
+[node name="Barrier_Concrete25" parent="01_Container" unique_id=1040669865 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.736813, 0.6776486, 6.1700172)
+
+[node name="Barrier_Concrete17" parent="01_Container" unique_id=1096142988 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.710457, 0.6776486, -3.329918)
+
+[node name="Barrier_Concrete27" parent="01_Container" unique_id=759256809 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.029055685, 0, 0.9995778, 0, 1, 0, -0.9995778, 0, -0.029055685, -9.639275, 0.6776486, 11.866127)
+
+[node name="Barrier_Concrete28" parent="01_Container" unique_id=639323940 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.029055685, 0, 0.9995778, 0, 1, 0, -0.9995778, 0, -0.029055685, -0.16804886, 0.6776486, 11.904312)
+
+[node name="Barrier_Concrete29" parent="01_Container" unique_id=1999264115 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, -7.407295, 0.6776486, 11.934624)
+
+[node name="Barrier_Concrete30" parent="01_Container" unique_id=1609437487 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, -5.084381, 0.6776486, 11.858242)
+
+[node name="Barrier_Concrete31" parent="01_Container" unique_id=1466049651 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, -2.8928719, 0.6776486, 11.883701)
+
+[node name="Barrier_Concrete34" parent="01_Container" unique_id=344291208 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, 2.257244, 0.6776486, 11.973713)
+
+[node name="Barrier_Concrete35" parent="01_Container" unique_id=298856791 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, 4.580158, 0.6776486, 11.897331)
+
+[node name="Barrier_Concrete36" parent="01_Container" unique_id=406463444 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, 6.8595314, 0.6776486, 11.922791)
+
+[node name="Barrier_Concrete32" parent="01_Container" unique_id=1433719144 instance=ExtResource("10_i7rwj")]
+transform = Transform3D(-0.009895824, 0, 0.999951, 0, 1, 0, -0.999951, 0, -0.009895824, -12.216909, 0.6776486, 11.955067)
+
+[node name="Street_Light" parent="01_Container" unique_id=1332811171 instance=ExtResource("12_f3da7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.690453, 0.49999997, 0.36844635)
+
+[node name="Street_Light11" parent="01_Container" unique_id=1754472984 instance=ExtResource("12_f3da7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1868362, 0.49999997, 0.23739624)
+intact_body_path = NodePath("../../Road/Street_Light2/IntactBody")
+intact_visual_root_path = NodePath("../../Road/Street_Light2/IntactBody/Intact")
+main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
+debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
+
+[node name="Crate" parent="01_Container" unique_id=963765490 instance=ExtResource("13_s42au")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4376202, 0.9047418, -6.359398)
+
+[node name="Crate2" parent="01_Container" unique_id=1709533431 instance=ExtResource("13_s42au")]
+transform = Transform3D(0.43760234, 0, 0.8991686, 0, 1, 0, -0.8991686, 0, 0.43760234, -1.690527, 0.9047418, -6.5540543)
+
+[node name="Crate_Large6" parent="01_Container" unique_id=1996788587 instance=ExtResource("15_uij31")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.045994, 1.5733719, -7.32428)
+
+[node name="Crate_Large7" parent="01_Container" unique_id=853324126 instance=ExtResource("15_uij31")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -10.03093, 1.5733709, 2.8248615)
+
+[node name="02_CenterCommand" type="Node3D" parent="." unique_id=367453326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.02, 9)
+script = ExtResource("2_uelin")
+
+[node name="RigidBody3D8" parent="02_CenterCommand" unique_id=1502772620 instance=ExtResource("7_ghfes")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.245021, 0.7675271, 9.989159)
+
+[node name="RigidBody3D9" parent="02_CenterCommand" unique_id=1202248675 instance=ExtResource("7_ghfes")]
+transform = Transform3D(0.95406795, 0, 0.29959032, 0, 1, 0, -0.29959032, 0, 0.95406795, -9.294096, 0.7675271, 10.573898)
+
+[node name="RigidBody3D10" parent="02_CenterCommand" unique_id=478548803 instance=ExtResource("7_ghfes")]
+transform = Transform3D(0.9002276, 0, 0.43541965, 0, 1, 0, -0.43541965, 0, 0.9002276, -10.008872, 0.7675271, 11.61161)
+
+[node name="RigidBody3D11" parent="02_CenterCommand" unique_id=823654825 instance=ExtResource("7_ghfes")]
+transform = Transform3D(0.7284308, 0, 0.6851194, 0, 1, 0, -0.6851194, 0, 0.7284308, -10.246111, 0.7675271, 12.8186035)
+
+[node name="Node3D11" parent="02_CenterCommand" unique_id=706969973 instance=ExtResource("9_s33xo")]
+transform = Transform3D(0.15436564, 0, -0.9880138, 0, 1, 0, 0.9880138, 0, 0.15436564, 7.7252235, 0.6623805, 15.928032)
+
+[node name="Node3D12" parent="02_CenterCommand" unique_id=1946746588 instance=ExtResource("9_s33xo")]
+transform = Transform3D(1.3113416e-07, 0, -1, 0, 1, 0, 1, 0, 1.3113416e-07, -0.62609863, 0.6623805, 16.801292)
+
+[node name="Node3D13" parent="02_CenterCommand" unique_id=1278380258 instance=ExtResource("9_s33xo")]
+transform = Transform3D(-0.97221076, 0, -0.23410726, 0, 1, 0, 0.23410726, 0, -0.97221076, -7.1489544, 0.6623805, 15.071648)
+
+[node name="Building_A" parent="02_CenterCommand" unique_id=455294865 instance=ExtResource("8_sem8g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.168622, 0.5000008, -5.246353)
+
+[node name="Street_Light14" parent="02_CenterCommand" unique_id=215404806 instance=ExtResource("12_f3da7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2859955, 0.49999997, 13.010368)
+intact_body_path = NodePath("../../Road/Street_Light2/IntactBody")
+intact_visual_root_path = NodePath("../../Road/Street_Light2/IntactBody/Intact")
+main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
+debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
+
+[node name="Street_Light18" parent="02_CenterCommand" unique_id=75632866 instance=ExtResource("12_f3da7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.11611, 0.49999997, 6.752289)
+intact_body_path = NodePath("../../Road/Street_Light2/IntactBody")
+intact_visual_root_path = NodePath("../../Road/Street_Light2/IntactBody/Intact")
+main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
+debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
+
+[node name="Crate1" parent="02_CenterCommand" unique_id=319443152 instance=ExtResource("14_xgfru")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.573599, 1, 6.4706554)
+
+[node name="Crate3" parent="02_CenterCommand" unique_id=1419264558 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.9294613, 0, 0.36891958, 0, 1, 0, -0.36891958, 0, 0.9294613, -10.925295, 1.000001, 6.7230816)
+intact_body_path = NodePath("../../01_Container/Crate2/IntactBody")
+intact_visual_root_path = NodePath("../../01_Container/Crate2/IntactBody/Intact")
+main_collision_path = NodePath("../../01_Container/Crate2/IntactBody/Collision")
+debris_root_path = NodePath("../../01_Container/Crate2/DebrisRoot")
+
+[node name="Crate4" parent="02_CenterCommand" unique_id=82083422 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.91703224, 0, -0.39881307, 0, 1, 0, 0.39881307, 0, 0.91703224, -12.394999, 1.000001, 8.124006)
+
+[node name="Crate5" parent="02_CenterCommand" unique_id=1082867664 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.9990227, -0.0017122349, 0.044165432, 0.0016646467, 0.999998, 0.0011141049, -0.044167247, -0.0010394852, 0.99902356, -11.969139, 2.5778236, 7.3389034)
+
+[node name="Crate9" parent="02_CenterCommand" unique_id=1734398578 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.9294613, 0, 0.36891958, 0, 1, 0, -0.36891958, 0, 0.9294613, 9.292765, 1.000001, 5.412956)
+
+[node name="Crate10" parent="02_CenterCommand" unique_id=689809519 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.91703224, 0, -0.39881307, 0, 1, 0, 0.39881307, 0, 0.91703224, 7.823061, 1.000001, 6.8138885)
+
+[node name="Crate6" parent="02_CenterCommand" unique_id=1802970912 instance=ExtResource("14_xgfru")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.296812, 1, -17.592957)
+
+[node name="Crate7" parent="02_CenterCommand" unique_id=109793834 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.9294613, 0, 0.36891958, 0, 1, 0, -0.36891958, 0, 0.9294613, 7.945116, 1.1651673, -17.34053)
+
+[node name="Crate8" parent="02_CenterCommand" unique_id=382331480 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.91703224, 0, -0.39881307, 0, 1, 0, 0.39881307, 0, 0.91703224, 6.4754124, 1.1651673, -15.939606)
+
+[node name="Crate11" parent="02_CenterCommand" unique_id=1380708763 instance=ExtResource("14_xgfru")]
+transform = Transform3D(0.9990227, -0.0017122349, 0.044165432, 0.0016646467, 0.999998, 0.0011141049, -0.044167247, -0.0010394852, 0.99902356, 6.901272, 2.5778236, -16.724709)
+
+[node name="Crate_Large" parent="02_CenterCommand" unique_id=1766569786 instance=ExtResource("15_uij31")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9906883, 1, 6.1632004)
+
+[node name="Crate_Large2" parent="02_CenterCommand" unique_id=1417695296 instance=ExtResource("15_uij31")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.360659, 1.2801666, -17.520721)
+
+[node name="Crate_Large3" parent="02_CenterCommand" unique_id=146977042 instance=ExtResource("15_uij31")]
+transform = Transform3D(0.17694727, 0, -0.98422027, 0, 1, 0, 0.98422027, 0, 0.17694727, 9.815372, 1.2801671, -13.430653)
+
+[node name="Crate_Large4" parent="02_CenterCommand" unique_id=1378682063 instance=ExtResource("15_uij31")]
+transform = Transform3D(0.9954346, 0, 0.09544617, 0, 1, 0, -0.09544617, 0, 0.9954346, 10.164814, 1.2801666, -16.061005)
+
+[node name="Crate_Large5" parent="02_CenterCommand" unique_id=860435714 instance=ExtResource("15_uij31")]
+transform = Transform3D(0.090788975, 0, -0.9958702, 0, 1, 0, 0.9958702, 0, 0.090788975, 8.150707, 1.2801671, -13.483061)
+
+[node name="BombRadarObjective" parent="." unique_id=1176266720 instance=ExtResource("2_o3eod")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.887817, 0, -8.331299)
+objective_text = "Détruire base militaire."
+
+[node name="POI_MilitaryBase_Center" type="Node3D" parent="." unique_id=430874450 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
+script = ExtResource("3_dh1hi")
+min_spawn_count = 7
+max_alive_from_zone = 16
+min_distance_from_target = 0.0
+max_distance_from_target = 999.0
+cooldown_seconds = 40.0
+
+[node name="DebugArea" type="CSGBox3D" parent="POI_MilitaryBase_Center" unique_id=587423254]
+size = Vector3(16, 0.12, 12)
+material = SubResource("StandardMaterial3D_b3sps")
+
+[node name="Label3D" type="Label3D" parent="POI_MilitaryBase_Center" unique_id=398785352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+billboard = 1
+no_depth_test = true
+text = "IDLE - route de départ
+Zombies déjà présents.
+Ils servent à rendre la zone habitée."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="POI_MilitaryBase_Center" unique_id=1462429011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="POI_MilitaryBase_Center" unique_id=382690660]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -2)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="POI_MilitaryBase_Center" unique_id=221734021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="POI_MilitaryBase_Center" unique_id=1523046470]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
