@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c14ka1406vt20"]
+
+[ext_resource type="PackedScene" uid="uid://boripddx5k3o5" path="res://asset/map/nature/cliff_top_rock.glb" id="1_mhrgl"]
+[ext_resource type="Material" uid="uid://bisvko0nf1by8" path="res://asset/texture/Color_Plain_Ground.tres" id="2_pn3at"]
+
+[node name="Cliff_River_Plain" unique_id=920645573 instance=ExtResource("1_mhrgl")]
+
+[node name="cliff_top_rock" parent="." index="0" unique_id=1167974469]
+transform = Transform3D(-4, 0, -6.039832e-07, 0, 4.05, 0, 6.039832e-07, 0, -4, 0, -0.05, 2)
+surface_material_override/0 = ExtResource("2_pn3at")

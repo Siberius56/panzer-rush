@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://b6rvtkvqbbb4n"]
+
+[ext_resource type="PackedScene" uid="uid://bboyvpk8gpupl" path="res://scenes/props/Tree_Pine_RoundD.tscn" id="1_ev1o4"]
+[ext_resource type="PackedScene" uid="uid://wh2ss8b1v438" path="res://scenes/props/Tree_Pine_RoundE.tscn" id="2_t6sus"]
+
+[node name="Tree_Group_2" type="Node3D" unique_id=918428027]
+
+[node name="Tree_Pine_RoundD" parent="." unique_id=49958975 instance=ExtResource("1_ev1o4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49402618, -1.9073486e-06, 0.8613777)
+
+[node name="Tree_Pine_RoundE" parent="." unique_id=889362458 instance=ExtResource("2_t6sus")]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1, -1.2498283, 1.9073486e-06, 2.0076408)
+
+[node name="Tree_Pine_RoundE2" parent="." unique_id=238843717 instance=ExtResource("2_t6sus")]
+transform = Transform3D(0.42127323, 0, -0.9069338, 0, 0.8, 0, 0.9069338, 0, 0.42127323, -1.3416977, 3.8146973e-06, -0.29724503)
+
+[node name="Tree_Pine_RoundE3" parent="." unique_id=408056108 instance=ExtResource("2_t6sus")]
+transform = Transform3D(0.42127323, 0, -0.9069338, 0, 1.2, 0, 0.9069338, 0, 0.42127323, 0.6583023, 3.8146973e-06, -1.297245)
+
+[node name="Tree_Pine_RoundE4" parent="." unique_id=1061557447 instance=ExtResource("2_t6sus")]
+transform = Transform3D(0.42127323, 0, -0.9069338, 0, 0.8, 0, 0.9069338, 0, 0.42127323, 2.4819336, 3.8146973e-06, -0.036613464)

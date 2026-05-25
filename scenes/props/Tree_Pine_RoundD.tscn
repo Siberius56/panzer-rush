@@ -1,14 +1,16 @@
 [gd_scene format=3 uid="uid://bboyvpk8gpupl"]
 
 [ext_resource type="ArrayMesh" uid="uid://dn0qyqhugb0am" path="res://asset/map/nature/obj/tree_pineRoundD.obj" id="1_2cwbm"]
-[ext_resource type="Material" uid="uid://clx562ubrlxfy" path="res://asset/texture/Color_Tree_DarkLeaf.tres" id="2_15u6y"]
+[ext_resource type="Material" uid="uid://ci1a3r2wd377n" path="res://asset/texture/Color_Tree_LightLeaf.tres" id="2_15u6y"]
 [ext_resource type="Material" uid="uid://wpx57b0q3xp" path="res://asset/texture/Color_Tree_Wood.tres" id="3_x7rb6"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_1niyt"]
 height = 4.0
-radius = 0.6
+radius = 1.0
 
 [node name="Tree_Pine_RoundD" type="StaticBody3D" unique_id=49958975]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1461689295]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)

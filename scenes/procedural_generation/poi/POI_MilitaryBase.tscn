@@ -68,6 +68,7 @@ mesh = SubResource("BoxMesh_b3sps")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.22271, 0.120019525, -20.373966)
 
 [node name="Road" type="Node3D" parent="." unique_id=86665436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 
 [node name="road-intersection-line2" parent="Road" unique_id=745380943 instance=ExtResource("4_bd3e6")]
 transform = Transform3D(-2.6226832e-07, 0, -6, 0, 6, 0, 6, 0, -2.6226832e-07, 0, 0, 0)
@@ -165,18 +166,19 @@ transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, 11.5
 [node name="Walls" type="Node3D" parent="." unique_id=849292099]
 
 [node name="Corner_1" type="Node3D" parent="Walls" unique_id=1691967321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
 
 [node name="bridge-pillar-wide28" parent="Walls/Corner_1" unique_id=619700784 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 3.5)
 
 [node name="bridge-pillar-wide29" parent="Walls/Corner_1" unique_id=149096756 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 12.5)
 
 [node name="bridge-pillar-wide49" parent="Walls/Corner_1" unique_id=341947094 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 20.5)
 
 [node name="bridge-pillar-wide69" parent="Walls/Corner_1" unique_id=1781306893 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 29.5)
 
 [node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_1" unique_id=1698244545]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
@@ -193,13 +195,13 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="bridge-pillar-wide30" parent="Walls/Corner_1" unique_id=13587932 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0, 29.51341)
 
 [node name="bridge-pillar-wide48" parent="Walls/Corner_1" unique_id=1926567150 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0, 29.51341)
 
 [node name="bridge-pillar-wide47" parent="Walls/Corner_1" unique_id=2130295628 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0, 29.51341)
 
 [node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_1" unique_id=2105913014]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
@@ -216,19 +218,19 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="Corner_2" type="Node3D" parent="Walls" unique_id=168881540]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -0.5, 0, 0.5)
 
 [node name="bridge-pillar-wide28" parent="Walls/Corner_2" unique_id=1928967826 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 3.5)
 
 [node name="bridge-pillar-wide29" parent="Walls/Corner_2" unique_id=2141149869 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 12.5)
 
 [node name="bridge-pillar-wide49" parent="Walls/Corner_2" unique_id=159480895 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 20.5)
 
 [node name="bridge-pillar-wide69" parent="Walls/Corner_2" unique_id=1017676081 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 29.5)
 
 [node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_2" unique_id=1034474568]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
@@ -245,13 +247,13 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="bridge-pillar-wide30" parent="Walls/Corner_2" unique_id=2103375196 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0, 29.51341)
 
 [node name="bridge-pillar-wide48" parent="Walls/Corner_2" unique_id=924291381 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0, 29.51341)
 
 [node name="bridge-pillar-wide47" parent="Walls/Corner_2" unique_id=629476710 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0, 29.51341)
 
 [node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_2" unique_id=1286945631]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
@@ -268,19 +270,19 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="Corner_3" type="Node3D" parent="Walls" unique_id=344210347]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -0.5, 0, -0.5)
 
 [node name="bridge-pillar-wide28" parent="Walls/Corner_3" unique_id=260399290 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 3.5)
 
 [node name="bridge-pillar-wide29" parent="Walls/Corner_3" unique_id=1404621459 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 12.5)
 
 [node name="bridge-pillar-wide49" parent="Walls/Corner_3" unique_id=17457759 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 20.5)
 
 [node name="bridge-pillar-wide69" parent="Walls/Corner_3" unique_id=811368744 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 29.5)
 
 [node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_3" unique_id=406487295]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
@@ -297,13 +299,13 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="bridge-pillar-wide30" parent="Walls/Corner_3" unique_id=1095607371 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0, 29.51341)
 
 [node name="bridge-pillar-wide48" parent="Walls/Corner_3" unique_id=1563589804 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0, 29.51341)
 
 [node name="bridge-pillar-wide47" parent="Walls/Corner_3" unique_id=476244452 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0, 29.51341)
 
 [node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_3" unique_id=602304737]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
@@ -320,19 +322,19 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="Corner_4" type="Node3D" parent="Walls" unique_id=1743668890]
-transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, 0)
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.5, 0, -0.5)
 
 [node name="bridge-pillar-wide28" parent="Walls/Corner_4" unique_id=891638788 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 3.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 3.5)
 
 [node name="bridge-pillar-wide29" parent="Walls/Corner_4" unique_id=343110011 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 12.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 12.5)
 
 [node name="bridge-pillar-wide49" parent="Walls/Corner_4" unique_id=585610621 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 20.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 20.5)
 
 [node name="bridge-pillar-wide69" parent="Walls/Corner_4" unique_id=759379857 instance=ExtResource("19_dviti")]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0.52, 29.5)
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 29.5, 0, 29.5)
 
 [node name="StaticBody3D11" type="StaticBody3D" parent="Walls/Corner_4" unique_id=1048516373]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553642, 1.7084022, 16.5)
@@ -349,13 +351,13 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="bridge-pillar-wide30" parent="Walls/Corner_4" unique_id=1268120695 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 21.513412, 0, 29.51341)
 
 [node name="bridge-pillar-wide48" parent="Walls/Corner_4" unique_id=608064737 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 12.513411, 0, 29.51341)
 
 [node name="bridge-pillar-wide47" parent="Walls/Corner_4" unique_id=382514289 instance=ExtResource("19_dviti")]
-transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0.52, 29.51341)
+transform = Transform3D(-3.496911e-07, 0, 8, 0, 8, 0, -8, 0, -3.496911e-07, 3.5134106, 0, 29.51341)
 
 [node name="StaticBody3D16" type="StaticBody3D" parent="Walls/Corner_4" unique_id=777147313]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.513412, 1.7084022, 29.459768)
@@ -372,7 +374,7 @@ mesh = SubResource("BoxMesh_655l5")
 surface_material_override/0 = SubResource("StandardMaterial3D_dwg10")
 
 [node name="01_Container" type="Node3D" parent="." unique_id=1310836055]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.163971, 0.02, 16.394184)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.164, -0.6, 16.394)
 
 [node name="Floor_02" type="CSGBox3D" parent="01_Container" unique_id=521355488]
 transform = Transform3D(-1, 1.509958e-07, 0, -1.509958e-07, -1, 0, 0, 0, 1, -4, 0.17799948, 0)
@@ -414,16 +416,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3312473, 0.6623805, 2.9506
 transform = Transform3D(0.9983917, 0, 0.056692787, 0, 1, 0, -0.056692787, 0, 0.9983917, -0.858551, 0.6623805, 2.747635)
 
 [node name="Node3D5" parent="01_Container" unique_id=1284586624 instance=ExtResource("9_s33xo")]
-transform = Transform3D(-0.05669283, 0, 0.9983917, 0, 1, 0, -0.9983917, 0, -0.05669283, -11.445652, 0.6623805, -9.634033)
+transform = Transform3D(-0.05669283, 0, 0.9983917, 0, 1, 0, -0.9983917, 0, -0.05669283, -11.539423, 0.6623805, -9.845015)
 
 [node name="Node3D6" parent="01_Container" unique_id=1292839402 instance=ExtResource("9_s33xo")]
-transform = Transform3D(0.017103355, 0, 0.9998538, 0, 1, 0, -0.9998538, 0, 0.017103355, -0.48073196, 0.6623805, -9.762779)
+transform = Transform3D(0.017103355, 0, 0.9998538, 0, 1, 0, -0.9998538, 0, 0.017103355, 0.35147285, 0.6623805, -9.762779)
 
 [node name="Node3D7" parent="01_Container" unique_id=1604376428 instance=ExtResource("9_s33xo")]
-transform = Transform3D(0.99563557, 0, -0.09332634, 0, 1, 0, 0.09332634, 0, 0.99563557, 5.047064, 0.6623805, -7.28238)
+transform = Transform3D(0.9942635, 0, -0.10695819, 0, 1, 0, 0.10695819, 0, 0.9942635, 5.586239, 0.6623805, -7.411313)
 
 [node name="Node3D10" parent="01_Container" unique_id=1345384364 instance=ExtResource("9_s33xo")]
-transform = Transform3D(-0.99992985, 0, 0.011850422, 0, 1, 0, -0.011850422, 0, -0.99992985, 5.7610044, 0.6623805, 7.4897003)
+transform = Transform3D(-0.9999981, 0, 0.0019895881, 0, 1, 0, -0.0019895881, 0, -0.9999981, 5.7610044, 0.6623805, 7.590296)
 
 [node name="Node3D4" parent="01_Container" unique_id=1938362971 instance=ExtResource("9_s33xo")]
 transform = Transform3D(-0.05669283, 0, 0.9983917, 0, 1, 0, -0.9983917, 0, -0.05669283, -4.8561516, 3.4078448, 4.183178)
@@ -444,28 +446,28 @@ transform = Transform3D(0.99993885, 0, -0.011065165, 0, 1, 0, 0.011065165, 0, 0.
 transform = Transform3D(0.9417879, 0, 0.33620784, 0, 1, 0, -0.33620784, 0, 0.9417879, 7.4187965, 0.6776486, 2.9855385)
 
 [node name="Barrier_Concrete6" parent="01_Container" unique_id=62654926 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(-0.8891211, 0, 0.4576722, 0, 1, 0, -0.4576722, 0, -0.8891211, 7.1562195, 0.6776486, -4.6284943)
+transform = Transform3D(-0.8891211, 0, 0.4576722, 0, 1, 0, -0.4576722, 0, -0.8891211, 7.4726906, 0.6776486, -4.6284943)
 
 [node name="Barrier_Concrete7" parent="01_Container" unique_id=642906616 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.5335407, 0.6776486, -6.619972)
+transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.850012, 0.6776486, -6.619972)
 
 [node name="Barrier_Concrete8" parent="01_Container" unique_id=2054990600 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.5748825, 0.6776486, -9.0733795)
+transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.8913536, 0.6776486, -9.0733795)
 
 [node name="Barrier_Concrete9" parent="01_Container" unique_id=75554858 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.562151, 0.6776486, -11.327988)
+transform = Transform3D(-0.99987394, 0, -0.015881836, 0, 1, 0, 0.015881836, 0, -0.99987394, 7.878622, 0.6776486, -11.327988)
 
 [node name="Barrier_Concrete10" parent="01_Container" unique_id=766439058 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(0.015881807, 0, -0.9998739, 0, 1, 0, 0.9998739, 0, 0.015881807, 5.6696854, 0.6776486, -11.966095)
+transform = Transform3D(0.015881807, 0, -0.9998739, 0, 1, 0, 0.9998739, 0, 0.015881807, 6.384678, 0.6776486, -11.966095)
 
 [node name="Barrier_Concrete11" parent="01_Container" unique_id=1772206483 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(0.015881807, 0, -0.9998739, 0, 1, 0, 0.9998739, 0, 0.015881807, -1.0473938, 0.6776486, -11.966095)
+transform = Transform3D(0.015881807, 0, -0.9998739, 0, 1, 0, 0.9998739, 0, 0.015881807, 1.6890392, 0.6776486, -11.966095)
 
 [node name="Barrier_Concrete12" parent="01_Container" unique_id=712993853 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(-0.04208493, 0, -0.99911404, 0, 1, 0, 0.99911404, 0, -0.04208493, 1.2837067, 0.6776486, -11.888809)
+transform = Transform3D(-0.04208493, 0, -0.99911404, 0, 1, 0, 0.99911404, 0, -0.04208493, 4.0201397, 0.6776486, -11.888809)
 
 [node name="Barrier_Concrete13" parent="01_Container" unique_id=1208368140 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(-0.04208493, 0, -0.99911404, 0, 1, 0, 0.99911404, 0, -0.04208493, -8.244942, 0.6776486, -11.877907)
+transform = Transform3D(-0.04208493, 0, -0.99911404, 0, 1, 0, 0.99911404, 0, -0.04208493, -0.64704895, 0.6776486, -11.877907)
 
 [node name="Barrier_Concrete18" parent="01_Container" unique_id=1755083962 instance=ExtResource("10_i7rwj")]
 transform = Transform3D(0.039242353, 0, -0.9992297, 0, 1, 0, 0.9992297, 0, 0.039242353, -10.7706375, 0.6776486, -11.907455)
@@ -477,7 +479,7 @@ transform = Transform3D(0.015637489, 0, -0.99987775, 0, 1, 0, 0.99987775, 0, 0.0
 transform = Transform3D(-0.011885436, 0, -0.9999294, 0, 1, 0, 0.9999294, 0, -0.011885436, -15.213654, 0.6776486, -11.860184)
 
 [node name="Barrier_Concrete14" parent="01_Container" unique_id=2121889410 instance=ExtResource("10_i7rwj")]
-transform = Transform3D(0.999114, 0, -0.042084977, 0, 1, 0, 0.042084977, 0, 0.999114, -15.82003, 0.6776486, -10.229904)
+transform = Transform3D(0.999114, 0, -0.042084977, 0, 1, 0, 0.042084977, 0, 0.999114, -15.948963, 0.6776486, -10.405722)
 
 [node name="Barrier_Concrete15" parent="01_Container" unique_id=328590359 instance=ExtResource("10_i7rwj")]
 transform = Transform3D(0.999951, 0, 0.009895779, 0, 1, 0, -0.009895779, 0, 0.999951, -15.86322, 0.6776486, -7.843788)
@@ -544,13 +546,13 @@ main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
 debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
 
 [node name="Crate" parent="01_Container" unique_id=963765490 instance=ExtResource("13_s42au")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4376202, 0.9047418, -6.359398)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7658138, 0.9047418, -6.359398)
 
 [node name="Crate2" parent="01_Container" unique_id=1709533431 instance=ExtResource("13_s42au")]
-transform = Transform3D(0.43760234, 0, 0.8991686, 0, 1, 0, -0.8991686, 0, 0.43760234, -1.690527, 0.9047418, -6.5540543)
+transform = Transform3D(0.43760234, 0, 0.8991686, 0, 1, 0, -0.8991686, 0, 0.43760234, -1.3623333, 0.9047418, -6.5540543)
 
 [node name="Crate_Large6" parent="01_Container" unique_id=1996788587 instance=ExtResource("15_uij31")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.045994, 1.5733719, -7.32428)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.139763, 1.5733719, -7.406328)
 
 [node name="Crate_Large7" parent="01_Container" unique_id=853324126 instance=ExtResource("15_uij31")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -10.03093, 1.5733709, 2.8248615)

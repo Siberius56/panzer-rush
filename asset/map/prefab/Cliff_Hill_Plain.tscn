@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cttqr8grx2ly7"]
+
+[ext_resource type="PackedScene" uid="uid://bhbl2afyeks2c" path="res://asset/map/nature/cliff_top_stone.glb" id="1_tkis6"]
+[ext_resource type="Material" uid="uid://bisvko0nf1by8" path="res://asset/texture/Color_Plain_Ground.tres" id="2_v468s"]
+[ext_resource type="Material" uid="uid://dj0ns6v46j1to" path="res://asset/texture/Color_Concrete_Gray.tres" id="3_v468s"]
+
+[node name="Cliff_Hill_Plain" type="Node3D" unique_id=920645573]
+
+[node name="cliff_top_stone2" parent="." unique_id=848104933 instance=ExtResource("1_tkis6")]
+transform = Transform3D(-4, 0, -6.039832e-07, 0, 4.192, 0, 6.039832e-07, 0, -4, 0, 0, 2)
+
+[node name="cliff_top_stone" parent="cliff_top_stone2" index="0" unique_id=883907225]
+surface_material_override/0 = ExtResource("2_v468s")
+surface_material_override/1 = ExtResource("3_v468s")
+
+[editable path="cliff_top_stone2"]

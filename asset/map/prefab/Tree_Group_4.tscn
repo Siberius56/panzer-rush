@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b1wa0pey6cxh4"]
+
+[ext_resource type="PackedScene" uid="uid://bs70gkkk72cmt" path="res://scenes/props/Tree_Pine_TallA.tscn" id="1_q1bs7"]
+
+[node name="Tree_Group_4" type="Node3D" unique_id=1903978091]
+
+[node name="Tree_Pine_TallA2" parent="." unique_id=49958975 instance=ExtResource("1_q1bs7")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -0.6456528, -1.9073486e-06, -0.2557068)
+
+[node name="Tree_Pine_TallA3" parent="." unique_id=977168964 instance=ExtResource("1_q1bs7")]
+transform = Transform3D(1.1227325, 0, 0.42364076, 0, 1.1999999, 0, -0.42364076, 0, 1.1227325, 0.4437256, -1.6599388, -2.7131538)
+
+[node name="Tree_Pine_TallA4" parent="." unique_id=2038264923 instance=ExtResource("1_q1bs7")]
+transform = Transform3D(0.30098313, 0, -1.1616405, 0, 1.1999999, 0, 1.1616405, 0, 0.30098313, 0.9985695, -1.1415195, 0.28684616)

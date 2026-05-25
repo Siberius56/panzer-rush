@@ -374,7 +374,7 @@ func _ready() -> void:
 	replicated_visual_y = visual_yaw
 	if camera != null:
 		camera.current = is_multiplayer_authority()
-
+	
 	_apply_camera_spring_length_for_vehicle_mode(vehicle_mode, true)
 	_apply_camera_dof_for_vehicle_mode(vehicle_mode, true)
 	_apply_vehicle_visual_state()

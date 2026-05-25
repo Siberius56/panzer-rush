@@ -1,11 +1,11 @@
-[gd_resource type="ShaderMaterial" format=3 uid="uid://ci1a3r2wd377n"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dkq78wrmbphhm"]
 
-[ext_resource type="Shader" uid="uid://barkppwwuw15" path="res://asset/texture/TreeLeaf_Shader.gdshader" id="1_0vmv8"]
+[ext_resource type="Shader" uid="uid://barkppwwuw15" path="res://asset/texture/TreeLeaf_Shader.gdshader" id="1_ya17m"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_0vmv8")
-shader_parameter/leaf_color = Color(0.1282669, 0.49951774, 0.2790042, 1)
+shader = ExtResource("1_ya17m")
+shader_parameter/leaf_color = Color(0.11, 0.44, 0.31899995, 1)
 shader_parameter/wind_strength = 0.110000005225
 shader_parameter/wind_speed = 1.4
 shader_parameter/wind_scale = 0.50000002049012

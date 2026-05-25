@@ -53,6 +53,8 @@ const SIDE_PROFILE_SEA: String = "sea"
 
 @export_group("POI")
 @export var allow_random_poi_rotation: bool = true
+@export var hide_poi_placeholders_on_ready: bool = true
+@export var poi_placeholder_name_keywords: PackedStringArray = PackedStringArray(["placeholder"])
 
 @export_group("Objectives")
 @export var objective_root_path: NodePath = ^"node_objective"
@@ -66,10 +68,16 @@ const SIDE_PROFILE_SEA: String = "sea"
 @export var disable_connector_collisions_when_hidden: bool = true
 
 
+func _ready() -> void:
+	if hide_poi_placeholders_on_ready:
+		hide_poi_placeholders()
+
+
 func get_poi_socket() -> Node3D:
 	var socket: Node3D = get_node_or_null(poi_socket_path) as Node3D
 	if socket != null:
 		return socket
+
 	return get_node_or_null("POISocket") as Node3D
 
 
@@ -86,6 +94,46 @@ func get_secondary_poi_socket(index: int) -> Node3D:
 
 	var safe_index: int = clampi(index, 0, sockets.size() - 1)
 	return sockets[safe_index]
+
+
+func hide_poi_placeholders() -> void:
+	var main_socket: Node3D = get_poi_socket()
+	if main_socket != null:
+		_hide_placeholder_nodes_recursive(main_socket)
+
+	var secondary_sockets: Array[Node3D] = get_secondary_poi_sockets()
+	for socket: Node3D in secondary_sockets:
+		_hide_placeholder_nodes_recursive(socket)
+
+
+func _hide_placeholder_nodes_recursive(root: Node) -> void:
+	for child: Node in root.get_children():
+		if _is_poi_placeholder_node(child):
+			_set_node_visible_if_supported(child, false)
+			continue
+
+		_hide_placeholder_nodes_recursive(child)
+
+
+func _is_poi_placeholder_node(node: Node) -> bool:
+	var normalized_name: String = String(node.name).strip_edges().to_lower()
+	for keyword: String in poi_placeholder_name_keywords:
+		var normalized_keyword: String = String(keyword).strip_edges().to_lower()
+		if normalized_keyword.is_empty():
+			continue
+		if normalized_name.contains(normalized_keyword):
+			return true
+
+	return false
+
+
+func _set_node_visible_if_supported(target: Node, is_visible: bool) -> void:
+	if target == null:
+		return
+	if not _object_has_property(target, "visible"):
+		return
+
+	target.set("visible", is_visible)
 
 
 func _collect_secondary_poi_sockets_recursive(root: Node, result: Array[Node3D]) -> void:
