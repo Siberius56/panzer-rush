@@ -11,6 +11,9 @@ albedo_color = Color(0.25, 0.25, 0.22, 1)
 material = SubResource("Mat_terrain_mountain")
 size = Vector3(200, 0.35, 200)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mpios"]
+albedo_color = Color(0.22, 0.38, 0.14, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_mpios"]
 material = SubResource("Mat_terrain_mountain")
 size = Vector3(110, 10, 90)
@@ -130,6 +133,12 @@ albedo_color = Color(0.8, 0.55, 0.14, 1)
 material = SubResource("Mat_poi")
 size = Vector3(60, 0.08, 60)
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_phnu0"]
+top_radius = 3.0
+bottom_radius = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fre2g"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3mgj6"]
 albedo_color = Color(1, 0.6, 0, 1)
 
@@ -153,6 +162,7 @@ south_side_profile = "road split"
 [node name="Terrain" type="MeshInstance3D" parent="." unique_id=1589526003]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3090515, -0.2, 0.10598755)
 mesh = SubResource("Mesh_Terrain")
+surface_material_override/0 = SubResource("StandardMaterial3D_mpios")
 
 [node name="Terrain2" type="MeshInstance3D" parent="." unique_id=86293077]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4.8, 0)
@@ -310,9 +320,7 @@ shape = SubResource("Shape_RockWall_A")
 [node name="POISocket" type="Node3D" parent="." unique_id=164526588]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 20, -6)
 
-[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="." unique_id=1460758716]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 20, -6)
-visible = false
+[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="POISocket" unique_id=1460758716]
 mesh = SubResource("Mesh_POI_Reserved")
 
 [node name="SpawnSockets" type="Node3D" parent="." unique_id=865006353]
@@ -401,15 +409,36 @@ size = Vector3(2, 10, 50)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 79.35773, 0.25, -39.498398)
 script = ExtResource("2_t0qtm")
 
-[node name="POISocket_Side2" type="Node3D" parent="." unique_id=1579098150]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -67.64227, 0.25, 16.501602)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side1" unique_id=55053395]
+mesh = SubResource("CylinderMesh_phnu0")
+surface_material_override/0 = SubResource("StandardMaterial3D_fre2g")
+
+[node name="POISocket_Side4" type="Node3D" parent="." unique_id=240291879]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35772705, 0.25, -66.4984)
 script = ExtResource("2_t0qtm")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side4" unique_id=1888705653]
+mesh = SubResource("CylinderMesh_phnu0")
+surface_material_override/0 = SubResource("StandardMaterial3D_fre2g")
+
+[node name="POISocket_Side2" type="Node3D" parent="." unique_id=1579098150]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -78.64227, 0.25, 16.501602)
+script = ExtResource("2_t0qtm")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side2" unique_id=135278021]
+mesh = SubResource("CylinderMesh_phnu0")
+surface_material_override/0 = SubResource("StandardMaterial3D_fre2g")
 
 [node name="POISocket_Side3" type="Node3D" parent="." unique_id=1434526326]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61.357727, 0.25, 80.5016)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.357727, 0.25, 77.5016)
 script = ExtResource("2_t0qtm")
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side3" unique_id=1063580636]
+mesh = SubResource("CylinderMesh_phnu0")
+surface_material_override/0 = SubResource("StandardMaterial3D_fre2g")
+
 [node name="Connectors" type="Node3D" parent="." unique_id=548626205]
+visible = false
 
 [node name="North" type="Node3D" parent="Connectors" unique_id=218995309]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -100)
@@ -455,6 +484,7 @@ size = Vector3(2, 10, 75)
 material = SubResource("StandardMaterial3D_3mgj6")
 
 [node name="SpawnZones" type="Node3D" parent="." unique_id=1095010049]
+visible = false
 
 [node name="Mountain_A_West_Horde" type="Node3D" parent="SpawnZones" unique_id=1755917292 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -63, 2.0101318, 64)

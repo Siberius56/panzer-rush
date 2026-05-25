@@ -111,6 +111,12 @@ albedo_color = Color(0.8, 0.55, 0.14, 1)
 material = SubResource("Mat_poi")
 size = Vector3(50, 0.08, 50)
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_ptodx"]
+top_radius = 3.0
+bottom_radius = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qdkg"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_an86m"]
 transparency = 1
 albedo_color = Color(1, 0.15, 0.08, 0.28)
@@ -210,9 +216,7 @@ shape = SubResource("Shape_RockyBeach_B")
 [node name="POISocket" type="Node3D" parent="." unique_id=23766971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, -33)
 
-[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="." unique_id=975083540]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 27.08, -33)
-visible = false
+[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="POISocket" unique_id=975083540]
 mesh = SubResource("Mesh_POI_Reserved")
 
 [node name="SpawnSockets" type="Node3D" parent="." unique_id=2063047229]
@@ -286,15 +290,28 @@ script = ExtResource("7_dv1sh")
 secondary_socket_environment = "sea"
 rotation_mode_override = "follow block"
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side1" unique_id=499783622]
+mesh = SubResource("CylinderMesh_ptodx")
+surface_material_override/0 = SubResource("StandardMaterial3D_0qdkg")
+
 [node name="POISocket_Side2" type="Node3D" parent="." unique_id=866624860]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76.30795, 0.25, -77.37894)
 script = ExtResource("7_dv1sh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side2" unique_id=768205893]
+mesh = SubResource("CylinderMesh_ptodx")
+surface_material_override/0 = SubResource("StandardMaterial3D_0qdkg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side2/MeshInstance3D" unique_id=1466712488]
+mesh = SubResource("CylinderMesh_ptodx")
+surface_material_override/0 = SubResource("StandardMaterial3D_0qdkg")
 
 [node name="POISocket_Side3" type="Node3D" parent="." unique_id=1827546219]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76.35773, 0.25, 37.501602)
 script = ExtResource("7_dv1sh")
 
 [node name="SpawnZones" type="Node3D" parent="." unique_id=2145214728]
+visible = false
 
 [node name="Sea_A_West_Horde" type="Node3D" parent="SpawnZones" unique_id=232072693 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2.0101318, 15)

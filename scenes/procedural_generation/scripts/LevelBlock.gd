@@ -54,6 +54,9 @@ const SIDE_PROFILE_SEA: String = "sea"
 @export_group("POI")
 @export var allow_random_poi_rotation: bool = true
 
+@export_group("Objectives")
+@export var objective_root_path: NodePath = ^"node_objective"
+
 @export_group("Sockets")
 @export var poi_socket_path: NodePath = ^"POISocket"
 
@@ -94,6 +97,86 @@ func _collect_secondary_poi_sockets_recursive(root: Node, result: Array[Node3D])
 
 		_collect_secondary_poi_sockets_recursive(child, result)
 
+
+func get_objective_root() -> Node:
+	var root: Node = get_node_or_null(objective_root_path)
+	if root != null:
+		return root
+
+	for fallback_name: String in ["node_objective", "NodeObjective", "Objectives"]:
+		root = get_node_or_null(fallback_name)
+		if root != null:
+			return root
+
+	return null
+
+
+func get_objective_candidates() -> Array[Node]:
+	var result: Array[Node] = []
+	var root: Node = get_objective_root()
+	if root == null:
+		return result
+
+	for child: Node in root.get_children():
+		if child is Node3D:
+			result.append(child)
+
+	return result
+
+
+func get_objective_candidate_count() -> int:
+	return get_objective_candidates().size()
+
+
+func select_objective_by_index(index: int) -> Dictionary:
+	var root: Node = get_objective_root()
+	if root == null:
+		return {}
+
+	var candidates: Array[Node] = get_objective_candidates()
+	if candidates.is_empty():
+		return {
+			"objective_root_path": String(objective_root_path),
+			"objective_count": 0,
+			"selected_objective": false,
+		}
+
+	var safe_index: int = clampi(index, 0, candidates.size() - 1)
+	var selected_objective: Node = candidates[safe_index]
+	var selected_name: String = String(selected_objective.name)
+
+	for objective: Node in candidates:
+		if objective == selected_objective:
+			if objective is Node3D:
+				var objective_node_3d: Node3D = objective as Node3D
+				objective_node_3d.visible = true
+			objective.process_mode = Node.PROCESS_MODE_INHERIT
+			continue
+
+		var objective_parent: Node = objective.get_parent()
+		if objective_parent != null:
+			objective_parent.remove_child(objective)
+		objective.free()
+
+	return {
+		"objective_root_path": String(objective_root_path),
+		"objective_count": candidates.size(),
+		"selected_objective": true,
+		"selected_objective_index": safe_index,
+		"selected_objective_name": selected_name,
+	}
+
+
+func select_objective_by_name(objective_name: String) -> Dictionary:
+	var candidates: Array[Node] = get_objective_candidates()
+	for index: int in range(candidates.size()):
+		if String(candidates[index].name) == objective_name:
+			return select_objective_by_index(index)
+
+	if not objective_name.is_empty() and not candidates.is_empty():
+		print("[LevelBlock] Objectif sauvegardé introuvable dans %s : %s. Fallback sur le premier objectif disponible." % [block_id, objective_name])
+
+	return select_objective_by_index(0)
 
 func get_spawn_sockets() -> Array[Node3D]:
 	var result: Array[Node3D] = []
@@ -382,6 +465,8 @@ func get_database_summary() -> Dictionary:
 		"has_water_near_poi": has_water_near_poi,
 		"poi_water_type": poi_water_type,
 		"allow_random_poi_rotation": allow_random_poi_rotation,
+		"objective_root_path": String(objective_root_path),
+		"objective_candidate_count": get_objective_candidate_count(),
 		"secondary_poi_socket_count": get_secondary_poi_sockets().size(),
 		"spawn_socket_count": get_spawn_sockets().size(),
 		"connector_root_path": String(connector_root_path),

@@ -16,34 +16,34 @@
 [ext_resource type="Material" uid="uid://clx562ubrlxfy" path="res://asset/texture/Color_Tree_DarkLeaf.tres" id="12_lh7vv"]
 [ext_resource type="Material" uid="uid://6kl1q3lhim2u" path="res://asset/texture/Color_Bush_Plains.tres" id="13_p2y7x"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rjcbc"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_p2y7x"]
 size = Vector3(200, 10, 200)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4fbs3"]
-size = Vector3(200, 10, 66)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_w2tbt"]
-size = Vector3(75, 10, 26)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_caadd"]
-size = Vector3(75, 10, 26)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_rfjag"]
-size = Vector3(70, 10, 20)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_7e7a5"]
-size = Vector3(6, 10, 24)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_pisc0"]
-size = Vector3(14, 10, 24)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_p2y7x"]
-size = Vector3(48, 10, 44)
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_lh7vv"]
-size = Vector3(56, 10, 44)
+size = Vector3(200, 10, 60)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fw17m"]
+size = Vector3(70, 10, 32)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mt3sn"]
+size = Vector3(70, 10, 32)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nbehi"]
+size = Vector3(75, 10, 16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fwhsa"]
+size = Vector3(6, 10, 28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dmjfh"]
+size = Vector3(9, 10, 28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xtan8"]
+size = Vector3(48, 10, 44)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rlbbv"]
+size = Vector3(51, 10, 44)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6pald"]
 size = Vector3(200, 10, 48)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rjcbc"]
@@ -55,23 +55,23 @@ size = Vector3(200, 10, 200)
 
 [sub_resource type="BoxMesh" id="Mesh_Terrain"]
 material = SubResource("StandardMaterial3D_rjcbc")
-size = Vector3(200, 10, 66)
+size = Vector3(200, 10, 60)
 
 [sub_resource type="BoxMesh" id="BoxMesh_lh7vv"]
 material = SubResource("StandardMaterial3D_rjcbc")
-size = Vector3(75, 10, 26)
+size = Vector3(70, 10, 32)
 
 [sub_resource type="BoxMesh" id="BoxMesh_nh0nh"]
 material = SubResource("StandardMaterial3D_rjcbc")
-size = Vector3(70, 10, 20)
+size = Vector3(75, 10, 16)
 
 [sub_resource type="BoxMesh" id="BoxMesh_mt3sn"]
 material = SubResource("StandardMaterial3D_rjcbc")
-size = Vector3(6, 10, 24)
+size = Vector3(6, 10, 28)
 
 [sub_resource type="BoxMesh" id="BoxMesh_nbehi"]
 material = SubResource("StandardMaterial3D_rjcbc")
-size = Vector3(14, 10, 24)
+size = Vector3(9, 10, 28)
 
 [sub_resource type="BoxMesh" id="BoxMesh_5qy1i"]
 material = SubResource("StandardMaterial3D_rjcbc")
@@ -79,7 +79,7 @@ size = Vector3(48, 10, 44)
 
 [sub_resource type="BoxMesh" id="BoxMesh_qki4w"]
 material = SubResource("StandardMaterial3D_rjcbc")
-size = Vector3(56, 10, 44)
+size = Vector3(51, 10, 44)
 
 [sub_resource type="BoxMesh" id="BoxMesh_hd0di"]
 material = SubResource("StandardMaterial3D_rjcbc")
@@ -90,7 +90,7 @@ albedo_color = Color(0.05, 0.18, 0.35, 1)
 
 [sub_resource type="BoxMesh" id="Mesh_River_Visual"]
 material = SubResource("Mat_water")
-size = Vector3(56, 5, 16)
+size = Vector3(53, 5, 16)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7e7a5"]
 render_priority = 0
@@ -156,7 +156,7 @@ shader_parameter/displacement_amount = 0.4
 
 [sub_resource type="BoxMesh" id="BoxMesh_ea3vh"]
 material = SubResource("Mat_water")
-size = Vector3(70, 5, 16)
+size = Vector3(75, 5, 16)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_p2y7x"]
 render_priority = 0
@@ -511,26 +511,21 @@ instance_count = 70
 mesh = SubResource("ArrayMesh_ecv8k")
 buffer = PackedFloat32Array(-0.5423828, 0, 3.842456, -8.886419, 0, 3.8805473, 0, 0, -3.842456, 0, -0.5423828, -0.107087135, 0.9418987, 0, 4.127709, 12.898647, 0, 4.233811, 0, 0, -4.127709, 0, 0.9418987, 1.2407198, 2.8446357, 0, 2.9395876, -14.888375, 0, 4.0906143, 0, 0, -2.9395876, 0, 2.8446357, 4.170597, -2.3716214, 0, 3.3961225, 19.723022, 0, 4.14225, 0, 0, -3.3961225, 0, -2.3716214, -4.4748287, -2.1794574, 0, -2.958859, -1.291359, 0, 3.6748989, 0, 0, 2.958859, 0, -2.1794574, 1.3843813, -4.1791587, 0, -1.20596, -20.576262, 0, 4.349679, 0, 0, 1.20596, 0, -4.1791587, -5.482749, -3.0997593, 0, 3.0272279, -16.738579, 0, 4.332738, 0, 0, -3.0272279, 0, -3.0997593, -1.3857584, 3.694068, 0, -1.7157006, 14.4752655, 0, 4.073054, 0, 0, 1.7157006, 0, 3.694068, -5.117305, -1.6837612, 0, -3.7630086, -25.558214, 0, 4.122534, 0, 0, 3.7630086, 0, -1.6837612, 5.63871, -3.8413649, 0, 0.49200213, -18.74947, 0, 3.8727446, 0, 0, -0.49200213, 0, -3.8413649, -2.1381447, -2.0154984, 0, 3.8217766, -0.61380386, 0, 4.3206725, 0, 0, -3.8217766, 0, -2.0154984, 1.253447, 2.2353194, 0, -3.1062412, -14.526222, 0, 3.8269293, 0, 0, 3.1062412, 0, 2.2353194, -0.26508427, -3.9907377, 0, -0.87005377, 12.38205, 0, 4.0844803, 0, 0, 0.87005377, 0, -3.9907377, -1.76442, 2.5127544, 0, 2.8331194, 5.3331337, 0, 3.7868853, 0, 0, -2.8331194, 0, 2.5127544, 5.9818897, 3.0918071, 0, 1.9044794, -28.413858, 0, 3.6312962, 0, 0, -1.9044794, 0, 3.0918071, 0.9019222, -2.6107287, 0, -3.2586951, 1.9853096, 0, 4.1755238, 0, 0, 3.2586951, 0, -2.6107287, 0.12268782, -3.9511182, 0, 1.0361845, 3.5518532, 0, 4.084729, 0, 0, -1.0361845, 0, -3.9511182, 2.8749714, -3.4220204, 0, -2.3620348, -21.50932, 0, 4.1580563, 0, 0, 2.3620348, 0, -3.4220204, 4.460146, 1.3079576, 0, -3.96208, -26.21293, 0, 4.172389, 0, 0, 3.96208, 0, 1.3079576, 0.4736414, 3.8446705, 0, -1.2079263, 17.284649, 0, 4.02996, 0, 0, 1.2079263, 0, 3.8446705, 3.6229448, 1.4375314, 0, -3.5688412, 23.214333, 0, 3.8474827, 0, 0, 3.5688412, 0, 1.4375314, -3.5055661, -1.657489, 0, 3.3310313, 2.4105034, 0, 3.7206235, 0, 0, -3.3310313, 0, -1.657489, 2.6000957, 2.8766928, 0, -2.8732007, 11.186569, 0, 4.065789, 0, 0, 2.8732007, 0, 2.8766928, 2.8919573, -3.2707732, 0, 2.8758883, -16.261917, 0, 4.355306, 0, 0, -2.8758883, 0, -3.2707732, -1.7750983, -4.1278358, 0, 1.0680671, -4.0121365, 0, 4.263777, 0, 0, -1.0680671, 0, -4.1278358, -5.461268, -2.4869063, 0, -3.3776755, 13.602779, 0, 4.194448, 0, 0, 3.3776755, 0, -2.4869063, -4.3059196, 1.262491, 0, 4.1906385, 9.490284, 0, 4.376681, 0, 0, -4.1906385, 0, 1.262491, 4.0790644, 1.9949625, 0, -3.1570826, -9.207453, 0, 3.7345743, 0, 0, 3.1570826, 0, 1.9949625, -0.29024982, -1.0242347, 0, -4.0971255, -7.6443977, 0, 4.223209, 0, 0, 4.0971255, 0, -1.0242347, -3.5869322, 3.859769, 0, 1.1806345, -21.469543, 0, 4.0362997, 0, 0, -1.1806345, 0, 3.859769, 1.780262, -2.8853006, 0, 2.324396, -1.9058304, 0, 3.7051015, 0, 0, -2.324396, 0, -2.8853006, -1.6061244, 2.4889233, 0, 2.8734913, -27.684044, 0, 3.801538, 0, 0, -2.8734913, 0, 2.4889233, -5.4819374, 4.022426, 0, -0.8664829, 9.470074, 0, 4.1146936, 0, 0, 0.8664829, 0, 4.022426, 3.5096903, -0.2900185, 0, 4.192981, -2.351984, 0, 4.2029986, 0, 0, -4.192981, 0, -0.2900185, 3.9282722, 0.38431317, 0, 4.0505953, -17.649918, 0, 4.0687857, 0, 0, -4.0505953, 0, 0.38431317, -2.1189976, 3.3343074, 0, -2.817697, 12.946018, 0, 4.365435, 0, 0, 2.817697, 0, 3.3343074, 2.5566597, 3.1089077, 0, 2.1730883, -12.074532, 0, 3.7931015, 0, 0, -2.1730883, 0, 3.1089077, -5.651567, 2.193954, 0, -3.5242376, -6.6645145, 0, 4.151347, 0, 0, 3.5242376, 0, 2.193954, -1.3651133, 4.023769, 0, -1.5485116, 0.95651245, 0, 4.3114505, 0, 0, 1.5485116, 0, 4.023769, -3.3375378, 2.7999732, 0, -2.4204986, -12.132469, 0, 3.7011704, 0, 0, 2.4204986, 0, 2.7999732, -0.737947, -1.5468465, 0, -3.9057546, -8.713533, 0, 4.200911, 0, 0, 3.9057546, 0, -1.5468465, -5.648686, 3.6019013, 0, -0.41748187, 7.1749306, 0, 3.626015, 0, 0, 0.41748187, 0, 3.6019013, -3.9883897, -2.8724606, 0, -2.176843, -18.143337, 0, 3.6041193, 0, 0, 2.176843, 0, -2.8724606, 5.88414, 4.217125, 0, 0.36196402, 26.838554, 0, 4.2326307, 0, 0, -0.36196402, 0, 4.217125, -4.5804353, -2.920788, 0, 2.431669, 29.713009, 0, 3.8005285, 0, 0, -2.431669, 0, -2.920788, 0.45554352, 1.4781663, 0, -3.5994682, 19.046146, 0, 3.8911626, 0, 0, 3.5994682, 0, 1.4781663, 4.709696, 1.8123305, 0, 3.3971436, 28.246113, 0, 3.850341, 0, 0, -3.3971436, 0, 1.8123305, -3.6749792, -3.526145, 0, -0.88041025, 27.456982, 0, 3.634394, 0, 0, 0.88041025, 0, -3.526145, 5.762416, 3.3786356, 0, 1.4140078, -5.430956, 0, 3.6625943, 0, 0, -1.4140078, 0, 3.3786356, -5.66542, -2.3735616, 0, 2.7178035, 15.443874, 0, 3.6083584, 0, 0, -2.7178035, 0, -2.3735616, -1.8309913, -1.5188177, 0, -3.709013, 7.9174232, 0, 4.0079403, 0, 0, 3.709013, 0, -1.5188177, 4.7959957, 2.991213, 0, 2.581309, -22.8022, 0, 3.951014, 0, 0, -2.581309, 0, 2.991213, -1.9763207, -0.41246513, 0, 3.6821156, 13.714428, 0, 3.7051454, 0, 0, -3.6821156, 0, -0.41246513, 0.29738903, 3.8692522, 0, 0.505509, 22.147137, 0, 3.9021342, 0, 0, -0.505509, 0, 3.8692522, 2.5974312, -2.1235538, 0, 3.1676905, -2.0036068, 0, 3.813626, 0, 0, -3.1676905, 0, -2.1235538, 3.8925323, -2.1129847, 0, 3.5349755, -6.1731834, 0, 4.118344, 0, 0, -3.5349755, 0, -2.1129847, -5.5255375, -4.2349505, 0, -0.5021031, -10.689945, 0, 4.2646117, 0, 0, 0.5021031, 0, -4.2349505, 2.2761917, -3.639368, 0, -0.71140134, 21.128391, 0, 3.7082465, 0, 0, 0.71140134, 0, -3.639368, 4.1907215, 0.66162896, 0, 3.8346364, 14.006535, 0, 3.8912966, 0, 0, -3.8346364, 0, 0.66162896, 2.787879, -3.0575, 0, -2.0687575, -7.4909782, 0, 3.6916208, 0, 0, 2.0687575, 0, -3.0575, 2.737173, 1.0493937, 0, 3.8943338, -27.221075, 0, 4.0332446, 0, 0, -3.8943338, 0, 1.0493937, 2.018959, 3.5707142, 0, -0.5149711, -3.431223, 0, 3.607658, 0, 0, 0.5149711, 0, 3.5707142, 4.5839663, -2.6934295, 0, 3.1787586, -25.990631, 0, 4.1664214, 0, 0, -3.1787586, 0, -2.6934295, -3.5750313, 4.062971, 0, 1.0299207, 18.218113, 0, 4.191476, 0, 0, -1.0299207, 0, 4.062971, 3.6278381, -0.54228985, 0, -3.7555957, 9.852547, 0, 3.7945457, 0, 0, 3.7555957, 0, -0.54228985, -0.35383606, 3.054364, 0, 2.7214084, -27.442919, 0, 4.090868, 0, 0, -2.7214084, 0, 3.054364, -3.2437706, 3.1973, 0, -2.9916673, -2.0439663, 0, 4.3786755, 0, 0, 2.9916673, 0, 3.1973, -4.1122384, 2.4385061, 0, -3.5351381, 20.734138, 0, 4.294591, 0, 0, 3.5351381, 0, 2.4385061, -2.0533829, 3.6927319, 0, 1.4861393, 8.002869, 0, 3.9805627, 0, 0, -1.4861393, 0, 3.6927319, -5.239156, 2.8842635, 0, -2.8569727, -14.754259, 0, 4.059713, 0, 0, 2.8569727, 0, 2.8842635, 3.516736)
 
-[sub_resource type="StandardMaterial3D" id="Mat_obstacle"]
-albedo_color = Color(0.08, 0.08, 0.08, 1)
-
-[sub_resource type="BoxMesh" id="Mesh_SmallHill_A"]
-material = SubResource("Mat_obstacle")
-size = Vector3(16, 2.5, 18)
-
-[sub_resource type="BoxMesh" id="Mesh_SmallHill_B"]
-material = SubResource("Mat_obstacle")
-size = Vector3(18, 2, 14)
-
-[sub_resource type="StandardMaterial3D" id="Mat_poi"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ykhha"]
 albedo_color = Color(0.8, 0.55, 0.14, 1)
 
 [sub_resource type="BoxMesh" id="Mesh_POI_Reserved"]
-material = SubResource("Mat_poi")
-size = Vector3(50, 0.08, 50)
+material = SubResource("StandardMaterial3D_ykhha")
+size = Vector3(60, 0.08, 60)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nsu61"]
 albedo_color = Color(1, 0.6, 0, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_p2y7x"]
+top_radius = 3.0
+bottom_radius = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lh7vv"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nh0nh"]
 transparency = 1
@@ -556,45 +551,45 @@ west_side_profile = "river"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 collision_layer = 8
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=1373998377]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -9.8, 0)
-shape = SubResource("BoxShape3D_rjcbc")
-
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground_Body" unique_id=777818332]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.8, -67)
-shape = SubResource("BoxShape3D_4fbs3")
-
-[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground_Body" unique_id=505715689]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62.5, -4.8, -21)
-shape = SubResource("BoxShape3D_w2tbt")
-
-[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground_Body" unique_id=1295085984]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.5, -4.8, -21)
-shape = SubResource("BoxShape3D_caadd")
-
-[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground_Body" unique_id=1392783308]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -4.8, 26)
-shape = SubResource("BoxShape3D_rfjag")
-
-[node name="CollisionShape3D6" type="CollisionShape3D" parent="Ground_Body" unique_id=149676612]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, -4.8, 4)
-shape = SubResource("BoxShape3D_7e7a5")
-
-[node name="CollisionShape3D7" type="CollisionShape3D" parent="Ground_Body" unique_id=1076779553]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -4.8, 4)
-shape = SubResource("BoxShape3D_pisc0")
-
-[node name="CollisionShape3D8" type="CollisionShape3D" parent="Ground_Body" unique_id=190094297]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, -4.8, 30)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=1631965521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
 shape = SubResource("BoxShape3D_p2y7x")
 
-[node name="CollisionShape3D9" type="CollisionShape3D" parent="Ground_Body" unique_id=734742277]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72, -4.8, 30)
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground_Body" unique_id=774682806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, -70)
 shape = SubResource("BoxShape3D_lh7vv")
 
-[node name="CollisionShape3D10" type="CollisionShape3D" parent="Ground_Body" unique_id=514328477]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.8, 76)
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground_Body" unique_id=1473319138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, -5, -24)
 shape = SubResource("BoxShape3D_fw17m")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground_Body" unique_id=1470341133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, -5, -24)
+shape = SubResource("BoxShape3D_mt3sn")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground_Body" unique_id=1057604521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -5, 28)
+shape = SubResource("BoxShape3D_nbehi")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="Ground_Body" unique_id=1942901988]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, -5, 6)
+shape = SubResource("BoxShape3D_fwhsa")
+
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="Ground_Body" unique_id=2126172562]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5, -5, 6)
+shape = SubResource("BoxShape3D_dmjfh")
+
+[node name="CollisionShape3D8" type="CollisionShape3D" parent="Ground_Body" unique_id=659645231]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, -5, 30)
+shape = SubResource("BoxShape3D_xtan8")
+
+[node name="CollisionShape3D9" type="CollisionShape3D" parent="Ground_Body" unique_id=922783685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.5, -5, 30)
+shape = SubResource("BoxShape3D_rlbbv")
+
+[node name="CollisionShape3D10" type="CollisionShape3D" parent="Ground_Body" unique_id=524927030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 76)
+shape = SubResource("BoxShape3D_6pald")
 
 [node name="Ground" type="Node3D" parent="." unique_id=2143581763]
 
@@ -603,27 +598,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
 mesh = SubResource("BoxMesh_8cnh0")
 
 [node name="Terrain1" type="MeshInstance3D" parent="Ground" unique_id=891920974]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, -67)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, -70)
 mesh = SubResource("Mesh_Terrain")
 
 [node name="Terrain6" type="MeshInstance3D" parent="Ground" unique_id=1034525399]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62.5, -5, -21)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, -5, -24)
 mesh = SubResource("BoxMesh_lh7vv")
 
 [node name="Terrain7" type="MeshInstance3D" parent="Ground" unique_id=837922739]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.5, -5, -21)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, -5, -24)
 mesh = SubResource("BoxMesh_lh7vv")
 
 [node name="Terrain2" type="MeshInstance3D" parent="Ground" unique_id=344027236]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -5, 26)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -5, 28)
 mesh = SubResource("BoxMesh_nh0nh")
 
 [node name="Terrain8" type="MeshInstance3D" parent="Ground" unique_id=763117457]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, -5, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, -5, 6)
 mesh = SubResource("BoxMesh_mt3sn")
 
 [node name="Terrain9" type="MeshInstance3D" parent="Ground" unique_id=536554469]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -5, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5, -5, 6)
 mesh = SubResource("BoxMesh_nbehi")
 
 [node name="Terrain3" type="MeshInstance3D" parent="Ground" unique_id=2139843346]
@@ -631,7 +626,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, -5, 30)
 mesh = SubResource("BoxMesh_5qy1i")
 
 [node name="Terrain4" type="MeshInstance3D" parent="Ground" unique_id=225029504]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72, -5, 30)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.5, -5, 30)
 mesh = SubResource("BoxMesh_qki4w")
 
 [node name="Terrain5" type="MeshInstance3D" parent="Ground" unique_id=135821628]
@@ -641,17 +636,17 @@ mesh = SubResource("BoxMesh_hd0di")
 [node name="River" type="Node3D" parent="." unique_id=1549052801]
 
 [node name="River_Visual2" type="MeshInstance3D" parent="River" unique_id=34218073]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72, -4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.5, -4, 0)
 mesh = SubResource("Mesh_River_Visual")
 surface_material_override/0 = SubResource("ShaderMaterial_7e7a5")
 
 [node name="River_Visual3" type="MeshInstance3D" parent="River" unique_id=353875232]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -37.5, -4, 22)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -42.5, -4, 22)
 mesh = SubResource("BoxMesh_nsu61")
 surface_material_override/0 = SubResource("ShaderMaterial_pisc0")
 
 [node name="River_Visual" type="MeshInstance3D" parent="River" unique_id=1772342052]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -4, 44)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -4, 44)
 mesh = SubResource("BoxMesh_ea3vh")
 surface_material_override/0 = SubResource("ShaderMaterial_p2y7x")
 
@@ -692,6 +687,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -35)
 mesh = SubResource("Mesh_Path_Thin_EW_B")
 
 [node name="Vegetation" type="Node3D" parent="." unique_id=248455279]
+visible = false
 
 [node name="MultiMesh_Grass_1" type="Node3D" parent="Vegetation" unique_id=345609952]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.076, 0, 68.762)
@@ -756,28 +752,11 @@ base_scale = 4.0
 material_override = ExtResource("13_p2y7x")
 multimesh = SubResource("MultiMesh_mt3sn")
 
-[node name="SmallHill_A" type="MeshInstance3D" parent="." unique_id=1466921957]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.781857, 1.25, -22.040846)
-mesh = SubResource("Mesh_SmallHill_A")
-
-[node name="SmallHill_A2" type="MeshInstance3D" parent="." unique_id=385649426]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.781857, 1.25, -41.040848)
-mesh = SubResource("Mesh_SmallHill_A")
-
-[node name="SmallHill_A3" type="MeshInstance3D" parent="." unique_id=2124330367]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.353085, 1.25, -56.858833)
-mesh = SubResource("Mesh_SmallHill_A")
-
-[node name="SmallHill_B" type="MeshInstance3D" parent="." unique_id=1081249508]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.78186, 1, -16.040846)
-mesh = SubResource("Mesh_SmallHill_B")
-
 [node name="POISocket" type="Node3D" parent="." unique_id=2112219716]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -10)
 
-[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="." unique_id=856011575]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -9)
-visible = false
+[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="POISocket" unique_id=856011575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
 mesh = SubResource("Mesh_POI_Reserved")
 
 [node name="SpawnSockets" type="Node3D" parent="." unique_id=1628970421]
@@ -896,17 +875,30 @@ size = Vector3(2, 10, 90)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -61.642273, 0.25, -63.498398)
 script = ExtResource("2_nsu61")
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side1" unique_id=1690773764]
+mesh = SubResource("CylinderMesh_p2y7x")
+surface_material_override/0 = SubResource("StandardMaterial3D_lh7vv")
+
 [node name="POISocket_Side2" type="Node3D" parent="." unique_id=1683476961]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.357727, 0.25, -70.4984)
 script = ExtResource("2_nsu61")
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side2" unique_id=1126208674]
+mesh = SubResource("CylinderMesh_p2y7x")
+surface_material_override/0 = SubResource("StandardMaterial3D_lh7vv")
+
 [node name="POISocket_Side3" type="Node3D" parent="." unique_id=1630761708]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.357727, 0.25, 37.501602)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.357727, 0.25, 74.5016)
 script = ExtResource("2_nsu61")
 secondary_socket_environment = "river"
 rotation_mode_override = "follow block"
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side3" unique_id=1958801346]
+mesh = SubResource("CylinderMesh_p2y7x")
+surface_material_override/0 = SubResource("StandardMaterial3D_lh7vv")
+
 [node name="SpawnZones" type="Node3D" parent="." unique_id=1922735349]
+visible = false
 
 [node name="Plans_River_A_West_Horde" type="Node3D" parent="SpawnZones" unique_id=1293432569 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -63, 2.0101318, 64)

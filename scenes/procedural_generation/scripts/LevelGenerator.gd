@@ -64,6 +64,10 @@ const DEFAULT_SECONDARY_POI_SCENE_PATHS: Array[String] = [
 @export_range(0.0, 1.0, 0.01) var secondary_poi_spawn_chance: float = 1.0
 @export var spawn_rig_scene: PackedScene
 
+@export_group("POI Variety")
+@export var avoid_duplicate_main_pois: bool = true
+@export var avoid_duplicate_secondary_pois: bool = true
+
 @export_group("Spawn Rig")
 @export_enum("snap socket 90", "follow socket", "follow block", "ignore rotation") var spawn_rig_rotation_mode: String = "snap socket 90"
 @export_range(-180.0, 180.0, 1.0) var spawn_rig_rotation_offset_degrees: float = 0.0
@@ -112,6 +116,8 @@ func generate_random(requested_seed: int = 0) -> Resource:
 		return database
 
 	var generated_blocks: Array[Node3D] = []
+	var used_main_poi_scene_keys: Array[String] = []
+	var used_secondary_poi_scene_keys: Array[String] = []
 	for assignment: Dictionary in assignments:
 		var blueprint: Dictionary = assignment.get("blueprint", {})
 		var block_scene: PackedScene = blueprint.get("scene", null) as PackedScene
@@ -127,6 +133,7 @@ func generate_random(requested_seed: int = 0) -> Resource:
 
 		block_node.position = slot_position
 		block_node.rotation.y = deg_to_rad(float(rotation_degrees))
+		var objective_selection: Dictionary = _select_random_objective_for_block(block_node)
 		_get_generated_root().add_child(block_node)
 		generated_blocks.append(block_node)
 
@@ -138,13 +145,15 @@ func generate_random(requested_seed: int = 0) -> Resource:
 		_apply_block_connectors(block_node, connected_local_sides)
 
 		var block_record: Dictionary = _make_block_record(block_node, block_scene, slot_index, slot_record, rotation_degrees, assignment)
+		if not objective_selection.is_empty():
+			block_record["objective_selection"] = objective_selection.duplicate(true)
 		block_record["connected_sides_world"] = Array(connected_world_sides)
 		block_record["connected_sides_local"] = Array(connected_local_sides)
 		# Compatibilité debug ancienne : maintenant cette clé contient les côtés LOCAUX.
 		block_record["connected_sides"] = Array(connected_local_sides)
 		database.block_records.append(block_record)
 
-		var poi_scene: PackedScene = _pick_poi_scene_for_block(block_node)
+		var poi_scene: PackedScene = _pick_poi_scene_for_block(block_node, used_main_poi_scene_keys)
 		if poi_scene != null:
 			var poi_rotation_degrees: int = 0
 			var allow_random_poi_rotation: bool = _read_bool_property(block_node, "allow_random_poi_rotation", true)
@@ -154,8 +163,9 @@ func generate_random(requested_seed: int = 0) -> Resource:
 			if poi_node != null:
 				var poi_record: Dictionary = _make_poi_record(poi_node, poi_scene, slot_index, poi_rotation_degrees, allow_random_poi_rotation, "main", -1, "POISocket", {})
 				database.poi_records.append(poi_record)
+				_mark_scene_key_as_used(poi_scene, used_main_poi_scene_keys)
 
-		_spawn_secondary_pois_for_block(database, block_node, slot_index)
+		_spawn_secondary_pois_for_block(database, block_node, slot_index, used_secondary_poi_scene_keys)
 
 	_spawn_rig_for_database(database, generated_blocks)
 
@@ -184,6 +194,7 @@ func generate_from_dictionary(database_dictionary: Dictionary) -> Resource:
 		var rotation_degrees: float = float(block_record.get("rotation_y_degrees", 0.0))
 		block_node.position = slot_position
 		block_node.rotation.y = deg_to_rad(rotation_degrees)
+		_apply_saved_objective_selection_to_block(block_node, block_record)
 		_get_generated_root().add_child(block_node)
 		generated_blocks.append(block_node)
 
@@ -885,11 +896,12 @@ func _emit_generation_finished(database: Resource) -> void:
 	generation_finished.emit(data)
 
 
-func _pick_poi_scene_for_block(block_node: Node) -> PackedScene:
-	return _pick_scene_from_candidates(poi_scenes, block_node)
+func _pick_poi_scene_for_block(block_node: Node, used_scene_keys: Array[String]) -> PackedScene:
+	var candidates: Array[PackedScene] = _get_main_poi_candidates_for_block(block_node)
+	return _pick_scene_with_duplicate_fallback(candidates, used_scene_keys, avoid_duplicate_main_pois, "POI principal", _get_node_debug_name(block_node))
 
 
-func _pick_secondary_poi_scene_for_socket(block_node: Node3D, socket: Node3D) -> PackedScene:
+func _pick_secondary_poi_scene_for_socket(block_node: Node3D, socket: Node3D, used_scene_keys: Array[String]) -> PackedScene:
 	var candidates: Array[PackedScene] = []
 	for scene: PackedScene in _get_effective_secondary_poi_scenes():
 		if scene == null:
@@ -897,26 +909,70 @@ func _pick_secondary_poi_scene_for_socket(block_node: Node3D, socket: Node3D) ->
 		if _secondary_poi_scene_can_spawn_on_socket(scene, block_node, socket):
 			candidates.append(scene)
 
-	if candidates.is_empty():
-		return null
-
-	var index: int = rng.randi_range(0, candidates.size() - 1)
-	return candidates[index]
+	return _pick_scene_with_duplicate_fallback(candidates, used_scene_keys, avoid_duplicate_secondary_pois, "POI secondaire", _get_node_debug_name(socket))
 
 
-func _pick_scene_from_candidates(source_scenes: Array[PackedScene], block_node: Node) -> PackedScene:
+func _get_main_poi_candidates_for_block(block_node: Node) -> Array[PackedScene]:
 	var candidates: Array[PackedScene] = []
-	for scene: PackedScene in source_scenes:
+	for scene: PackedScene in poi_scenes:
 		if scene == null:
 			continue
 		if _poi_scene_can_spawn_on_block(scene, block_node):
 			candidates.append(scene)
+	return candidates
 
+
+func _pick_scene_with_duplicate_fallback(candidates: Array[PackedScene], used_scene_keys: Array[String], avoid_duplicates: bool, poi_label: String, context_name: String) -> PackedScene:
 	if candidates.is_empty():
 		return null
 
-	var index: int = rng.randi_range(0, candidates.size() - 1)
-	return candidates[index]
+	if not avoid_duplicates:
+		return candidates[rng.randi_range(0, candidates.size() - 1)]
+
+	var unused_candidates: Array[PackedScene] = []
+	for scene: PackedScene in candidates:
+		var scene_key: String = _get_scene_unique_key(scene)
+		if not used_scene_keys.has(scene_key):
+			unused_candidates.append(scene)
+
+	if not unused_candidates.is_empty():
+		return unused_candidates[rng.randi_range(0, unused_candidates.size() - 1)]
+
+	var duplicate_scene: PackedScene = candidates[rng.randi_range(0, candidates.size() - 1)]
+	print("[LevelGenerator] Doublon de %s nécessaire sur %s. Aucun candidat inutilisé compatible. Spawn du doublon : %s" % [poi_label, context_name, _get_scene_debug_name(duplicate_scene)])
+	return duplicate_scene
+
+
+func _mark_scene_key_as_used(scene: PackedScene, used_scene_keys: Array[String]) -> void:
+	var scene_key: String = _get_scene_unique_key(scene)
+	if scene_key.is_empty():
+		return
+	if not used_scene_keys.has(scene_key):
+		used_scene_keys.append(scene_key)
+
+
+func _get_scene_unique_key(scene: PackedScene) -> String:
+	if scene == null:
+		return ""
+	var scene_path: String = _get_scene_path(scene)
+	if not scene_path.is_empty():
+		return scene_path
+	return str(scene.get_instance_id())
+
+
+func _get_scene_debug_name(scene: PackedScene) -> String:
+	if scene == null:
+		return "null"
+	var scene_path: String = _get_scene_path(scene)
+	if not scene_path.is_empty():
+		return scene_path
+	return "PackedScene#%s" % str(scene.get_instance_id())
+
+
+func _get_node_debug_name(node: Node) -> String:
+	if node == null:
+		return "node inconnu"
+	return String(node.name)
 
 
 func _get_effective_secondary_poi_scenes() -> Array[PackedScene]:
@@ -1062,6 +1118,45 @@ func _side_profile_to_socket_environment(side_profile: String) -> String:
 	return "land"
 
 
+func _select_random_objective_for_block(block_node: Node3D) -> Dictionary:
+	if block_node == null:
+		return {}
+	if not block_node.has_method("get_objective_candidate_count") or not block_node.has_method("select_objective_by_index"):
+		return {}
+
+	var objective_count: int = int(block_node.call("get_objective_candidate_count"))
+	if objective_count <= 0:
+		return {}
+
+	var chosen_index: int = rng.randi_range(0, objective_count - 1)
+	var selection_value: Variant = block_node.call("select_objective_by_index", chosen_index)
+	if selection_value is Dictionary:
+		return (selection_value as Dictionary).duplicate(true)
+	return {
+		"objective_count": objective_count,
+		"selected_objective_index": chosen_index,
+	}
+
+
+func _apply_saved_objective_selection_to_block(block_node: Node3D, block_record: Dictionary) -> void:
+	if block_node == null:
+		return
+	if not block_node.has_method("select_objective_by_index"):
+		return
+
+	var selection: Dictionary = _dictionary_from_variant(block_record.get("objective_selection", {}))
+	if selection.is_empty():
+		_select_random_objective_for_block(block_node)
+		return
+
+	var selected_name: String = String(selection.get("selected_objective_name", ""))
+	if not selected_name.is_empty() and block_node.has_method("select_objective_by_name"):
+		block_node.call("select_objective_by_name", selected_name)
+		return
+
+	var selected_index: int = int(selection.get("selected_objective_index", 0))
+	block_node.call("select_objective_by_index", selected_index)
+
 func _instantiate_block_from_scene(block_scene: PackedScene) -> Node3D:
 	if block_scene == null:
 		return null
@@ -1093,7 +1188,7 @@ func _spawn_poi_on_block(block_node: Node3D, poi_scene: PackedScene, poi_rotatio
 	return _spawn_poi_on_socket(block_node, poi_socket, poi_scene, poi_rotation_degrees, "POI")
 
 
-func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: int) -> void:
+func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: int, used_scene_keys: Array[String]) -> void:
 	if not spawn_secondary_pois or block_node == null:
 		return
 	if secondary_poi_spawn_chance <= 0.0:
@@ -1118,7 +1213,7 @@ func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: i
 		if final_spawn_chance < 1.0 and rng.randf() > final_spawn_chance:
 			continue
 
-		var secondary_scene: PackedScene = _pick_secondary_poi_scene_for_socket(block_node, socket)
+		var secondary_scene: PackedScene = _pick_secondary_poi_scene_for_socket(block_node, socket, used_scene_keys)
 		if secondary_scene == null:
 			continue
 
@@ -1147,6 +1242,7 @@ func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: i
 		}
 		var poi_record: Dictionary = _make_poi_record(poi_node, secondary_scene, block_slot, poi_rotation_degrees, rotation_mode == "random 90", "secondary", socket_index, String(socket.name), extra_data)
 		database.secondary_poi_records.append(poi_record)
+		_mark_scene_key_as_used(secondary_scene, used_scene_keys)
 
 
 func _get_secondary_poi_sockets_for_block(block_node: Node3D) -> Array[Node3D]:

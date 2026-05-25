@@ -304,7 +304,7 @@ albedo_color = Color(0.8, 0.55, 0.14, 1)
 
 [sub_resource type="BoxMesh" id="Mesh_POI_Reserved"]
 material = SubResource("Mat_poi")
-size = Vector3(50, 0.08, 50)
+size = Vector3(60, 0.08, 60)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lc1pb"]
 albedo_color = Color(1, 0.6, 0, 1)
@@ -416,7 +416,7 @@ collision_layer = 8
 shape = SubResource("Shape_Bridge_Corner")
 
 [node name="Path_Wide_NS2" type="MeshInstance3D" parent="Road" unique_id=337124760]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7821665, 0.41114166, 39.609177)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.411, 39.609)
 mesh = SubResource("BoxMesh_lc1pb")
 
 [node name="Path_Wide_NS6" type="MeshInstance3D" parent="Road" unique_id=659174729]
@@ -448,7 +448,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -66.
 mesh = SubResource("BoxMesh_264rr")
 
 [node name="Path_Wide_EW" type="MeshInstance3D" parent="Road" unique_id=1631354465]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.041847, 0.04, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0.04, 0)
 mesh = SubResource("Mesh_Path_Wide_EW")
 
 [node name="Rock_A" type="MeshInstance3D" parent="." unique_id=1170501410]
@@ -485,7 +485,11 @@ collision_layer = 8
 shape = SubResource("Shape_Rock_B")
 
 [node name="POISocket" type="Node3D" parent="." unique_id=1693500767]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.642273, 0.25, 33.501602)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0.25, 35)
+
+[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="POISocket" unique_id=1770512947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
+mesh = SubResource("Mesh_POI_Reserved")
 
 [node name="POISocket_Side1" type="Node3D" parent="." unique_id=2127443591]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.64227, 0.25, -62.498398)
@@ -500,10 +504,6 @@ transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 58.3
 script = ExtResource("2_lc1pb")
 secondary_socket_environment = "river"
 rotation_mode_override = "follow socket"
-
-[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="." unique_id=1770512947]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.642273, 0.08, 33.501602)
-mesh = SubResource("Mesh_POI_Reserved")
 
 [node name="SpawnSockets" type="Node3D" parent="." unique_id=1627810835]
 
