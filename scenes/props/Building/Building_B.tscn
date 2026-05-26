@@ -199,7 +199,7 @@ transform = Transform3D(1.9670122e-07, 0, -3.4999998, 0, 1.1999999, 0, 1.5, 0, 4
 transform = Transform3D(-1.5000002, 0, -3.059797e-07, 0, 1.1999999, 0, 1.3113416e-07, 0, -3.4999995, -4.7464547, -1.2776859, -0.92598724)
 
 [node name="wall-low4" parent="Floor_2" unique_id=1962363973 instance=ExtResource("15_tqxvm")]
-transform = Transform3D(-6.556708e-08, 0, 4, 0, 1.2, 0, -1.5, 0, -1.7484555e-07, 0.17917109, -1.2776859, -4.494801)
+transform = Transform3D(-6.556708e-08, 0, 4, 0, 1.2, 0, -1.5, 0, -1.7484555e-07, 0.17917109, -1.3748577, -4.494801)
 
 [node name="wall-low5" parent="Floor_2" unique_id=1747610996 instance=ExtResource("15_tqxvm")]
 transform = Transform3D(1.5, 0, -2.842171e-14, 0, 1.2, 0, 2.1316282e-14, 0, 2, 4.9861264, -1.2776859, -1.2378442)

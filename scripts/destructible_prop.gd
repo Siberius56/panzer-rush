@@ -1,5 +1,5 @@
 extends Node3D
-#class_name DestructibleProp
+class_name DestructibleProp
 
 ## Script commun pour des props physiques destructibles.
 ## Godot 4.x.
@@ -70,6 +70,13 @@ signal final_cleanup_requested(prop: DestructibleProp)
 ## Si true et use_rpc_for_destroyed_state est true, l'autorite supprime aussi le prop sur tous les peers.
 @export var use_rpc_for_final_cleanup: bool = true
 
+@export_category("Runtime zone streaming")
+## Utilise par LevelBlock quand une zone devient inactive.
+## L'objet n'est jamais detruit. Son corps intact est gele et ses collisions sont coupees.
+@export var preserve_transform_when_zone_inactive: bool = true
+## Laisse false pour eviter l'effet "prop qui disparait" pendant le streaming de zone.
+@export var hide_when_zone_inactive: bool = false
+
 var current_hp: float = 0.0
 
 var _intact_body: RigidBody3D
@@ -88,6 +95,11 @@ var _activated_debris: Array[RigidBody3D] = []
 var _debris_local_transforms: Dictionary = {}
 var _debris_root_local_to_intact: Transform3D = Transform3D.IDENTITY
 var _last_intact_global_transform: Transform3D = Transform3D.IDENTITY
+
+var _zone_runtime_active: bool = true
+var _runtime_saved_intact_transform: Transform3D = Transform3D.IDENTITY
+var _runtime_has_saved_intact_transform: bool = false
+var _runtime_multiplayer_nodes: Array[Node] = []
 
 
 static func from_collider(collider: Node) -> DestructibleProp:
@@ -124,8 +136,10 @@ func _ready() -> void:
 		_intact_body.set_meta(&"destructible_prop", self)
 		_intact_body.continuous_cd = true
 		_intact_body.collision_mask = _get_physics_mask_with_enemy_rule(_intact_body.collision_mask)
+		_remember_runtime_original_collision(_intact_body)
 		_apply_physics_enabled()
 
+	_collect_runtime_multiplayer_nodes(self, _runtime_multiplayer_nodes)
 	_setup_embedded_debris()
 
 	_last_observed_destroyed_state = destroyed_state
@@ -193,6 +207,46 @@ func heal_full() -> void:
 func set_physics_enabled(enabled: bool) -> void:
 	physics_enabled = enabled
 	_apply_physics_enabled()
+
+
+func set_level_block_runtime_active(active: bool) -> void:
+	set_prop_runtime_active(active)
+
+
+func set_prop_runtime_active(active: bool) -> void:
+	_zone_runtime_active = active
+	set_meta("runtime_active", active)
+
+	# Un prop deja detruit ne doit jamais redevenir solide lors du retour dans la zone.
+	if _is_destroyed or destroyed_state:
+		_set_runtime_multiplayer_nodes_active(active)
+		return
+
+	if hide_when_zone_inactive:
+		visible = active
+	else:
+		visible = true
+
+	if _intact_body == null or not is_instance_valid(_intact_body):
+		_set_runtime_multiplayer_nodes_active(active)
+		return
+
+	_remember_runtime_original_collision(_intact_body)
+
+	if active:
+		_restore_intact_body_after_runtime_pause()
+	else:
+		_pause_intact_body_for_inactive_zone()
+
+	_set_runtime_multiplayer_nodes_active(active)
+
+
+func is_prop_runtime_active() -> bool:
+	return _zone_runtime_active
+
+
+func is_destructible_prop_destroyed() -> bool:
+	return _is_destroyed or destroyed_state
 
 
 func destroy() -> void:
@@ -424,6 +478,98 @@ func _cleanup_after_delay(delay_seconds: float) -> void:
 			queue_free()
 	else:
 		queue_free()
+
+
+func _pause_intact_body_for_inactive_zone() -> void:
+	if _intact_body == null or not is_instance_valid(_intact_body):
+		return
+
+	if preserve_transform_when_zone_inactive:
+		_runtime_saved_intact_transform = _intact_body.global_transform
+		_runtime_has_saved_intact_transform = true
+
+	_intact_body.linear_velocity = Vector3.ZERO
+	_intact_body.angular_velocity = Vector3.ZERO
+	_intact_body.sleeping = true
+	_intact_body.freeze = true
+	_intact_body.freeze_mode = RigidBody3D.FREEZE_MODE_STATIC
+	_intact_body.collision_layer = 0
+	_intact_body.collision_mask = 0
+
+
+func _restore_intact_body_after_runtime_pause() -> void:
+	if _intact_body == null or not is_instance_valid(_intact_body):
+		return
+
+	_intact_body.freeze = true
+	_intact_body.sleeping = true
+	_intact_body.linear_velocity = Vector3.ZERO
+	_intact_body.angular_velocity = Vector3.ZERO
+
+	if preserve_transform_when_zone_inactive and _runtime_has_saved_intact_transform:
+		_force_rigidbody_transform(_intact_body, _runtime_saved_intact_transform)
+
+	_restore_runtime_original_collision(_intact_body)
+	_apply_physics_enabled()
+
+	if physics_enabled:
+		_intact_body.sleeping = false
+
+
+func _remember_runtime_original_collision(body: CollisionObject3D) -> void:
+	if body == null or not is_instance_valid(body):
+		return
+
+	const META_LAYER: String = "destructible_runtime_original_collision_layer"
+	const META_MASK: String = "destructible_runtime_original_collision_mask"
+	if not body.has_meta(META_LAYER):
+		body.set_meta(META_LAYER, body.collision_layer)
+	if not body.has_meta(META_MASK):
+		body.set_meta(META_MASK, body.collision_mask)
+
+
+func _restore_runtime_original_collision(body: CollisionObject3D) -> void:
+	if body == null or not is_instance_valid(body):
+		return
+
+	const META_LAYER: String = "destructible_runtime_original_collision_layer"
+	const META_MASK: String = "destructible_runtime_original_collision_mask"
+	if body.has_meta(META_LAYER):
+		body.collision_layer = int(body.get_meta(META_LAYER))
+	if body.has_meta(META_MASK):
+		body.collision_mask = int(body.get_meta(META_MASK))
+
+
+func _collect_runtime_multiplayer_nodes(root: Node, output: Array[Node]) -> void:
+	if root == null:
+		return
+
+	if root is MultiplayerSynchronizer or root is MultiplayerSpawner:
+		if not output.has(root):
+			output.append(root)
+
+	for child in root.get_children():
+		_collect_runtime_multiplayer_nodes(child, output)
+
+
+func _object_has_property(target: Object, property_name: String) -> bool:
+	if target == null:
+		return false
+
+	for property_info: Dictionary in target.get_property_list():
+		if String(property_info.get("name", "")) == property_name:
+			return true
+
+	return false
+
+
+func _set_runtime_multiplayer_nodes_active(active: bool) -> void:
+	for multiplayer_node: Node in _runtime_multiplayer_nodes:
+		if multiplayer_node == null or not is_instance_valid(multiplayer_node):
+			continue
+		if _object_has_property(multiplayer_node, "public_visibility"):
+			multiplayer_node.set("public_visibility", active)
+		multiplayer_node.process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
 
 
 func _apply_physics_enabled() -> void:

@@ -111,6 +111,7 @@ high_speed_lateral_damping = 1.0
 high_speed_yaw_damping = 1.1
 visual_idle_shake_rotation_degrees = 0.3
 visual_idle_critical_shake_rotation_degrees = 1.8
+max_health = 6600
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1476231065]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009307861, 1.2991391, 0.0028429031)
@@ -153,19 +154,19 @@ transform = Transform3D(-1.25, 5.4639244e-08, -5.4639244e-08, -5.4639234e-08, 5.
 [node name="box_bevel2" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=76553973 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.19444445, 0, 0, 0, 0.16666669, 0, 0, 0, 0.1388889, 0.25, 0.8822223, -0.4688889)
 
-[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel2" index="0" unique_id=1933577301]
+[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel2" index="0" unique_id=531334882]
 surface_material_override/0 = ExtResource("8_7n6k5")
 
 [node name="box_bevel3" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=898445028 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.19444445, 0, 0, 0, 0.16666669, 0, 0, 0, 0.1388889, -0.25, 0.8822223, -0.4688889)
 
-[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel3" index="0" unique_id=1933577301]
+[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel3" index="0" unique_id=531334882]
 surface_material_override/0 = ExtResource("8_7n6k5")
 
 [node name="box_bevel4" parent="BodyVisualRoot/EngineShakeRoot/Body" unique_id=1851600694 instance=ExtResource("3_13c08")]
 transform = Transform3D(0.2777778, 0, 0, 0, 0.06566757, 0.05130513, 0, -0.05130513, 0.06566757, 6.6227386e-08, 0.82819796, 0.6057321)
 
-[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel4" index="0" unique_id=1933577301]
+[node name="Cube" parent="BodyVisualRoot/EngineShakeRoot/Body/box_bevel4" index="0" unique_id=531334882]
 surface_material_override/0 = ExtResource("8_7n6k5")
 
 [node name="Tank_Bulb1" parent="BodyVisualRoot/EngineShakeRoot" unique_id=827648905 instance=ExtResource("3_a3h3n")]

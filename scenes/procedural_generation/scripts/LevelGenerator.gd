@@ -72,11 +72,25 @@ const DEFAULT_SECONDARY_POI_SCENE_PATHS: Array[String] = [
 @export_enum("snap socket 90", "follow socket", "follow block", "ignore rotation") var spawn_rig_rotation_mode: String = "snap socket 90"
 @export_range(-180.0, 180.0, 1.0) var spawn_rig_rotation_offset_degrees: float = 0.0
 
+@export_group("Passage Gates")
+@export var auto_spawn_passage_gates: bool = true
+@export var passage_gate_scene: PackedScene
+@export_file("*.tscn") var passage_gate_scene_path: String = "res://scenes/triggers/PassageGate.tscn"
+@export var passage_gates_root_path: NodePath = ^"../PassageGates"
+@export var passage_gate_y_offset: float = 0.0
+@export var road_split_gate_offset: float = 35.0
+@export var river_gate_offset: float = 13.0
+@export var debug_print_passage_gates: bool = true
+
 @export_group("Debug")
 @export var debug_print_database: bool = true
 
 var last_database: Resource = null
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var active_block_slot_index: int = -1
+var active_block_node: Node3D = null
+var runtime_block_lookup_by_slot: Dictionary = {}
+var runtime_passage_gates: Array[Node3D] = []
 
 
 func _ready() -> void:
@@ -168,6 +182,7 @@ func generate_random(requested_seed: int = 0) -> Resource:
 		_spawn_secondary_pois_for_block(database, block_node, slot_index, used_secondary_poi_scene_keys)
 
 	_spawn_rig_for_database(database, generated_blocks)
+	_setup_runtime_blocks_and_passage_gates(generated_blocks, database.block_records, int(database.spawn_record.get("block_slot", 0)))
 
 	last_database = database
 	_emit_generation_finished(database)
@@ -207,6 +222,7 @@ func generate_from_dictionary(database_dictionary: Dictionary) -> Resource:
 		_spawn_poi_from_record(poi_record, generated_blocks, database.block_records, true)
 
 	_spawn_rig_from_record(database.spawn_record, generated_blocks, database.block_records)
+	_setup_runtime_blocks_and_passage_gates(generated_blocks, database.block_records, int(database.spawn_record.get("block_slot", 0)))
 	if database.connection_records.is_empty():
 		database.connection_records = _get_block_record_connection_records(database.block_records)
 	database.connection_errors = _get_block_record_connection_errors(database.block_records)
@@ -266,6 +282,288 @@ func get_spawn_points_root() -> Node3D:
 
 func get_vehicle_spawns_root() -> Node3D:
 	return _get_or_create_root(vehicle_spawns_output_path, "VehicleSpawns")
+
+
+
+func get_passage_gates_root() -> Node3D:
+	return _get_or_create_root(passage_gates_root_path, "PassageGates")
+
+
+func get_active_level_block() -> Node3D:
+	return active_block_node
+
+
+func get_active_level_block_slot() -> int:
+	return active_block_slot_index
+
+
+func request_level_block_transition(from_block: Node3D, to_block: Node3D, passage_gate: Node = null) -> void:
+	if to_block == null or not is_instance_valid(to_block):
+		return
+
+	var target_slot: int = _get_runtime_slot_for_block(to_block)
+	if target_slot < 0:
+		return
+
+	if multiplayer.has_multiplayer_peer():
+		if multiplayer.is_server():
+			rpc("rpc_set_active_level_block_slot", target_slot)
+		else:
+			rpc_id(1, "rpc_request_active_level_block_slot", target_slot)
+		return
+
+	rpc_set_active_level_block_slot(target_slot)
+
+
+@rpc("any_peer", "reliable")
+func rpc_request_active_level_block_slot(target_slot: int) -> void:
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
+	rpc("rpc_set_active_level_block_slot", target_slot)
+
+
+@rpc("authority", "call_local", "reliable")
+func rpc_set_active_level_block_slot(target_slot: int) -> void:
+	set_active_level_block_slot(target_slot, true, true)
+
+
+func set_active_level_block_slot(target_slot: int, kill_inactive_enemies: bool = true, spawn_idle: bool = true) -> void:
+	if runtime_block_lookup_by_slot.is_empty():
+		_rebuild_runtime_block_lookup_from_scene()
+
+	if not runtime_block_lookup_by_slot.has(target_slot):
+		push_warning("[LevelGenerator] Block actif introuvable pour slot %d." % target_slot)
+		return
+
+	active_block_slot_index = target_slot
+	active_block_node = runtime_block_lookup_by_slot[target_slot] as Node3D
+
+	for slot_key: Variant in runtime_block_lookup_by_slot.keys():
+		var block_node: Node3D = runtime_block_lookup_by_slot[slot_key] as Node3D
+		if block_node == null or not is_instance_valid(block_node):
+			continue
+
+		var slot_index: int = int(slot_key)
+		var should_be_active: bool = slot_index == target_slot
+		if block_node.has_method("set_runtime_slot_index"):
+			block_node.call("set_runtime_slot_index", slot_index)
+		if block_node.has_method("set_block_runtime_active"):
+			block_node.call("set_block_runtime_active", should_be_active, kill_inactive_enemies)
+		elif block_node.has_method("set_network_zone_active"):
+			block_node.call("set_network_zone_active", should_be_active)
+
+	var horde_director: Node = _find_horde_director()
+	if horde_director != null and horde_director.has_method("set_active_level_block"):
+		horde_director.call("set_active_level_block", active_block_node, target_slot, spawn_idle)
+
+	if debug_print_passage_gates:
+		print("[LevelGenerator] Block actif : slot %d (%s)." % [target_slot, str(active_block_node.name)])
+
+
+func _setup_runtime_blocks_and_passage_gates(generated_blocks: Array[Node3D], block_records: Array[Dictionary], start_slot_index: int) -> void:
+	runtime_block_lookup_by_slot.clear()
+
+	for block_node: Node3D in generated_blocks:
+		if block_node == null or not is_instance_valid(block_node):
+			continue
+		var slot_index: int = _find_block_slot_for_generated_node(block_node, generated_blocks, block_records)
+		if slot_index < 0:
+			slot_index = generated_blocks.find(block_node)
+		runtime_block_lookup_by_slot[slot_index] = block_node
+		block_node.set_meta("runtime_slot_index", slot_index)
+		if block_node.has_method("set_runtime_slot_index"):
+			block_node.call("set_runtime_slot_index", slot_index)
+		if block_node.has_method("refresh_runtime_cache"):
+			block_node.call("refresh_runtime_cache")
+
+	_spawn_passage_gates_for_blocks(generated_blocks, block_records)
+	set_active_level_block_slot(start_slot_index, true, true)
+
+
+func _rebuild_runtime_block_lookup_from_scene() -> void:
+	runtime_block_lookup_by_slot.clear()
+	var root: Node3D = _get_generated_root()
+	if root == null:
+		return
+
+	for child: Node in root.get_children():
+		if not (child is Node3D):
+			continue
+		var block_node: Node3D = child as Node3D
+		if not block_node.has_method("get_database_summary"):
+			continue
+		var slot_variant: Variant = block_node.get_meta("runtime_slot_index", -1)
+		if slot_variant == null:
+			slot_variant = -1
+		var slot_index: int = int(slot_variant)
+		if slot_index >= 0:
+			runtime_block_lookup_by_slot[slot_index] = block_node
+
+
+func _spawn_passage_gates_for_blocks(generated_blocks: Array[Node3D], block_records: Array[Dictionary]) -> void:
+	runtime_passage_gates.clear()
+	_clear_children(get_passage_gates_root())
+
+	if not auto_spawn_passage_gates:
+		return
+
+	var gate_scene: PackedScene = _get_passage_gate_scene()
+	if gate_scene == null:
+		push_warning("[LevelGenerator] PassageGate scene manquante.")
+		return
+
+	var spawned_pair_keys: Dictionary = {}
+
+	for block_record: Dictionary in block_records:
+		var slot_index: int = int(block_record.get("slot_index", -1))
+		var block_node: Node3D = _find_generated_block_by_slot(generated_blocks, block_records, slot_index)
+		if block_node == null:
+			continue
+
+		var grid_position: Vector2i = _grid_position_from_block_record(block_record)
+		for side: String in CARDINAL_DIRECTIONS:
+			var offset_value: Variant = DIRECTION_TO_GRID_OFFSET.get(side, Vector2i.ZERO)
+			var neighbor_grid: Vector2i = grid_position + (offset_value as Vector2i)
+			var neighbor_record: Dictionary = _find_block_record_at_grid(block_records, neighbor_grid)
+			if neighbor_record.is_empty():
+				continue
+
+			var neighbor_slot: int = int(neighbor_record.get("slot_index", -1))
+			var pair_key: String = _connection_pair_key(slot_index, neighbor_slot)
+			if spawned_pair_keys.has(pair_key):
+				continue
+			spawned_pair_keys[pair_key] = true
+
+			var profile: String = _get_world_side_profile_from_record(block_record, side)
+			var offsets: Array[float] = _get_passage_gate_offsets_for_profile(profile)
+			if offsets.is_empty():
+				continue
+
+			var neighbor_block: Node3D = _find_generated_block_by_slot(generated_blocks, block_records, neighbor_slot)
+			if neighbor_block == null:
+				continue
+
+			for offset: float in offsets:
+				_spawn_one_passage_gate(gate_scene, block_node, neighbor_block, slot_index, neighbor_slot, side, offset)
+
+	if debug_print_passage_gates:
+		print("[LevelGenerator] PassageGates générés : %d." % runtime_passage_gates.size())
+
+
+func _spawn_one_passage_gate(gate_scene: PackedScene, block_a: Node3D, block_b: Node3D, slot_a: int, slot_b: int, side_from_a_to_b: String, lateral_offset: float) -> Node3D:
+	if gate_scene == null:
+		return null
+
+	var gate_base: Node = gate_scene.instantiate()
+	if not (gate_base is Node3D):
+		gate_base.queue_free()
+		return null
+
+	var gate: Node3D = gate_base as Node3D
+	gate.name = "PassageGate_%d_%d_%s_%d" % [slot_a, slot_b, side_from_a_to_b, int(round(lateral_offset))]
+	get_passage_gates_root().add_child(gate)
+
+	var direction: Vector3 = _world_direction_vector_for_side(side_from_a_to_b)
+	var side_position: Vector3 = block_a.global_position + (direction * (block_size * 0.5))
+	var offset_vector: Vector3 = _world_lateral_vector_for_side(side_from_a_to_b) * lateral_offset
+	var final_position: Vector3 = side_position + offset_vector
+	final_position.y += passage_gate_y_offset
+	gate.global_position = final_position
+	gate.look_at(final_position + direction, Vector3.UP)
+
+	# Après look_at(), le front local (-Z) du gate regarde vers block_b.
+	if gate.has_method("configure_passage_blocks"):
+		gate.call("configure_passage_blocks", block_b, block_a, "block_%d" % slot_b, "block_%d" % slot_a, self)
+
+	runtime_passage_gates.append(gate)
+	return gate
+
+
+func _get_passage_gate_scene() -> PackedScene:
+	if passage_gate_scene != null:
+		return passage_gate_scene
+	if passage_gate_scene_path.is_empty():
+		return null
+	if not ResourceLoader.exists(passage_gate_scene_path):
+		return null
+	return ResourceLoader.load(passage_gate_scene_path) as PackedScene
+
+
+func _get_passage_gate_offsets_for_profile(profile: String) -> Array[float]:
+	var normalized: String = profile.strip_edges().to_lower().replace("_", " ")
+	var result: Array[float] = []
+
+	if normalized == SIDE_PROFILE_NONE or normalized == SIDE_PROFILE_SEA or normalized == "non":
+		return result
+
+	if normalized.contains("river") or normalized == "river":
+		result.append(-river_gate_offset)
+		result.append(river_gate_offset)
+		return result
+
+	if normalized == "road split" or normalized == "road split river":
+		result.append(-road_split_gate_offset)
+		result.append(road_split_gate_offset)
+		return result
+
+	if normalized == "road center" or normalized == "road center river":
+		result.append(0.0)
+		return result
+
+	return result
+
+
+func _get_world_side_profile_from_record(block_record: Dictionary, side: String) -> String:
+	var side_profiles_value: Variant = block_record.get("side_profiles_rotated", {})
+	if side_profiles_value is Dictionary:
+		var side_profiles: Dictionary = side_profiles_value as Dictionary
+		return String(side_profiles.get(side, SIDE_PROFILE_NONE))
+	return SIDE_PROFILE_NONE
+
+
+func _world_direction_vector_for_side(side: String) -> Vector3:
+	match side:
+		"north":
+			return Vector3(0.0, 0.0, -1.0)
+		"east":
+			return Vector3(1.0, 0.0, 0.0)
+		"south":
+			return Vector3(0.0, 0.0, 1.0)
+		"west":
+			return Vector3(-1.0, 0.0, 0.0)
+		_:
+			return Vector3.ZERO
+
+
+func _world_lateral_vector_for_side(side: String) -> Vector3:
+	match side:
+		"north", "south":
+			return Vector3(1.0, 0.0, 0.0)
+		"east", "west":
+			return Vector3(0.0, 0.0, 1.0)
+		_:
+			return Vector3.ZERO
+
+
+func _get_runtime_slot_for_block(block_node: Node3D) -> int:
+	if block_node == null or not is_instance_valid(block_node):
+		return -1
+	if block_node.has_method("get_runtime_slot_index"):
+		return int(block_node.call("get_runtime_slot_index"))
+	return int(block_node.get_meta("runtime_slot_index", -1))
+
+
+func _find_horde_director() -> Node:
+	if GameSessionState != null:
+		var director_value: Variant = GameSessionState.get("horde_director")
+		if director_value is Node and is_instance_valid(director_value):
+			return director_value as Node
+
+	for candidate: Node in get_tree().get_nodes_in_group("horde_director"):
+		if candidate != null and is_instance_valid(candidate):
+			return candidate
+
+	return null
 
 
 func _build_generation_plan(seed_value: int) -> Dictionary:
@@ -1564,6 +1862,11 @@ func _find_generated_block_by_slot(generated_blocks: Array[Node3D], block_record
 
 func _clear_current_level() -> void:
 	_clear_children(_get_generated_root())
+	_clear_children(get_passage_gates_root())
+	runtime_passage_gates.clear()
+	runtime_block_lookup_by_slot.clear()
+	active_block_node = null
+	active_block_slot_index = -1
 	_clear_spawn_output_roots()
 
 

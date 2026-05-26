@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bt6cgd1c4soop"]
+
+[ext_resource type="Script" uid="uid://c0r7ut6qhhuqu" path="res://vehicle_system/FuelRefill/FuelRefillArea.gd" id="1_fuel_refill_area"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fuel_refill_area"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fuel_platform"]
+size = Vector3(5, 0.3, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fuel_platform"]
+albedo_color = Color(0.08, 0.18, 0.08, 1)
+roughness = 0.9
+
+[node name="FuelRefillArea" type="Area3D" unique_id=513271938]
+collision_layer = 0
+collision_mask = 4294967295
+monitorable = false
+script = ExtResource("1_fuel_refill_area")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1185238052]
+shape = SubResource("BoxShape3D_fuel_refill_area")
+debug_color = Color(0, 0.9, 0.25, 0.42)
+
+[node name="PlatformMesh" type="MeshInstance3D" parent="." unique_id=1133346135]
+mesh = SubResource("BoxMesh_fuel_platform")
+surface_material_override/0 = SubResource("StandardMaterial3D_fuel_platform")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=1328213896]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.16287231, 0)
+text = "FUEL"
+font_size = 64

@@ -67,10 +67,30 @@ const SIDE_PROFILE_SEA: String = "sea"
 @export var hidden_connector_y_offset: float = -20.0
 @export var disable_connector_collisions_when_hidden: bool = true
 
+@export_group("Runtime Activation")
+@export var runtime_activation_enabled: bool = true
+@export var disable_renderers_when_inactive: bool = false
+@export var disable_static_collisions_when_inactive: bool = true
+@export var kill_child_enemies_when_inactive: bool = true
+@export var enemy_groups_to_kill_on_inactive: PackedStringArray = PackedStringArray(["zombies", "enemies", "enemy"])
+@export_storage var runtime_slot_index: int = -1
+
+var runtime_is_active: bool = true
+var _runtime_cache_ready: bool = false
+var _runtime_collision_objects: Array[CollisionObject3D] = []
+var _runtime_rigid_bodies: Array[RigidBody3D] = []
+var _runtime_character_bodies: Array[CharacterBody3D] = []
+var _runtime_areas: Array[Area3D] = []
+var _runtime_visual_nodes: Array[Node3D] = []
+var _runtime_spawn_zones: Array[Node] = []
+var _runtime_multiplayer_nodes: Array[Node] = []
+var _runtime_destructible_props: Array[Node] = []
+
 
 func _ready() -> void:
 	if hide_poi_placeholders_on_ready:
 		hide_poi_placeholders()
+	refresh_runtime_cache()
 
 
 func get_poi_socket() -> Node3D:
@@ -386,6 +406,260 @@ func _object_has_property(target: Object, property_name: String) -> bool:
 	return false
 
 
+
+func set_runtime_slot_index(slot_index: int) -> void:
+	runtime_slot_index = slot_index
+	_set_spawn_zone_section_ids()
+
+
+func get_runtime_slot_index() -> int:
+	return runtime_slot_index
+
+
+func is_block_runtime_active() -> bool:
+	return runtime_is_active
+
+
+func refresh_runtime_cache() -> void:
+	_runtime_collision_objects.clear()
+	_runtime_rigid_bodies.clear()
+	_runtime_character_bodies.clear()
+	_runtime_areas.clear()
+	_runtime_visual_nodes.clear()
+	_runtime_spawn_zones.clear()
+	_runtime_multiplayer_nodes.clear()
+	_runtime_destructible_props.clear()
+
+	_collect_runtime_nodes_recursive(self)
+	_set_spawn_zone_section_ids()
+	_runtime_cache_ready = true
+
+
+func set_network_zone_active(active: bool) -> void:
+	set_block_runtime_active(active, true)
+
+
+func set_block_runtime_active(active: bool, kill_enemies: bool = true) -> void:
+	if not runtime_activation_enabled:
+		return
+
+	if not _runtime_cache_ready:
+		refresh_runtime_cache()
+
+	runtime_is_active = active
+	visible = true
+
+	_set_runtime_process_state(self, active)
+	for visual_node: Node3D in _runtime_visual_nodes:
+		if visual_node == null or not is_instance_valid(visual_node):
+			continue
+		if disable_renderers_when_inactive:
+			visual_node.visible = active
+
+	for collision_object: CollisionObject3D in _runtime_collision_objects:
+		_set_runtime_collision_object_active(collision_object, active)
+
+	for rigid_body: RigidBody3D in _runtime_rigid_bodies:
+		_set_runtime_rigid_body_active(rigid_body, active)
+
+	for character_body: CharacterBody3D in _runtime_character_bodies:
+		if character_body != null and is_instance_valid(character_body):
+			character_body.velocity = Vector3.ZERO
+
+	for area: Area3D in _runtime_areas:
+		_set_runtime_area_active(area, active)
+
+	for multiplayer_node: Node in _runtime_multiplayer_nodes:
+		_set_runtime_multiplayer_node_active(multiplayer_node, active)
+
+	for spawn_zone: Node in _runtime_spawn_zones:
+		_set_runtime_spawn_zone_active(spawn_zone, active)
+
+	for destructible_prop: Node in _runtime_destructible_props:
+		_set_runtime_destructible_prop_active(destructible_prop, active)
+
+	if not active and kill_enemies and kill_child_enemies_when_inactive:
+		kill_runtime_child_enemies()
+
+
+func kill_runtime_child_enemies() -> void:
+	var enemies_to_kill: Array[Node] = []
+	_collect_runtime_child_enemies(self, enemies_to_kill)
+
+	for enemy_node: Node in enemies_to_kill:
+		if enemy_node == null or not is_instance_valid(enemy_node):
+			continue
+		enemy_node.queue_free()
+
+
+func _collect_runtime_nodes_recursive(root: Node) -> void:
+	if root == null:
+		return
+
+	if root != self and _is_runtime_destructible_prop_root(root):
+		if not _runtime_destructible_props.has(root):
+			_runtime_destructible_props.append(root)
+		return
+
+	if root != self:
+		if root is CollisionObject3D:
+			_runtime_collision_objects.append(root as CollisionObject3D)
+		if root is RigidBody3D:
+			_runtime_rigid_bodies.append(root as RigidBody3D)
+		if root is CharacterBody3D:
+			_runtime_character_bodies.append(root as CharacterBody3D)
+		if root is Area3D:
+			_runtime_areas.append(root as Area3D)
+		if root is MeshInstance3D or root is GPUParticles3D or root is CPUParticles3D:
+			_runtime_visual_nodes.append(root as Node3D)
+		if root is MultiplayerSynchronizer or root is MultiplayerSpawner:
+			_runtime_multiplayer_nodes.append(root)
+		if root.is_in_group("zombie_spawn_zone") or root.has_method("get_spawn_points"):
+			if not _runtime_spawn_zones.has(root):
+				_runtime_spawn_zones.append(root)
+
+	for child: Node in root.get_children():
+		_collect_runtime_nodes_recursive(child)
+
+
+func _set_spawn_zone_section_ids() -> void:
+	for spawn_zone: Node in _runtime_spawn_zones:
+		if spawn_zone == null or not is_instance_valid(spawn_zone):
+			continue
+		if _object_has_property(spawn_zone, "section_id"):
+			spawn_zone.set("section_id", runtime_slot_index)
+		if spawn_zone.has_method("set_owner_level_block"):
+			spawn_zone.call("set_owner_level_block", self, runtime_slot_index)
+		else:
+			spawn_zone.set_meta("owner_level_block_instance_id", get_instance_id())
+			spawn_zone.set_meta("owner_level_block_slot", runtime_slot_index)
+
+
+func _set_runtime_spawn_zone_active(spawn_zone: Node, active: bool) -> void:
+	if spawn_zone == null or not is_instance_valid(spawn_zone):
+		return
+	if spawn_zone.has_method("set_zone_runtime_active"):
+		spawn_zone.call("set_zone_runtime_active", active)
+	else:
+		spawn_zone.set_meta("runtime_active", active)
+
+
+func _set_runtime_destructible_prop_active(destructible_prop: Node, active: bool) -> void:
+	if destructible_prop == null or not is_instance_valid(destructible_prop):
+		return
+
+	if destructible_prop.has_method("set_level_block_runtime_active"):
+		destructible_prop.call("set_level_block_runtime_active", active)
+		return
+
+	if destructible_prop.has_method("set_prop_runtime_active"):
+		destructible_prop.call("set_prop_runtime_active", active)
+		return
+
+	destructible_prop.set_meta("runtime_active", active)
+
+
+func _is_runtime_destructible_prop_root(node: Node) -> bool:
+	if node == null or not is_instance_valid(node):
+		return false
+
+	if node.is_in_group("destructible_props"):
+		return true
+	if node.has_method("set_level_block_runtime_active"):
+		return true
+	if node.has_method("set_prop_runtime_active"):
+		return true
+
+	return false
+
+
+func _set_runtime_collision_object_active(collision_object: CollisionObject3D, active: bool) -> void:
+	if collision_object == null or not is_instance_valid(collision_object):
+		return
+	if not disable_static_collisions_when_inactive and not (collision_object is RigidBody3D) and not (collision_object is CharacterBody3D) and not (collision_object is Area3D):
+		return
+
+	const META_LAYER: String = "runtime_original_collision_layer"
+	const META_MASK: String = "runtime_original_collision_mask"
+	if not collision_object.has_meta(META_LAYER):
+		collision_object.set_meta(META_LAYER, collision_object.collision_layer)
+	if not collision_object.has_meta(META_MASK):
+		collision_object.set_meta(META_MASK, collision_object.collision_mask)
+
+	if active:
+		collision_object.collision_layer = int(collision_object.get_meta(META_LAYER))
+		collision_object.collision_mask = int(collision_object.get_meta(META_MASK))
+	else:
+		collision_object.collision_layer = 0
+		collision_object.collision_mask = 0
+
+
+func _set_runtime_rigid_body_active(rigid_body: RigidBody3D, active: bool) -> void:
+	if rigid_body == null or not is_instance_valid(rigid_body):
+		return
+
+	rigid_body.linear_velocity = Vector3.ZERO
+	rigid_body.angular_velocity = Vector3.ZERO
+	rigid_body.sleeping = not active
+	if _object_has_property(rigid_body, "freeze"):
+		rigid_body.set("freeze", not active)
+
+
+func _set_runtime_area_active(area: Area3D, active: bool) -> void:
+	if area == null or not is_instance_valid(area):
+		return
+	area.monitoring = active
+	area.monitorable = active
+
+
+func _set_runtime_multiplayer_node_active(multiplayer_node: Node, active: bool) -> void:
+	if multiplayer_node == null or not is_instance_valid(multiplayer_node):
+		return
+
+	_set_runtime_process_state(multiplayer_node, active)
+	if _object_has_property(multiplayer_node, "public_visibility"):
+		multiplayer_node.set("public_visibility", active)
+
+
+func _set_runtime_process_state(target: Node, active: bool) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+
+	const META_PROCESS_MODE: String = "runtime_original_process_mode"
+	if not target.has_meta(META_PROCESS_MODE):
+		target.set_meta(META_PROCESS_MODE, target.process_mode)
+
+	if active:
+		target.process_mode = int(target.get_meta(META_PROCESS_MODE))
+	else:
+		target.process_mode = Node.PROCESS_MODE_DISABLED
+
+
+func _collect_runtime_child_enemies(root: Node, result: Array[Node]) -> void:
+	if root == null or not is_instance_valid(root):
+		return
+
+	if root != self and _is_runtime_enemy_node(root):
+		result.append(root)
+		return
+
+	for child: Node in root.get_children():
+		_collect_runtime_child_enemies(child, result)
+
+
+func _is_runtime_enemy_node(node: Node) -> bool:
+	if node == null or not is_instance_valid(node):
+		return false
+
+	for group_name: String in enemy_groups_to_kill_on_inactive:
+		if group_name.is_empty():
+			continue
+		if node.is_in_group(group_name):
+			return true
+
+	return false
+
+
 func has_compatible_tag(tag: String) -> bool:
 	for current_tag: String in compatible_poi_tags:
 		if current_tag == tag:
@@ -519,5 +793,7 @@ func get_database_summary() -> Dictionary:
 		"spawn_socket_count": get_spawn_sockets().size(),
 		"connector_root_path": String(connector_root_path),
 		"hidden_connector_y_offset": hidden_connector_y_offset,
+		"runtime_slot_index": runtime_slot_index,
+		"runtime_activation_enabled": runtime_activation_enabled,
 		"side_profiles": _get_local_side_profiles(),
 	}

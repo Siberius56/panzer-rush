@@ -24,6 +24,12 @@ enum DirectorState {
 @export var server_only: bool = true
 @export var current_section_id: int = 0
 
+@export_group("Procedural Active Block")
+@export var restrict_spawns_to_active_level_block: bool = true
+@export var spawn_idle_population_on_block_activation: bool = true
+@export var stop_horde_on_block_transition: bool = true
+@export var kill_director_enemies_from_inactive_sections: bool = true
+
 @export_group("Spawn Scenes")
 # Ancien champ conservé comme fallback.
 # Si tonfa_enemy_scene n'est pas assignée, zombie_scene sera utilisé comme soldat tonfa par défaut.
@@ -124,6 +130,7 @@ var time_since_last_mega_horde: float = 999999.0
 var cleanup_timer: float = 0.0
 var spawned_zombie_sections: Dictionary = {}
 var spawned_zombie_last_combat_time: Dictionary = {}
+var active_level_block: Node = null
 
 
 func _ready() -> void:
@@ -184,6 +191,72 @@ func force_mega_horde_now() -> void:
 		return
 
 	_start_build_up(true)
+
+
+
+func set_active_level_block(block_node: Node, section_id: int, spawn_idle: bool = true) -> void:
+	active_level_block = block_node
+	current_section_id = section_id
+
+	if stop_horde_on_block_transition:
+		stop_current_wave_for_level_transition()
+
+	refresh_registered_spawn_zones()
+
+	if kill_director_enemies_from_inactive_sections:
+		despawn_zombies_not_in_section(current_section_id)
+
+	if spawn_idle and spawn_idle_population_on_block_activation:
+		spawn_idle_population_for_active_block()
+
+	_emit_event("Block actif : %d. Zones valides : %d." % [current_section_id, cached_zones.size()])
+
+
+func clear_active_level_block() -> void:
+	active_level_block = null
+	refresh_registered_spawn_zones()
+
+
+func stop_current_wave_for_level_transition() -> void:
+	if state == DirectorState.REST:
+		return
+
+	state = DirectorState.REST
+	state_timer = random.randf_range(rest_min_seconds, rest_max_seconds)
+	next_spawn_timer = 0.0
+	horde_remaining = 0
+	super_horde_hammer_remaining = 0
+	active_horde_zone = null
+	active_horde_zones.clear()
+	active_horde_points_by_zone.clear()
+	_emit_event("Transition de block. Horde arrêtée, retour au repos.")
+
+
+func spawn_idle_population_for_active_block() -> void:
+	initial_idle_population_done = false
+	waiting_for_idle_population_deferred = false
+	call_deferred("_try_spawn_initial_idle_population_once")
+
+
+func despawn_zombies_not_in_section(section_id: int) -> void:
+	var zombies: Array[Node] = _get_zombie_nodes_for_cleanup()
+	var removed_count: int = 0
+
+	for zombie: Node in zombies:
+		if zombie == null or not is_instance_valid(zombie):
+			continue
+
+		var instance_id: int = zombie.get_instance_id()
+		var zombie_section_id: int = int(spawned_zombie_sections.get(instance_id, zombie.get_meta("horde_section_id", section_id)))
+		if zombie_section_id == section_id:
+			continue
+
+		_unregister_spawned_zombie(zombie)
+		zombie.queue_free()
+		removed_count += 1
+
+	if removed_count > 0:
+		_emit_event("Transition de block : %d ennemis director supprimés hors section active." % removed_count)
 
 
 func get_state_text() -> String:
@@ -368,7 +441,6 @@ func _update_horde_spawning(delta: float) -> void:
 
 func _spawn_initial_idle_population() -> void:
 	var populated_count: int = 0
-
 	for zone in cached_zones:
 		if populated_count >= max_idle_zones_populated_on_ready:
 			return
@@ -380,8 +452,20 @@ func _spawn_initial_idle_population() -> void:
 		if zone == null or not is_instance_valid(zone):
 			continue
 
+		if not _is_zone_allowed_by_active_block(zone):
+			continue
+
+		if not _zone_matches_current_section(zone):
+			continue
+
 		if not zone.has_method("can_spawn_idle") or not zone.call("can_spawn_idle"):
 			continue
+
+		if zone.has_method("get_alive_spawned_count"):
+			var alive_from_zone: int = int(zone.call("get_alive_spawned_count"))
+			var max_alive_from_zone_value: Variant = zone.get("max_alive_from_zone")
+			if max_alive_from_zone_value != null and alive_from_zone >= int(max_alive_from_zone_value):
+				continue
 
 		var requested_spawn_count: int = _get_zone_spawn_count(zone)
 		var remaining_budget: int = max_alive_zombies - get_alive_zombie_count()
@@ -474,6 +558,11 @@ func _register_spawned_zombie(zombie: Node) -> void:
 
 	spawned_zombie_sections[zombie.get_instance_id()] = current_section_id
 	spawned_zombie_last_combat_time[zombie.get_instance_id()] = Time.get_ticks_msec()
+	zombie.set_meta("horde_section_id", current_section_id)
+
+	if active_level_block != null and is_instance_valid(active_level_block):
+		zombie.set_meta("owner_level_block_instance_id", active_level_block.get_instance_id())
+		zombie.set_meta("owner_level_block_slot", current_section_id)
 
 	if zombie.has_method("set_spawned_section_id"):
 		zombie.call("set_spawned_section_id", current_section_id)
@@ -609,6 +698,8 @@ func _is_valid_spawn_zone_node(zone: Node) -> bool:
 		return false
 	if not zone.is_inside_tree():
 		return false
+	if not _is_zone_allowed_by_active_block(zone):
+		return false
 	if zone.has_method("get_spawn_points"):
 		return true
 	return zone.is_in_group("zombie_spawn_zone")
@@ -629,6 +720,48 @@ func _prune_cached_zones() -> void:
 
 	if active_horde_zone != null and not _is_valid_spawn_zone_node(active_horde_zone):
 		active_horde_zone = null
+
+
+
+func _is_zone_allowed_by_active_block(zone: Node) -> bool:
+	if zone == null or not is_instance_valid(zone):
+		return false
+
+	if zone.has_method("is_runtime_active") and not bool(zone.call("is_runtime_active")):
+		return false
+
+	if not restrict_spawns_to_active_level_block:
+		return true
+
+	if active_level_block == null or not is_instance_valid(active_level_block):
+		return true
+
+	if active_level_block.is_ancestor_of(zone):
+		return true
+
+	if zone.has_method("get_owner_level_block"):
+		var owner_value: Variant = zone.call("get_owner_level_block")
+		if owner_value == active_level_block:
+			return true
+
+	var owner_instance_id: int = int(zone.get_meta("owner_level_block_instance_id", -1))
+	if owner_instance_id == active_level_block.get_instance_id():
+		return true
+
+	var owner_slot: int = int(zone.get_meta("owner_level_block_slot", -999999))
+	if owner_slot == current_section_id:
+		return true
+
+	return false
+
+
+func _zone_matches_current_section(zone: Node) -> bool:
+	if zone == null or not is_instance_valid(zone):
+		return false
+	var section_value: Variant = zone.get("section_id")
+	if section_value == null:
+		return true
+	return int(section_value) == current_section_id
 
 
 func _pick_valid_zone(wants_attack: bool) -> Node:
@@ -667,6 +800,9 @@ func _get_valid_zones(wants_attack: bool) -> Array[Node]:
 		if zone == null or not is_instance_valid(zone):
 			continue
 
+		if not _is_zone_allowed_by_active_block(zone):
+			continue
+
 		if zone.has_method("is_valid_for_targets"):
 			var is_valid: bool = zone.call("is_valid_for_targets", target_positions, wants_attack, current_section_id)
 			if not is_valid:
@@ -688,6 +824,9 @@ func _pick_active_horde_zone_for_spawn() -> Node:
 
 	for zone in active_horde_zones:
 		if zone == null or not is_instance_valid(zone):
+			continue
+
+		if not _is_zone_allowed_by_active_block(zone):
 			continue
 
 		var valid_points: Array[Marker3D] = _get_valid_spawn_points(zone, true)

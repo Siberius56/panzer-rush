@@ -19,6 +19,13 @@ enum ZoneMode {
 @export var zone_mode: ZoneMode = ZoneMode.IDLE_PRESENT
 @export var section_id: int = 0
 
+@export_group("Runtime Activation")
+@export var runtime_active: bool = true
+@export var unregister_when_runtime_inactive: bool = false
+
+var owner_level_block: Node = null
+var owner_level_block_slot: int = -1
+
 @export_group("Spawn Count")
 @export var min_spawn_count: int = 6
 @export var max_spawn_count: int = 12
@@ -55,6 +62,8 @@ func _notification(what: int) -> void:
 func _register_to_horde_director() -> void:
 	if not is_inside_tree():
 		return
+	if unregister_when_runtime_inactive and not runtime_active:
+		return
 	if GameSessionState == null:
 		return
 	if GameSessionState.has_method("register_horde_spawn_zone"):
@@ -69,10 +78,14 @@ func _unregister_from_horde_director() -> void:
 
 
 func can_spawn_idle() -> bool:
+	if not is_runtime_active():
+		return false
 	return zone_mode == ZoneMode.IDLE_PRESENT or zone_mode == ZoneMode.MIXED
 
 
 func can_spawn_attack() -> bool:
+	if not is_runtime_active():
+		return false
 	return zone_mode == ZoneMode.HORDE_ATTACK or zone_mode == ZoneMode.MIXED
 
 
@@ -83,6 +96,9 @@ func get_spawn_points() -> Array[Marker3D]:
 
 
 func is_valid_for_targets(target_positions: Array[Vector3], wants_attack: bool, wanted_section_id: int) -> bool:
+	if not is_runtime_active():
+		return false
+
 	if not enabled:
 		return false
 
@@ -112,6 +128,38 @@ func is_valid_for_targets(target_positions: Array[Vector3], wants_attack: bool, 
 		return false
 
 	return true
+
+
+
+func set_zone_runtime_active(active: bool) -> void:
+	runtime_active = active
+	if active:
+		if unregister_when_runtime_inactive:
+			_register_to_horde_director()
+	else:
+		if unregister_when_runtime_inactive:
+			_unregister_from_horde_director()
+
+
+func is_runtime_active() -> bool:
+	return runtime_active and is_inside_tree() and process_mode != Node.PROCESS_MODE_DISABLED
+
+
+func set_owner_level_block(block_node: Node, slot_index: int) -> void:
+	owner_level_block = block_node
+	owner_level_block_slot = slot_index
+	section_id = slot_index
+	set_meta("owner_level_block_slot", slot_index)
+	if block_node != null and is_instance_valid(block_node):
+		set_meta("owner_level_block_instance_id", block_node.get_instance_id())
+
+
+func get_owner_level_block() -> Node:
+	return owner_level_block
+
+
+func get_owner_level_block_slot() -> int:
+	return owner_level_block_slot
 
 
 func register_spawned(node: Node) -> void:

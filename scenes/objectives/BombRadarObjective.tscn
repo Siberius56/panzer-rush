@@ -162,7 +162,7 @@ void fragment() {
 }
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wave_pulse"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_npaug"]
 render_priority = 1
 shader = SubResource("Shader_mxha0")
 shader_parameter/base_color = Color(1, 0.42, 0.08, 0.78)
@@ -176,7 +176,7 @@ shader_parameter/emission_strength = 1.45
 shader_parameter/alpha_strength = 1.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_c3kp2"]
-material = SubResource("ShaderMaterial_wave_pulse")
+material = SubResource("ShaderMaterial_npaug")
 size = Vector2(8, 8)
 subdivide_width = 1
 subdivide_depth = 1

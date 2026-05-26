@@ -1,11 +1,18 @@
 [gd_scene format=3 uid="uid://de28p2htwgvqs"]
 
 [ext_resource type="Script" uid="uid://cvdneexrf1he2" path="res://scenes/triggers/PassageGate.gd" id="1_passage_gate"]
+[ext_resource type="Material" uid="uid://1xxp5pltlv00" path="res://asset/texture/Color_Gray.tres" id="2_6inf3"]
 [ext_resource type="PackedScene" uid="uid://cp3o2d2kduimw" path="res://asset/map/road/road-square.glb" id="2_aboca"]
 [ext_resource type="PackedScene" uid="uid://c23d4w2brqi2u" path="res://asset/map/misc-2/indicator-special-cross.glb" id="2_rfhyr"]
 [ext_resource type="PackedScene" uid="uid://c4nxd06ghh0fu" path="res://asset/map/misc-2/indicator-special-area.glb" id="2_s2yx6"]
 [ext_resource type="PackedScene" uid="uid://h8v8os25dggj" path="res://scenes/triggers/SlidingHangarDoor.tscn" id="2_sliding_door"]
 [ext_resource type="PackedScene" uid="uid://dnq7kmbkjp2vx" path="res://Spawner_Player.tscn" id="6_7bk7q"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_kw10p"]
+size = Vector3(20, 10, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_s3o2d"]
+size = Vector3(20, 10, 10)
 
 [sub_resource type="BoxMesh" id="BoxMesh_s2yx6"]
 size = Vector3(5, 1, 5)
@@ -17,8 +24,34 @@ roughness = 0.9
 [sub_resource type="BoxShape3D" id="BoxShape3D_qnygc"]
 size = Vector3(4, 4, 4)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_front_button"]
+size = Vector3(4, 3, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_button"]
+size = Vector3(1.2, 1.2, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_button"]
+albedo_color = Color(0.8, 0.12, 0.08, 1)
+roughness = 0.65
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rear_button"]
+size = Vector3(4, 3, 2)
+
 [node name="PassageGate" type="Node3D" unique_id=691636036]
 script = ExtResource("1_passage_gate")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=888287582]
+collision_layer = 8
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=403465340]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+mesh = SubResource("BoxMesh_kw10p")
+surface_material_override/0 = ExtResource("2_6inf3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1986666999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+shape = SubResource("BoxShape3D_s3o2d")
 
 [node name="road-square2" parent="." unique_id=294416620 instance=ExtResource("2_aboca")]
 transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -6.5, 0.5, 0)
@@ -71,7 +104,34 @@ right_open_position = Vector3(3, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
 left_open_position = Vector3(-3, 0, 0)
 right_open_position = Vector3(3, 0, 0)
-start_open = true
+
+[node name="FrontButtonArea" type="Area3D" parent="." unique_id=1637692603]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 0, -8.2)
+collision_layer = 0
+collision_mask = 4294901765
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FrontButtonArea" unique_id=2044622371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_front_button")
+
+[node name="ButtonMesh" type="MeshInstance3D" parent="FrontButtonArea" unique_id=898901976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("BoxMesh_button")
+surface_material_override/0 = SubResource("StandardMaterial3D_button")
+
+[node name="RearButtonArea" type="Area3D" parent="." unique_id=1723599463]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -3.6, 0, 8.2)
+collision_layer = 0
+collision_mask = 4294901765
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RearButtonArea" unique_id=1379864486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_rear_button")
+
+[node name="ButtonMesh" type="MeshInstance3D" parent="RearButtonArea" unique_id=120397561]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("BoxMesh_button")
+surface_material_override/0 = SubResource("StandardMaterial3D_button")
 
 [node name="NodeCapture" type="Node3D" parent="." unique_id=1446821589]
 

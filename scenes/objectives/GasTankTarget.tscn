@@ -1,0 +1,217 @@
+[gd_scene format=3 uid="uid://cnbg5tx5pd14d"]
+
+[ext_resource type="Script" uid="uid://chem630wud84m" path="res://scenes/objectives/AirportTargetDestructible.gd" id="1_58kdt"]
+[ext_resource type="PackedScene" uid="uid://cuawdsptfumqs" path="res://asset/map/factory-building/detail-tank.glb" id="2_58kdt"]
+[ext_resource type="PackedScene" uid="uid://c7hxotilt34mx" path="res://vehicle_system/effects/Vehicle_EngineDamageSmoke.tscn" id="3_13jw7"]
+[ext_resource type="PackedScene" uid="uid://ccvrst0luot23" path="res://vehicle_system/effects/Vehicle_EngineFire.tscn" id="4_ehk34"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_collision"]
+size = Vector3(4, 1.2, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hm401"]
+size = Vector3(1.0151367, 1.2, 0.46722412)
+
+[sub_resource type="Animation" id="Animation_fxvy1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("VisualRoot/DestroyedRoot:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("VisualRoot/DestroyedRoot/Vehicle_EngineDamageSmoke/Particles:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("VisualRoot/DestroyedRoot/Vehicle_EngineFire/Particles:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("VisualRoot/IntactRoot:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_sjml4"]
+resource_name = "destroyed"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("VisualRoot/DestroyedRoot:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("VisualRoot/DestroyedRoot/Vehicle_EngineDamageSmoke/Particles:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("VisualRoot/DestroyedRoot/Vehicle_EngineFire/Particles:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("VisualRoot/IntactRoot:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_g4xrj"]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("VisualRoot/IntactRoot:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("VisualRoot/DestroyedRoot:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("VisualRoot/DestroyedRoot/Vehicle_EngineDamageSmoke/Particles:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("VisualRoot/DestroyedRoot/Vehicle_EngineFire/Particles:emitting")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_u0tmc"]
+_data = {
+&"RESET": SubResource("Animation_fxvy1"),
+&"destroyed": SubResource("Animation_sjml4"),
+&"idle": SubResource("Animation_g4xrj")
+}
+
+[node name="GasTankTarget" type="StaticBody3D" unique_id=1795258964 groups=["airport_objective_targets", "enemies", "enemy"]]
+script = ExtResource("1_58kdt")
+target_id = "gastank"
+aim_height = 0.8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=908096188]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52461606, 1, -0.041137695)
+shape = SubResource("BoxShape3D_collision")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=1202700312]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9678156, 1, 0.005645752)
+shape = SubResource("BoxShape3D_hm401")
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1824269591]
+
+[node name="IntactRoot" type="Node3D" parent="VisualRoot" unique_id=1616024461]
+visible = false
+
+[node name="detail-tank2" parent="VisualRoot/IntactRoot" unique_id=744762949 instance=ExtResource("2_58kdt")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -0.1506769, 0, 0)
+
+[node name="DestroyedRoot" type="Node3D" parent="VisualRoot" unique_id=889242467]
+
+[node name="detail-tank2" parent="VisualRoot/DestroyedRoot" unique_id=1219979462 instance=ExtResource("2_58kdt")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -0.1506769, 0, 0)
+
+[node name="Vehicle_EngineDamageSmoke" parent="VisualRoot/DestroyedRoot" unique_id=1816618499 instance=ExtResource("3_13jw7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 2.3801186, 0)
+
+[node name="Particles" parent="VisualRoot/DestroyedRoot/Vehicle_EngineDamageSmoke" index="0" unique_id=480031066]
+emitting = true
+
+[node name="Vehicle_EngineFire" parent="VisualRoot/DestroyedRoot" unique_id=24528148 instance=ExtResource("4_ehk34")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.15, 2.1301186, 0)
+
+[node name="Particles" parent="VisualRoot/DestroyedRoot/Vehicle_EngineFire" index="0" unique_id=674461127]
+emitting = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1581048488]
+libraries/ = SubResource("AnimationLibrary_u0tmc")
+autoplay = &"idle"
+
+[editable path="VisualRoot/DestroyedRoot/Vehicle_EngineDamageSmoke"]
+[editable path="VisualRoot/DestroyedRoot/Vehicle_EngineFire"]
