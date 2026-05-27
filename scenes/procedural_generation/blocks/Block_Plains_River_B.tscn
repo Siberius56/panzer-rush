@@ -172,10 +172,6 @@ size = Vector3(20, 1, 20)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1edxd"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_sp78h"]
-top_radius = 3.0
-bottom_radius = 3.0
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tvdin"]
 albedo_color = Color(1, 0.6, 0, 1)
 
@@ -187,7 +183,7 @@ albedo_color = Color(1, 0.15, 0.08, 0.28)
 transparency = 1
 albedo_color = Color(1, 0.65, 0.05, 0.28)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_m4mqu"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6br0e"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("38_6br0e")
@@ -445,142 +441,142 @@ transform = Transform3D(1.0191042, 0, 1.1006482, 0, 1.5000002, 0, -1.1006482, 0,
 [node name="Hill_South" type="Node3D" parent="Ground" unique_id=835705264]
 
 [node name="Terrain9" type="MeshInstance3D" parent="Ground/Hill_South" unique_id=528421457]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 63.6, 0, 59)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 63.6, -2, 59)
 mesh = SubResource("BoxMesh_7yy8h")
 
 [node name="Terrain13" type="MeshInstance3D" parent="Ground/Hill_South" unique_id=1011145220]
-transform = Transform3D(0.008160831, -6.234536e-05, -0.99996674, -5.07042e-06, 1, -6.238847e-05, 0.99996674, 5.5852133e-06, 0.0081608305, 76.6, 0, 53.69574)
+transform = Transform3D(0.008160831, -6.234536e-05, -0.99996674, -5.07042e-06, 1, -6.238847e-05, 0.99996674, 5.5852133e-06, 0.0081608305, 76.6, -2, 53.69574)
 mesh = SubResource("BoxMesh_ncj3t")
 
 [node name="Terrain10" type="MeshInstance3D" parent="Ground/Hill_South" unique_id=295613310]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 65.6, 0, 76)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 65.6, -2, 76)
 mesh = SubResource("BoxMesh_6odlo")
 
 [node name="Terrain12" type="MeshInstance3D" parent="Ground/Hill_South" unique_id=901117391]
-transform = Transform3D(-4.371139e-08, 0.9063078, -0.42261824, 0, 0.42261824, 0.9063078, 1, 3.9615973e-08, -1.847323e-08, 56.0714, -0.90378857, 72)
+transform = Transform3D(-4.371139e-08, 0.9063078, -0.42261824, 0, 0.42261824, 0.9063078, 1, 3.9615973e-08, -1.847323e-08, 56.0714, -2.9037886, 72)
 mesh = SubResource("BoxMesh_isyvx")
 
 [node name="Terrain11" type="MeshInstance3D" parent="Ground/Hill_South" unique_id=290368519]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 57.6, 0, 79)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 57.6, -2, 79)
 mesh = SubResource("BoxMesh_koyrd")
 
 [node name="Cliff_Hill_Plain" parent="Ground/Hill_South" unique_id=920645573 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 77)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 77)
 
 [node name="Cliff_Hill_Plain2" parent="Ground/Hill_South" unique_id=151575715 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 81)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 81)
 
 [node name="Cliff_Hill_Plain21" parent="Ground/Hill_South" unique_id=1498230552 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 63)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 63)
 
 [node name="Cliff_Hill_Plain22" parent="Ground/Hill_South" unique_id=571763390 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 67)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 67)
 
 [node name="Cliff_Hill_Plain32" parent="Ground/Hill_South" unique_id=1353780962 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 55.63301, 0, 69)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 55.63301, -2, 69)
 
 [node name="Cliff_Hill_Plain33" parent="Ground/Hill_South" unique_id=925175004 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 59.63301, 0, 69)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 59.63301, -2, 69)
 
 [node name="Cliff_Hill_Plain34" parent="Ground/Hill_South" unique_id=379152032 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1.255, 0, -8.742278e-08, 0, -1, 59.63301, 0, 75)
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1.255, 0, -8.742278e-08, 0, -1, 59.63301, -2, 75)
 
 [node name="Cliff_Hill_Plain35" parent="Ground/Hill_South" unique_id=1508870176 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1.255, 0, -8.742278e-08, 0, -1, 55.63301, 0, 75)
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1.255, 0, -8.742278e-08, 0, -1, 55.63301, -2, 75)
 
 [node name="Cliff_Hill_Plain23" parent="Ground/Hill_South" unique_id=921303878 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 55)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 55)
 
 [node name="Cliff_Hill_Plain24" parent="Ground/Hill_South" unique_id=1484841814 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 59)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 59)
 
 [node name="Cliff_Hill_Plain25" parent="Ground/Hill_South" unique_id=999599501 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 55.63301, 0, 49)
+transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 55.63301, -2, 49)
 
 [node name="Cliff_Hill_Plain27" parent="Ground/Hill_South" unique_id=1829717501 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 59.63301, 0, 49)
+transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 59.63301, -2, 49)
 
 [node name="Cliff_Hill_Plain28" parent="Ground/Hill_South" unique_id=1711482327 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 63.63301, 0, 49)
+transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 63.63301, -2, 49)
 
 [node name="Cliff_Hill_Plain29" parent="Ground/Hill_South" unique_id=1859005626 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 67.63301, 0, 49)
+transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 67.63301, -2, 49)
 
 [node name="Cliff_Hill_Plain30" parent="Ground/Hill_South" unique_id=2029605864 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 71.63301, 0, 49)
+transform = Transform3D(-1, 0, 1.509958e-07, 0, 1.255, 0, -1.509958e-07, 0, -1, 71.63301, -2, 49)
 
 [node name="Cliff_Hill_Plain31" parent="Ground/Hill_South" unique_id=76284770 instance=ExtResource("6_ljryl")]
-transform = Transform3D(7.54979e-08, 0, 1, 0, 1.255, 0, -1, 0, 7.54979e-08, 73.63301, 0, 51)
+transform = Transform3D(7.54979e-08, 0, 1, 0, 1.255, 0, -1, 0, 7.54979e-08, 73.63301, -2, 51)
 
 [node name="Cliff_Hill_Plain26" parent="Ground/Hill_South" unique_id=679101613 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, 0, 51)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.255, 0, 1, 0, -4.371139e-08, 53.63301, -2, 51)
 
 [node name="Cliff_Hill_Plain3" parent="Ground/Hill_South" unique_id=2044870740 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 55.60642, 0, 83)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 55.60642, -2, 83)
 
 [node name="Cliff_Hill_Plain4" parent="Ground/Hill_South" unique_id=159021747 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 59.60642, 0, 83)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 59.60642, -2, 83)
 
 [node name="Cliff_Hill_Plain5" parent="Ground/Hill_South" unique_id=1654266013 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 63.60642, 0, 83)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 63.60642, -2, 83)
 
 [node name="Cliff_Hill_Plain6" parent="Ground/Hill_South" unique_id=1134416542 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 67.60642, 0, 83)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 67.60642, -2, 83)
 
 [node name="Cliff_Hill_Plain7" parent="Ground/Hill_South" unique_id=342679930 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, 0, 81)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, -2, 81)
 
 [node name="Cliff_Hill_Plain8" parent="Ground/Hill_South" unique_id=1119869840 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, 0, 77)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, -2, 77)
 
 [node name="Cliff_Hill_Plain9" parent="Ground/Hill_South" unique_id=1194018039 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, 0, 73)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, -2, 73)
 
 [node name="Cliff_Hill_Plain10" parent="Ground/Hill_South" unique_id=1085666369 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, 0, 69)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 69.60642, -2, 69)
 
 [node name="Cliff_Hill_Plain11" parent="Ground/Hill_South" unique_id=766203932 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 71.60642, 0, 69)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 71.60642, -2, 69)
 
 [node name="Cliff_Hill_Plain15" parent="Ground/Hill_South" unique_id=647606758 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 77.60642, 0, 57)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 77.60642, -2, 57)
 
 [node name="Cliff_Hill_Plain16" parent="Ground/Hill_South" unique_id=641512704 instance=ExtResource("6_ljryl")]
-transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 73.60642, 0, 57)
+transform = Transform3D(1, 0, 3.5527137e-15, 0, 1.255, 0, -3.5527137e-15, 0, 1, 73.60642, -2, 57)
 
 [node name="Cliff_Hill_Plain12" parent="Ground/Hill_South" unique_id=901525565 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 73.60642, 0, 67)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 73.60642, -2, 67)
 
 [node name="Cliff_Hill_Plain13" parent="Ground/Hill_South" unique_id=101223808 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 73.60642, 0, 63)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 73.60642, -2, 63)
 
 [node name="Cliff_Hill_Plain14" parent="Ground/Hill_South" unique_id=103176341 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 73.60642, 0, 59)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 73.60642, -2, 59)
 
 [node name="Cliff_Hill_Plain17" parent="Ground/Hill_South" unique_id=1102310167 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 79.60642, 0, 55)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 79.60642, -2, 55)
 
 [node name="Cliff_Hill_Plain18" parent="Ground/Hill_South" unique_id=580660952 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 79.60642, 0, 52.361816)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1.255, 0, -1, 0, -4.371139e-08, 79.60642, -2, 52.361816)
 
 [node name="Cliff_Hill_Plain19" parent="Ground/Hill_South" unique_id=1978206647 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1.0000001, 0, 1.5099582e-07, 0, 1.255, 0, -1.5099582e-07, 0, -1.0000001, 77.68643, 0, 50.379925)
+transform = Transform3D(-1.0000001, 0, 1.5099582e-07, 0, 1.255, 0, -1.5099582e-07, 0, -1.0000001, 77.68643, -2, 50.379925)
 
 [node name="Cliff_Hill_Plain20" parent="Ground/Hill_South" unique_id=582303161 instance=ExtResource("6_ljryl")]
-transform = Transform3D(-1.0000001, 0, 1.5099582e-07, 0, 1.255, 0, -1.5099582e-07, 0, -1.0000001, 75.02206, 0, 50.379925)
+transform = Transform3D(-1.0000001, 0, 1.5099582e-07, 0, 1.255, 0, -1.5099582e-07, 0, -1.0000001, 75.02206, -2, 50.379925)
 
 [node name="Hill_North" type="Node3D" parent="Ground" unique_id=23186209]
 
 [node name="Terrain6" type="MeshInstance3D" parent="Ground/Hill_North" unique_id=394623778]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 50, 0, -33)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 50, -2, -33)
 mesh = SubResource("BoxMesh_1lvr1")
 
 [node name="Terrain7" type="MeshInstance3D" parent="Ground/Hill_North" unique_id=815382920]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 26, 0, -32)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 26, -2, -32)
 mesh = SubResource("BoxMesh_ljryl")
 
 [node name="Terrain8" type="MeshInstance3D" parent="Ground/Hill_North" unique_id=854803679]
-transform = Transform3D(-4.1075268e-08, -1.4950174e-08, -1, -0.34202012, 0.9396926, 0, 0.9396926, 0.34202012, -4.371139e-08, 26, -2.45, -22.18926)
+transform = Transform3D(-4.1075268e-08, -1.4950174e-08, -1, -0.34202012, 0.9396926, 0, 0.9396926, 0.34202012, -4.371139e-08, 26, -4.45, -22.18926)
 mesh = SubResource("BoxMesh_verew")
 
 [node name="River" type="Node3D" parent="." unique_id=2104765831]
@@ -618,10 +614,10 @@ transform = Transform3D(1.1521523, 0, -5.888339, 0, 6, 0, 5.888339, 0, 1.1521523
 transform = Transform3D(4.834125, 0, -6.374264, 0, 8, 0, 6.374264, 0, 4.834125, -5.116961, -3.3599582, -98.256996)
 
 [node name="rock-sand-a4" parent="River" unique_id=235076126 instance=ExtResource("11_ys1h4")]
-transform = Transform3D(-4.242641, 0, -4.2426414, 0, 6, 0, 4.2426414, 0, -4.242641, -0.70195603, -3.277, 51.402824)
+transform = Transform3D(-3.0000002, 0, -5.1961527, 0, 6, 0, 5.1961527, 0, -3.0000002, -0.5437416, -3.277, 51.029713)
 
 [node name="rock-sand-b4" parent="River" unique_id=1333655196 instance=ExtResource("12_1lvr1")]
-transform = Transform3D(-4.242641, 0, -4.2426414, 0, 6, 0, 4.2426414, 0, -4.242641, 4.2179604, -3.277, 50.827957)
+transform = Transform3D(-3.0000002, 0, -5.1961527, 0, 6, 0, 5.1961527, 0, -3.0000002, 4.059746, -3.277, 49.20107)
 
 [node name="rock-sand-c7" parent="River" unique_id=1971973116 instance=ExtResource("13_ljryl")]
 transform = Transform3D(2.6369076, 0, -5.3895, 0, 6, 0, 5.3895, 0, 2.6369076, -2.1874042, -3.277, 56.784718)
@@ -960,13 +956,10 @@ transform = Transform3D(-7.899639e-06, 0, 6, 0, 6, 0, -28, 0, -1.6927798e-06, -5
 transform = Transform3D(-27, 0, -9.0597484e-07, 0, 6, 0, 4.076887e-06, 0, -6, -62.5, 0, 74)
 
 [node name="road-straight21" parent="Road" unique_id=89528008 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(-27, 0, -9.0597484e-07, 0, 6, 0, 4.076887e-06, 0, -6, -29.5, 0, 74)
-
-[node name="road-straight43" parent="Road" unique_id=936499421 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(-27, 0, -9.0597484e-07, 0, 6, 0, 4.076887e-06, 0, -6, -29.5, 0, 74)
+transform = Transform3D(-18, 0, -9.0597484e-07, 0, 6, 0, 2.7179244e-06, 0, -6, -34, 0, 74)
 
 [node name="road-straight22" parent="Road" unique_id=1616066096 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(-22, 0, -9.0597484e-07, 0, 6, 0, 3.3219076e-06, 0, -6, 27, 0, 74)
+transform = Transform3D(-13, 0, -9.0597484e-07, 0, 6, 0, 1.9629454e-06, 0, -6, 31.5, 0, 74)
 
 [node name="road-straight23" parent="Road" unique_id=995393728 instance=ExtResource("9_cfkkv")]
 transform = Transform3D(-3.218532e-06, 0, 5.9999995, 0, 5.9999995, 0, -29.999998, 0, -6.4370647e-07, 47, 0, 50)
@@ -977,9 +970,6 @@ transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 75, 0, -61)
 [node name="road-straight35" parent="Road" unique_id=1273677840 instance=ExtResource("9_cfkkv")]
 transform = Transform3D(8.567116e-06, 0, -6, 0, 6, 0, 44, 0, 1.1682431e-06, 78, 0, -33)
 
-[node name="road-straight36" parent="Road" unique_id=125693349 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(-28, 0, -9.0597484e-07, 0, 6, 0, 4.2278825e-06, 0, -6, 30, 0, -64)
-
 [node name="road-straight19" parent="Road" unique_id=2045677466 instance=ExtResource("9_cfkkv")]
 transform = Transform3D(1.1682431e-06, 0, -6, 0, 6, 0, 6, 0, 1.1682431e-06, -46, 0, 68)
 
@@ -989,47 +979,50 @@ transform = Transform3D(-6, 0, -9.059748e-07, 0, 6, 0, 9.059748e-07, 0, -6, -79,
 [node name="road-straight44" parent="Road" unique_id=1364667623 instance=ExtResource("9_cfkkv")]
 transform = Transform3D(3.8941437e-07, 0, -6, 0, 6, 0, 2, 0, 1.1682431e-06, -46, 0, 4)
 
-[node name="road-intersection-line11" parent="Road" unique_id=997508388 instance=ExtResource("8_i7e1h")]
-transform = Transform3D(6, 0, -1.0490733e-06, 0, 6, 0, 1.0490733e-06, 0, 6, -13, 0, 74)
-
-[node name="road-straight39" parent="Road" unique_id=890797638 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(-6.4889896e-06, 0, 6, 0, 6, 0, -23, 0, -1.6927798e-06, -13, 0, 88.5)
-
-[node name="road-intersection-line12" parent="Road" unique_id=950724336 instance=ExtResource("8_i7e1h")]
-transform = Transform3D(6, 0, -1.0490733e-06, 0, 6, 0, 1.0490733e-06, 0, 6, 13, 0, 74)
-
-[node name="road-straight40" parent="Road" unique_id=2061838858 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(-6.4889896e-06, 0, 6, 0, 6, 0, -23, 0, -1.6927798e-06, 13, 0, 88.5)
-
 [node name="road-intersection-line13" parent="Road" unique_id=706368702 instance=ExtResource("8_i7e1h")]
-transform = Transform3D(-6, 0, 1.5736099e-06, 0, 6, 0, -1.5736099e-06, 0, -6, 13, 0, -64)
+transform = Transform3D(-6, 0, 1.5736099e-06, 0, 6, 0, -1.5736099e-06, 0, -6, 22, 0, -64)
 
 [node name="road-straight41" parent="Road" unique_id=112095076 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(6.4253372e-06, 0, -6, 0, 6, 0, 33, 0, 1.1682431e-06, 13, 0, -83.5)
+transform = Transform3D(6.4253372e-06, 0, -6, 0, 6, 0, 33, 0, 1.1682431e-06, 22, 0, -83.5)
 
 [node name="road-intersection-line14" parent="Road" unique_id=1403298506 instance=ExtResource("8_i7e1h")]
-transform = Transform3D(-6, 0, 1.5736099e-06, 0, 6, 0, -1.5736099e-06, 0, -6, -13, 0, -64)
+transform = Transform3D(-6, 0, 1.5736099e-06, 0, 6, 0, -1.5736099e-06, 0, -6, -22, 0, -64)
 
 [node name="road-straight42" parent="Road" unique_id=1147992616 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(6.4253372e-06, 0, -6, 0, 6, 0, 33, 0, 1.1682431e-06, -13, 0, -83.5)
+transform = Transform3D(6.4253372e-06, 0, -6, 0, 6, 0, 33, 0, 1.1682431e-06, -22, 0, -83.5)
 
 [node name="road-intersection-line9" parent="Road" unique_id=48555510 instance=ExtResource("8_i7e1h")]
 transform = Transform3D(6, 0, -2.0981465e-06, 0, 6, 0, 2.0981465e-06, 0, 6, -34, 0, -64)
 
 [node name="road-straight32" parent="Road" unique_id=519880747 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(15, 0, 0, 0, 6, 0, 0, 0, 6, -23.5, 0, -64)
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -28, 0, -64)
 
 [node name="road-straight46" parent="Road" unique_id=1224438811 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(2, 0, 0, 0, 6, 0, 0, 0, 6, -9, 0, -64)
+transform = Transform3D(12, 0, 0, 0, 6, 0, 0, 0, 6, -13, 0, -64)
 
-[node name="road-straight47" parent="Road" unique_id=1717926906 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(2, 0, 0, 0, 6, 0, 0, 0, 6, 9, 0, -64)
+[node name="road-straight47" parent="Road" unique_id=305813285 instance=ExtResource("9_cfkkv")]
+transform = Transform3D(12, 0, 0, 0, 6, 0, 0, 0, 6, 13, 0, -64)
 
-[node name="road-straight48" parent="Road" unique_id=1196796613 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(2, 0, 0, 0, 6, 0, 0, 0, 6, 9, 0, 74)
+[node name="road-intersection-line16" parent="Road" unique_id=1281515962 instance=ExtResource("8_i7e1h")]
+transform = Transform3D(6, 0, -1.0490733e-06, 0, 6, 0, 1.0490733e-06, 0, 6, -22, 0, 74)
 
-[node name="road-straight49" parent="Road" unique_id=1747688811 instance=ExtResource("9_cfkkv")]
-transform = Transform3D(2, 0, 0, 0, 6, 0, 0, 0, 6, -9, 0, 74)
+[node name="road-straight51" parent="Road" unique_id=930511431 instance=ExtResource("9_cfkkv")]
+transform = Transform3D(-6.2068593e-06, 0, 5.9999995, 0, 5.9999995, 0, -22, 0, -1.6927797e-06, -21.999998, 0, 88)
+
+[node name="road-intersection-line17" parent="Road" unique_id=1126528485 instance=ExtResource("8_i7e1h")]
+transform = Transform3D(6, 0, -1.0490733e-06, 0, 6, 0, 1.0490733e-06, 0, 6, 22, 0, 74)
+
+[node name="road-straight52" parent="Road" unique_id=1262626581 instance=ExtResource("9_cfkkv")]
+transform = Transform3D(-6.2068593e-06, 0, 5.9999995, 0, 5.9999995, 0, -22, 0, -1.6927797e-06, 22.000002, 0, 88)
+
+[node name="road-straight53" parent="Road" unique_id=645553294 instance=ExtResource("9_cfkkv")]
+transform = Transform3D(-12, 0, -5.2453663e-07, 0, 6, 0, 1.0490733e-06, 0, -6, 12.999999, 0, 74)
+
+[node name="road-straight54" parent="Road" unique_id=1845297624 instance=ExtResource("9_cfkkv")]
+transform = Transform3D(-12, 0, -5.2453663e-07, 0, 6, 0, 1.0490733e-06, 0, -6, -13.000001, 0, 74)
+
+[node name="road-straight50" parent="Road" unique_id=834154263 instance=ExtResource("9_cfkkv")]
+transform = Transform3D(19, 0, 0, 0, 6, 0, 0, 0, 6, 34.5, 0, -64)
 
 [node name="road-straight33" parent="Road" unique_id=1121221727 instance=ExtResource("9_cfkkv")]
 transform = Transform3D(13, 0, 3.814382e-07, 0, 6, 0, -8.264494e-07, 0, 6, -43.5, 0, -64)
@@ -1268,7 +1261,7 @@ transform = Transform3D(-0.5, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.5, 33.783
 transform = Transform3D(-0.2588191, 0, -0.9659259, 0, 1, 0, 0.9659259, 0, -0.2588191, 24.565125, 0, 58.370377)
 
 [node name="Tree_Group_213" parent="Tree" unique_id=788534834 instance=ExtResource("9_gcsy1")]
-transform = Transform3D(-0.8660253, 0, -0.5, 0, 1, 0, 0.5, 0, -0.8660253, 17.840775, 1.9073486e-06, 54.610012)
+transform = Transform3D(-0.8660253, 0, -0.5, 0, 1, 0, 0.5, 0, -0.8660253, 39.840775, 1.9073486e-06, 44.610012)
 
 [node name="Tree_Group_214" parent="Tree" unique_id=389250863 instance=ExtResource("9_gcsy1")]
 transform = Transform3D(5.9604645e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, 5.9604645e-08, 23.395523, 1.9073486e-06, 55.53755)
@@ -1442,10 +1435,10 @@ transform = Transform3D(0.49999988, 0, 0.8660253, 0, 1, 0, -0.8660253, 0, 0.4999
 transform = Transform3D(0.49999994, 0, 0.86602527, 0, 1, 0, -0.86602527, 0, 0.49999994, -28.147299, 0, 89.31117)
 
 [node name="Tree_Group_140" parent="Tree" unique_id=396206046 instance=ExtResource("9_gcsy1")]
-transform = Transform3D(0.9659257, 0, 0.25881907, 0, 1, 0, -0.25881907, 0, 0.9659257, -22.625332, 1.9073486e-06, 94.68379)
+transform = Transform3D(0.9659257, 0, 0.25881907, 0, 1, 0, -0.25881907, 0, 0.9659257, -9.625332, 1.9073486e-06, 86.68379)
 
 [node name="Tree_Group_141" parent="Tree" unique_id=1054948523 instance=ExtResource("9_gcsy1")]
-transform = Transform3D(0.25881898, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881898, -27.75074, 1.9073486e-06, 92.35019)
+transform = Transform3D(0.25881898, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881898, -27.75074, 1.9073486e-06, 84.35019)
 
 [node name="Tree_Group_83" parent="Tree" unique_id=357061726 instance=ExtResource("7_1edxd")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -21.21787, 0, -9.948696)
@@ -1460,7 +1453,7 @@ transform = Transform3D(0.25881913, 0, -0.9659257, 0, 1, 0, 0.9659257, 0, 0.2588
 transform = Transform3D(0.70710677, 0, 0.70710695, 0, 1, 0, -0.70710695, 0, 0.70710677, -17.694868, 1.9073486e-06, -13.351555)
 
 [node name="Tree_Group_152" parent="Tree" unique_id=511903992 instance=ExtResource("8_agt2a")]
-transform = Transform3D(-0.45950234, 0, -0.8881766, 0, 1, 0, 0.8881766, 0, -0.45950234, 18.815151, 1.9073486e-06, -76.707306)
+transform = Transform3D(-0.45950234, 0, -0.8881766, 0, 1, 0, 0.8881766, 0, -0.45950234, 27.815151, 1.9073486e-06, -76.707306)
 
 [node name="Tree_Group_153" parent="Tree" unique_id=1260599050 instance=ExtResource("7_1edxd")]
 transform = Transform3D(-1.4901161e-08, 0, 1, 0, 1, 0, -1, 0, -1.4901161e-08, 71.2417, 0, -72.924965)
@@ -1553,7 +1546,7 @@ transform = Transform3D(-0.49999988, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, -0.
 transform = Transform3D(-0.8660254, 0, 0.50000006, 0, 1, 0, -0.50000006, 0, -0.8660254, 69.35979, 0, -89.41269)
 
 [node name="Tree_Group_175" parent="Tree" unique_id=1904446538 instance=ExtResource("8_agt2a")]
-transform = Transform3D(-0.8660254, 0, -0.5, 0, 1, 0, 0.5, 0, -0.8660254, 19.885387, 1.9073486e-06, -70.57331)
+transform = Transform3D(-0.8660254, 0, -0.5, 0, 1, 0, 0.5, 0, -0.8660254, 28.885387, 1.9073486e-06, -70.57331)
 
 [node name="Tree_Group_176" parent="Tree" unique_id=1453431683 instance=ExtResource("9_gcsy1")]
 transform = Transform3D(-0.25881904, 0, 0.9659257, 0, 1, 0, -0.9659257, 0, -0.25881904, 74.73241, 1.9073486e-06, -94.93465)
@@ -1904,7 +1897,7 @@ transform = Transform3D(0.25881884, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.2588
 transform = Transform3D(0.8660255, 0, 0.50000036, 0, 1, 0, -0.50000036, 0, 0.8660255, 32.85255, 0, 86.04172)
 
 [node name="Tree_Group_241" parent="Tree" unique_id=324255689 instance=ExtResource("9_gcsy1")]
-transform = Transform3D(0.70710653, 0, 0.7071071, 0, 1, 0, -0.7071071, 0, 0.70710653, 26.588024, 1.9073486e-06, 89.20003)
+transform = Transform3D(0.70710653, 0, 0.7071071, 0, 1, 0, -0.7071071, 0, 0.70710653, 9.588024, 1.9073486e-06, 92.20003)
 
 [node name="Tree_Group_242" parent="Tree" unique_id=355032715 instance=ExtResource("10_nr768")]
 transform = Transform3D(-0.25881898, 0, -0.9659258, 0, 1, 0, 0.9659258, 0, -0.25881898, 90.24054, 1.9073486e-06, 56.98183)
@@ -2059,32 +2052,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0, -27)
 script = ExtResource("2_tvdin")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side1" unique_id=1800095912]
+visible = false
 mesh = SubResource("BoxMesh_07ecl")
 surface_material_override/0 = SubResource("StandardMaterial3D_1edxd")
 
 [node name="POISocket_Side2" type="Node3D" parent="." unique_id=1379837657]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 47, 0, -84)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47, 0, -84)
 script = ExtResource("2_tvdin")
-secondary_socket_environment = "river"
-rotation_mode_override = "follow socket"
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="POISocket_Side2" unique_id=1391644876]
+visible = false
 mesh = SubResource("BoxMesh_07ecl")
 surface_material_override/0 = SubResource("StandardMaterial3D_1edxd")
 
-[node name="POISocket_Side3" type="Node3D" parent="." unique_id=768553066]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.358, 0, -27.498)
-script = ExtResource("2_tvdin")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side3" unique_id=94324108]
-mesh = SubResource("CylinderMesh_sp78h")
-surface_material_override/0 = SubResource("StandardMaterial3D_1edxd")
-
 [node name="POISocket_Side4" type="Node3D" parent="." unique_id=1176318292]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.358, 0, 31.502)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 68.358, 0, 31.502)
 script = ExtResource("2_tvdin")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="POISocket_Side4" unique_id=885757585]
+visible = false
 mesh = SubResource("BoxMesh_07ecl")
 surface_material_override/0 = SubResource("StandardMaterial3D_1edxd")
 
@@ -2097,16 +2083,25 @@ visible = false
 mesh = SubResource("BoxMesh_07ecl")
 surface_material_override/0 = SubResource("StandardMaterial3D_1edxd")
 
+[node name="POISocket_Side6" type="Node3D" parent="." unique_id=1402121176]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 7, 0, 60)
+script = ExtResource("2_tvdin")
+secondary_socket_environment = "river"
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="POISocket_Side6" unique_id=182579695]
+visible = false
+mesh = SubResource("BoxMesh_07ecl")
+surface_material_override/0 = SubResource("StandardMaterial3D_1edxd")
+
 [node name="SpawnSockets" type="Node3D" parent="." unique_id=1695568011]
 
 [node name="Spawn_A" type="Node3D" parent="SpawnSockets" unique_id=977722022]
-transform = Transform3D(0.7071069, 0, 0.70710665, 0, 1, 0, -0.70710665, 0, 0.7071069, -58, 0.4, 52)
+transform = Transform3D(0.7071069, 0, 0.70710665, 0, 1, 0, -0.70710665, 0, 0.7071069, -81, 0.4, -41)
 
 [node name="Spawn_B" type="Node3D" parent="SpawnSockets" unique_id=186335938]
-transform = Transform3D(0.7071069, 0, -0.70710665, 0, 1, 0, 0.70710665, 0, 0.7071069, 56, 0.4, -52)
+transform = Transform3D(0.7071069, 0, -0.70710665, 0, 1, 0, 0.70710665, 0, 0.7071069, 25, 0.4, 30)
 
 [node name="Connectors" type="Node3D" parent="." unique_id=154302352]
-visible = false
 
 [node name="North" type="Node3D" parent="Connectors" unique_id=1417836616]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -100)
@@ -2155,66 +2150,80 @@ material = SubResource("StandardMaterial3D_tvdin")
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
 [node name="CSGBox3D1" type="CSGBox3D" parent="Walls_Limit" unique_id=1952264641]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0, -61.999996)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0, -66.49999)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 75)
+size = Vector3(2, 10, 66)
 
 [node name="CSGBox3D4" type="CSGBox3D" parent="Walls_Limit" unique_id=1939049727]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -99, 0, 62)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -99, 0, 66.225044)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 75)
+size = Vector3(2, 10, 66.54993)
 
 [node name="CSGBox3D7" type="CSGBox3D" parent="Walls_Limit" unique_id=1087555102]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99, 0, -62)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99, 0, -66.26368)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 75)
+size = Vector3(2, 10, 66.47266)
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="Walls_Limit" unique_id=1717270785]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99.849434, 0, 0.077723905)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 22.032227)
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="Walls_Limit" unique_id=48121903]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100.69091, 0, 0.077732675)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 22.032227)
 
 [node name="CSGBox3D8" type="CSGBox3D" parent="Walls_Limit" unique_id=2075799211]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 99, 0, 62)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 99, 0, 66.221245)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 75)
+size = Vector3(2, 10, 66.557495)
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="Walls_Limit" unique_id=382040570]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55, 0, -99)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55.407776, 0, -99)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 90)
+size = Vector3(2, 10, 89.18445)
 
 [node name="CSGBox3D3" type="CSGBox3D" parent="Walls_Limit" unique_id=152240511]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55, 0, -99)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55.51367, 0, -99)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 90)
+size = Vector3(2, 10, 88.97266)
 
 [node name="CSGBox3D5" type="CSGBox3D" parent="Walls_Limit" unique_id=211977855]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55, 0, 99)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55.597656, 0, 99)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 90)
+size = Vector3(2, 10, 88.80469)
 
 [node name="CSGBox3D6" type="CSGBox3D" parent="Walls_Limit" unique_id=922596026]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55, 0, 99)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55.473145, 0, 99)
 use_collision = true
 collision_layer = 8
 collision_mask = 0
-size = Vector3(2, 10, 90)
+size = Vector3(2, 10, 89.05371)
 
 [node name="SpawnZones" type="Node3D" parent="." unique_id=907018010]
+visible = false
 
 [node name="Plans_River_B_West_Horde" type="Node3D" parent="SpawnZones" unique_id=1345116410 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 2.0101318, -44)
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85, 2.0101318, 0)
 script = ExtResource("3_h8ymr")
 zone_mode = 1
 min_spawn_count = 12
@@ -2249,9 +2258,44 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, -2)
 [node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_B_West_Horde" unique_id=1624922551]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, 4)
 
+[node name="Plans_River_B_North_Horde2" type="Node3D" parent="SpawnZones" unique_id=2086127978 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.0101318, -65)
+script = ExtResource("3_h8ymr")
+zone_mode = 1
+min_spawn_count = 12
+max_spawn_count = 22
+max_alive_from_zone = 28
+max_distance_from_target = 140.0
+cooldown_seconds = 55.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_North_Horde2" unique_id=1338287991]
+size = Vector3(20, 0.12, 14)
+material = SubResource("StandardMaterial3D_bms1v")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_North_Horde2" unique_id=1144418298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - flanc gauche
+Spawn dynamique.
+À placer hors champ ou derrière un obstacle."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde2" unique_id=1875469070]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.2, -4)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde2" unique_id=433058265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.2, 5)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde2" unique_id=1235542847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.20000005, -1)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde2" unique_id=455185302]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.20000005, 4)
+
 [node name="Plans_River_B_South_Horde" type="Node3D" parent="SpawnZones" unique_id=20598959 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 2.766817, 40)
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 2.766817, 32)
 script = ExtResource("3_h8ymr")
 zone_mode = 1
 min_spawn_count = 10
@@ -2283,9 +2327,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 4)
 [node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_South_Horde" unique_id=1188596063]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -2)
 
-[node name="Plans_River_B_Right_Mixed" type="Node3D" parent="SpawnZones" unique_id=1993406346 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.6224, 4.0951777, -28.189766)
-visible = false
+[node name="Plans_River_B_Right_Mixed1" type="Node3D" parent="SpawnZones" unique_id=1993406346 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.6224, 4.0951777, -3.189766)
 script = ExtResource("3_h8ymr")
 zone_mode = 2
 max_spawn_count = 14
@@ -2293,11 +2336,11 @@ min_distance_from_target = 22.0
 max_distance_from_target = 140.0
 cooldown_seconds = 45.0
 
-[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=1183420360]
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_B_Right_Mixed1" unique_id=1183420360]
 size = Vector3(16, 0.12, 16)
 material = SubResource("StandardMaterial3D_3jeqi")
 
-[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=125519327]
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_B_Right_Mixed1" unique_id=125519327]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 billboard = 1
 no_depth_test = true
@@ -2307,18 +2350,20 @@ Peut aussi servir de renfort dynamique."
 font_size = 36
 outline_size = 9
 
-[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=704452478]
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed1" unique_id=704452478]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
 
-[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=32186022]
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed1" unique_id=32186022]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
 
-[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed" unique_id=2001875667]
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed1" unique_id=2001875667]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
 
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed1" unique_id=1830655663]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.19999981, 3)
+
 [node name="Plans_River_B_Right_Mixed2" type="Node3D" parent="SpawnZones" unique_id=562533931 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.3776, 4.0951777, 85.810234)
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -71.3776, 4.0951777, 75.810234)
 script = ExtResource("3_h8ymr")
 zone_mode = 2
 max_spawn_count = 14
@@ -2341,17 +2386,19 @@ font_size = 36
 outline_size = 9
 
 [node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=1939805013]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.19999981, -4)
 
 [node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=51881503]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.19999981, -3)
 
 [node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=1367006827]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.19999981, 4)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_B_Right_Mixed2" unique_id=1138800418]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.19999981, 4)
 
 [node name="Plans_River_B_North_Horde" type="Node3D" parent="SpawnZones" unique_id=1114721347 groups=["zombie_spawn_zone"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 4.6445227, -77)
-visible = false
 script = ExtResource("3_h8ymr")
 zone_mode = 1
 min_spawn_count = 16
@@ -2376,25 +2423,31 @@ font_size = 36
 outline_size = 9
 
 [node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=1758155090]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.19999981, -7)
 
 [node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=1527547405]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
 
 [node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=59970497]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.19999981, -4)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=1989315981]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.19999981, 5)
+
+[node name="SpawnPoint_05" type="Marker3D" parent="SpawnZones/Plans_River_B_North_Horde" unique_id=916819605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.19999981, 5)
 
 [node name="GrassField3D" parent="." unique_id=1870486570 instance=ExtResource("37_m4mqu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80.07258, -0.1998291, -43.334106)
 zone_size = Vector2(36, 40)
-generated_material = SubResource("ShaderMaterial_m4mqu")
+generated_material = SubResource("ShaderMaterial_6br0e")
 bottom_color = Color(0.21960784, 0.38039216, 0.14117648, 1)
 top_color = Color(0.33059996, 0.57, 0.2109, 1)
 player_group = &"player"
 vehicle_group = &"vehicle"
 
 [node name="GrassMultiMesh" type="MultiMeshInstance3D" parent="GrassField3D" unique_id=1513731520]
-material_override = SubResource("ShaderMaterial_m4mqu")
+material_override = SubResource("ShaderMaterial_6br0e")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_wsjci")
 

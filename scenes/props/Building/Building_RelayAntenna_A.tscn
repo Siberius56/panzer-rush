@@ -301,7 +301,7 @@ transform = Transform3D(-0.86036474, 0, -1.228728, 0, 1.5, 0, 1.228728, 0, -0.86
 visible = false
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Floor_1" unique_id=852477828]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.365, 0.1, -0.188)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.365, 0.11, -0.188)
 mesh = SubResource("BoxMesh_5lss7")
 
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="Floor_1" unique_id=1795370881]
@@ -384,32 +384,32 @@ transform = Transform3D(1.509958e-07, 0, 1, 0, 1, 0, -2, 0, 7.54979e-08, 2.42718
 [node name="robot-arm-b2" parent="Floor_2" unique_id=1057584527 instance=ExtResource("16_kplsd")]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0.44004703, 7.4930825, -1.3113673)
 
-[node name="robot-arm-b" parent="Floor_2/robot-arm-b2" index="0" unique_id=676776806]
+[node name="robot-arm-b" parent="Floor_2/robot-arm-b2" index="0" unique_id=788543719]
 transform = Transform3D(1, 0, 0, 0, 1.35, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="element-a" parent="Floor_2/robot-arm-b2/robot-arm-b" index="0" unique_id=1649671499]
+[node name="element-a" parent="Floor_2/robot-arm-b2/robot-arm-b" index="0" unique_id=16270307]
 transform = Transform3D(-3.278354e-08, 0.57357645, -0.614364, 0, 0.81915206, 0.43018234, 0.75, 2.5071824e-08, -2.6854705e-08, 0, 0.2, 0)
 
 [node name="robot-arm-b5" parent="Floor_2" unique_id=903680605 instance=ExtResource("16_kplsd")]
 transform = Transform3D(-0.7071067, 0, 0.7071068, 0, 1, 0, -0.7071068, 0, -0.7071067, 2.5613673, 7.4930825, 0.809953)
 
-[node name="robot-arm-b" parent="Floor_2/robot-arm-b5" index="0" unique_id=676776806]
+[node name="robot-arm-b" parent="Floor_2/robot-arm-b5" index="0" unique_id=788543719]
 transform = Transform3D(1, 0, 0, 0, 1.35, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="element-a" parent="Floor_2/robot-arm-b5/robot-arm-b" index="0" unique_id=1649671499]
+[node name="element-a" parent="Floor_2/robot-arm-b5/robot-arm-b" index="0" unique_id=16270307]
 transform = Transform3D(-3.278354e-08, 0.57357645, -0.614364, 0, 0.81915206, 0.43018234, 0.75, 2.5071824e-08, -2.6854705e-08, 0, 0.2, 0)
 
 [node name="chimney-basic2" parent="Floor_2" unique_id=908966617 instance=ExtResource("14_xnyms")]
 transform = Transform3D(2.828427, 0, -2.828427, 0, 6, 0, 2.828427, 0, 2.828427, 1.5, 7.5, -0.25)
 
-[node name="chimney-basic" parent="Floor_2/chimney-basic2" index="0" unique_id=1402586507]
+[node name="chimney-basic" parent="Floor_2/chimney-basic2" index="0" unique_id=1748051214]
 surface_material_override/0 = SubResource("StandardMaterial3D_4b6to")
 
 [node name="crane-lift2" type="Node3D" parent="Floor_2/chimney-basic2" unique_id=312329487]
 transform = Transform3D(0.16666667, 0, 0, 0, 0.16666667, 0, 0, 0, 0.16666667, 0, 1.37, 0)
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="Floor_2/chimney-basic2/crane-lift2" unique_id=617274139]
-transform = Transform3D(0.8000001, 0, 0, 0, 0.8000001, 0, 0, 0, 0.8000001, 0, -0.8000001, 0)
+transform = Transform3D(0.8000001, 0, 0, 0, 0.8000001, 0, 0, 0, 0.8000001, 0, -0.59907246, 0)
 cast_shadow = 0
 amount = 2
 lifetime = 1.7
@@ -419,15 +419,15 @@ process_material = SubResource("ParticleProcessMaterial_kplsd")
 draw_pass_1 = SubResource("PlaneMesh_4b6to")
 
 [node name="chain" type="MeshInstance3D" parent="Floor_2/chimney-basic2/crane-lift2" unique_id=79918358]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, -0.5855713, 0)
 mesh = SubResource("ArrayMesh_7c5qd")
 
 [node name="magnet" type="MeshInstance3D" parent="Floor_2/chimney-basic2/crane-lift2" unique_id=1279814471]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3500004, 0)
+transform = Transform3D(0.99999994, 0, 0, 0, 0.8, 0, 0, 0, 0.99999994, 0, -1.5495853, 0)
 mesh = SubResource("ArrayMesh_35q1i")
 
 [node name="crane-lift" type="MeshInstance3D" parent="Floor_2/chimney-basic2/crane-lift2" unique_id=237141731]
-transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 0, -0.2, 0)
+transform = Transform3D(0.65, 0, 0, 0, 0.4, 0, 0, 0, 0.65, 0, -0.5355711, 0)
 mesh = SubResource("ArrayMesh_0nub8")
 
 [node name="Area_1" type="Area3D" parent="." unique_id=330594335]

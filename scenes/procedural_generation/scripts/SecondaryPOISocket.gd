@@ -25,7 +25,7 @@ const ROTATION_FOLLOW_SOCKET: String = "follow socket"
 @export_range(0.0, 1.0, 0.01) var socket_spawn_chance: float = 1.0
 
 @export_group("Rotation")
-@export_enum("use poi setting", "random 90", "follow block", "follow socket") var rotation_mode_override: String = "random 90"
+@export_enum("use poi setting", "random 90", "follow block", "follow socket") var rotation_mode_override: String = "follow socket" #"random 90"
 
 
 func get_secondary_socket_environment() -> String:

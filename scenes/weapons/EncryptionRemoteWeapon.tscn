@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://b0ownu2qdkfb"]
+
+[ext_resource type="Script" uid="uid://dvu22mecfo8u" path="res://scenes/weapons/WeaponInstance3D.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="mat_dark"]
+albedo_color = Color(0.035, 0.04, 0.05, 1)
+roughness = 0.78
+
+[sub_resource type="BoxMesh" id="mesh_body"]
+size = Vector3(0.28, 0.12, 0.46)
+
+[sub_resource type="StandardMaterial3D" id="mat_blue"]
+albedo_color = Color(0.08, 0.42, 0.95, 1)
+emission_enabled = true
+emission = Color(0.04, 0.32, 0.9, 1)
+emission_energy_multiplier = 0.75
+
+[sub_resource type="BoxMesh" id="mesh_screen"]
+size = Vector3(0.2, 0.018, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.32, 0.34, 0.37, 1)
+metallic = 0.25
+roughness = 0.52
+
+[sub_resource type="BoxMesh" id="mesh_button"]
+size = Vector3(0.075, 0.022, 0.075)
+
+[sub_resource type="StandardMaterial3D" id="mat_orange"]
+albedo_color = Color(1, 0.42, 0.08, 1)
+emission_enabled = true
+emission = Color(1, 0.28, 0.04, 1)
+emission_energy_multiplier = 0.45
+
+[sub_resource type="CylinderMesh" id="mesh_antenna"]
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.24
+radial_segments = 8
+
+[sub_resource type="BoxMesh" id="mesh_grip"]
+size = Vector3(0.21, 0.04, 0.035)
+
+[node name="EncryptionRemoteWeapon" type="Node3D" unique_id=269768954]
+script = ExtResource("1_script")
+weapon_id = "encryption_remote"
+weapon_label = "Encryption Remote"
+weapon_local_position = Vector3(0.12, 1.12, -0.34)
+weapon_behavior = "objective_item"
+magazine_size = 0
+reload_duration = 0.0
+fire_cooldown = 999.0
+camera_shake_enabled = false
+hand_position = Vector3(0.1, -0.04, -0.04)
+back_position = Vector3(0.1, 0.02, 0.04)
+back_rotation_deg = Vector3(-80, 0, 10)
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1633147673]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, -0.12)
+material_override = SubResource("mat_dark")
+mesh = SubResource("mesh_body")
+
+[node name="Screen" type="MeshInstance3D" parent="." unique_id=2031399528]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.067, -0.21)
+material_override = SubResource("mat_blue")
+mesh = SubResource("mesh_screen")
+
+[node name="ButtonLeft" type="MeshInstance3D" parent="." unique_id=135589462]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, -0.055, 0.072, -0.045)
+material_override = SubResource("mat_metal")
+mesh = SubResource("mesh_button")
+
+[node name="ButtonRight" type="MeshInstance3D" parent="." unique_id=1096076138]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0.055, 0.072, -0.045)
+material_override = SubResource("mat_orange")
+mesh = SubResource("mesh_button")
+
+[node name="Antenna" type="MeshInstance3D" parent="." unique_id=1323024813]
+transform = Transform3D(1, 0, 0, 0, -0.18048511, -0.98357797, 0, 0.98357797, -0.18048511, 0, 0.07747335, -0.44598997)
+material_override = SubResource("mat_metal")
+mesh = SubResource("mesh_antenna")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=882147356]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, -0.08, -0.08)
+material_override = SubResource("mat_metal")
+mesh = SubResource("mesh_grip")
+
+[node name="Muzzle" type="Marker3D" parent="." unique_id=123482693]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.48)
+
+[node name="LeftGrip" type="Node3D" parent="." unique_id=691223659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.01, -0.14)
+
+[node name="RightGrip" type="Node3D" parent="." unique_id=319982351]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.01, -0.04)

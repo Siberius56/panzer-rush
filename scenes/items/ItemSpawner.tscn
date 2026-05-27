@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://dvknhr0s6gbg6"]
+
+[ext_resource type="Script" uid="uid://sbbh1310t65h" path="res://scenes/items/ItemSpawner.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://dd33dmmqhjkul" path="res://scenes/weapons/PistolWeapon.tscn" id="2_pw0ib"]
+[ext_resource type="PackedScene" uid="uid://nykf7fy7m5jg" path="res://scenes/weapons/SMGWeapon.tscn" id="3_r5hs6"]
+[ext_resource type="PackedScene" uid="uid://dluj1jv7g4ocm" path="res://scenes/weapons/RifleWeapon.tscn" id="4_gju73"]
+[ext_resource type="PackedScene" uid="uid://cp3e1snyeddda" path="res://scenes/weapons/GravityGunWeapon.tscn" id="5_30wy5"]
+[ext_resource type="PackedScene" uid="uid://cofmp6s0ce18y" path="res://scenes/weapons/RepairToolWeapon.tscn" id="6_8kn8f"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/BombWeapon.tscn" id="7_urwuy"]
+[ext_resource type="PackedScene" uid="uid://b0ownu2qdkfb" path="res://scenes/weapons/EncryptionRemoteWeapon.tscn" id="8_a7u5x"]
+[ext_resource type="PackedScene" uid="uid://cp2owv2un3i85" path="res://scenes/loot/9MMAmmoPickup.tscn" id="9_svcqw"]
+[ext_resource type="PackedScene" uid="uid://dvepi4iwm0o5w" path="res://scenes/loot/RifleAmmoPickup.tscn" id="10_mykr6"]
+[ext_resource type="PackedScene" uid="uid://d2xh1lt8ew0om" path="res://scenes/loot/MoneyPickup.tscn" id="11_d8ec0"]
+[ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="12_world"]
+
+[node name="ItemSpawner" type="Node3D" unique_id=937762401]
+script = ExtResource("1_script")
+spawn_count = 2
+debug_print_spawns = true
+world_weapon_scene = ExtResource("12_world")
+pistol_weapon_scene = ExtResource("2_pw0ib")
+smg_weapon_scene = ExtResource("3_r5hs6")
+rifle_weapon_scene = ExtResource("4_gju73")
+gravity_gun_scene = ExtResource("5_30wy5")
+repair_tool_scene = ExtResource("6_8kn8f")
+bomb_scene = ExtResource("7_urwuy")
+encryption_remote_scene = ExtResource("8_a7u5x")
+ammo_9mm_scene = ExtResource("9_svcqw")
+ammo_rifle_scene = ExtResource("10_mykr6")
+money_pick_scene = ExtResource("11_d8ec0")
+
+[node name="Marker_01" type="Marker3D" parent="." unique_id=947945133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
+
+[node name="Marker_02" type="Marker3D" parent="." unique_id=617743240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
+
+[node name="Marker_03" type="Marker3D" parent="." unique_id=1059129788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
+
+[node name="Marker_04" type="Marker3D" parent="." unique_id=852653451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)

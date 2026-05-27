@@ -1,13 +1,39 @@
 [gd_scene format=3 uid="uid://cjjpkdoh41543"]
 
 [ext_resource type="Script" uid="uid://1ucs7m0x27aq" path="res://scenes/procedural_generation/scripts/PlayerVehicleSpawnRig.gd" id="1_spawn_script"]
+[ext_resource type="PackedScene" uid="uid://dvknhr0s6gbg6" path="res://scenes/items/ItemSpawner.tscn" id="2_1wnh1"]
+[ext_resource type="Material" uid="uid://2hcuccvspy1n" path="res://asset/texture/Color_Dark.tres" id="2_ttr1l"]
+[ext_resource type="Material" uid="uid://1xxp5pltlv00" path="res://asset/texture/Color_Gray.tres" id="4_ots1r"]
+[ext_resource type="PackedScene" uid="uid://dks54llxvcjhi" path="res://asset/map/misc-2/indicator-special-lines.glb" id="5_8g4b1"]
+[ext_resource type="PackedScene" uid="uid://dyp8f1jr41dyl" path="res://asset/map/factory-kit/crane.glb" id="6_ielg3"]
+[ext_resource type="PackedScene" uid="uid://dxg6ye53rg5gu" path="res://scenes/props/Construction_Cone.tscn" id="7_c0mis"]
+[ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Physic/Crate.tscn" id="8_04c24"]
+[ext_resource type="PackedScene" uid="uid://cdfsoh484um4y" path="res://scenes/props/Physic/Light_Street_cross.tscn" id="9_geng4"]
+[ext_resource type="PackedScene" uid="uid://dk63ole3mu7ww" path="res://scenes/Light_Tower.tscn" id="10_iex2r"]
 
-[sub_resource type="StandardMaterial3D" id="Mat_spawn"]
-albedo_color = Color(0.12, 0.42, 0.62, 1)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ttr1l"]
+size = Vector3(16, 1, 16)
 
-[sub_resource type="BoxMesh" id="Mesh_SpawnPad"]
-material = SubResource("Mat_spawn")
-size = Vector3(18, 0.25, 18)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ots1r"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8g4b1"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ielg3"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c0mis"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_k7y25"]
+size = Vector3(16, 1, 16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wod2u"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_au63m"]
+material = ExtResource("4_ots1r")
+size = Vector3(1, 1, 8)
 
 [sub_resource type="StandardMaterial3D" id="Mat_metal"]
 albedo_color = Color(0.38, 0.4, 0.42, 1)
@@ -23,36 +49,207 @@ size = Vector3(6, 0.18, 6)
 [node name="PlayerVehicleSpawnRig" type="Node3D" unique_id=1184003027]
 script = ExtResource("1_spawn_script")
 
-[node name="SpawnPad" type="MeshInstance3D" parent="." unique_id=832810233]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
-mesh = SubResource("Mesh_SpawnPad")
+[node name="Ground" type="StaticBody3D" parent="." unique_id=16562572]
+collision_layer = 8
+collision_mask = 0
 
-[node name="VehiclePad_A" type="MeshInstance3D" parent="." unique_id=1255290435]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.1, 5)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=511453772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+shape = SubResource("BoxShape3D_ttr1l")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground" unique_id=48431335]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+shape = SubResource("BoxShape3D_ots1r")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground" unique_id=244975420]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+shape = SubResource("BoxShape3D_8g4b1")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground" unique_id=1106167244]
+transform = Transform3D(-0.70710677, -0.70710677, -8.742278e-08, -0.70710677, 0.70710677, 0, 6.181723e-08, 6.181723e-08, -1, -8, -0.6071558, 0)
+shape = SubResource("BoxShape3D_ielg3")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground" unique_id=2134339669]
+transform = Transform3D(0.70710677, 0.70710677, -7.1054274e-15, -0.70710677, 0.70710677, 0, 7.1054274e-15, 7.1054274e-15, 1, 8, -0.6071558, 0)
+shape = SubResource("BoxShape3D_c0mis")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1959431817]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+material_override = ExtResource("4_ots1r")
+mesh = SubResource("BoxMesh_k7y25")
+surface_material_override/0 = SubResource("StandardMaterial3D_wod2u")
+
+[node name="Bridge_Wide5" type="MeshInstance3D" parent="Ground" unique_id=133316346]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+mesh = SubResource("BoxMesh_au63m")
+
+[node name="Bridge_Wide6" type="MeshInstance3D" parent="Ground" unique_id=1998967638]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+mesh = SubResource("BoxMesh_au63m")
+
+[node name="Bridge_Wide7" type="MeshInstance3D" parent="Ground" unique_id=308650086]
+transform = Transform3D(-0.70710677, -0.70710677, -8.742278e-08, -0.70710677, 0.70710677, 0, 6.181723e-08, 6.181723e-08, -1, -8, -0.6071558, 0)
+mesh = SubResource("BoxMesh_au63m")
+
+[node name="Bridge_Wide8" type="MeshInstance3D" parent="Ground" unique_id=107018295]
+transform = Transform3D(0.70710677, 0.70710677, -7.1054274e-15, -0.70710677, 0.70710677, 0, 7.1054274e-15, 7.1054274e-15, 1, 8, -0.6071558, 0)
+mesh = SubResource("BoxMesh_au63m")
+
+[node name="indicator-special-lines2" parent="Ground" unique_id=1518633966 instance=ExtResource("5_8g4b1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0.11, -7.25)
+
+[node name="indicator-special-lines5" parent="Ground" unique_id=1129792465 instance=ExtResource("5_8g4b1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0.8461361, 0.11, -7.25)
+
+[node name="indicator-special-lines6" parent="Ground" unique_id=1319346801 instance=ExtResource("5_8g4b1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 1.6990957, 0.11, -7.25)
+
+[node name="indicator-special-lines3" parent="Ground" unique_id=1120301915 instance=ExtResource("5_8g4b1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -1.2797709, 0.11, -7.25)
+
+[node name="indicator-special-lines4" parent="Ground" unique_id=599403657 instance=ExtResource("5_8g4b1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -1.7028399, 0.11, -7.25)
+
+[node name="VehiclePad_A" type="MeshInstance3D" parent="Ground" unique_id=1255290435]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.1, 4)
 mesh = SubResource("Mesh_VehiclePad_A")
+surface_material_override/0 = ExtResource("2_ttr1l")
 
-[node name="VehiclePad_B" type="MeshInstance3D" parent="." unique_id=34815742]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.1, 5)
+[node name="VehiclePad_B" type="MeshInstance3D" parent="Ground" unique_id=34815742]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.1, 4)
 mesh = SubResource("Mesh_VehiclePad_B")
+surface_material_override/0 = ExtResource("2_ttr1l")
 
 [node name="SpawnPoints" type="Node3D" parent="." unique_id=303063077]
 
 [node name="PlayerSpawn_01" type="Node3D" parent="SpawnPoints" unique_id=731593092]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.45, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.45, -5)
 
 [node name="PlayerSpawn_02" type="Node3D" parent="SpawnPoints" unique_id=2083253262]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.45, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.45, -5)
 
 [node name="PlayerSpawn_03" type="Node3D" parent="SpawnPoints" unique_id=320277738]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.45, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.45, -3)
 
 [node name="PlayerSpawn_04" type="Node3D" parent="SpawnPoints" unique_id=3233498]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.45, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.45, -3)
 
 [node name="VehicleSpawns" type="Node3D" parent="." unique_id=1951919902]
 
 [node name="VehicleSpawn_01" type="Node3D" parent="VehicleSpawns" unique_id=1117860079]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -5, 0.45, 5)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -4, 0.45, 4)
 
 [node name="VehicleSpawn_02" type="Node3D" parent="VehicleSpawns" unique_id=142321028]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 5, 0.45, 5)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 4, 0.45, 4)
+
+[node name="Props" type="Node3D" parent="." unique_id=1217472849]
+
+[node name="crane2" parent="Props" unique_id=1326099284 instance=ExtResource("6_ielg3")]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 6.75, 0.1, -7)
+visible = false
+
+[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1326099284, 372918128) index="0" unique_id=1170679970]
+transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 3.0033193, 0)
+
+[node name="RigidBody3D8" parent="Props" unique_id=1144813020 instance=ExtResource("7_c0mis")]
+transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, -5.4170227, 0.1525979, -7.3599124)
+
+[node name="RigidBody3D9" parent="Props" unique_id=1621964634 instance=ExtResource("7_c0mis")]
+transform = Transform3D(0.8440192, 0, 0.53631294, 0, 1, 0, -0.53631294, 0, 0.8440192, -6.4668083, 0.1525979, -3.4980927)
+
+[node name="RigidBody3D10" parent="Props" unique_id=1837193840 instance=ExtResource("7_c0mis")]
+transform = Transform3D(0.75685817, 0, 0.6535791, 0, 1, 0, -0.6535791, 0, 0.75685817, -4.295178, 0.1525979, -5.3894715)
+
+[node name="RigidBody3D11" parent="Props" unique_id=1975758814 instance=ExtResource("7_c0mis")]
+transform = Transform3D(0.80330634, 0, 0.59556615, 0, 1, 0, -0.59556615, 0, 0.80330634, 5.127879, 0.1525979, -7.2816553)
+
+[node name="RigidBody3D12" parent="Props" unique_id=1165224733 instance=ExtResource("7_c0mis")]
+transform = Transform3D(0.7079455, 0, 0.70626706, 0, 1, 0, -0.70626706, 0, 0.7079455, 5.391986, 0.1525979, -6.0040007)
+
+[node name="Crate1" parent="Props" unique_id=1108256052 instance=ExtResource("8_04c24")]
+transform = Transform3D(0.25881895, 0, -0.9659258, 0, 1, 0, 0.9659258, 0, 0.25881895, 5.7258377, 0.78808594, -4.751586)
+
+[node name="Crate3" parent="Props" unique_id=46867743 instance=ExtResource("8_04c24")]
+transform = Transform3D(0.5969112, 0, -0.80230737, 0, 1, 0, 0.80230737, 0, 0.5969112, 7.224969, 0.7880869, -5.224216)
+intact_body_path = NodePath("../../01_Container/Crate2/IntactBody")
+intact_visual_root_path = NodePath("../../01_Container/Crate2/IntactBody/Intact")
+main_collision_path = NodePath("../../01_Container/Crate2/IntactBody/Collision")
+debris_root_path = NodePath("../../01_Container/Crate2/DebrisRoot")
+
+[node name="Crate2" parent="Props" unique_id=1388836719 instance=ExtResource("8_04c24")]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, -6.9943466, 0.78808594, -5.2295947)
+
+[node name="Crate6" parent="Props" unique_id=2117779869 instance=ExtResource("8_04c24")]
+transform = Transform3D(-0.36891946, 0, 0.92946136, 0, 1, 0, -0.92946136, 0, -0.36891946, -6.7419205, 0.7880869, -6.8778987)
+intact_body_path = NodePath("../../01_Container/Crate2/IntactBody")
+intact_visual_root_path = NodePath("../../01_Container/Crate2/IntactBody/Intact")
+main_collision_path = NodePath("../../01_Container/Crate2/IntactBody/Collision")
+debris_root_path = NodePath("../../01_Container/Crate2/DebrisRoot")
+
+[node name="Crate7" parent="Props" unique_id=1699398557 instance=ExtResource("8_04c24")]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, -6.8533125, 2.2891846, -6.1424623)
+
+[node name="Crate8" parent="Props" unique_id=1662297472 instance=ExtResource("8_04c24")]
+transform = Transform3D(0.65530795, 0, 0.7553618, 0, 1, 0, -0.7553618, 0, 0.65530795, -5.566945, 0.7880869, -5.844266)
+intact_body_path = NodePath("../../01_Container/Crate2/IntactBody")
+intact_visual_root_path = NodePath("../../01_Container/Crate2/IntactBody/Intact")
+main_collision_path = NodePath("../../01_Container/Crate2/IntactBody/Collision")
+debris_root_path = NodePath("../../01_Container/Crate2/DebrisRoot")
+
+[node name="Crate4" parent="Props" unique_id=2620765 instance=ExtResource("8_04c24")]
+transform = Transform3D(-0.9170322, 0, 0.39881316, 0, 1, 0, -0.39881316, 0, -0.9170322, 6.731593, 0.7880869, -6.9017477)
+
+[node name="Crate5" parent="Props" unique_id=1637900104 instance=ExtResource("8_04c24")]
+transform = Transform3D(0.3012283, 0.0005609069, -0.9535518, 0.0016646468, 0.9999981, 0.0011141051, 0.9535507, -0.0019229304, 0.3012268, 7.176056, 2.3659096, -5.2385077)
+
+[node name="Street_Light18" parent="Props" unique_id=1832236308 instance=ExtResource("9_geng4")]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, 0, 0, 0)
+intact_body_path = NodePath("../../Road/Street_Light2/IntactBody")
+intact_visual_root_path = NodePath("../../Road/Street_Light2/IntactBody/Intact")
+main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
+debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
+
+[node name="Street_Light19" parent="Props" unique_id=1563269669 instance=ExtResource("9_geng4")]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, -6, 0, -6)
+visible = false
+intact_body_path = NodePath("../../Road/Street_Light2/IntactBody")
+intact_visual_root_path = NodePath("../../Road/Street_Light2/IntactBody/Intact")
+main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
+debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
+
+[node name="Light_Tower1" parent="Props" unique_id=1670222082 instance=ExtResource("10_iex2r")]
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, 9.633, 0, 0)
+
+[node name="Light_Tower2" parent="Props" unique_id=881177521 instance=ExtResource("10_iex2r")]
+transform = Transform3D(0.9999999, 0, 0, 0, 1, 0, 0, 0, 0.9999999, -9.5, 0, 0)
+
+[node name="ItemSpawner_Weapon" parent="." unique_id=1415529893 instance=ExtResource("2_1wnh1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2)
+spawn_count = 4
+stack_jitter_radius = 0.25
+
+[node name="ItemSpawner_Repair_Tool" parent="." unique_id=937762401 instance=ExtResource("2_1wnh1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -4)
+spawn_count = 1
+item_type = "repair_tool"
+stack_jitter_radius = 0.25
+
+[node name="ItemSpawner_Ammo" parent="." unique_id=1659669105 instance=ExtResource("2_1wnh1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+spawn_count = 4
+item_type = "munition"
+
+[node name="Marker_01" parent="ItemSpawner_Ammo" index="0" unique_id=947945133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+
+[node name="Marker_02" parent="ItemSpawner_Ammo" index="1" unique_id=617743240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="Marker_03" parent="ItemSpawner_Ammo" index="2" unique_id=1059129788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+
+[node name="Marker_04" parent="ItemSpawner_Ammo" index="3" unique_id=852653451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[editable path="Props/crane2"]
+[editable path="ItemSpawner_Ammo"]

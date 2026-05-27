@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://s40q2ft30bab" path="res://scenes/props/Physic/sandbag.tscn" id="7_yjr0b"]
 [ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="8_hpol8"]
 [ext_resource type="PackedScene" uid="uid://d2xh1lt8ew0om" path="res://scenes/loot/MoneyPickup.tscn" id="9_2jbge"]
-[ext_resource type="PackedScene" uid="uid://cp2owv2un3i85" path="res://scenes/loot/PistolAmmoPickup.tscn" id="10_hucti"]
+[ext_resource type="PackedScene" uid="uid://cp2owv2un3i85" path="res://scenes/loot/9MMAmmoPickup.tscn" id="10_hucti"]
 [ext_resource type="PackedScene" uid="uid://dvepi4iwm0o5w" path="res://scenes/loot/RifleAmmoPickup.tscn" id="11_pfesg"]
 [ext_resource type="PackedScene" uid="uid://dhx3v13g7vw0e" path="res://scenes/loot/SMGAmmoPickup.tscn" id="12_7p6sg"]
 [ext_resource type="PackedScene" uid="uid://clhmm4drbsxau" path="res://scenes/enemies/NetworkEnemy.tscn" id="13_l60kg"]

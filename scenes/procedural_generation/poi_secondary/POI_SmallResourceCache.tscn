@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://dbiabg3bjeylo" path="res://scenes/procedural_generation/scripts/LevelSecondaryPOI.gd" id="1_poi_script"]
 [ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="2_quyps"]
-[ext_resource type="PackedScene" uid="uid://blodqqhmu7rur" path="res://scenes/props/Container_Gray.tscn" id="3_4wvvp"]
 [ext_resource type="Material" uid="uid://1xxp5pltlv00" path="res://asset/texture/Color_Gray.tres" id="3_kywxd"]
 [ext_resource type="PackedScene" uid="uid://dks54llxvcjhi" path="res://asset/map/misc-2/indicator-special-lines.glb" id="4_1a58q"]
 [ext_resource type="PackedScene" uid="uid://d3rkidkkcso24" path="res://scenes/props/Container_Blue.tscn" id="4_r4xwa"]
@@ -11,16 +10,30 @@
 [ext_resource type="PackedScene" uid="uid://dxg6ye53rg5gu" path="res://scenes/props/Construction_Cone.tscn" id="7_ny7so"]
 [ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Physic/Crate.tscn" id="8_8c51c"]
 [ext_resource type="PackedScene" uid="uid://cdfsoh484um4y" path="res://scenes/props/Physic/Light_Street_cross.tscn" id="9_554en"]
+[ext_resource type="PackedScene" uid="uid://dvknhr0s6gbg6" path="res://scenes/items/ItemSpawner.tscn" id="12_ny7so"]
 [ext_resource type="PackedScene" uid="uid://dk63ole3mu7ww" path="res://scenes/Light_Tower.tscn" id="12_r4xwa"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rmxun"]
 transparency = 1
 albedo_color = Color(0.1, 0.75, 0.25, 0.28)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_r4xwa"]
+size = Vector3(16, 1, 16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ny7so"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8c51c"]
+size = Vector3(1, 1, 8)
+
 [sub_resource type="BoxMesh" id="BoxMesh_u5ygr"]
 size = Vector3(16, 1, 16)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ygyci"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_554en"]
+material = ExtResource("3_kywxd")
+size = Vector3(1, 1, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ib8o6"]
 size = Vector3(0.3, 3, 16)
@@ -72,22 +85,42 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20000005, 5)
 [node name="SpawnPoint_04" type="Marker3D" parent="POI_Small_Resource_Cache" unique_id=960643033]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
 
-[node name="Container_Gray" parent="POI_Small_Resource_Cache" unique_id=980568818 instance=ExtResource("3_4wvvp")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -0.21095164, -1, -2.0054808)
-
 [node name="Container_Blue" parent="POI_Small_Resource_Cache" unique_id=1649313581 instance=ExtResource("4_r4xwa")]
 transform = Transform3D(-0.037184436, 0, 0.9993084, 0, 1, 0, -0.9993084, 0, -0.037184436, 0.20289738, -1, 1.2090615)
+
+[node name="Container_Blue3" parent="POI_Small_Resource_Cache" unique_id=980568818 instance=ExtResource("4_r4xwa")]
+transform = Transform3D(-0.037184436, 0, 0.9993084, 0, 1, 0, -0.9993084, 0, -0.037184436, -0.21671931, -1, -2.0630941)
 
 [node name="Container_Blue2" parent="POI_Small_Resource_Cache" unique_id=1715154962 instance=ExtResource("4_r4xwa")]
 transform = Transform3D(0.08712097, 0, 0.99619776, 0, 1, 0, -0.99619776, 0, 0.08712097, -0.080917954, 1.6919785, -0.46638542)
 
-[node name="Ground" type="Node3D" parent="." unique_id=712528031]
+[node name="Ground" type="StaticBody3D" parent="." unique_id=595149120]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1327652556]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+shape = SubResource("BoxShape3D_r4xwa")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground" unique_id=803771151]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+shape = SubResource("BoxShape3D_ny7so")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground" unique_id=437792333]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+shape = SubResource("BoxShape3D_8c51c")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=935927497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
 material_override = ExtResource("3_kywxd")
 mesh = SubResource("BoxMesh_u5ygr")
 surface_material_override/0 = SubResource("StandardMaterial3D_ygyci")
+
+[node name="Bridge_Wide5" type="MeshInstance3D" parent="Ground" unique_id=1361521459]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+mesh = SubResource("BoxMesh_554en")
+
+[node name="Bridge_Wide6" type="MeshInstance3D" parent="Ground" unique_id=98573978]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+mesh = SubResource("BoxMesh_554en")
 
 [node name="indicator-special-lines2" parent="Ground" unique_id=219245076 instance=ExtResource("4_1a58q")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0.11, -7.25)
@@ -242,7 +275,7 @@ visible = false
 [node name="crane2" parent="Props" unique_id=1148094443 instance=ExtResource("6_r4xwa")]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 6.75, 0.1, -7)
 
-[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1148094443, 1818639732) index="0" unique_id=546961492]
+[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1148094443, 372918128) index="0" unique_id=1170679970]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 3.0033193, 0)
 
 [node name="RigidBody3D8" parent="Props" unique_id=1144813020 instance=ExtResource("7_ny7so")]
@@ -310,10 +343,43 @@ intact_visual_root_path = NodePath("../../Road/Street_Light2/IntactBody/Intact")
 main_collision_path = NodePath("../../Road/Street_Light2/IntactBody/Collision")
 debris_root_path = NodePath("../../Road/Street_Light2/DebrisRoot")
 
-[node name="Light_Tower" parent="Props" unique_id=1670222082 instance=ExtResource("12_r4xwa")]
+[node name="Light_Tower1" parent="Props" unique_id=1670222082 instance=ExtResource("12_r4xwa")]
 transform = Transform3D(0.99999994, 0, 7.450581e-09, 0, 1, 0, -7.450581e-09, 0, 0.99999994, 9.633, 0, 0)
 
 [node name="Light_Tower2" parent="Props" unique_id=1728259974 instance=ExtResource("12_r4xwa")]
 transform = Transform3D(-0.9999999, 0, 7.997218e-08, 0, 1, 0, -7.997218e-08, 0, -0.9999999, -9.5, 0, 0)
 
+[node name="ItemSpawner" parent="." unique_id=937762401 instance=ExtResource("12_ny7so")]
+spawn_count = 4
+item_type = "munition"
+
+[node name="Marker_01" parent="ItemSpawner" index="0" unique_id=947945133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+
+[node name="Marker_02" parent="ItemSpawner" index="1" unique_id=617743240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="Marker_03" parent="ItemSpawner" index="2" unique_id=1059129788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+
+[node name="Marker_04" parent="ItemSpawner" index="3" unique_id=852653451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="ItemSpawner2" parent="." unique_id=2098784614 instance=ExtResource("12_ny7so")]
+item_type = "munition"
+
+[node name="Marker_01" parent="ItemSpawner2" index="0" unique_id=947945133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -4)
+
+[node name="Marker_02" parent="ItemSpawner2" index="1" unique_id=617743240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -5)
+
+[node name="Marker_03" parent="ItemSpawner2" index="2" unique_id=1059129788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 3)
+
+[node name="Marker_04" parent="ItemSpawner2" index="3" unique_id=852653451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)
+
 [editable path="Props/crane2"]
+[editable path="ItemSpawner"]
+[editable path="ItemSpawner2"]

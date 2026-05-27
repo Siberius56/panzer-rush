@@ -122,7 +122,7 @@ shape = SubResource("BoxShape3D_dcai8")
 [node name="Ground" type="Node3D" parent="." unique_id=1294688184]
 
 [node name="ConcreteGround" type="MeshInstance3D" parent="Ground" unique_id=1360121739]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -9, 0)
 mesh = SubResource("BoxMesh_1d1x2")
 
 [node name="ConcreteGround2" type="MeshInstance3D" parent="Ground" unique_id=2101706662]

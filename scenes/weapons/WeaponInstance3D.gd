@@ -13,7 +13,6 @@ const DEFAULT_VISUAL_BULLET_SCENE := preload("res://scenes/weapons/VisualBullet.
 
 @export_group("Ammo")
 @export var magazine_size: int = 12
-#@export var max_reserve_ammo: int = 48
 @export var reload_duration: float = 1.1
 
 @export_group("Fire")

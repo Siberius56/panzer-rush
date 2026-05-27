@@ -12,10 +12,23 @@
 [ext_resource type="PackedScene" uid="uid://ddwu7klxnc2vg" path="res://asset/map/misc-2/indicator-special-arrow.glb" id="11_lrq5p"]
 [ext_resource type="PackedScene" uid="uid://dks54llxvcjhi" path="res://asset/map/misc-2/indicator-special-lines.glb" id="12_lrq5p"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_ku851"]
+size = Vector3(16, 1, 16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mxc3o"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nf356"]
+size = Vector3(1, 1, 8)
+
 [sub_resource type="BoxMesh" id="BoxMesh_lrq5p"]
 size = Vector3(16, 1, 16)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ku851"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_fi2cw"]
+material = ExtResource("3_5sdnv")
+size = Vector3(1, 1, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_kdwna"]
 size = Vector3(0.3, 3, 16)
@@ -54,13 +67,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.030965805, 0.20000005, -5.4
 [node name="SpawnPoint_05" type="Marker3D" parent="POI_Radio_Relay" unique_id=2003766163]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.030965805, 0.20000005, 5.5406427)
 
-[node name="Ground" type="Node3D" parent="." unique_id=236512785]
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1102670621]
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground" unique_id=1010637815]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+shape = SubResource("BoxShape3D_ku851")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1984623167]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+shape = SubResource("BoxShape3D_mxc3o")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground" unique_id=1734865416]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+shape = SubResource("BoxShape3D_nf356")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1860006275]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
 material_override = ExtResource("3_5sdnv")
 mesh = SubResource("BoxMesh_lrq5p")
 surface_material_override/0 = SubResource("StandardMaterial3D_ku851")
+
+[node name="Bridge_Wide5" type="MeshInstance3D" parent="Ground" unique_id=1707752138]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+mesh = SubResource("BoxMesh_fi2cw")
+
+[node name="Bridge_Wide6" type="MeshInstance3D" parent="Ground" unique_id=1571446313]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+mesh = SubResource("BoxMesh_fi2cw")
 
 [node name="indicator-special-arrow2" parent="Ground" unique_id=788975119 instance=ExtResource("11_lrq5p")]
 transform = Transform3D(-1.3113416e-07, 0, 3, 0, 3, 0, -3, 0, -1.3113416e-07, 0, 0.101, 5.8)

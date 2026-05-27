@@ -123,8 +123,24 @@ static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 
 @export_group("Procedural Body Motion")
 @export var body_bob_amount: float = 0.045
-@export var body_tilt_amount: float = 0.10
+@export var body_tilt_amount: float = 0.16
 @export var landing_squash_strength: float = 0.12
+@export var breathing_enabled: bool = true
+@export var breathing_speed: float = 0.85
+@export var breathing_height_amount: float = 0.012
+@export var breathing_pitch_amount: float = 0.018
+@export_range(0.0, 1.0, 0.01) var breathing_moving_multiplier: float = 0.35
+@export var body_recoil_enabled: bool = true
+@export var body_recoil_damage_reference: float = 35.0
+@export var body_recoil_min_pitch: float = 0.025
+@export var body_recoil_max_pitch: float = 0.16
+@export var body_recoil_max_accumulated_pitch: float = 0.24
+@export var body_recoil_recover_speed: float = 10.0
+@export_range(0.0, 1.0, 0.01) var body_recoil_automatic_multiplier: float = 0.72
+@export var weapon_recoil_position_multiplier: float = 0.85
+@export var weapon_recoil_max_offset: float = 0.16
+@export var weapon_recoil_recover_speed: float = 7.0
+@export var debug_weapon_recoil: bool = false
 
 @export_group("Procedural Limb Lengths")
 @export var upper_leg_length: float = 0.44
@@ -189,6 +205,11 @@ var last_valid_aim_target_position: Vector3 = Vector3.FORWARD
 var visual_yaw: float = 0.0
 var walk_phase: float = 0.0
 var landing_squash: float = 0.0
+var body_motion_time: float = 0.0
+var body_recoil_pitch: float = 0.0
+var weapon_recoil_offset: float = 0.0
+var last_weapon_recoil_applied_offset: float = 0.0
+var last_recoiled_weapon_instance_id: int = 0
 var procedural_nodes_ready: bool = false
 var camera_spring_length_target: float = 7.0
 var camera_spring_length_tween: Tween = null
@@ -343,8 +364,7 @@ func _ready() -> void:
 		right_probe.enabled = true
 
 	visual_yaw = global_transform.basis.get_euler().y
-	if foot_probe_root != null:
-		foot_probe_root.rotation.y = visual_yaw
+	_apply_visual_yaw_to_child(foot_probe_root)
 
 	if is_multiplayer_authority():
 		hud = PLAYER_HUD_SCENE.instantiate()
@@ -1130,6 +1150,7 @@ func _try_fire_local() -> void:
 
 	if not uses_repair_tool:
 		_emit_weapon_fire_camera_shake(weapon)
+		_apply_fire_recoil_from_weapon(weapon)
 
 	# Prédiction visuelle uniquement côté client.
 	# Le serveur spawn la vraie balle dans _server_fire_weapon().
@@ -1224,6 +1245,7 @@ func _request_select_weapon_slot(slot_index: int) -> void:
 func _select_weapon_slot_local(slot_index: int) -> void:
 	current_weapon_slot = clampi(slot_index, 0, 1)
 	_cancel_local_reload()
+	_reset_fire_recoil()
 	_refresh_weapon_nodes()
 	_apply_current_held_weapon_pose_immediately()
 
@@ -2671,7 +2693,8 @@ func _apply_respawn_state(spawn_transform: Transform3D, health_value: int) -> vo
 	if aim_root != null:
 		aim_root.rotation = Vector3.ZERO
 	if visual_root != null:
-		visual_root.rotation = Vector3.ZERO
+		visual_root.rotation = Vector3(0.0, _get_visual_child_local_yaw(), 0.0)
+	_reset_fire_recoil()
 
 	weapon_slots[0] = {}
 	weapon_slots[1] = {}
@@ -3395,13 +3418,100 @@ func _validate_procedural_scene_nodes() -> bool:
 	return true
 
 
+func _get_player_root_world_yaw() -> float:
+	return global_transform.basis.get_euler().y
+
+
+func _get_visual_child_local_yaw() -> float:
+	# visual_yaw est stocké en yaw monde.
+	# VisualRoot et FootProbeRoot sont enfants du CharacterBody3D.
+	# On retire donc la rotation monde du joueur, sinon un spawn à 180° inverse les visuels.
+	return wrapf(visual_yaw - _get_player_root_world_yaw(), -PI, PI)
+
+
+func _apply_visual_yaw_to_child(node: Node3D) -> void:
+	if node == null:
+		return
+	node.rotation.y = _get_visual_child_local_yaw()
+
+
+func _reset_fire_recoil() -> void:
+	body_recoil_pitch = 0.0
+	weapon_recoil_offset = 0.0
+	last_weapon_recoil_applied_offset = 0.0
+	last_recoiled_weapon_instance_id = 0
+
+
+func _get_weapon_optional_float(weapon: Node, property_name: String, fallback: float = 0.0) -> float:
+	if weapon == null:
+		return fallback
+	if property_name in weapon:
+		var raw_value = weapon.get(property_name)
+		var raw_type: int = typeof(raw_value)
+		if raw_type == TYPE_INT or raw_type == TYPE_FLOAT:
+			return float(raw_value)
+	return fallback
+
+
+func _get_weapon_projectile_count_for_recoil(weapon: Node) -> float:
+	var projectile_count: float = 1.0
+	projectile_count = max(projectile_count, _get_weapon_optional_float(weapon, "projectile_count", 1.0))
+	projectile_count = max(projectile_count, _get_weapon_optional_float(weapon, "projectiles_per_shot", projectile_count))
+	projectile_count = max(projectile_count, _get_weapon_optional_float(weapon, "pellet_count", projectile_count))
+	projectile_count = max(projectile_count, _get_weapon_optional_float(weapon, "bullets_per_shot", projectile_count))
+	return max(projectile_count, 1.0)
+
+
+func _get_fire_recoil_power_from_weapon(weapon: WeaponInstance3D) -> float:
+	if weapon == null:
+		return 0.0
+	if _is_repair_tool_weapon(weapon):
+		return 0.0
+
+	var explicit_recoil: float = _get_weapon_optional_float(weapon, "body_recoil_strength", -1.0)
+	if explicit_recoil >= 0.0:
+		return clampf(explicit_recoil, body_recoil_min_pitch, body_recoil_max_pitch)
+
+	var projectile_damage: float = _get_weapon_optional_float(weapon, "projectile_damage", 0.0)
+	var projectile_count: float = _get_weapon_projectile_count_for_recoil(weapon)
+	var total_damage: float = projectile_damage * projectile_count
+	var reference_damage: float = max(body_recoil_damage_reference, 1.0)
+	var damage_ratio: float = clampf(total_damage / reference_damage, 0.0, 1.0)
+	var recoil_power: float = lerpf(body_recoil_min_pitch, body_recoil_max_pitch, damage_ratio)
+
+	if "automatic_fire" in weapon and bool(weapon.automatic_fire):
+		recoil_power *= body_recoil_automatic_multiplier
+
+	return clampf(recoil_power, body_recoil_min_pitch, body_recoil_max_pitch)
+
+
+func _apply_fire_recoil_from_weapon(weapon: WeaponInstance3D) -> void:
+	if not body_recoil_enabled:
+		return
+	if weapon == null:
+		return
+	if _is_repair_tool_weapon(weapon):
+		return
+
+	var recoil_power: float = _get_fire_recoil_power_from_weapon(weapon)
+	if recoil_power <= 0.0:
+		return
+
+	body_recoil_pitch = min(body_recoil_pitch + recoil_power, body_recoil_max_accumulated_pitch)
+	weapon_recoil_offset = min(weapon_recoil_offset + recoil_power * weapon_recoil_position_multiplier, weapon_recoil_max_offset)
+
+	if debug_weapon_recoil:
+		var projectile_damage: float = _get_weapon_optional_float(weapon, "projectile_damage", 0.0)
+		print("Weapon recoil | weapon=", weapon.name, " damage=", projectile_damage, " power=", recoil_power, " offset=", weapon_recoil_offset)
+
+
 func _reset_procedural_pose() -> void:
 	if not procedural_nodes_ready:
 		return
 
 	visual_yaw = global_transform.basis.get_euler().y
-	if foot_probe_root != null:
-		foot_probe_root.rotation.y = visual_yaw
+	_apply_visual_yaw_to_child(foot_probe_root)
+	_reset_fire_recoil()
 
 	if placeholder_left_grip != null:
 		placeholder_left_grip.position = fallback_left_grip_local_position
@@ -3544,8 +3654,7 @@ func _update_feet(delta: float) -> void:
 	if grounded and speed_ratio > 0.03:
 		walk_phase += delta * lerp(3.0, gait_frequency, speed_ratio)
 
-	if foot_probe_root != null:
-		foot_probe_root.rotation.y = visual_yaw
+	_apply_visual_yaw_to_child(foot_probe_root)
 
 	if grounded:
 		var left_target: Vector3 = _sample_grounded_foot_position(-1.0, horizontal_velocity, 0.0)
@@ -3685,6 +3794,8 @@ func _update_body_rotation(delta: float) -> void:
 
 
 func _update_body_motion(delta: float) -> void:
+	body_motion_time += delta
+
 	var horizontal_velocity: Vector3 = _get_procedural_horizontal_velocity()
 	var speed_ratio: float = clamp(horizontal_velocity.length() / move_speed, 0.0, 1.0)
 
@@ -3693,13 +3804,32 @@ func _update_body_motion(delta: float) -> void:
 	var pitch: float = clamp(local_velocity.z / move_speed, -1.0, 1.0) * body_tilt_amount
 	var roll: float = clamp(-local_velocity.x / move_speed, -1.0, 1.0) * body_tilt_amount
 
+	var breath: float = 0.0
+	var breath_multiplier: float = lerpf(1.0, breathing_moving_multiplier, speed_ratio)
+	if breathing_enabled:
+		breath = sin(body_motion_time * breathing_speed * TAU) * breath_multiplier
+
+	var body_recoil_decay: float = 1.0 - exp(-body_recoil_recover_speed * delta)
+	body_recoil_pitch = lerpf(body_recoil_pitch, 0.0, body_recoil_decay)
+	if abs(body_recoil_pitch) < 0.0001:
+		body_recoil_pitch = 0.0
+
+	var weapon_recoil_decay: float = 1.0 - exp(-weapon_recoil_recover_speed * delta)
+	weapon_recoil_offset = lerpf(weapon_recoil_offset, 0.0, weapon_recoil_decay)
+	if abs(weapon_recoil_offset) < 0.0001:
+		weapon_recoil_offset = 0.0
+
 	landing_squash = move_toward(landing_squash, 0.0, delta * 5.5)
 	var squash: float = landing_squash * landing_squash_strength
 	if landing_squash < 0.0:
 		squash = landing_squash * landing_squash_strength * 0.5
 
-	visual_root.position.y = lerp(visual_root.position.y, bob, delta * 12.0)
-	visual_root.rotation = Vector3(pitch, visual_yaw, roll)
+	var target_y: float = bob + breath * breathing_height_amount
+	var final_pitch: float = pitch + breath * breathing_pitch_amount + body_recoil_pitch
+	var visual_local_yaw: float = _get_visual_child_local_yaw()
+
+	visual_root.position.y = lerp(visual_root.position.y, target_y, delta * 12.0)
+	visual_root.rotation = Vector3(final_pitch, visual_local_yaw, roll)
 	visual_root.scale = Vector3(1.0 + abs(squash) * 0.45, 1.0 - squash, 1.0 + abs(squash) * 0.25)
 
 
@@ -3711,9 +3841,21 @@ func _update_weapon_pose(delta: float) -> void:
 		_refresh_procedural_hand_grips()
 		return
 
-	var current_weapon_local_position: Vector3 = current_visual_weapon.position
-	var target_local_position: Vector3 = _get_weapon_local_position(current_visual_weapon)
-	current_visual_weapon.position = current_weapon_local_position.lerp(target_local_position, min(delta * weapon_follow_speed, 1.0))
+	var current_weapon_instance_id: int = current_visual_weapon.get_instance_id()
+	if current_weapon_instance_id != last_recoiled_weapon_instance_id:
+		last_weapon_recoil_applied_offset = 0.0
+		last_recoiled_weapon_instance_id = current_weapon_instance_id
+
+	var previous_recoil_vector: Vector3 = Vector3(0.0, 0.0, last_weapon_recoil_applied_offset)
+	var current_weapon_base_position: Vector3 = current_visual_weapon.position - previous_recoil_vector
+	var target_base_position: Vector3 = _get_weapon_local_position(current_visual_weapon)
+	var smoothed_base_position: Vector3 = current_weapon_base_position.lerp(target_base_position, min(delta * weapon_follow_speed, 1.0))
+
+	var current_recoil_vector: Vector3 = Vector3.ZERO
+	if current_visual_weapon != empty_weapon_instance:
+		current_recoil_vector = Vector3(0.0, 0.0, weapon_recoil_offset)
+	current_visual_weapon.position = smoothed_base_position + current_recoil_vector
+	last_weapon_recoil_applied_offset = current_recoil_vector.z
 
 	if current_visual_weapon == empty_weapon_instance:
 		# Arme factice : elle sert uniquement à placer les mains.
@@ -4028,6 +4170,7 @@ func _spawn_bullet_fx(shot_origin: Vector3, shot_direction: Vector3, slot_index:
 		return
 
 	_spawn_visual_bullet_from_weapon(weapon, shot_origin, shot_direction)
+	_apply_fire_recoil_from_weapon(weapon)
 	weapon.free()
 
 @rpc("any_peer", "reliable")

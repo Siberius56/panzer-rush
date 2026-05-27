@@ -1,13 +1,13 @@
 extends RigidBody3D
 class_name WorldWeapon3D
 
-const PISTOL_SCENE: PackedScene = preload("uid://dd33dmmqhjkul")
-const SMG_SCENE: PackedScene = preload("uid://nykf7fy7m5jg")
-const RIFLE_SCENE: PackedScene = preload("uid://dluj1jv7g4ocm")
-const REPAIR_TOOL_SCENE: PackedScene = preload("res://scenes/weapons/RepairToolWeapon.tscn")
-const BOMB_SCENE: PackedScene = preload("res://scenes/weapons/BombWeapon.tscn")
-const GRAVITY_GUN_SCENE: PackedScene = preload("res://scenes/weapons/GravityGunWeapon.tscn")
-const ENCRYPTION_REMOTE_SCENE: PackedScene = preload("res://scenes/weapons/EncryptionRemoteWeapon.tscn")
+const PISTOL_SCENE := preload("uid://dd33dmmqhjkul")
+const SMG_SCENE := preload("uid://nykf7fy7m5jg")
+const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm")
+const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
+const BOMB_SCENE := preload("res://scenes/weapons/BombWeapon.tscn")
+const GRAVITY_GUN_SCENE := preload("res://scenes/weapons/GravityGunWeapon.tscn")
+const ENCRYPTION_REMOTE_SCENE := preload("res://scenes/weapons/EncryptionRemoteWeapon.tscn")
 
 @export var state_send_interval: float = 0.05
 
@@ -17,7 +17,9 @@ const ENCRYPTION_REMOTE_SCENE: PackedScene = preload("res://scenes/weapons/Encry
 @export var editor_spawn_on_ready: bool = true
 
 @onready var visual_socket: Node3D = $VisualSocket
-@onready var label_3d: Label3D = %Label3D
+
+@onready var label_3d = %Label3D
+
 
 var net_id: int = -1
 var weapon_visual: WeaponInstance3D
@@ -53,10 +55,10 @@ func _ready() -> void:
 	add_to_group("world_weapon")
 	replicated_transform = global_transform
 	_set_objective_origin_transform(global_transform)
-
+	
 	if is_instance_valid(label_3d):
 		label_3d.hide()
-
+	
 	if editor_spawn_on_ready:
 		setup_from_state(editor_weapon_id, editor_ammo_in_magazine, editor_reserve_ammo)
 
@@ -72,47 +74,17 @@ func setup_from_state(weapon_id: String, ammo_in_magazine: int, reserve_ammo: in
 	if extra_state.has("objective_origin_transform") and extra_state["objective_origin_transform"] is Transform3D:
 		_set_objective_origin_transform(extra_state["objective_origin_transform"])
 
-	var scene: PackedScene = _get_weapon_scene_for_setup(weapon_id, extra_state)
+	var scene: PackedScene = get_weapon_scene_by_id(weapon_id)
 	if scene == null:
 		push_error("Unknown weapon_id on world weapon: %s" % weapon_id)
 		return
 
-	var instance: Node = scene.instantiate()
-	weapon_visual = instance as WeaponInstance3D
-	if weapon_visual == null:
-		if instance != null:
-			instance.queue_free()
-		push_error("Weapon scene root must extend WeaponInstance3D for weapon_id: %s" % weapon_id)
-		return
-
-	var socket: Node3D = _get_visual_socket()
-	if socket == null:
-		weapon_visual.queue_free()
-		weapon_visual = null
-		push_error("WorldWeapon3D has no VisualSocket.")
-		return
-
-	socket.add_child(weapon_visual)
+	weapon_visual = scene.instantiate() as WeaponInstance3D
+	visual_socket.add_child(weapon_visual)
 	weapon_visual.apply_runtime_state({
 		"ammo_in_magazine": ammo_in_magazine,
 		"reserve_ammo": reserve_ammo,
 	})
-
-func _get_weapon_scene_for_setup(weapon_id: String, extra_state: Dictionary) -> PackedScene:
-	if extra_state.has("weapon_scene") and extra_state["weapon_scene"] is PackedScene:
-		return extra_state["weapon_scene"] as PackedScene
-
-	return get_weapon_scene_by_id(weapon_id)
-
-func _get_visual_socket() -> Node3D:
-	if visual_socket != null and is_instance_valid(visual_socket):
-		return visual_socket
-
-	var socket: Node3D = get_node_or_null("VisualSocket") as Node3D
-	if socket != null:
-		visual_socket = socket
-
-	return socket
 
 func get_weapon_state() -> Dictionary:
 	if weapon_visual == null:
@@ -153,22 +125,18 @@ func _physics_process(delta: float) -> void:
 		global_basis = Basis(current_q.slerp(target_q, weight))
 
 func _clear_visual() -> void:
-	var socket: Node3D = _get_visual_socket()
-	if socket == null:
-		weapon_visual = null
-		return
-
-	for child: Node in socket.get_children():
+	for child in visual_socket.get_children():
 		child.queue_free()
-
 	weapon_visual = null
 
 func set_objective_origin_transform(new_transform: Transform3D) -> void:
 	objective_origin_transform = new_transform
 	objective_origin_initialized = true
 
+
 func _set_objective_origin_transform(new_transform: Transform3D) -> void:
 	set_objective_origin_transform(new_transform)
+
 
 func _is_objective_item() -> bool:
 	if current_weapon_id == "bomb" or current_weapon_id == "encryption_remote":
@@ -179,8 +147,14 @@ func _is_objective_item() -> bool:
 
 	return false
 
+
 func is_objective_bomb() -> bool:
 	return current_weapon_id == "bomb"
+
+
+func is_encryption_remote() -> bool:
+	return current_weapon_id == "encryption_remote"
+
 
 func handle_killzone_entered(killzone: Node) -> bool:
 	if not _is_objective_item():
@@ -192,6 +166,7 @@ func handle_killzone_entered(killzone: Node) -> bool:
 	_reset_objective_item_to_origin()
 	_notify_lost.rpc()
 	return true
+
 
 func _reset_objective_item_to_origin() -> void:
 	if not objective_origin_initialized:
@@ -205,9 +180,11 @@ func _reset_objective_item_to_origin() -> void:
 	state_timer = 0.0
 	_receive_world_state.rpc(global_transform)
 
+
 @rpc("authority", "call_local", "reliable")
 func _notify_lost() -> void:
 	lost.emit(self)
+
 
 func despawn() -> void:
 	if is_despawning:
@@ -219,6 +196,7 @@ func despawn() -> void:
 	else:
 		_request_despawn.rpc_id(1)
 
+
 @rpc("any_peer", "call_remote", "reliable")
 func _request_despawn() -> void:
 	if not multiplayer.is_server():
@@ -229,6 +207,7 @@ func _request_despawn() -> void:
 
 	is_despawning = true
 	_despawn.rpc()
+
 
 @rpc("authority", "call_local", "reliable")
 func _despawn() -> void:

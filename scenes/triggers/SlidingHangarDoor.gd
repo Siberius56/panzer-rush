@@ -27,22 +27,31 @@ signal state_changed(is_open: bool)
 @export var tween_transition: Tween.TransitionType = Tween.TRANS_SINE
 @export var tween_ease: Tween.EaseType = Tween.EASE_IN_OUT
 
+@export_group("Orientation")
+@export var lock_editor_orientation: bool = true
+@export var debug_orientation_lock: bool = false
+
 @onready var left_panel: Node3D = get_node_or_null(left_panel_path) as Node3D
 @onready var right_panel: Node3D = get_node_or_null(right_panel_path) as Node3D
 
 var _left_editor_position: Vector3 = Vector3.ZERO
 var _right_editor_position: Vector3 = Vector3.ZERO
+
+var _root_editor_rotation: Vector3 = Vector3.ZERO
+var _root_editor_scale: Vector3 = Vector3.ONE
+var _left_editor_rotation: Vector3 = Vector3.ZERO
+var _left_editor_scale: Vector3 = Vector3.ONE
+var _right_editor_rotation: Vector3 = Vector3.ZERO
+var _right_editor_scale: Vector3 = Vector3.ONE
+
 var _is_open: bool = false
 var _is_animating: bool = false
 var _active_tween: Tween = null
 
 
 func _ready() -> void:
-	if left_panel != null:
-		_left_editor_position = left_panel.position
-
-	if right_panel != null:
-		_right_editor_position = right_panel.position
+	_cache_editor_transform_values()
+	force_editor_orientation()
 
 	if apply_start_state_on_ready:
 		set_open(start_open, true)
@@ -70,6 +79,8 @@ func set_open(value: bool, immediate: bool = false) -> void:
 		_active_tween.kill()
 		_active_tween = null
 
+	force_editor_orientation()
+
 	_is_open = value
 	_is_animating = not immediate and animation_duration > 0.0
 
@@ -85,6 +96,7 @@ func set_open(value: bool, immediate: bool = false) -> void:
 
 	if immediate or animation_duration <= 0.0:
 		_apply_panel_positions(left_target_position, right_target_position)
+		force_editor_orientation()
 		_is_animating = false
 		_emit_finished_signal(value)
 		return
@@ -124,12 +136,48 @@ func is_animating() -> bool:
 	return _is_animating
 
 
+func force_editor_orientation() -> void:
+	if not lock_editor_orientation:
+		return
+
+	rotation = _root_editor_rotation
+	scale = _root_editor_scale
+
+	if left_panel != null and is_instance_valid(left_panel):
+		left_panel.rotation = _left_editor_rotation
+		left_panel.scale = _left_editor_scale
+
+	if right_panel != null and is_instance_valid(right_panel):
+		right_panel.rotation = _right_editor_rotation
+		right_panel.scale = _right_editor_scale
+
+	if debug_orientation_lock:
+		print("[SlidingHangarDoor] Orientation restaurée : ", get_path())
+
+
+func _cache_editor_transform_values() -> void:
+	_root_editor_rotation = rotation
+	_root_editor_scale = scale
+
+	if left_panel != null:
+		_left_editor_position = left_panel.position
+		_left_editor_rotation = left_panel.rotation
+		_left_editor_scale = left_panel.scale
+
+	if right_panel != null:
+		_right_editor_position = right_panel.position
+		_right_editor_rotation = right_panel.rotation
+		_right_editor_scale = right_panel.scale
+
+
 func _apply_panel_positions(left_target_position: Vector3, right_target_position: Vector3) -> void:
 	if left_panel != null:
 		left_panel.position = left_target_position
 
 	if right_panel != null:
 		right_panel.position = right_target_position
+
+	force_editor_orientation()
 
 
 func _get_left_target_position(to_opened: bool) -> Vector3:
@@ -157,6 +205,7 @@ func _get_right_target_position(to_opened: bool) -> Vector3:
 func _on_tween_finished(is_now_open: bool) -> void:
 	_is_animating = false
 	_active_tween = null
+	force_editor_orientation()
 	_emit_finished_signal(is_now_open)
 
 

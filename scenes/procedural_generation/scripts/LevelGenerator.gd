@@ -91,6 +91,7 @@ var active_block_slot_index: int = -1
 var active_block_node: Node3D = null
 var runtime_block_lookup_by_slot: Dictionary = {}
 var runtime_passage_gates: Array[Node3D] = []
+var scene_root_property_cache: Dictionary = {}
 
 
 func _ready() -> void:
@@ -142,11 +143,11 @@ func generate_random(requested_seed: int = 0) -> Resource:
 		var slot_record: Dictionary = assignment.get("slot_record", {})
 		var slot_position: Vector3 = slot_record.get("world_position", Vector3.ZERO)
 		var rotation_steps: int = int(assignment.get("rotation_steps", 0))
-		var rotation_degrees: int = rotation_steps * 90
+		var block_rotation_y_degrees: int = rotation_steps * 90
 		var slot_index: int = int(slot_record.get("slot_index", generated_blocks.size()))
 
 		block_node.position = slot_position
-		block_node.rotation.y = deg_to_rad(float(rotation_degrees))
+		block_node.rotation.y = deg_to_rad(float(block_rotation_y_degrees))
 		var objective_selection: Dictionary = _select_random_objective_for_block(block_node)
 		_get_generated_root().add_child(block_node)
 		generated_blocks.append(block_node)
@@ -158,7 +159,7 @@ func generate_random(requested_seed: int = 0) -> Resource:
 		var connected_local_sides: PackedStringArray = _world_sides_to_local_sides(connected_world_sides, rotation_steps)
 		_apply_block_connectors(block_node, connected_local_sides)
 
-		var block_record: Dictionary = _make_block_record(block_node, block_scene, slot_index, slot_record, rotation_degrees, assignment)
+		var block_record: Dictionary = _make_block_record(block_node, block_scene, slot_index, slot_record, block_rotation_y_degrees, assignment)
 		if not objective_selection.is_empty():
 			block_record["objective_selection"] = objective_selection.duplicate(true)
 		block_record["connected_sides_world"] = Array(connected_world_sides)
@@ -206,9 +207,9 @@ func generate_from_dictionary(database_dictionary: Dictionary) -> Resource:
 			continue
 
 		var slot_position: Vector3 = _vector3_from_array(block_record.get("slot_position", [0.0, 0.0, 0.0]))
-		var rotation_degrees: float = float(block_record.get("rotation_y_degrees", 0.0))
+		var saved_block_rotation_y_degrees: float = float(block_record.get("rotation_y_degrees", 0.0))
 		block_node.position = slot_position
-		block_node.rotation.y = deg_to_rad(rotation_degrees)
+		block_node.rotation.y = deg_to_rad(saved_block_rotation_y_degrees)
 		_apply_saved_objective_selection_to_block(block_node, block_record)
 		_get_generated_root().add_child(block_node)
 		generated_blocks.append(block_node)
@@ -1176,8 +1177,8 @@ func _rotation_steps_from_block_record(block_record: Dictionary) -> int:
 	if block_record.has("rotation_steps"):
 		return int(block_record.get("rotation_steps", 0))
 
-	var rotation_degrees: float = float(block_record.get("rotation_y_degrees", 0.0))
-	var rounded_steps: int = int(round(rotation_degrees / 90.0))
+	var saved_block_rotation_y_degrees: float = float(block_record.get("rotation_y_degrees", 0.0))
+	var rounded_steps: int = int(round(saved_block_rotation_y_degrees / 90.0))
 	return ((rounded_steps % 4) + 4) % 4
 
 
@@ -1286,15 +1287,42 @@ func _get_effective_secondary_poi_scenes() -> Array[PackedScene]:
 
 
 func _poi_scene_can_spawn_on_block(scene: PackedScene, block_node: Node) -> bool:
-	var poi: Node = scene.instantiate()
-	if poi == null:
+	if scene == null or block_node == null:
 		return false
 
-	var can_spawn: bool = true
-	if poi.has_method("can_spawn_on_block"):
-		can_spawn = bool(poi.call("can_spawn_on_block", block_node))
-	poi.free()
-	return can_spawn
+	# Important :
+	# On ne doit pas instancier les POI juste pour lire leurs exports.
+	# Certains enfants de scène peuvent lire global_transform pendant l'instanciation,
+	# ce qui provoque des centaines de warnings quand le générateur teste les candidats.
+	var poi_properties: Dictionary = _get_scene_root_properties(scene)
+
+	var block_has_water: bool = _read_bool_property(block_node, "has_water_near_poi", false)
+	var block_poi_water_type: String = _read_string_property(block_node, "poi_water_type", "none")
+	var required_water_type: String = _sanitize_main_poi_water_type(_scene_property_as_string(poi_properties, "required_water_type", "none"))
+	var requires_water_near_poi: bool = _scene_property_as_bool(poi_properties, "requires_water_near_poi", false)
+
+	if required_water_type != "none":
+		if required_water_type == "any_water" and not block_has_water:
+			return false
+		if required_water_type == "river" and block_poi_water_type != "river":
+			return false
+		if required_water_type == "sea" and block_poi_water_type != "sea":
+			return false
+	elif requires_water_near_poi and not block_has_water:
+		return false
+
+	var poi_tags: PackedStringArray = _scene_property_as_string_array(poi_properties, "poi_tags", PackedStringArray(["land"]))
+	var block_tags: PackedStringArray = _read_string_array_property(block_node, "compatible_poi_tags", PackedStringArray())
+
+	if block_tags.is_empty():
+		return true
+
+	for poi_tag: String in poi_tags:
+		for block_tag: String in block_tags:
+			if poi_tag == block_tag:
+				return true
+
+	return false
 
 
 func _secondary_poi_scene_can_spawn_on_socket(scene: PackedScene, block_node: Node3D, socket: Node3D) -> bool:
@@ -1302,38 +1330,33 @@ func _secondary_poi_scene_can_spawn_on_socket(scene: PackedScene, block_node: No
 		return false
 
 	# Pas de détection automatique. Un socket secondaire doit avoir SecondaryPOISocket.gd.
-	if not socket.has_method("can_accept_secondary_poi"):
+	if not socket.has_method("get_secondary_socket_environment"):
 		push_warning("[LevelGenerator] Socket secondaire sans SecondaryPOISocket.gd : %s" % socket.name)
 		return false
 
-	var poi: Node = scene.instantiate()
-	if poi == null:
+	if socket.has_method("is_secondary_socket_enabled") and not bool(socket.call("is_secondary_socket_enabled")):
 		return false
 
-	var can_spawn: bool = bool(socket.call("can_accept_secondary_poi", poi))
-	poi.free()
-	return can_spawn
+	var socket_environment: String = _sanitize_secondary_environment(String(socket.call("get_secondary_socket_environment")))
+	var required_environment: String = _get_secondary_poi_placement_type(scene)
+
+	return _secondary_socket_accepts_environment(socket_environment, required_environment)
 
 
 func _get_secondary_poi_rotation_mode(scene: PackedScene, socket: Node3D = null) -> String:
 	if scene == null:
-		return "follow block"
+		return "random 90"
 
-	var poi: Node = scene.instantiate()
-	if poi == null:
-		return "follow block"
-
-	var rotation_mode: String = "follow block"
-	if poi.has_method("get_secondary_rotation_mode"):
-		rotation_mode = String(poi.call("get_secondary_rotation_mode"))
-	else:
-		rotation_mode = _read_string_property(poi, "secondary_rotation_mode", "follow block")
+	var poi_properties: Dictionary = _get_scene_root_properties(scene)
+	var rotation_mode: String = _sanitize_secondary_rotation_mode(_scene_property_as_string(poi_properties, "secondary_rotation_mode", "random 90"))
 
 	# Le socket peut surcharger le mode de rotation.
-	if socket != null and socket.has_method("get_secondary_rotation_mode_for_poi"):
-		rotation_mode = String(socket.call("get_secondary_rotation_mode_for_poi", poi, rotation_mode))
+	# On lit la propriété directement pour éviter d'instancier le POI.
+	if socket != null:
+		var socket_override: String = _read_string_property(socket, "rotation_mode_override", "random 90")
+		if socket_override != "use poi setting":
+			rotation_mode = _sanitize_secondary_rotation_mode(socket_override)
 
-	poi.free()
 	return rotation_mode
 
 
@@ -1341,18 +1364,23 @@ func _get_secondary_poi_placement_type(scene: PackedScene) -> String:
 	if scene == null:
 		return "land"
 
-	var poi: Node = scene.instantiate()
-	if poi == null:
-		return "land"
+	var poi_properties: Dictionary = _get_scene_root_properties(scene)
+	var placement_type: String = _sanitize_secondary_environment(_scene_property_as_string(poi_properties, "secondary_placement_type", ""))
 
-	var placement_type: String = "land"
-	if poi.has_method("get_effective_placement_type"):
-		placement_type = String(poi.call("get_effective_placement_type"))
-	else:
-		placement_type = _read_string_property(poi, "secondary_placement_type", "land")
+	if not placement_type.is_empty():
+		return placement_type
 
-	poi.free()
-	return placement_type
+	# Compatibilité avec les anciens POI secondaires qui utilisaient required_water_type.
+	var required_water_type: String = _scene_property_as_string(poi_properties, "required_water_type", "none")
+	match required_water_type:
+		"river":
+			return "river"
+		"sea":
+			return "sea"
+		"any_water":
+			return "water"
+		_:
+			return "land"
 
 
 func _get_secondary_socket_environment(block_node: Node3D, socket: Node3D, scene: PackedScene = null) -> String:
@@ -1386,7 +1414,8 @@ func _get_closest_block_side_for_socket(block_node: Node3D, socket: Node3D) -> S
 	if block_node == null or socket == null:
 		return "north"
 
-	var local_position: Vector3 = block_node.global_transform.affine_inverse() * socket.global_position
+	var socket_relative_transform: Transform3D = _get_node3d_transform_relative_to_ancestor(socket, block_node)
+	var local_position: Vector3 = socket_relative_transform.origin
 	if absf(local_position.x) > absf(local_position.z):
 		if local_position.x >= 0.0:
 			return "east"
@@ -1577,6 +1606,15 @@ func _spawn_poi_on_socket(block_node: Node3D, socket: Node3D, poi_scene: PackedS
 	if block_node == null or socket == null or poi_scene == null:
 		return null
 
+	var socket_world_transform: Transform3D = _get_socket_world_transform_safe(block_node, socket)
+	var block_world_transform: Transform3D = _get_node3d_world_transform_safe(block_node)
+
+	var base_rotation_y: float = block_world_transform.basis.get_euler().y
+	if rotation_mode == "follow socket":
+		base_rotation_y = socket_world_transform.basis.get_euler().y
+
+	var final_rotation_y: float = base_rotation_y + deg_to_rad(float(poi_rotation_degrees))
+
 	var poi_node_base: Node = poi_scene.instantiate()
 	if not (poi_node_base is Node3D):
 		poi_node_base.queue_free()
@@ -1584,14 +1622,13 @@ func _spawn_poi_on_socket(block_node: Node3D, socket: Node3D, poi_scene: PackedS
 
 	var poi_node: Node3D = poi_node_base as Node3D
 	poi_node.name = "%s_%s" % [name_prefix, String(poi_node.name)]
-	_get_generated_root().add_child(poi_node)
-	poi_node.global_position = socket.global_position
 
-	var base_rotation_y: float = block_node.global_rotation.y
-	if rotation_mode == "follow socket":
-		base_rotation_y = socket.global_rotation.y
+	var final_basis: Basis = Basis(Vector3.UP, final_rotation_y).scaled(poi_node.scale)
+	var final_world_transform: Transform3D = Transform3D(final_basis, socket_world_transform.origin)
 
-	poi_node.global_rotation = Vector3(0.0, base_rotation_y + deg_to_rad(float(poi_rotation_degrees)), 0.0)
+	var generated_root: Node3D = _get_generated_root()
+	generated_root.add_child(poi_node)
+	_apply_node3d_world_transform_safe(poi_node, final_world_transform)
 	return poi_node
 
 
@@ -1606,9 +1643,9 @@ func _spawn_poi_from_record(poi_record: Dictionary, generated_blocks: Array[Node
 	if block_node == null:
 		return null
 
-	var rotation_degrees: int = int(poi_record.get("rotation_y_degrees", 0))
+	var saved_poi_rotation_y_degrees: int = int(poi_record.get("rotation_y_degrees", 0))
 	if not use_secondary_socket:
-		return _spawn_poi_on_block(block_node, poi_scene, rotation_degrees)
+		return _spawn_poi_on_block(block_node, poi_scene, saved_poi_rotation_y_degrees)
 
 	var socket_index: int = int(poi_record.get("socket_index", -1))
 	var socket: Node3D = null
@@ -1626,7 +1663,7 @@ func _spawn_poi_from_record(poi_record: Dictionary, generated_blocks: Array[Node
 		return _spawn_poi_at_saved_transform(poi_record, poi_scene, "SecondaryPOI")
 
 	var rotation_mode: String = String(poi_record.get("secondary_rotation_mode", "follow block"))
-	return _spawn_poi_on_socket(block_node, socket, poi_scene, rotation_degrees, "SecondaryPOI", rotation_mode)
+	return _spawn_poi_on_socket(block_node, socket, poi_scene, saved_poi_rotation_y_degrees, "SecondaryPOI", rotation_mode)
 
 
 func _spawn_poi_at_saved_transform(poi_record: Dictionary, poi_scene: PackedScene, name_prefix: String) -> Node3D:
@@ -1640,9 +1677,15 @@ func _spawn_poi_at_saved_transform(poi_record: Dictionary, poi_scene: PackedScen
 
 	var poi_node: Node3D = poi_node_base as Node3D
 	poi_node.name = "%s_%s" % [name_prefix, String(poi_node.name)]
-	_get_generated_root().add_child(poi_node)
-	poi_node.global_position = _vector3_from_array(poi_record.get("global_position", [0.0, 0.0, 0.0]))
-	poi_node.global_rotation = Vector3(0.0, deg_to_rad(float(poi_record.get("global_rotation_y_degrees", poi_record.get("rotation_y_degrees", 0.0)))), 0.0)
+
+	var saved_position: Vector3 = _vector3_from_array(poi_record.get("global_position", [0.0, 0.0, 0.0]))
+	var saved_rotation_y: float = deg_to_rad(float(poi_record.get("global_rotation_y_degrees", poi_record.get("rotation_y_degrees", 0.0))))
+	var saved_basis: Basis = Basis(Vector3.UP, saved_rotation_y).scaled(poi_node.scale)
+	var saved_world_transform: Transform3D = Transform3D(saved_basis, saved_position)
+
+	var generated_root: Node3D = _get_generated_root()
+	generated_root.add_child(poi_node)
+	_apply_node3d_world_transform_safe(poi_node, saved_world_transform)
 	return poi_node
 
 
@@ -1703,23 +1746,26 @@ func _make_spawn_rig_transform(spawn_socket: Node3D, block_node: Node3D) -> Tran
 	if spawn_socket == null:
 		return Transform3D.IDENTITY
 
+	var socket_world_transform: Transform3D = _get_socket_world_transform_safe(block_node, spawn_socket)
+	var block_world_transform: Transform3D = _get_node3d_world_transform_safe(block_node)
+
 	var y_degrees: float = 0.0
 	match spawn_rig_rotation_mode:
 		"follow socket":
-			y_degrees = rad_to_deg(spawn_socket.global_rotation.y)
+			y_degrees = rad_to_deg(socket_world_transform.basis.get_euler().y)
 		"follow block":
 			if block_node != null:
-				y_degrees = rad_to_deg(block_node.global_rotation.y)
+				y_degrees = rad_to_deg(block_world_transform.basis.get_euler().y)
 			else:
-				y_degrees = rad_to_deg(spawn_socket.global_rotation.y)
+				y_degrees = rad_to_deg(socket_world_transform.basis.get_euler().y)
 		"ignore rotation":
 			y_degrees = 0.0
 		_:
-			y_degrees = rad_to_deg(spawn_socket.global_rotation.y)
+			y_degrees = rad_to_deg(socket_world_transform.basis.get_euler().y)
 			y_degrees = round(y_degrees / 90.0) * 90.0
 
 	y_degrees += spawn_rig_rotation_offset_degrees
-	return Transform3D(Basis(Vector3.UP, deg_to_rad(y_degrees)), spawn_socket.global_position)
+	return Transform3D(Basis(Vector3.UP, deg_to_rad(y_degrees)), socket_world_transform.origin)
 
 
 func _spawn_rig_at_transform(spawn_transform: Transform3D) -> void:
@@ -1735,8 +1781,9 @@ func _spawn_rig_at_transform(spawn_transform: Transform3D) -> void:
 
 	var rig: Node3D = rig_base as Node3D
 	rig.name = "PlayerVehicleSpawnRig"
-	_get_generated_root().add_child(rig)
-	rig.global_transform = spawn_transform
+	var generated_root: Node3D = _get_generated_root()
+	generated_root.add_child(rig)
+	_apply_node3d_world_transform_safe(rig, spawn_transform)
 
 	_copy_marker_children(rig.get_node_or_null("SpawnPoints"), get_spawn_points_root())
 	_copy_marker_children(rig.get_node_or_null("VehicleSpawns"), get_vehicle_spawns_root())
@@ -1758,7 +1805,7 @@ func _copy_marker_children(source_root: Node, destination_root: Node3D) -> void:
 		index += 1
 
 
-func _make_block_record(block_node: Node3D, block_scene: PackedScene, slot_index: int, slot_record: Dictionary, rotation_degrees: int, assignment: Dictionary) -> Dictionary:
+func _make_block_record(block_node: Node3D, block_scene: PackedScene, slot_index: int, slot_record: Dictionary, block_rotation_y_degrees: int, assignment: Dictionary) -> Dictionary:
 	var data: Dictionary = {}
 	if block_node.has_method("get_database_summary"):
 		var summary_value: Variant = block_node.call("get_database_summary")
@@ -1771,7 +1818,7 @@ func _make_block_record(block_node: Node3D, block_scene: PackedScene, slot_index
 	data["slot_index"] = slot_index
 	data["slot_position"] = _vector3_to_array(slot_position)
 	data["grid_position"] = [grid_position.x, grid_position.y]
-	data["rotation_y_degrees"] = rotation_degrees
+	data["rotation_y_degrees"] = block_rotation_y_degrees
 	data["rotation_steps"] = int(assignment.get("rotation_steps", 0))
 	data["scene_path"] = _get_scene_path(block_scene)
 	var blueprint: Dictionary = assignment.get("blueprint", {})
@@ -1784,7 +1831,7 @@ func _make_block_record(block_node: Node3D, block_scene: PackedScene, slot_index
 	return data
 
 
-func _make_poi_record(poi_node: Node3D, poi_scene: PackedScene, block_slot: int, rotation_degrees: int, allow_random_poi_rotation: bool, poi_category: String, socket_index: int, socket_name: String, extra_data: Dictionary) -> Dictionary:
+func _make_poi_record(poi_node: Node3D, poi_scene: PackedScene, block_slot: int, poi_record_rotation_y_degrees: int, allow_random_poi_rotation: bool, poi_category: String, socket_index: int, socket_name: String, extra_data: Dictionary) -> Dictionary:
 	var data: Dictionary = {}
 	if poi_node.has_method("get_database_summary"):
 		var summary_value: Variant = poi_node.call("get_database_summary")
@@ -1797,13 +1844,69 @@ func _make_poi_record(poi_node: Node3D, poi_scene: PackedScene, block_slot: int,
 	data["block_slot"] = block_slot
 	data["global_position"] = _vector3_to_array(poi_node.global_position)
 	data["global_rotation_y_degrees"] = rad_to_deg(poi_node.global_rotation.y)
-	data["rotation_y_degrees"] = rotation_degrees
+	data["rotation_y_degrees"] = poi_record_rotation_y_degrees
 	data["allow_random_poi_rotation"] = allow_random_poi_rotation
 	data["poi_category"] = poi_category
 	data["socket_index"] = socket_index
 	data["socket_name"] = socket_name
 	data["scene_path"] = _get_scene_path(poi_scene)
 	return data
+
+
+func _get_node3d_world_transform_safe(node_3d: Node3D) -> Transform3D:
+	if node_3d == null:
+		return Transform3D.IDENTITY
+	if node_3d.is_inside_tree():
+		return node_3d.global_transform
+	return node_3d.transform
+
+
+func _get_node3d_transform_relative_to_ancestor(node_3d: Node3D, ancestor: Node3D) -> Transform3D:
+	if node_3d == null:
+		return Transform3D.IDENTITY
+	if ancestor == null:
+		return node_3d.transform
+
+	var relative_transform: Transform3D = Transform3D.IDENTITY
+	var current_node: Node = node_3d
+	while current_node != null and current_node != ancestor:
+		if current_node is Node3D:
+			var current_node_3d: Node3D = current_node as Node3D
+			relative_transform = current_node_3d.transform * relative_transform
+		current_node = current_node.get_parent()
+
+	if current_node == ancestor:
+		return relative_transform
+
+	return node_3d.transform
+
+
+func _get_socket_world_transform_safe(block_node: Node3D, socket: Node3D) -> Transform3D:
+	if socket == null:
+		return _get_node3d_world_transform_safe(block_node)
+
+	if socket.is_inside_tree():
+		return socket.global_transform
+
+	var block_world_transform: Transform3D = _get_node3d_world_transform_safe(block_node)
+	var socket_relative_transform: Transform3D = _get_node3d_transform_relative_to_ancestor(socket, block_node)
+	return block_world_transform * socket_relative_transform
+
+
+func _apply_node3d_world_transform_safe(node_3d: Node3D, world_transform: Transform3D) -> void:
+	if node_3d == null:
+		return
+
+	if node_3d.is_inside_tree():
+		node_3d.global_transform = world_transform
+		return
+
+	var parent_node_3d: Node3D = node_3d.get_parent() as Node3D
+	if parent_node_3d != null and parent_node_3d.is_inside_tree():
+		node_3d.transform = parent_node_3d.global_transform.affine_inverse() * world_transform
+		return
+
+	node_3d.transform = world_transform
 
 
 func _get_block_record_connection_records(block_records: Array[Dictionary]) -> Array[Dictionary]:
@@ -1865,6 +1968,7 @@ func _clear_current_level() -> void:
 	_clear_children(get_passage_gates_root())
 	runtime_passage_gates.clear()
 	runtime_block_lookup_by_slot.clear()
+	scene_root_property_cache.clear()
 	active_block_node = null
 	active_block_slot_index = -1
 	_clear_spawn_output_roots()
@@ -1946,6 +2050,122 @@ func _dictionary_array_from_variant(value: Variant) -> Array[Dictionary]:
 			if item is Dictionary:
 				result.append((item as Dictionary).duplicate(true))
 	return result
+
+
+func _get_scene_root_properties(scene: PackedScene) -> Dictionary:
+	if scene == null:
+		return {}
+
+	var scene_key: String = _get_scene_unique_key(scene)
+	if scene_root_property_cache.has(scene_key):
+		return (scene_root_property_cache[scene_key] as Dictionary).duplicate(true)
+
+	var result: Dictionary = {}
+	var state: SceneState = scene.get_state()
+	_collect_scene_state_root_properties(state, result)
+
+	scene_root_property_cache[scene_key] = result.duplicate(true)
+	return result
+
+
+func _collect_scene_state_root_properties(state: SceneState, result: Dictionary) -> void:
+	if state == null:
+		return
+
+	var base_state: SceneState = state.get_base_scene_state()
+	if base_state != null:
+		_collect_scene_state_root_properties(base_state, result)
+
+	if state.get_node_count() <= 0:
+		return
+
+	var property_count: int = state.get_node_property_count(0)
+	for property_index: int in range(property_count):
+		var property_name: String = String(state.get_node_property_name(0, property_index))
+		result[property_name] = state.get_node_property_value(0, property_index)
+
+
+func _scene_property_as_string(properties: Dictionary, property_name: String, fallback: String) -> String:
+	if not properties.has(property_name):
+		return fallback
+	return String(properties[property_name])
+
+
+func _scene_property_as_bool(properties: Dictionary, property_name: String, fallback: bool) -> bool:
+	if not properties.has(property_name):
+		return fallback
+	return bool(properties[property_name])
+
+
+func _scene_property_as_string_array(properties: Dictionary, property_name: String, fallback: PackedStringArray) -> PackedStringArray:
+	if not properties.has(property_name):
+		return fallback
+
+	return _string_array_from_variant(properties[property_name], fallback)
+
+
+func _read_string_array_property(target: Object, property_name: String, fallback: PackedStringArray) -> PackedStringArray:
+	if target == null:
+		return fallback
+
+	for property_info: Dictionary in target.get_property_list():
+		if String(property_info.get("name", "")) == property_name:
+			return _string_array_from_variant(target.get(property_name), fallback)
+
+	return fallback
+
+
+func _string_array_from_variant(value: Variant, fallback: PackedStringArray) -> PackedStringArray:
+	if value is PackedStringArray:
+		return value as PackedStringArray
+
+	var result: PackedStringArray = PackedStringArray()
+	if value is Array:
+		for item: Variant in value:
+			result.append(String(item))
+	elif value is String:
+		result.append(String(value))
+
+	if result.is_empty():
+		return fallback
+
+	return result
+
+
+func _sanitize_main_poi_water_type(value: String) -> String:
+	if value in ["none", "any_water", "river", "sea"]:
+		return value
+	return "none"
+
+
+func _sanitize_secondary_environment(value: String) -> String:
+	if value in ["any", "land", "river", "sea", "water"]:
+		return value
+	return ""
+
+
+func _sanitize_secondary_rotation_mode(value: String) -> String:
+	if value in ["random 90", "follow block", "follow socket"]:
+		return value
+	return "random 90"
+
+
+func _secondary_socket_accepts_environment(socket_environment: String, required_environment: String) -> bool:
+	if required_environment.is_empty():
+		required_environment = "land"
+	if socket_environment.is_empty():
+		socket_environment = "land"
+
+	if required_environment == "any":
+		return true
+	if socket_environment == "any":
+		return true
+	if required_environment == "water":
+		return socket_environment == "river" or socket_environment == "sea" or socket_environment == "water"
+	if socket_environment == "water":
+		return required_environment == "river" or required_environment == "sea" or required_environment == "water"
+
+	return socket_environment == required_environment
 
 
 func _read_bool_property(target: Object, property_name: String, fallback: bool) -> bool:

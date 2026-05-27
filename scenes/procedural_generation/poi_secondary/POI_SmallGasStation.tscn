@@ -17,10 +17,23 @@
 transparency = 1
 albedo_color = Color(0.1, 0.75, 0.25, 0.28)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_5avg3"]
+size = Vector3(16, 1, 16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uebqt"]
+size = Vector3(1, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lc178"]
+size = Vector3(1, 1, 8)
+
 [sub_resource type="BoxMesh" id="BoxMesh_u5ygr"]
 size = Vector3(16, 1, 16)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ygyci"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_gb72f"]
+material = ExtResource("5_0ogh2")
+size = Vector3(1, 1, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ib8o6"]
 size = Vector3(0.3, 3, 16)
@@ -72,13 +85,35 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20000005, 5)
 [node name="SpawnPoint_04" type="Marker3D" parent="POI_Small_Resource_Cache" unique_id=960643033]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
 
-[node name="Ground" type="Node3D" parent="." unique_id=712528031]
+[node name="Ground" type="StaticBody3D" parent="." unique_id=435042769]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=171788795]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+shape = SubResource("BoxShape3D_5avg3")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground" unique_id=351756939]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+shape = SubResource("BoxShape3D_uebqt")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground" unique_id=1849497200]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+shape = SubResource("BoxShape3D_lc178")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=935927497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
 material_override = ExtResource("5_0ogh2")
 mesh = SubResource("BoxMesh_u5ygr")
 surface_material_override/0 = SubResource("StandardMaterial3D_ygyci")
+
+[node name="Bridge_Wide5" type="MeshInstance3D" parent="Ground" unique_id=1576755505]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, 8)
+mesh = SubResource("BoxMesh_gb72f")
+
+[node name="Bridge_Wide6" type="MeshInstance3D" parent="Ground" unique_id=1882085053]
+transform = Transform3D(-3.090862e-08, -3.090862e-08, 1, -0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, -4.371139e-08, 0, -0.6071558, -8)
+mesh = SubResource("BoxMesh_gb72f")
 
 [node name="indicator-special-lines2" parent="Ground" unique_id=219245076 instance=ExtResource("6_vsp0x")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0.11, -7.25)
@@ -233,7 +268,7 @@ visible = false
 [node name="crane2" parent="Props" unique_id=1148094443 instance=ExtResource("8_lhlkr")]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 6.75, 0.1, -7)
 
-[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1148094443, 1818639732) index="0" unique_id=546961492]
+[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1148094443, 372918128) index="0" unique_id=1170679970]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 3.0033193, 0)
 
 [node name="RigidBody3D8" parent="Props" unique_id=1144813020 instance=ExtResource("9_4pg83")]
