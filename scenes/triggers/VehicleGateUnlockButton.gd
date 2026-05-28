@@ -28,8 +28,8 @@ signal activated(player_node: Node)
 
 var _players_inside: Dictionary = {}
 var _is_used: bool = false
-var _base_mesh_position: Vector3 = Vector3.ZERO
-var _base_mesh_scale: Vector3 = Vector3.ONE
+#var _base_mesh_position: Vector3 = Vector3.ZERO
+#var _base_mesh_scale: Vector3 = Vector3.ONE
 var _button_material: StandardMaterial3D = null
 
 
@@ -144,9 +144,6 @@ func _setup_visual_cache() -> void:
 	if button_mesh == null:
 		return
 
-	#_base_mesh_position = button_mesh.position
-	#_base_mesh_scale = button_mesh.scale
-
 	var current_material: Material = button_mesh.get_surface_override_material(0)
 	if current_material == null and button_mesh.mesh != null:
 		current_material = button_mesh.mesh.surface_get_material(0)
@@ -166,13 +163,6 @@ func _apply_used_visual(value: bool) -> void:
 
 	if _button_material != null:
 		_button_material.albedo_color = disabled_color if value else enabled_color
-
-	#if value:
-		#button_mesh.position = _base_mesh_position + used_local_offset
-		#button_mesh.scale = _base_mesh_scale * used_scale_multiplier
-	#else:
-		#button_mesh.position = _base_mesh_position
-		#button_mesh.scale = _base_mesh_scale
 
 
 func _on_detector_entered(detector: Node) -> void:

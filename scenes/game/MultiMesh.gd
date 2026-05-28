@@ -111,7 +111,7 @@ func generate_trees() -> void:
 		var random_x: float = rng.randf_range(-forest_size.x * 0.5, forest_size.x * 0.5)
 		var random_z: float = rng.randf_range(-forest_size.y * 0.5, forest_size.y * 0.5)
 
-		var position: Vector3 = Vector3(random_x, ground_y, random_z)
+		var tree_position: Vector3 = Vector3(random_x, ground_y, random_z)
 
 		var rotation_y_degrees: float = 0.0
 
@@ -121,10 +121,10 @@ func generate_trees() -> void:
 		var rotation_y_radians: float = deg_to_rad(rotation_y_degrees)
 		var random_scale: float = rng.randf_range(min_scale, max_scale)
 
-		var basis: Basis = Basis(Vector3.UP, rotation_y_radians)
-		basis = basis.scaled(Vector3.ONE * random_scale)
+		var tree_basis: Basis = Basis(Vector3.UP, rotation_y_radians)
+		tree_basis = tree_basis.scaled(Vector3.ONE * random_scale)
 
-		var tree_transform: Transform3D = Transform3D(basis, position)
+		var tree_transform: Transform3D = Transform3D(tree_basis, tree_position)
 
 		target_multimesh.set_instance_transform(i, tree_transform)
 

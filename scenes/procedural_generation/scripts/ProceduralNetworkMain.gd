@@ -20,8 +20,6 @@ const TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH: String = "res://scenes/enemies/T
 @export_group("Procedural Level Generation")
 @export var use_procedural_generation: bool = true
 @export var procedural_generator_path: NodePath = ^"ProceduralLevelGenerator"
-@export var load_procedural_database_on_ready: bool = false
-@export var procedural_database_path: String = "user://last_procedural_level.json"
 @export var debug_reposition_players_on_regeneration: bool = true
 
 @export_group("Respawn")
@@ -57,7 +55,7 @@ var active_respawn_passage_path: NodePath = NodePath("")
 
 var procedural_generator: Node = null
 var procedural_level_ready: bool = false
-var procedural_database_snapshot: Dictionary = {}
+var procedural_generation_snapshot: Dictionary = {}
 var procedural_sync_after_receive_started: bool = false
 
 
@@ -116,7 +114,7 @@ func _prepare_procedural_level() -> void:
 
 	if multiplayer.multiplayer_peer != null and not multiplayer.is_server():
 		procedural_level_ready = false
-		_request_procedural_level_database.rpc_id(NetworkManager.SERVER_PEER_ID)
+		_request_procedural_level_snapshot.rpc_id(NetworkManager.SERVER_PEER_ID)
 		return
 
 	_generate_procedural_level_as_authority(0, false)
@@ -145,32 +143,28 @@ func _generate_procedural_level_as_authority(requested_seed: int, broadcast_to_c
 		procedural_level_ready = true
 		return
 
-	var generated_database: Variant = null
-	if load_procedural_database_on_ready and requested_seed == 0 and generator.has_method("generate_from_json_file"):
-		generated_database = generator.call("generate_from_json_file", procedural_database_path)
-	else:
-		generated_database = generator.call("generate_random", requested_seed)
+	var generated_generation_data: Variant = generator.call("generate_random", requested_seed)
 
-	procedural_database_snapshot = _read_database_dictionary_from_generator(generator)
+	procedural_generation_snapshot = _read_generation_dictionary_from_generator(generator)
 	procedural_level_ready = true
 	_refresh_spawn_roots_from_procedural_generator()
 
 	if broadcast_to_clients and multiplayer.multiplayer_peer != null and multiplayer.is_server():
-		_receive_procedural_level_database.rpc(procedural_database_snapshot.duplicate(true))
+		_receive_procedural_level_snapshot.rpc(procedural_generation_snapshot.duplicate(true))
 
 	if debug_reposition_players_on_regeneration and broadcast_to_clients:
 		_reposition_existing_players_and_vehicles_to_current_spawns()
 
 
-func _read_database_dictionary_from_generator(generator: Node) -> Dictionary:
+func _read_generation_dictionary_from_generator(generator: Node) -> Dictionary:
 	if generator == null:
 		return {}
-	if not generator.has_method("get_database_dictionary"):
-		return {}
 
-	var value: Variant = generator.call("get_database_dictionary")
-	if value is Dictionary:
-		return (value as Dictionary).duplicate(true)
+	if generator.has_method("get_generation_dictionary"):
+		var generation_value: Variant = generator.call("get_generation_dictionary")
+		if generation_value is Dictionary:
+			return (generation_value as Dictionary).duplicate(true)
+
 	return {}
 
 
@@ -191,37 +185,37 @@ func _refresh_spawn_roots_from_procedural_generator() -> void:
 		vehicle_spawns_root = get_node_or_null("VehicleSpawns") as Node3D
 
 
-func _on_procedural_generation_finished(database_dictionary: Dictionary) -> void:
-	procedural_database_snapshot = database_dictionary.duplicate(true)
+func _on_procedural_generation_finished(generation_dictionary: Dictionary) -> void:
+	procedural_generation_snapshot = generation_dictionary.duplicate(true)
 	_refresh_spawn_roots_from_procedural_generator()
 
 
 @rpc("any_peer", "reliable")
-func _request_procedural_level_database() -> void:
+func _request_procedural_level_snapshot() -> void:
 	if multiplayer.multiplayer_peer != null and not multiplayer.is_server():
 		return
 
-	if procedural_database_snapshot.is_empty():
+	if procedural_generation_snapshot.is_empty():
 		_generate_procedural_level_as_authority(0, false)
 
 	var requester_peer_id: int = multiplayer.get_remote_sender_id()
 	if requester_peer_id <= 0:
 		return
 
-	_receive_procedural_level_database.rpc_id(requester_peer_id, procedural_database_snapshot.duplicate(true))
+	_receive_procedural_level_snapshot.rpc_id(requester_peer_id, procedural_generation_snapshot.duplicate(true))
 
 
 @rpc("authority", "call_local", "reliable")
-func _receive_procedural_level_database(database_dictionary: Dictionary) -> void:
+func _receive_procedural_level_snapshot(generation_dictionary: Dictionary) -> void:
 	var generator: Node = _get_procedural_generator()
 	if generator == null:
 		procedural_level_ready = true
 		return
 
 	if generator.has_method("generate_from_dictionary"):
-		generator.call("generate_from_dictionary", database_dictionary.duplicate(true))
+		generator.call("generate_from_dictionary", generation_dictionary.duplicate(true))
 
-	procedural_database_snapshot = database_dictionary.duplicate(true)
+	procedural_generation_snapshot = generation_dictionary.duplicate(true)
 	procedural_level_ready = true
 	_refresh_spawn_roots_from_procedural_generator()
 
@@ -251,38 +245,8 @@ func _request_debug_regenerate_procedural_level(requested_seed: int) -> void:
 	debug_regenerate_procedural_level(requested_seed)
 
 
-func debug_save_procedural_database() -> bool:
-	var generator: Node = _get_procedural_generator()
-	if generator == null or not generator.has_method("save_current_database"):
-		return false
-	return bool(generator.call("save_current_database", procedural_database_path))
-
-
-func debug_load_procedural_database() -> bool:
-	var generator: Node = _get_procedural_generator()
-	if generator == null or not generator.has_method("generate_from_json_file"):
-		return false
-
-	var loaded: Variant = generator.call("generate_from_json_file", procedural_database_path)
-	if loaded == null:
-		return false
-
-	procedural_database_snapshot = _read_database_dictionary_from_generator(generator)
-	procedural_level_ready = true
-	_refresh_spawn_roots_from_procedural_generator()
-
-	if multiplayer.multiplayer_peer != null and multiplayer.is_server():
-		_receive_procedural_level_database.rpc(procedural_database_snapshot.duplicate(true))
-
-	_reposition_existing_players_and_vehicles_to_current_spawns()
-	return true
-
-
-func debug_get_procedural_database_text() -> String:
-	var generator: Node = _get_procedural_generator()
-	if generator != null and generator.has_method("get_database_text"):
-		return String(generator.call("get_database_text"))
-	return JSON.stringify(procedural_database_snapshot, "\t")
+func get_procedural_generation_snapshot() -> Dictionary:
+	return procedural_generation_snapshot.duplicate(true)
 
 
 func _reposition_existing_players_and_vehicles_to_current_spawns() -> void:

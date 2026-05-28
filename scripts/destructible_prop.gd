@@ -1,5 +1,5 @@
 extends Node3D
-class_name DestructibleProp
+#class_name DestructibleProp
 
 ## Script commun pour des props physiques destructibles.
 ## Godot 4.x.

@@ -127,6 +127,8 @@ func _disconnect_network_signals() -> void:
 
 
 func debug_log(message: String) -> void:
+	return
+	#
 	var time := Time.get_time_string_from_system()
 	var text := "%s [%s] %s" % [DEBUG_PREFIX, time, message]
 	print(text)

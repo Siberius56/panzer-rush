@@ -104,12 +104,12 @@ func setup_grass() -> void:
 		var width: float = random.randf_range(blade_width_min, blade_width_max)
 		var height: float = random.randf_range(blade_height_min, blade_height_max)
 
-		var basis: Basis = Basis.IDENTITY
-		basis = basis.rotated(Vector3.UP, rotation_y)
-		basis = basis.scaled(Vector3(width, height, width))
+		var blade_basis: Basis = Basis.IDENTITY
+		blade_basis = blade_basis.rotated(Vector3.UP, rotation_y)
+		blade_basis = blade_basis.scaled(Vector3(width, height, width))
 
-		var transform: Transform3D = Transform3D(basis, local_position)
-		new_multimesh.set_instance_transform(i, transform)
+		var blade_transform: Transform3D = Transform3D(blade_basis, local_position)
+		new_multimesh.set_instance_transform(i, blade_transform)
 
 		var phase: float = random.randf()
 		var color_variation: float = random.randf()
@@ -246,10 +246,10 @@ func _get_random_local_position(random: RandomNumberGenerator, space_state: Phys
 
 	if use_ground_raycast and space_state != null:
 		var from_local: Vector3 = Vector3(x, raycast_height, z)
-		var to_local: Vector3 = Vector3(x, -raycast_depth, z)
+		var ray_to_local: Vector3 = Vector3(x, -raycast_depth, z)
 		var from_global: Vector3 = global_transform * from_local
-		var to_global: Vector3 = global_transform * to_local
-		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from_global, to_global, ground_collision_mask)
+		var ray_to_global: Vector3 = global_transform * ray_to_local
+		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from_global, ray_to_global, ground_collision_mask)
 		var hit: Dictionary = space_state.intersect_ray(query)
 
 		if hit.has("position"):
@@ -313,9 +313,9 @@ func _reset_all_interactor_uniforms(material: ShaderMaterial) -> void:
 	for i in range(MAX_INTERACTORS):
 		_set_interactor_uniform(material, i, Vector3(99999.0, 0.0, 99999.0), 0.0, 0.0)
 
-func _set_interactor_uniform(material: ShaderMaterial, index: int, position: Vector3, radius: float, strength: float) -> void:
+func _set_interactor_uniform(material: ShaderMaterial, index: int, interactor_position: Vector3, radius: float, strength: float) -> void:
 	var position_uniform_name: StringName = StringName("interactor_%d" % index)
 	var strength_uniform_name: StringName = StringName("interactor_strength_%d" % index)
 
-	material.set_shader_parameter(position_uniform_name, Vector4(position.x, position.y, position.z, radius))
+	material.set_shader_parameter(position_uniform_name, Vector4(interactor_position.x, interactor_position.y, interactor_position.z, radius))
 	material.set_shader_parameter(strength_uniform_name, strength)

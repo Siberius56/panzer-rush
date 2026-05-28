@@ -2,21 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c84gyf57qgg2v" path="res://scenes/procedural_generation/scripts/ProceduralNetworkMain.gd" id="1_main_script"]
 [ext_resource type="Script" uid="uid://bt865vka7yo3f" path="res://scenes/procedural_generation/scripts/LevelGenerator.gd" id="2_generator_script"]
-[ext_resource type="PackedScene" uid="uid://lshlls7ig76" path="res://scenes/procedural_generation/blocks/Block_Forest_A.tscn" id="3_block_forest_a"]
-[ext_resource type="PackedScene" uid="uid://o2h1jb668fxp" path="res://scenes/procedural_generation/blocks/Block_Forest_B.tscn" id="4_block_forest_b"]
-[ext_resource type="PackedScene" uid="uid://dob0iqe3orn8f" path="res://scenes/procedural_generation/blocks/Block_Mountain_A.tscn" id="5_block_mountain_a"]
-[ext_resource type="PackedScene" uid="uid://dqjq4n5u0koy8" path="res://scenes/procedural_generation/blocks/Block_Plains_River_A.tscn" id="6_block_plains_river_a"]
-[ext_resource type="PackedScene" uid="uid://0p32l1mo0vkr" path="res://scenes/procedural_generation/blocks/Block_Sea_A.tscn" id="8_block_sea_a"]
-[ext_resource type="PackedScene" uid="uid://15idkeyw31h" path="res://scenes/procedural_generation/poi/POI_MilitaryBase.tscn" id="9_poi_military"]
-[ext_resource type="PackedScene" uid="uid://vg2uemvefmjk" path="res://scenes/procedural_generation/poi/POI_Airport.tscn" id="10_poi_airport"]
-[ext_resource type="PackedScene" uid="uid://1ysm4xmerk2h" path="res://scenes/procedural_generation/poi/POI_Town.tscn" id="11_poi_town"]
-[ext_resource type="PackedScene" uid="uid://b2lmqof6q0ayu" path="res://scenes/procedural_generation/poi/POI_MissileSilo.tscn" id="12_poi_silo"]
-[ext_resource type="PackedScene" uid="uid://b27lxj0874218" path="res://scenes/procedural_generation/poi/POI_Port.tscn" id="13_poi_port"]
 [ext_resource type="PackedScene" uid="uid://cjjpkdoh41543" path="res://scenes/procedural_generation/spawn/PlayerVehicleSpawnRig.tscn" id="14_spawn_rig"]
 [ext_resource type="PackedScene" uid="uid://tqdx11vt816b" path="res://scenes/procedural_generation/debug/ProceduralLevelDebugMenu.tscn" id="15_debug_menu"]
-[ext_resource type="PackedScene" uid="uid://bous1acnqpthg" path="res://scenes/procedural_generation/blocks/Block_Mountain_B.tscn" id="16_block_mountain_b"]
-[ext_resource type="PackedScene" uid="uid://bqio66mcoweml" path="res://scenes/procedural_generation/blocks/Block_Plains_River_L.tscn" id="17_block_plains_river_l"]
-[ext_resource type="PackedScene" uid="uid://cdsjs3uaig5au" path="res://scenes/procedural_generation/blocks/Block_Plains_River_B.tscn" id="18_block_plains_river_b"]
 [ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="19_1msgv"]
 [ext_resource type="Script" uid="uid://vfp2lnkr8vd5" path="res://scripts/game/zombie_director/HordeDirector.gd" id="19_horde_director_script"]
 [ext_resource type="Script" uid="uid://uoltysxx0x3w" path="res://scripts/game/zombie_director/HordeDirectorDebugHUD.gd" id="21_w1v0g"]
@@ -48,8 +35,6 @@ max_idle_zones_populated_on_ready = 99
 script = ExtResource("2_generator_script")
 block_size = 200.0
 sea_block_generation_chance = 0.5
-block_scenes = Array[PackedScene]([ExtResource("3_block_forest_a"), ExtResource("4_block_forest_b"), ExtResource("5_block_mountain_a"), ExtResource("16_block_mountain_b"), ExtResource("6_block_plains_river_a"), ExtResource("18_block_plains_river_b"), ExtResource("17_block_plains_river_l"), ExtResource("8_block_sea_a")])
-poi_scenes = Array[PackedScene]([ExtResource("9_poi_military"), ExtResource("10_poi_airport"), ExtResource("11_poi_town"), ExtResource("12_poi_silo"), ExtResource("13_poi_port")])
 spawn_rig_scene = ExtResource("14_spawn_rig")
 
 [node name="Lighting" type="Node3D" parent="." unique_id=2010338712]

@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://yo01d53hgslv" path="res://scenes/props/Physic/Crate.tscn" id="8_04c24"]
 [ext_resource type="PackedScene" uid="uid://cdfsoh484um4y" path="res://scenes/props/Physic/Light_Street_cross.tscn" id="9_geng4"]
 [ext_resource type="PackedScene" uid="uid://dk63ole3mu7ww" path="res://scenes/Light_Tower.tscn" id="10_iex2r"]
+[ext_resource type="PackedScene" uid="uid://dha7qfqc5vywa" path="res://scenes/weapons/WorldWeapon3D.tscn" id="11_ots1r"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ttr1l"]
 size = Vector3(16, 1, 16)
@@ -148,7 +149,7 @@ transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 4,
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 6.75, 0.1, -7)
 visible = false
 
-[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1326099284, 372918128) index="0" unique_id=1170679970]
+[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1326099284, 1818639732) index="0" unique_id=546961492]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 3.0033193, 0)
 
 [node name="RigidBody3D8" parent="Props" unique_id=1144813020 instance=ExtResource("7_c0mis")]
@@ -250,6 +251,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
 
 [node name="Marker_04" parent="ItemSpawner_Ammo" index="3" unique_id=852653451]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="WorldWeapon3D" parent="." unique_id=2144849267 instance=ExtResource("11_ots1r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8372953, 0.9935507, -6.9254665)
+editor_weapon_id = "smg"
 
 [editable path="Props/crane2"]
 [editable path="ItemSpawner_Ammo"]

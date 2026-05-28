@@ -121,7 +121,7 @@ func _configure_zombie_surround_slot(instance_offset: int) -> void:
 	var golden_angle: float = 2.39996323
 	_zombie_surround_angle = fmod(float(instance_offset) * golden_angle, TAU)
 	_zombie_surround_ring_index = int(abs(instance_offset)) % max(zombie_surround_ring_count, 1)
-	var radius_noise_index: int = int(abs(instance_offset / 17)) % 31
+	var radius_noise_index: int = int(abs(float(instance_offset) / 17)) % 31
 	_zombie_surround_radius_scale = 0.88 + float(radius_noise_index) / 31.0 * 0.24
 
 

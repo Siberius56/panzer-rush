@@ -1,8 +1,7 @@
 extends Node3D
 
-signal generation_finished(database_dictionary: Dictionary)
+signal generation_finished(generation_dictionary: Dictionary)
 
-const DatabaseScript: Script = preload("res://scenes/procedural_generation/scripts/LevelGenerationDatabase.gd")
 const CARDINAL_DIRECTIONS: Array[String] = ["north", "east", "south", "west"]
 const OPPOSITE_DIRECTIONS: Dictionary = {
 	"north": "south",
@@ -25,21 +24,15 @@ const AVAILABLE_LAYOUTS: Dictionary = {
 }
 const SIDE_PROFILE_NONE: String = "none"
 const SIDE_PROFILE_SEA: String = "sea"
-const DEFAULT_SECONDARY_POI_SCENE_PATHS: Array[String] = [
-	"res://scenes/procedural_generation/poi_secondary/POI_AbandonedCamp.tscn",
-	"res://scenes/procedural_generation/poi_secondary/POI_SmallResourceCache.tscn",
-	"res://scenes/procedural_generation/poi_secondary/POI_RadioRelay.tscn",
-	"res://scenes/procedural_generation/poi_secondary/POI_CrashedConvoy.tscn",
-	"res://scenes/procedural_generation/poi_secondary/POI_RiverFishingDock.tscn",
-	"res://scenes/procedural_generation/poi_secondary/POI_SeaShipwreck.tscn",
-]
+const DEFAULT_BLOCK_SCENES_FOLDER: String = "res://scenes/procedural_generation/blocks/"
+const DEFAULT_POI_SCENES_FOLDER: String = "res://scenes/procedural_generation/poi/"
+const DEFAULT_SECONDARY_POI_SCENES_FOLDER: String = "res://scenes/procedural_generation/poi_secondary/"
 
 @export_group("Generation")
 @export var auto_generate_on_ready: bool = false
 @export var default_block_count: int = 3
 @export var block_size: float = 150.0
 @export var layout_id: String = "random_3"
-@export var database_save_path: String = "user://last_procedural_level.json"
 @export var max_generation_attempts: int = 128
 @export var allow_duplicate_blocks: bool = false
 @export var require_neighbor_connection: bool = true
@@ -57,9 +50,9 @@ const DEFAULT_SECONDARY_POI_SCENE_PATHS: Array[String] = [
 @export var vehicle_spawns_output_path: NodePath = ^"../VehicleSpawns"
 
 @export_group("Packed Scenes")
-@export var block_scenes: Array[PackedScene] = []
-@export var poi_scenes: Array[PackedScene] = []
-@export var secondary_poi_scenes: Array[PackedScene] = []
+@export_dir var block_scenes_folder: String = DEFAULT_BLOCK_SCENES_FOLDER
+@export_dir var poi_scenes_folder: String = DEFAULT_POI_SCENES_FOLDER
+@export_dir var secondary_poi_scenes_folder: String = DEFAULT_SECONDARY_POI_SCENES_FOLDER
 @export var spawn_secondary_pois: bool = true
 @export_range(0.0, 1.0, 0.01) var secondary_poi_spawn_chance: float = 1.0
 @export var spawn_rig_scene: PackedScene
@@ -83,15 +76,16 @@ const DEFAULT_SECONDARY_POI_SCENE_PATHS: Array[String] = [
 @export var debug_print_passage_gates: bool = true
 
 @export_group("Debug")
-@export var debug_print_database: bool = true
+@export var debug_print_generation_snapshot: bool = false
 
-var last_database: Resource = null
+var last_generation_snapshot: Dictionary = {}
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var active_block_slot_index: int = -1
 var active_block_node: Node3D = null
 var runtime_block_lookup_by_slot: Dictionary = {}
 var runtime_passage_gates: Array[Node3D] = []
 var scene_root_property_cache: Dictionary = {}
+var folder_scene_cache: Dictionary = {}
 
 
 func _ready() -> void:
@@ -100,35 +94,41 @@ func _ready() -> void:
 		generate_random(0)
 
 
-func generate_random(requested_seed: int = 0) -> Resource:
+func generate_random(requested_seed: int = 0) -> Dictionary:
 	var final_seed: int = requested_seed
 	if final_seed == 0:
 		final_seed = int(Time.get_unix_time_from_system()) ^ randi()
 
 	_clear_current_level()
 
-	var database = DatabaseScript.new()
-	database.generation_seed = final_seed
-	database.generated_at_unix = int(Time.get_unix_time_from_system())
-	database.block_size = block_size
+	var generation_data: Dictionary = _make_empty_generation_data(final_seed)
+	var block_records: Array[Dictionary] = []
+	var poi_records: Array[Dictionary] = []
+	var secondary_poi_records: Array[Dictionary] = []
 
 	var plan: Dictionary = _build_generation_plan(final_seed)
 	if plan.is_empty():
 		push_warning("[LevelGenerator] Impossible de trouver une combinaison valide pour la génération.")
-		last_database = database
-		_emit_generation_finished(database)
-		return database
+		generation_data["blocks"] = block_records
+		generation_data["pois"] = poi_records
+		generation_data["secondary_pois"] = secondary_poi_records
+		_store_and_emit_generation_snapshot(generation_data)
+		return generation_data
 
 	var chosen_layout_id: String = String(plan.get("layout_id", "line_3"))
 	var assignments: Array[Dictionary] = _dictionary_array_from_variant(plan.get("assignments", []))
-	database.layout_id = chosen_layout_id
-	database.connection_records = _get_assignment_connection_records(assignments)
-	database.connection_errors = _get_assignment_connection_errors(assignments)
-	if not database.connection_errors.is_empty():
-		push_warning("[LevelGenerator] Plan rejeté après validation finale : %s" % JSON.stringify(database.connection_errors))
-		last_database = database
-		_emit_generation_finished(database)
-		return database
+	generation_data["layout_id"] = chosen_layout_id
+	generation_data["connections"] = _get_assignment_connection_records(assignments)
+	generation_data["connection_errors"] = _get_assignment_connection_errors(assignments)
+
+	var connection_errors: Array[Dictionary] = _dictionary_array_from_variant(generation_data.get("connection_errors", []))
+	if not connection_errors.is_empty():
+		push_warning("[LevelGenerator] Plan rejeté après validation finale : %s" % str(connection_errors))
+		generation_data["blocks"] = block_records
+		generation_data["pois"] = poi_records
+		generation_data["secondary_pois"] = secondary_poi_records
+		_store_and_emit_generation_snapshot(generation_data)
+		return generation_data
 
 	var generated_blocks: Array[Node3D] = []
 	var used_main_poi_scene_keys: Array[String] = []
@@ -152,9 +152,6 @@ func generate_random(requested_seed: int = 0) -> Resource:
 		_get_generated_root().add_child(block_node)
 		generated_blocks.append(block_node)
 
-		# Les connexions sont d'abord calculées en directions MONDE.
-		# Les nodes Connectors/North/East/South/West sont, eux, des côtés LOCAUX du bloc.
-		# Il faut donc convertir monde -> local en tenant compte de la rotation du bloc.
 		var connected_world_sides: PackedStringArray = _get_connected_world_sides_for_assignment(assignment, assignments)
 		var connected_local_sides: PackedStringArray = _world_sides_to_local_sides(connected_world_sides, rotation_steps)
 		_apply_block_connectors(block_node, connected_local_sides)
@@ -164,9 +161,8 @@ func generate_random(requested_seed: int = 0) -> Resource:
 			block_record["objective_selection"] = objective_selection.duplicate(true)
 		block_record["connected_sides_world"] = Array(connected_world_sides)
 		block_record["connected_sides_local"] = Array(connected_local_sides)
-		# Compatibilité debug ancienne : maintenant cette clé contient les côtés LOCAUX.
 		block_record["connected_sides"] = Array(connected_local_sides)
-		database.block_records.append(block_record)
+		block_records.append(block_record)
 
 		var poi_scene: PackedScene = _pick_poi_scene_for_block(block_node, used_main_poi_scene_keys)
 		if poi_scene != null:
@@ -177,29 +173,37 @@ func generate_random(requested_seed: int = 0) -> Resource:
 			var poi_node: Node3D = _spawn_poi_on_block(block_node, poi_scene, poi_rotation_degrees)
 			if poi_node != null:
 				var poi_record: Dictionary = _make_poi_record(poi_node, poi_scene, slot_index, poi_rotation_degrees, allow_random_poi_rotation, "main", -1, "POISocket", {})
-				database.poi_records.append(poi_record)
+				poi_records.append(poi_record)
 				_mark_scene_key_as_used(poi_scene, used_main_poi_scene_keys)
 
-		_spawn_secondary_pois_for_block(database, block_node, slot_index, used_secondary_poi_scene_keys)
+		_spawn_secondary_pois_for_block(secondary_poi_records, block_node, slot_index, used_secondary_poi_scene_keys)
 
-	_spawn_rig_for_database(database, generated_blocks)
-	_setup_runtime_blocks_and_passage_gates(generated_blocks, database.block_records, int(database.spawn_record.get("block_slot", 0)))
+	generation_data["blocks"] = block_records
+	generation_data["pois"] = poi_records
+	generation_data["secondary_pois"] = secondary_poi_records
 
-	last_database = database
-	_emit_generation_finished(database)
-	return database
+	_spawn_rig_for_generation(generation_data, generated_blocks)
+	var spawn_record: Dictionary = _dictionary_from_variant(generation_data.get("spawn", {}))
+	_setup_runtime_blocks_and_passage_gates(generated_blocks, block_records, int(spawn_record.get("block_slot", 0)))
+
+	_store_and_emit_generation_snapshot(generation_data)
+	return generation_data
 
 
-func generate_from_dictionary(database_dictionary: Dictionary) -> Resource:
+func generate_from_dictionary(generation_dictionary: Dictionary) -> Dictionary:
 	_clear_current_level()
 
-	var database = DatabaseScript.new()
-	database.from_dictionary(database_dictionary)
-	block_size = float(database.block_size)
-	layout_id = String(database.layout_id)
+	var generation_data: Dictionary = generation_dictionary.duplicate(true)
+	block_size = float(generation_data.get("block_size", block_size))
+	layout_id = String(generation_data.get("layout_id", layout_id))
+
+	var block_records: Array[Dictionary] = _dictionary_array_from_variant(generation_data.get("blocks", []))
+	var poi_records: Array[Dictionary] = _dictionary_array_from_variant(generation_data.get("pois", []))
+	var secondary_poi_records: Array[Dictionary] = _dictionary_array_from_variant(generation_data.get("secondary_pois", []))
+	var spawn_record: Dictionary = _dictionary_from_variant(generation_data.get("spawn", {}))
 
 	var generated_blocks: Array[Node3D] = []
-	for block_record: Dictionary in database.block_records:
+	for block_record: Dictionary in block_records:
 		var scene_path: String = String(block_record.get("scene_path", ""))
 		var block_scene: PackedScene = _load_scene(scene_path)
 		var block_node: Node3D = _instantiate_block_from_scene(block_scene)
@@ -214,67 +218,48 @@ func generate_from_dictionary(database_dictionary: Dictionary) -> Resource:
 		_get_generated_root().add_child(block_node)
 		generated_blocks.append(block_node)
 
-	_apply_connectors_from_block_records(generated_blocks, database.block_records)
+	_apply_connectors_from_block_records(generated_blocks, block_records)
 
-	for poi_record: Dictionary in database.poi_records:
-		_spawn_poi_from_record(poi_record, generated_blocks, database.block_records, false)
+	for poi_record: Dictionary in poi_records:
+		_spawn_poi_from_record(poi_record, generated_blocks, block_records, false)
 
-	for poi_record: Dictionary in database.secondary_poi_records:
-		_spawn_poi_from_record(poi_record, generated_blocks, database.block_records, true)
+	for poi_record: Dictionary in secondary_poi_records:
+		_spawn_poi_from_record(poi_record, generated_blocks, block_records, true)
 
-	_spawn_rig_from_record(database.spawn_record, generated_blocks, database.block_records)
-	_setup_runtime_blocks_and_passage_gates(generated_blocks, database.block_records, int(database.spawn_record.get("block_slot", 0)))
-	if database.connection_records.is_empty():
-		database.connection_records = _get_block_record_connection_records(database.block_records)
-	database.connection_errors = _get_block_record_connection_errors(database.block_records)
+	_spawn_rig_from_record(spawn_record, generated_blocks, block_records)
+	_setup_runtime_blocks_and_passage_gates(generated_blocks, block_records, int(spawn_record.get("block_slot", 0)))
 
-	last_database = database
-	_emit_generation_finished(database)
-	return database
+	if _dictionary_array_from_variant(generation_data.get("connections", [])).is_empty():
+		generation_data["connections"] = _get_block_record_connection_records(block_records)
+	generation_data["connection_errors"] = _get_block_record_connection_errors(block_records)
 
-
-func generate_from_json_file(path: String) -> Resource:
-	var final_path: String = path
-	if final_path.is_empty():
-		final_path = database_save_path
-
-	var data: Dictionary = DatabaseScript.load_dictionary_from_json(final_path)
-	if data.is_empty():
-		return null
-	return generate_from_dictionary(data)
+	_store_and_emit_generation_snapshot(generation_data)
+	return generation_data
 
 
-func save_current_database(path: String = "") -> bool:
-	if last_database == null:
-		return false
-
-	var final_path: String = path
-	if final_path.is_empty():
-		final_path = database_save_path
-
-	if not last_database.has_method("save_to_json"):
-		return false
-
-	return bool(last_database.call("save_to_json", final_path))
+func get_generation_dictionary() -> Dictionary:
+	return last_generation_snapshot.duplicate(true)
 
 
-func get_database_dictionary() -> Dictionary:
-	if last_database == null:
-		return {}
-	if not last_database.has_method("to_dictionary"):
-		return {}
-	var value: Variant = last_database.call("to_dictionary")
-	if value is Dictionary:
-		return (value as Dictionary).duplicate(true)
-	return {}
+
+func _make_empty_generation_data(final_seed: int) -> Dictionary:
+	return {
+		"generation_seed": final_seed,
+		"generated_at_unix": int(Time.get_unix_time_from_system()),
+		"layout_id": layout_id,
+		"block_size": block_size,
+		"blocks": [],
+		"pois": [],
+		"secondary_pois": [],
+		"spawn": {},
+		"connections": [],
+		"connection_errors": [],
+	}
 
 
-func get_database_text() -> String:
-	if last_database == null:
-		return "{}"
-	if not last_database.has_method("to_json_text"):
-		return "{}"
-	return String(last_database.call("to_json_text"))
+func _store_and_emit_generation_snapshot(generation_data: Dictionary) -> void:
+	last_generation_snapshot = generation_data.duplicate(true)
+	_emit_generation_finished(last_generation_snapshot)
 
 
 func get_spawn_points_root() -> Node3D:
@@ -649,7 +634,7 @@ func _grid_key(grid_position: Vector2i) -> String:
 
 func _collect_block_blueprints() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for scene: PackedScene in block_scenes:
+	for scene: PackedScene in _get_effective_block_scenes():
 		if scene == null:
 			continue
 
@@ -1182,15 +1167,11 @@ func _rotation_steps_from_block_record(block_record: Dictionary) -> int:
 	return ((rounded_steps % 4) + 4) % 4
 
 
-func _emit_generation_finished(database: Resource) -> void:
-	var data: Dictionary = {}
-	if database != null and database.has_method("to_dictionary"):
-		var value: Variant = database.call("to_dictionary")
-		if value is Dictionary:
-			data = (value as Dictionary).duplicate(true)
+func _emit_generation_finished(generation_data: Dictionary) -> void:
+	var data: Dictionary = generation_data.duplicate(true)
 
-	if debug_print_database:
-		print("[LevelGenerator] Database générée :\n", JSON.stringify(data, "\t"))
+	if debug_print_generation_snapshot:
+		print("[LevelGenerator] Snapshot de génération : ", data)
 
 	generation_finished.emit(data)
 
@@ -1213,7 +1194,7 @@ func _pick_secondary_poi_scene_for_socket(block_node: Node3D, socket: Node3D, us
 
 func _get_main_poi_candidates_for_block(block_node: Node) -> Array[PackedScene]:
 	var candidates: Array[PackedScene] = []
-	for scene: PackedScene in poi_scenes:
+	for scene: PackedScene in _get_effective_poi_scenes():
 		if scene == null:
 			continue
 		if _poi_scene_can_spawn_on_block(scene, block_node):
@@ -1274,16 +1255,86 @@ func _get_node_debug_name(node: Node) -> String:
 	return String(node.name)
 
 
-func _get_effective_secondary_poi_scenes() -> Array[PackedScene]:
-	if not secondary_poi_scenes.is_empty():
-		return secondary_poi_scenes
+func _get_effective_block_scenes() -> Array[PackedScene]:
+	return _load_packed_scenes_from_folder(block_scenes_folder)
 
+
+func _get_effective_poi_scenes() -> Array[PackedScene]:
+	return _load_packed_scenes_from_folder(poi_scenes_folder)
+
+
+func _get_effective_secondary_poi_scenes() -> Array[PackedScene]:
+	return _load_packed_scenes_from_folder(secondary_poi_scenes_folder)
+
+
+func _load_packed_scenes_from_folder(folder_path: String) -> Array[PackedScene]:
 	var result: Array[PackedScene] = []
-	for scene_path: String in DEFAULT_SECONDARY_POI_SCENE_PATHS:
+	var normalized_folder_path: String = folder_path.strip_edges()
+	if normalized_folder_path.is_empty():
+		return result
+
+	if not normalized_folder_path.ends_with("/"):
+		normalized_folder_path += "/"
+
+	if folder_scene_cache.has(normalized_folder_path):
+		return _packed_scene_array_from_variant(folder_scene_cache[normalized_folder_path])
+
+	var directory: DirAccess = DirAccess.open(normalized_folder_path)
+	if directory == null:
+		push_warning("[LevelGenerator] Dossier de scènes introuvable : %s" % normalized_folder_path)
+		return result
+
+	var file_names: PackedStringArray = directory.get_files()
+	file_names.sort()
+	for file_name: String in file_names:
+		var scene_path: String = _get_scene_path_from_directory_file(normalized_folder_path, file_name)
+		if scene_path.is_empty():
+			continue
+
 		var scene: PackedScene = _load_scene(scene_path)
 		if scene != null:
-			result.append(scene)
+			_append_unique_packed_scene(result, scene)
+
+	folder_scene_cache[normalized_folder_path] = result.duplicate()
 	return result
+
+
+func _packed_scene_array_from_variant(value: Variant) -> Array[PackedScene]:
+	var result: Array[PackedScene] = []
+	if value is Array:
+		for item: Variant in value:
+			var scene: PackedScene = item as PackedScene
+			if scene != null:
+				result.append(scene)
+	return result
+
+
+func _get_scene_path_from_directory_file(folder_path: String, file_name: String) -> String:
+	var normalized_file_name: String = file_name.strip_edges()
+	if normalized_file_name.is_empty():
+		return ""
+
+	if normalized_file_name.ends_with(".tscn"):
+		return folder_path + normalized_file_name
+
+	# En export Godot, certains fichiers peuvent apparaître sous forme .tscn.remap.
+	# Le chemin res:// original reste celui à charger via ResourceLoader.
+	if normalized_file_name.ends_with(".tscn.remap"):
+		return folder_path + normalized_file_name.trim_suffix(".remap")
+
+	return ""
+
+
+func _append_unique_packed_scene(target: Array[PackedScene], scene: PackedScene) -> void:
+	if scene == null:
+		return
+
+	var scene_key: String = _get_scene_unique_key(scene)
+	for existing_scene: PackedScene in target:
+		if _get_scene_unique_key(existing_scene) == scene_key:
+			return
+
+	target.append(scene)
 
 
 func _poi_scene_can_spawn_on_block(scene: PackedScene, block_node: Node) -> bool:
@@ -1515,7 +1566,7 @@ func _spawn_poi_on_block(block_node: Node3D, poi_scene: PackedScene, poi_rotatio
 	return _spawn_poi_on_socket(block_node, poi_socket, poi_scene, poi_rotation_degrees, "POI")
 
 
-func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: int, used_scene_keys: Array[String]) -> void:
+func _spawn_secondary_pois_for_block(secondary_poi_records: Array[Dictionary], block_node: Node3D, block_slot: int, used_scene_keys: Array[String]) -> void:
 	if not spawn_secondary_pois or block_node == null:
 		return
 	if secondary_poi_spawn_chance <= 0.0:
@@ -1549,6 +1600,7 @@ func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: i
 		if rotation_mode == "random 90":
 			poi_rotation_degrees = rng.randi_range(0, 3) * 90
 
+
 		var poi_node: Node3D = _spawn_poi_on_socket(block_node, socket, secondary_scene, poi_rotation_degrees, "SecondaryPOI", rotation_mode)
 		if poi_node == null:
 			continue
@@ -1568,7 +1620,7 @@ func _spawn_secondary_pois_for_block(database, block_node: Node3D, block_slot: i
 			"socket_summary": socket_summary,
 		}
 		var poi_record: Dictionary = _make_poi_record(poi_node, secondary_scene, block_slot, poi_rotation_degrees, rotation_mode == "random 90", "secondary", socket_index, String(socket.name), extra_data)
-		database.secondary_poi_records.append(poi_record)
+		secondary_poi_records.append(poi_record)
 		_mark_scene_key_as_used(secondary_scene, used_scene_keys)
 
 
@@ -1689,7 +1741,7 @@ func _spawn_poi_at_saved_transform(poi_record: Dictionary, poi_scene: PackedScen
 	return poi_node
 
 
-func _spawn_rig_for_database(database, generated_blocks: Array[Node3D]) -> void:
+func _spawn_rig_for_generation(generation_data: Dictionary, generated_blocks: Array[Node3D]) -> void:
 	if generated_blocks.is_empty():
 		return
 
@@ -1711,7 +1763,7 @@ func _spawn_rig_for_database(database, generated_blocks: Array[Node3D]) -> void:
 	var spawn_transform: Transform3D = _make_spawn_rig_transform(spawn_socket, block_node)
 	_spawn_rig_at_transform(spawn_transform)
 
-	database.spawn_record = {
+	generation_data["spawn"] = {
 		"block_slot": block_index,
 		"socket_index": socket_index,
 		"global_position": _vector3_to_array(spawn_transform.origin),
@@ -1969,6 +2021,7 @@ func _clear_current_level() -> void:
 	runtime_passage_gates.clear()
 	runtime_block_lookup_by_slot.clear()
 	scene_root_property_cache.clear()
+	folder_scene_cache.clear()
 	active_block_node = null
 	active_block_slot_index = -1
 	_clear_spawn_output_roots()

@@ -133,7 +133,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -145,7 +145,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -157,7 +157,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -169,7 +169,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [true]
 }
 
 [sub_resource type="Animation" id="Animation_sjml4"]
@@ -293,7 +293,6 @@ shape = SubResource("BoxShape3D_collision")
 [node name="VisualRoot" type="Node3D" parent="." unique_id=1824269591]
 
 [node name="IntactRoot" type="Node3D" parent="VisualRoot" unique_id=1616024461]
-visible = false
 
 [node name="Fighter_BlueMoon" type="MeshInstance3D" parent="VisualRoot/IntactRoot" unique_id=1943686216]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
@@ -308,6 +307,7 @@ transform = Transform3D(0.6666667, 0, 0, 0, 0.6666667, 0, 0, 0, 0.6666667, -0.53
 mesh = SubResource("ArrayMesh_m2r6p")
 
 [node name="DestroyedRoot" type="Node3D" parent="VisualRoot" unique_id=889242467]
+visible = false
 
 [node name="Fighter_BlueMoon" type="MeshInstance3D" parent="VisualRoot/DestroyedRoot" unique_id=295250669]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
@@ -324,14 +324,8 @@ mesh = SubResource("ArrayMesh_m2r6p")
 [node name="Vehicle_EngineDamageSmoke" parent="VisualRoot/DestroyedRoot" unique_id=1816618499 instance=ExtResource("2_smoke")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.54785156, 0)
 
-[node name="Particles" parent="VisualRoot/DestroyedRoot/Vehicle_EngineDamageSmoke" index="0" unique_id=480031066]
-emitting = true
-
 [node name="Vehicle_EngineFire" parent="VisualRoot/DestroyedRoot" unique_id=24528148 instance=ExtResource("3_fire")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.15, 0.29785156, 0)
-
-[node name="Particles" parent="VisualRoot/DestroyedRoot/Vehicle_EngineFire" index="0" unique_id=674461127]
-emitting = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1581048488]
 libraries/ = SubResource("AnimationLibrary_u0tmc")

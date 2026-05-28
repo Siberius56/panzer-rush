@@ -1,5 +1,5 @@
 extends RigidBody3D
-class_name WorldWeapon3D
+#class_name WorldWeapon3D
 
 const PISTOL_SCENE: PackedScene = preload("uid://dd33dmmqhjkul")
 const SMG_SCENE: PackedScene = preload("uid://nykf7fy7m5jg")

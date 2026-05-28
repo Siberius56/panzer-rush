@@ -212,10 +212,14 @@ func _is_on_cooldown() -> bool:
 
 
 func _get_closest_distance_to_targets(target_positions: Array[Vector3]) -> float:
+	if not is_inside_tree():
+		return 999999.0
+
+	var zone_position: Vector3 = global_position
 	var closest_distance: float = 999999.0
 
 	for target_position: Vector3 in target_positions:
-		var distance: float = global_position.distance_to(target_position)
+		var distance: float = zone_position.distance_to(target_position)
 		if distance < closest_distance:
 			closest_distance = distance
 

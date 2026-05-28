@@ -16,7 +16,6 @@
 [node name="ItemSpawner" type="Node3D" unique_id=937762401]
 script = ExtResource("1_script")
 spawn_count = 2
-debug_print_spawns = true
 world_weapon_scene = ExtResource("12_world")
 pistol_weapon_scene = ExtResource("2_pw0ib")
 smg_weapon_scene = ExtResource("3_r5hs6")
