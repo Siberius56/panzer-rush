@@ -104,7 +104,7 @@ albedo_color = Color(0.38, 0.4, 0.42, 1)
 
 [sub_resource type="BoxMesh" id="Mesh_CranePlaceholder"]
 material = SubResource("Mat_metal")
-size = Vector3(6, 14, 6)
+size = Vector3(6, 10, 6)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jn3uo"]
 transparency = 1
@@ -136,6 +136,21 @@ shape = SubResource("BoxShape3D_jn3uo")
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=733385659]
 navigation_mesh = SubResource("NavigationMesh_oarmm")
+
+[node name="NavigationLink3D_North" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=538522714]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -29)
+start_position = Vector3(0, 0.2, 0)
+end_position = Vector3(0, 0, -3)
+
+[node name="NavigationLink3D_South" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=133037632]
+transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 29)
+start_position = Vector3(0, 0.2, 0)
+end_position = Vector3(2.682209e-07, 0, -3)
+
+[node name="NavigationLink3D_East" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=328379068]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 28, 0, 1.2239188e-06)
+start_position = Vector3(0, 0.2, 0)
+end_position = Vector3(-1.3987644e-06, 0, -4)
 
 [node name="Ground" type="Node3D" parent="NavigationRegion3D" unique_id=1790563587]
 
@@ -391,7 +406,7 @@ collision_layer = 8
 shape = SubResource("Shape_CranePlaceholder")
 
 [node name="CranePlaceholder" type="MeshInstance3D" parent="NavigationRegion3D/Building/CranePlaceholder_Body" unique_id=1060224960]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -2, 0)
 mesh = SubResource("Mesh_CranePlaceholder")
 
 [node name="Props" type="Node3D" parent="NavigationRegion3D" unique_id=715064909]
@@ -510,13 +525,13 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 25.4
 [node name="crate-wide2" parent="NavigationRegion3D/Props" unique_id=293644643 instance=ExtResource("20_cxqrf")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 9.262159, 0.52000195, -1.917923)
 
-[node name="crate-wide" parent="NavigationRegion3D/Props/crate-wide2" index="0" unique_id=524523357]
+[node name="crate-wide" parent="NavigationRegion3D/Props/crate-wide2" index="0" unique_id=541943120]
 transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, 2.5214283, 0, -24.123627)
 
-[node name="lid" parent="NavigationRegion3D/Props/crate-wide2/crate-wide" index="0" unique_id=1331873250]
+[node name="lid" parent="NavigationRegion3D/Props/crate-wide2/crate-wide" index="0" unique_id=766874207]
 transform = Transform3D(-0.70710677, 0.70710677, 0, -0.70710677, -0.70710677, 0, 0, 0, 1, 0.25, 0.19, -5.4143357e-16)
 
-[node name="AnimationPlayer" parent="NavigationRegion3D/Props/crate-wide2" index="1" unique_id=716209920]
+[node name="AnimationPlayer" parent="NavigationRegion3D/Props/crate-wide2" index="1" unique_id=1253150416]
 autoplay = &"open"
 
 [node name="WorldWeapon3D_Gravity1" parent="NavigationRegion3D/Props" unique_id=2144849267 instance=ExtResource("21_m4pqi")]
@@ -558,28 +573,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6.25)
 [node name="UnlockButton" parent="NavigationRegion3D/Trigger/VehicleBlockingGate" index="2" unique_id=616946492]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.134, 1, 11.018)
 
-[node name="NavigationLink3D_North" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=538522714]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -28)
-start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
-
-[node name="NavigationLink3D_South" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=133037632]
-transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 28)
-start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
-
-[node name="NavigationLink3D_East" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=328379068]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 28, 0, 1.2239188e-06)
-start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
-
-[node name="NavigationLink3D_West" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=705388469]
-transform = Transform3D(-4.569558e-08, 0, 1, 0, 1, 0, -1, 0, -4.569558e-08, -28, 0, -1.2239188e-06)
-start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
-
 [node name="BombRadarObjective" parent="." unique_id=1176266720 instance=ExtResource("2_c6fdk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0981045, 13.845459, -12.109009)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0981045, 9.845459, -12.109009)
 objective_text = "Détruire port."
 
 [node name="POI_Port_South" type="Node3D" parent="." unique_id=70323991 groups=["zombie_spawn_zone"]]

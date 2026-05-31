@@ -34,7 +34,9 @@ max_idle_zones_populated_on_ready = 99
 [node name="ProceduralLevelGenerator" type="Node3D" parent="." unique_id=933561247]
 script = ExtResource("2_generator_script")
 block_size = 200.0
+allow_duplicate_blocks = true
 sea_block_generation_chance = 0.5
+max_river_blocks_per_generation = 3
 spawn_rig_scene = ExtResource("14_spawn_rig")
 
 [node name="Lighting" type="Node3D" parent="." unique_id=2010338712]
@@ -67,9 +69,9 @@ light_indirect_energy = 0.2
 light_volumetric_fog_energy = 0.0
 
 [node name="Camera_TopDown_Debug" type="Camera3D" parent="." unique_id=919904991 groups=["top_down_debug_camera"]]
-transform = Transform3D(-1, 8.742278e-08, 3.821371e-15, 0, -4.371139e-08, 1, 8.742278e-08, 1, 4.371139e-08, 0, 35, 50)
+transform = Transform3D(-1, 8.742278e-08, 3.821371e-15, 0, -4.371139e-08, 1, 8.742278e-08, 1, 4.371139e-08, 0, 35, 0)
 projection = 1
-size = 500.0
+size = 220.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1973119719]
 

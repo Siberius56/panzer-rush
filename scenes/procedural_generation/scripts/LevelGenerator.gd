@@ -72,7 +72,7 @@ const DEFAULT_SECONDARY_POI_SCENES_FOLDER: String = "res://scenes/procedural_gen
 @export var passage_gates_root_path: NodePath = ^"../PassageGates"
 @export var passage_gate_y_offset: float = 0.0
 @export var road_split_gate_offset: float = 35.0
-@export var river_gate_offset: float = 13.0
+@export var river_gate_offset: float = 22.0
 @export var debug_print_passage_gates: bool = true
 
 @export_group("Debug")
@@ -164,6 +164,8 @@ func generate_random(requested_seed: int = 0) -> Dictionary:
 		block_record["connected_sides"] = Array(connected_local_sides)
 		block_records.append(block_record)
 
+		var reserved_secondary_socket_indices: Array[int] = []
+
 		var poi_scene: PackedScene = _pick_poi_scene_for_block(block_node, used_main_poi_scene_keys)
 		if poi_scene != null:
 			var poi_rotation_degrees: int = 0
@@ -176,7 +178,11 @@ func generate_random(requested_seed: int = 0) -> Dictionary:
 				poi_records.append(poi_record)
 				_mark_scene_key_as_used(poi_scene, used_main_poi_scene_keys)
 
-		_spawn_secondary_pois_for_block(secondary_poi_records, block_node, slot_index, used_secondary_poi_scene_keys)
+				var objective_socket_index: int = _spawn_objective_secondary_poi_for_block(secondary_poi_records, block_node, slot_index, poi_node, poi_scene, used_secondary_poi_scene_keys)
+				if objective_socket_index >= 0:
+					reserved_secondary_socket_indices.append(objective_socket_index)
+
+		_spawn_secondary_pois_for_block(secondary_poi_records, block_node, slot_index, used_secondary_poi_scene_keys, reserved_secondary_socket_indices)
 
 	generation_data["blocks"] = block_records
 	generation_data["pois"] = poi_records
@@ -1566,7 +1572,89 @@ func _spawn_poi_on_block(block_node: Node3D, poi_scene: PackedScene, poi_rotatio
 	return _spawn_poi_on_socket(block_node, poi_socket, poi_scene, poi_rotation_degrees, "POI")
 
 
-func _spawn_secondary_pois_for_block(secondary_poi_records: Array[Dictionary], block_node: Node3D, block_slot: int, used_scene_keys: Array[String]) -> void:
+
+func _spawn_objective_secondary_poi_for_block(secondary_poi_records: Array[Dictionary], block_node: Node3D, block_slot: int, main_poi_node: Node3D, main_poi_scene: PackedScene, used_scene_keys: Array[String]) -> int:
+	if block_node == null or main_poi_node == null:
+		return -1
+
+	var objective_scene: PackedScene = _get_objective_secondary_poi_scene(main_poi_node, main_poi_scene)
+	if objective_scene == null:
+		return -1
+
+	var sockets: Array[Node3D] = _get_secondary_poi_sockets_for_block(block_node)
+	if sockets.is_empty():
+		push_warning("[LevelGenerator] POI objectif secondaire impossible. Aucun socket secondaire sur le bloc : %s" % _get_node_debug_name(block_node))
+		return -1
+
+	var compatible_socket_indices: Array[int] = []
+	for socket_index: int in range(sockets.size()):
+		var socket: Node3D = sockets[socket_index]
+		if socket == null:
+			continue
+		if not socket.has_method("get_secondary_socket_environment"):
+			continue
+		if socket.has_method("is_secondary_socket_enabled") and not bool(socket.call("is_secondary_socket_enabled")):
+			continue
+		if _secondary_poi_scene_can_spawn_on_socket(objective_scene, block_node, socket):
+			compatible_socket_indices.append(socket_index)
+
+	if compatible_socket_indices.is_empty():
+		push_warning("[LevelGenerator] POI objectif secondaire impossible. Aucun socket compatible pour %s sur %s." % [_get_scene_debug_name(objective_scene), _get_node_debug_name(block_node)])
+		return -1
+
+	var chosen_socket_index: int = compatible_socket_indices[rng.randi_range(0, compatible_socket_indices.size() - 1)]
+	var chosen_socket: Node3D = sockets[chosen_socket_index]
+	var rotation_mode: String = _get_secondary_poi_rotation_mode(objective_scene, chosen_socket)
+	var poi_rotation_degrees: int = 0
+	if rotation_mode == "random 90":
+		poi_rotation_degrees = rng.randi_range(0, 3) * 90
+
+	var poi_node: Node3D = _spawn_poi_on_socket(block_node, chosen_socket, objective_scene, poi_rotation_degrees, "ObjectiveSecondaryPOI", rotation_mode)
+	if poi_node == null:
+		return -1
+
+	var socket_environment: String = _get_secondary_socket_environment(block_node, chosen_socket, objective_scene)
+	var placement_type: String = _get_secondary_poi_placement_type(objective_scene)
+	var socket_summary: Dictionary = {}
+	if chosen_socket.has_method("get_database_summary"):
+		var socket_summary_value: Variant = chosen_socket.call("get_database_summary")
+		if socket_summary_value is Dictionary:
+			socket_summary = (socket_summary_value as Dictionary).duplicate(true)
+
+	var extra_data: Dictionary = {
+		"secondary_placement_type": placement_type,
+		"secondary_rotation_mode": rotation_mode,
+		"socket_environment": socket_environment,
+		"socket_summary": socket_summary,
+		"forced_by_main_poi": true,
+		"required_by_main_poi_id": _read_string_property(main_poi_node, "poi_id", String(main_poi_node.name)),
+		"required_by_main_poi_type": _read_string_property(main_poi_node, "poi_type", ""),
+	}
+	var poi_record: Dictionary = _make_poi_record(poi_node, objective_scene, block_slot, poi_rotation_degrees, rotation_mode == "random 90", "objective_secondary", chosen_socket_index, String(chosen_socket.name), extra_data)
+	secondary_poi_records.append(poi_record)
+	_mark_scene_key_as_used(objective_scene, used_scene_keys)
+	return chosen_socket_index
+
+
+func _get_objective_secondary_poi_scene(main_poi_node: Node3D, main_poi_scene: PackedScene) -> PackedScene:
+	var scene_from_instance: PackedScene = _read_packed_scene_property(main_poi_node, "poi_objective_scene")
+	if scene_from_instance != null:
+		return scene_from_instance
+
+	var scene_properties: Dictionary = _get_scene_root_properties(main_poi_scene)
+	var scene_from_scene_state: PackedScene = _scene_property_as_packed_scene(scene_properties, "poi_objective_scene")
+	if scene_from_scene_state != null:
+		return scene_from_scene_state
+
+	# Alias volontaire. Utile si tu renommes l'export plus tard.
+	scene_from_scene_state = _scene_property_as_packed_scene(scene_properties, "objective_secondary_poi_scene")
+	if scene_from_scene_state != null:
+		return scene_from_scene_state
+
+	return null
+
+
+func _spawn_secondary_pois_for_block(secondary_poi_records: Array[Dictionary], block_node: Node3D, block_slot: int, used_scene_keys: Array[String], reserved_socket_indices: Array[int] = []) -> void:
 	if not spawn_secondary_pois or block_node == null:
 		return
 	if secondary_poi_spawn_chance <= 0.0:
@@ -1577,6 +1665,9 @@ func _spawn_secondary_pois_for_block(secondary_poi_records: Array[Dictionary], b
 		return
 
 	for socket_index: int in range(sockets.size()):
+		if reserved_socket_indices.has(socket_index):
+			continue
+
 		var socket: Node3D = sockets[socket_index]
 		if not socket.has_method("get_secondary_socket_environment"):
 			push_warning("[LevelGenerator] POI secondaire ignoré. Le socket n'a pas SecondaryPOISocket.gd : %s" % socket.name)
@@ -2155,6 +2246,22 @@ func _scene_property_as_string_array(properties: Dictionary, property_name: Stri
 		return fallback
 
 	return _string_array_from_variant(properties[property_name], fallback)
+
+
+
+func _scene_property_as_packed_scene(properties: Dictionary, property_name: String) -> PackedScene:
+	if not properties.has(property_name):
+		return null
+	return properties[property_name] as PackedScene
+
+
+func _read_packed_scene_property(target: Object, property_name: String) -> PackedScene:
+	if target == null:
+		return null
+	for property_info: Dictionary in target.get_property_list():
+		if String(property_info.get("name", "")) == property_name:
+			return target.get(property_name) as PackedScene
+	return null
 
 
 func _read_string_array_property(target: Object, property_name: String, fallback: PackedStringArray) -> PackedStringArray:

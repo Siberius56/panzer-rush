@@ -68,6 +68,8 @@ enum EnemyState {
 @export var director_idle_spawn_stays_idle_until_alert: bool = true
 @export var director_idle_spawn_ignores_detection: bool = true
 @export var director_attack_spawn_alerts_immediately: bool = true
+@export var director_attack_spawn_ignores_target_distance: bool = true
+@export var director_attack_spawn_never_returns_to_origin: bool = true
 
 @export_group("Performance Scans")
 @export_range(1, 120, 1) var scan_interval_frames: int = 20
@@ -247,6 +249,8 @@ var _transport_spawn_deployment_target: Vector3 = Vector3.ZERO
 var _transport_spawn_deployment_time_remaining: float = 0.0
 var _director_spawn_behaviour: String = ""
 var _director_idle_passive: bool = false
+var _director_attack_unlimited_chase: bool = false
+var _director_never_return_to_origin: bool = false
 
 var _network_zone_active: bool = true
 var _network_zone_saved_process_mode: int = Node.PROCESS_MODE_INHERIT
@@ -349,6 +353,8 @@ func set_spawn_behaviour(behaviour: String) -> void:
 			_apply_director_attack_spawn_mode()
 		_:
 			_director_idle_passive = false
+			_director_attack_unlimited_chase = false
+			_director_never_return_to_origin = false
 
 
 func set_target_position(target_position: Vector3) -> void:
@@ -362,7 +368,8 @@ func set_target_position(target_position: Vector3) -> void:
 	_reset_attack_line_of_sight_cache()
 	_clear_navigation_target()
 
-	var nearest_target: Node3D = _find_nearest_target(max_target_distance)
+	var search_distance: float = _get_target_search_distance()
+	var nearest_target: Node3D = _find_nearest_target(search_distance)
 	if nearest_target != null:
 		_force_alert_target(nearest_target)
 	else:
@@ -391,8 +398,24 @@ func is_director_idle_passive() -> bool:
 	return _director_idle_passive
 
 
+func is_director_attack_unlimited_chase() -> bool:
+	return _director_attack_unlimited_chase
+
+
+func _get_target_search_distance() -> float:
+	if _director_attack_unlimited_chase:
+		return INF
+	return max_target_distance
+
+
+func _should_validate_target_distance() -> bool:
+	return not _director_attack_unlimited_chase
+
+
 func _apply_director_idle_spawn_mode() -> void:
 	_director_idle_passive = director_idle_spawn_stays_idle_until_alert
+	_director_attack_unlimited_chase = false
+	_director_never_return_to_origin = false
 	current_target = null
 	forced_alert = false
 	detection_zone_targets.clear()
@@ -407,6 +430,8 @@ func _apply_director_idle_spawn_mode() -> void:
 
 func _apply_director_attack_spawn_mode() -> void:
 	_director_idle_passive = false
+	_director_attack_unlimited_chase = director_attack_spawn_ignores_target_distance
+	_director_never_return_to_origin = director_attack_spawn_never_returns_to_origin
 	forced_alert = director_attack_spawn_alerts_immediately
 	_reset_attack_line_of_sight_cache()
 	_clear_navigation_target()
@@ -1057,7 +1082,14 @@ func _handle_no_target_state() -> void:
 
 func _handle_return_to_origin_or_idle() -> void:
 	_update_idle_aim_target()
-	var origin_distance := _planar_distance_to(_origin_position)
+	if _director_never_return_to_origin:
+		_set_state(EnemyState.IDLE)
+		velocity.x = 0.0
+		velocity.z = 0.0
+		_clear_navigation_target()
+		return
+
+	var origin_distance: float = _planar_distance_to(_origin_position)
 	if origin_distance > return_reach_distance:
 		_set_state(EnemyState.RETURN)
 		_move_towards(_origin_position, return_reach_distance)
@@ -1243,7 +1275,7 @@ func _acquire_target(allow_global_scan: bool = true) -> void:
 			best_target = target
 
 	if best_target == null and forced_alert and allow_global_scan:
-		best_target = _find_nearest_target(max_target_distance)
+		best_target = _find_nearest_target(_get_target_search_distance())
 
 	current_target = best_target
 	if current_target != null:
@@ -1266,6 +1298,15 @@ func _find_nearest_target(max_distance: float = INF) -> Node3D:
 	for node in get_tree().get_nodes_in_group("player"):
 		var target: Node3D = node as Node3D
 		if target == null or not _is_valid_target(target):
+			continue
+		var dist: float = global_position.distance_squared_to(target.global_position)
+		if dist < best_distance:
+			best_distance = dist
+			best_target = target
+
+	for node in get_tree().get_nodes_in_group("players"):
+		var target: Node3D = node as Node3D
+		if target == null or target == best_target or not _is_valid_target(target):
 			continue
 		var dist: float = global_position.distance_squared_to(target.global_position)
 		if dist < best_distance:
@@ -1330,6 +1371,9 @@ func _validate_current_target() -> void:
 	if not _is_valid_target(current_target):
 		current_target = null
 		_reset_attack_line_of_sight_cache()
+		return
+
+	if not _should_validate_target_distance():
 		return
 
 	var max_target_distance_squared: float = max_target_distance * max_target_distance
@@ -1426,7 +1470,7 @@ func _resolve_detected_target(node: Node) -> Node3D:
 	while current != null:
 		if current is Node3D:
 			var current_node := current as Node3D
-			if current_node.is_in_group("player"):
+			if current_node.is_in_group("player") or current_node.is_in_group("players"):
 				return current_node
 			if current_node.is_in_group("vehicle") or current_node.is_in_group("vehicles"):
 				return current_node
@@ -1472,7 +1516,7 @@ func _is_valid_target(node: Node) -> bool:
 	if _is_target_dead(node):
 		return false
 
-	if node.is_in_group("player"):
+	if node.is_in_group("player") or node.is_in_group("players"):
 		return true
 
 	if node.is_in_group("vehicle") or node.is_in_group("vehicles"):
@@ -1888,7 +1932,7 @@ func set_alert_mode(enabled: bool = true) -> void:
 		return
 
 	if enabled:
-		current_target = _find_nearest_target(max_target_distance)
+		current_target = _find_nearest_target(_get_target_search_distance())
 		if current_target != null:
 			_last_known_target_position = current_target.global_position
 			_has_last_known_target_position = true

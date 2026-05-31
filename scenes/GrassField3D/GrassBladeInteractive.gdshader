@@ -103,21 +103,8 @@ void vertex() {
 }
 
 void fragment() {
-	float height_factor = clamp(v_height_factor, 0.0, 1.0);
-
-	vec3 color = mix(bottom_color.rgb, top_color.rgb, height_factor);
+	vec3 color = mix(bottom_color.rgb, top_color.rgb, v_height_factor);
 	float color_multiplier = mix(0.85, 1.15, v_color_variation);
-
 	ALBEDO = color * color_multiplier;
-
-	vec3 n = normalize(NORMAL);
-
-	if (!FRONT_FACING) {
-		n = -n;
-	}
-
-	n = normalize(mix(n, vec3(0.0, 1.0, 0.0), 0.85));
-	NORMAL = n;
-
 	ROUGHNESS = 1.0;
 }

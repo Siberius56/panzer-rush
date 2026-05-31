@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://cvhbv8u5egx4d"]
+
+[ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_i6dnb"]
+[ext_resource type="PackedScene" uid="uid://mr7wmja8v5u7" path="res://asset/map/space-kit/rail_end.glb" id="2_i6dnb"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o0upt"]
+size = Vector3(0.85, 3.5, 0.25)
+
+[node name="Fence_Rail_Corner" type="Node3D" unique_id=1108256052 groups=["destructible_props"]]
+script = ExtResource("1_i6dnb")
+main_collision_path = NodePath("")
+max_hp = 1.0
+physics_enabled = false
+enemies_can_physically_interact = false
+debris_min_impulse = 1.3
+debris_max_impulse = 3.4
+debris_upward_bias = 0.35
+debris_torque_impulse = 2.2
+debris_collision_layer = 0
+debris_collision_mask = 4278190095
+
+[node name="IntactBody" type="RigidBody3D" parent="." unique_id=106632416 groups=["destructible_prop_bodies"]]
+collision_layer = 24
+collision_mask = 4294967295
+mass = 12.0
+linear_damp = 0.35
+angular_damp = 0.5
+
+[node name="Intact" type="Node3D" parent="IntactBody" unique_id=861077649]
+
+[node name="rail_end2" parent="IntactBody/Intact" unique_id=1359536511 instance=ExtResource("2_i6dnb")]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -8, 0, -7.9)
+
+[node name="Collision3" type="CollisionShape3D" parent="IntactBody" unique_id=1930164488]
+transform = Transform3D(0, -1.0000001, 0, 1.0000001, 0, 0, 0, 0, 1, -0.181, 0.5, 0.0016257539)
+shape = SubResource("BoxShape3D_o0upt")
+
+[node name="DebrisRoot" type="Node3D" parent="." unique_id=1062000715]
+visible = false
+
+[node name="TopPlank" type="RigidBody3D" parent="DebrisRoot" unique_id=1629069113]
+transform = Transform3D(0.99776894, -0.06676151, 0, 0.06676151, 0.99776894, 0, 0, 0, 1, -0.00095549226, 0.18708968, 0)
+collision_layer = 0
+collision_mask = 4294967295
+mass = 2.0
+
+[node name="Collision3" type="CollisionShape3D" parent="DebrisRoot/TopPlank" unique_id=1718282973]
+transform = Transform3D(0, -1.0000001, 0, 1.0000001, 0, 0, 0, 0, 1, 0.0028756838, 0.5813636, -0.010686636)
+shape = SubResource("BoxShape3D_o0upt")
+
+[node name="rail_end2" parent="DebrisRoot/TopPlank" unique_id=2007085190 instance=ExtResource("2_i6dnb")]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -8, 0, -7.9)

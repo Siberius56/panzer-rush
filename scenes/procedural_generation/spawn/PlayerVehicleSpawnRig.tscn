@@ -149,7 +149,7 @@ transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 4,
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 6.75, 0.1, -7)
 visible = false
 
-[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1326099284, 1818639732) index="0" unique_id=546961492]
+[node name="arm" parent="Props/crane2/crane" parent_id_path=PackedInt32Array(1326099284, 372918128) index="0" unique_id=1170679970]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 3.0033193, 0)
 
 [node name="RigidBody3D8" parent="Props" unique_id=1144813020 instance=ExtResource("7_c0mis")]
@@ -255,6 +255,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
 [node name="WorldWeapon3D" parent="." unique_id=2144849267 instance=ExtResource("11_ots1r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8372953, 0.9935507, -6.9254665)
 editor_weapon_id = "smg"
+
+[node name="WorldWeapon3D2" parent="." unique_id=896257747 instance=ExtResource("11_ots1r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.063263, 0.099998474, -1.8580725)
+editor_weapon_id = "bomb"
+
+[node name="WorldWeapon3D3" parent="." unique_id=2147000875 instance=ExtResource("11_ots1r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.720978, 0.099998474, -3.2114105)
+editor_weapon_id = "encryption_remote"
 
 [editable path="Props/crane2"]
 [editable path="ItemSpawner_Ammo"]

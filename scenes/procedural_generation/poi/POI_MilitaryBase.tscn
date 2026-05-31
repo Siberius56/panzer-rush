@@ -63,24 +63,24 @@ shape = SubResource("BoxShape3D_dh1hi")
 navigation_mesh = SubResource("NavigationMesh_lfwob")
 
 [node name="NavigationLink3D_North" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=628033155]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -29)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(0, 0, -3)
 
 [node name="NavigationLink3D_South" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=738828568]
-transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 28)
+transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 29)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(2.682209e-07, 0, -3)
 
 [node name="NavigationLink3D_East" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=1881141123]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 28, 0, 1.2239188e-06)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 29, 0, 1.2239188e-06)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(-1.355053e-06, 0, -3)
 
 [node name="NavigationLink3D_West" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=1522408486]
-transform = Transform3D(-4.569558e-08, 0, 1, 0, 1, 0, -1, 0, -4.569558e-08, -28, 0, -1.2239188e-06)
+transform = Transform3D(-4.569558e-08, 0, 1, 0, 1, 0, -1, 0, -4.569558e-08, -29, 0, -1.2239188e-06)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(-1.0868321e-06, 0, -3)
 
 [node name="Ground" type="Node3D" parent="NavigationRegion3D" unique_id=1745538487]
 
@@ -678,9 +678,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.887817, 0, -8.331299)
 objective_text = "Détruire base militaire."
 
 [node name="POI_MilitaryBase_Center" type="Node3D" parent="." unique_id=430874450 groups=["zombie_spawn_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 2, -20)
 script = ExtResource("3_dh1hi")
-min_spawn_count = 7
 max_alive_from_zone = 16
 min_distance_from_target = 0.0
 max_distance_from_target = 999.0
@@ -711,13 +710,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 3)
 
 [node name="SpawnPoint_04" type="Marker3D" parent="POI_MilitaryBase_Center" unique_id=1523046470]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.2, 4)
-
-[node name="NavigationLink3D_North" type="NavigationLink3D" parent="." unique_id=1201285798]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6.5)
-start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
-
-[node name="NavigationLink3D_South" type="NavigationLink3D" parent="." unique_id=1450079272]
-transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 6.5)
-start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)

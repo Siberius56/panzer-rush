@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b0nbbyaoir7nn"]
+
+[ext_resource type="Script" uid="uid://bxx0bepu4p3o2" path="res://EditableCable3D.gd" id="1_script"]
+
+[node name="EditableCable3D" type="Node3D" unique_id=398785672]
+script = ExtResource("1_script")

@@ -12,8 +12,9 @@ const GRAVITY_GUN_SCENE = preload("uid://cp3e1snyeddda")
 const RIFLE_SCENE := preload("uid://dluj1jv7g4ocm") #preload("res://weapons/RifleWeapon.tscn")
 const REPAIR_TOOL_SCENE := preload("res://scenes/weapons/RepairToolWeapon.tscn")
 const BOMB_SCENE := preload("res://scenes/weapons/BombWeapon.tscn")
-const EMPTY_WEAPON_SCENE_PATH := "res://scenes/weapons/weapon_empty.tscn"
+#const EMPTY_WEAPON_SCENE_PATH := "res://scenes/weapons/weapon_empty.tscn"
 const EMPTY_WEAPON_SCENE := preload("res://scenes/weapons/weapon_empty.tscn")
+const ENCRYPTION_REMOTE_SCENE: PackedScene = preload("res://scenes/weapons/EncryptionRemoteWeapon.tscn")
 
 static var NEXT_WORLD_WEAPON_NET_ID: int = 1
 
@@ -1899,6 +1900,8 @@ func _get_weapon_scene_by_id(weapon_id: String) -> PackedScene:
 			return REPAIR_TOOL_SCENE
 		"bomb":
 			return BOMB_SCENE
+		"encryption_remote":
+			return ENCRYPTION_REMOTE_SCENE
 		"gravity_gun":
 			return GRAVITY_GUN_SCENE
 		_:

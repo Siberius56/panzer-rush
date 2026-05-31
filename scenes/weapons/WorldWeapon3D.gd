@@ -1,5 +1,5 @@
 extends RigidBody3D
-#class_name WorldWeapon3D
+class_name WorldWeapon3D
 
 const PISTOL_SCENE: PackedScene = preload("uid://dd33dmmqhjkul")
 const SMG_SCENE: PackedScene = preload("uid://nykf7fy7m5jg")
@@ -181,6 +181,14 @@ func _is_objective_item() -> bool:
 
 func is_objective_bomb() -> bool:
 	return current_weapon_id == "bomb"
+
+func is_encryption_remote() -> bool:
+	if current_weapon_id == "encryption_remote":
+		return true
+	return editor_weapon_id == "encryption_remote"
+
+func is_objective_encryption_remote() -> bool:
+	return is_encryption_remote()
 
 func handle_killzone_entered(killzone: Node) -> bool:
 	if not _is_objective_item():

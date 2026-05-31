@@ -9,6 +9,12 @@ const MAX_INTERACTORS: int = 8
 const BLADE_SINGLE_PLANE: int = 0
 const BLADE_CROSS_PLANES: int = 1
 
+@export_category("Editor Buttons")
+@export_tool_button("Setup / Regenerate Grass") var setup_grass_button: Callable = setup_grass
+@export_tool_button("Clear Grass") var clear_grass_button: Callable = clear_grass
+@export_tool_button("Refresh Material Params") var refresh_material_button: Callable = refresh_material_params
+@export_tool_button("Create Exclusion Box") var create_exclusion_box_button: Callable = create_exclusion_box
+
 @export_category("Generation")
 @export var auto_generate_on_ready: bool = false
 @export var update_in_editor: bool = true
@@ -32,6 +38,14 @@ const BLADE_CROSS_PLANES: int = 1
 @export_range(1.0, 500.0, 1.0) var raycast_height: float = 80.0
 @export_range(1.0, 500.0, 1.0) var raycast_depth: float = 120.0
 
+@export_category("Exclusion")
+@export var use_exclusion_volumes: bool = true
+@export var exclusion_group_name: StringName = &"grass_exclusion"
+@export var use_exclusion_name_detection: bool = true
+@export var exclusion_name_prefix: String = "GrassExclusion"
+@export var default_exclusion_box_size: Vector3 = Vector3(8.0, 4.0, 20.0)
+@export_range(1, 32, 1) var max_spawn_attempt_multiplier: int = 8
+
 @export_category("Material")
 @export var grass_shader: Shader
 @export var generated_material: ShaderMaterial
@@ -53,11 +67,6 @@ const BLADE_CROSS_PLANES: int = 1
 @export_range(0.0, 5.0, 0.01) var vehicle_bend_strength: float = 1.15
 @export_range(0.0, 2.0, 0.01) var vertical_push: float = 0.35
 @export_range(0.0, 3.0, 0.01) var bend_response: float = 1.0
-
-@export_category("Editor Buttons")
-@export_tool_button("Setup / Regenerate Grass") var setup_grass_button: Callable = setup_grass
-@export_tool_button("Clear Grass") var clear_grass_button: Callable = clear_grass
-@export_tool_button("Refresh Material Params") var refresh_material_button: Callable = refresh_material_params
 
 func _ready() -> void:
 	set_process(true)
@@ -89,7 +98,7 @@ func setup_grass() -> void:
 	new_multimesh.use_custom_data = true
 	new_multimesh.mesh = grass_mesh
 	new_multimesh.instance_count = blade_count
-	new_multimesh.visible_instance_count = -1
+	new_multimesh.visible_instance_count = 0
 
 	var random: RandomNumberGenerator = RandomNumberGenerator.new()
 	random.seed = generation_seed
@@ -98,23 +107,40 @@ func setup_grass() -> void:
 	if use_ground_raycast and is_inside_tree() and get_world_3d() != null:
 		space_state = get_world_3d().direct_space_state
 
-	for i in range(blade_count):
+	var exclusion_nodes: Array[Node] = _get_exclusion_candidate_nodes()
+
+	var placed_count: int = 0
+	var attempts: int = 0
+	var max_attempts: int = max(blade_count, blade_count * max_spawn_attempt_multiplier)
+
+	while placed_count < blade_count and attempts < max_attempts:
+		attempts += 1
+
 		var local_position: Vector3 = _get_random_local_position(random, space_state)
+		var world_position: Vector3 = global_transform * local_position
+
+		if _is_world_position_excluded(world_position, exclusion_nodes):
+			continue
+
 		var rotation_y: float = random.randf_range(0.0, TAU)
-		var width: float = random.randf_range(blade_width_min, blade_width_max)
-		var height: float = random.randf_range(blade_height_min, blade_height_max)
+		var blade_width: float = random.randf_range(blade_width_min, blade_width_max)
+		var blade_height: float = random.randf_range(blade_height_min, blade_height_max)
 
 		var blade_basis: Basis = Basis.IDENTITY
 		blade_basis = blade_basis.rotated(Vector3.UP, rotation_y)
-		blade_basis = blade_basis.scaled(Vector3(width, height, width))
+		blade_basis = blade_basis.scaled(Vector3(blade_width, blade_height, blade_width))
 
 		var blade_transform: Transform3D = Transform3D(blade_basis, local_position)
-		new_multimesh.set_instance_transform(i, blade_transform)
+		new_multimesh.set_instance_transform(placed_count, blade_transform)
 
 		var phase: float = random.randf()
 		var color_variation: float = random.randf()
 		var bend_variation: float = random.randf()
-		new_multimesh.set_instance_custom_data(i, Color(phase, color_variation, bend_variation, 1.0))
+		new_multimesh.set_instance_custom_data(placed_count, Color(phase, color_variation, bend_variation, 1.0))
+
+		placed_count += 1
+
+	new_multimesh.visible_instance_count = placed_count
 
 	var margin: float = max(vehicle_radius, player_radius) + max(blade_height_max, 1.0) + wind_strength + 2.0
 	new_multimesh.custom_aabb = AABB(
@@ -130,7 +156,34 @@ func setup_grass() -> void:
 	_update_interactors()
 
 	if Engine.is_editor_hint():
-		print("[GrassField3D] Grass generated: %s blades in area %s." % [blade_count, zone_size])
+		print("[GrassField3D] Grass generated: %s/%s blades in area %s." % [placed_count, blade_count, zone_size])
+
+
+func create_exclusion_box() -> void:
+	var exclusion_area: Area3D = Area3D.new()
+	exclusion_area.name = "GrassExclusion_%02d" % _get_next_exclusion_index()
+	add_child(exclusion_area)
+
+	var editor_owner: Node = _get_editor_owner_node()
+	if editor_owner != null:
+		exclusion_area.owner = editor_owner
+
+	if exclusion_group_name != StringName():
+		exclusion_area.add_to_group(exclusion_group_name, true)
+
+	var collision_shape: CollisionShape3D = CollisionShape3D.new()
+	collision_shape.name = "CollisionShape3D"
+	exclusion_area.add_child(collision_shape)
+
+	if editor_owner != null:
+		collision_shape.owner = editor_owner
+
+	var box_shape: BoxShape3D = BoxShape3D.new()
+	box_shape.size = default_exclusion_box_size
+	collision_shape.shape = box_shape
+
+	if Engine.is_editor_hint():
+		print("[GrassField3D] Exclusion box created: %s. Move and scale its CollisionShape3D, then regenerate grass." % exclusion_area.name)
 
 func clear_grass() -> void:
 	var existing_node: Node = get_node_or_null(GRASS_NODE_NAME)
@@ -257,6 +310,150 @@ func _get_random_local_position(random: RandomNumberGenerator, space_state: Phys
 			return to_local(hit_position)
 
 	return Vector3(x, ground_y, z)
+
+
+
+func _get_exclusion_candidate_nodes() -> Array[Node]:
+	var exclusion_nodes: Array[Node] = []
+
+	if not use_exclusion_volumes:
+		return exclusion_nodes
+
+	if get_tree() == null:
+		return exclusion_nodes
+
+	if exclusion_group_name != StringName():
+		var grouped_nodes: Array[Node] = get_tree().get_nodes_in_group(exclusion_group_name)
+		for grouped_node in grouped_nodes:
+			if not exclusion_nodes.has(grouped_node):
+				exclusion_nodes.append(grouped_node)
+
+	if use_exclusion_name_detection and not exclusion_name_prefix.strip_edges().is_empty():
+		var search_root: Node = _get_exclusion_search_root()
+		if search_root != null:
+			_append_named_exclusion_nodes_recursive(search_root, exclusion_nodes)
+
+	return exclusion_nodes
+
+func _append_named_exclusion_nodes_recursive(current_node: Node, exclusion_nodes: Array[Node]) -> void:
+	if current_node == null:
+		return
+
+	if _node_matches_exclusion_name(current_node) and not exclusion_nodes.has(current_node):
+		exclusion_nodes.append(current_node)
+
+	var children: Array[Node] = current_node.get_children()
+	for child_node in children:
+		_append_named_exclusion_nodes_recursive(child_node, exclusion_nodes)
+
+func _node_matches_exclusion_name(node: Node) -> bool:
+	if node == null:
+		return false
+
+	if exclusion_name_prefix.strip_edges().is_empty():
+		return false
+
+	var node_name: String = String(node.name)
+	return node_name.begins_with(exclusion_name_prefix)
+
+func _get_exclusion_search_root() -> Node:
+	if get_tree() == null:
+		return null
+
+	if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
+		return get_tree().edited_scene_root
+
+	if get_tree().current_scene != null:
+		return get_tree().current_scene
+
+	return get_tree().root
+
+func _get_editor_owner_node() -> Node:
+	if Engine.is_editor_hint() and get_tree() != null and get_tree().edited_scene_root != null:
+		return get_tree().edited_scene_root
+
+	return owner
+
+func _get_next_exclusion_index() -> int:
+	var highest_index: int = 0
+	var search_root: Node = _get_exclusion_search_root()
+
+	if search_root == null:
+		return 1
+
+	var stack: Array[Node] = []
+	stack.append(search_root)
+
+	while not stack.is_empty():
+		var current_node: Node = stack.pop_back()
+		var node_name: String = String(current_node.name)
+
+		if node_name.begins_with("GrassExclusion_"):
+			var suffix: String = node_name.trim_prefix("GrassExclusion_")
+			if suffix.is_valid_int():
+				highest_index = max(highest_index, suffix.to_int())
+
+		var children: Array[Node] = current_node.get_children()
+		for child_node in children:
+			stack.append(child_node)
+
+	return highest_index + 1
+
+func _is_world_position_excluded(world_position: Vector3, exclusion_nodes: Array[Node]) -> bool:
+	if not use_exclusion_volumes:
+		return false
+
+	for exclusion_node in exclusion_nodes:
+		if _is_position_inside_exclusion_node(world_position, exclusion_node):
+			return true
+
+	return false
+
+func _is_position_inside_exclusion_node(world_position: Vector3, exclusion_node: Node) -> bool:
+	if exclusion_node == null:
+		return false
+
+	var direct_collision_shape: CollisionShape3D = exclusion_node as CollisionShape3D
+	if direct_collision_shape != null:
+		return _is_position_inside_collision_shape(world_position, direct_collision_shape)
+
+	var shape_nodes: Array[Node] = exclusion_node.find_children("*", "CollisionShape3D", true, false)
+
+	for shape_node in shape_nodes:
+		var collision_shape: CollisionShape3D = shape_node as CollisionShape3D
+		if collision_shape == null:
+			continue
+
+		if _is_position_inside_collision_shape(world_position, collision_shape):
+			return true
+
+	return false
+
+func _is_position_inside_collision_shape(world_position: Vector3, collision_shape: CollisionShape3D) -> bool:
+	if collision_shape.disabled:
+		return false
+
+	if collision_shape.shape == null:
+		return false
+
+	var local_position: Vector3 = collision_shape.global_transform.affine_inverse() * world_position
+
+	var box_shape: BoxShape3D = collision_shape.shape as BoxShape3D
+	if box_shape != null:
+		var half_size: Vector3 = box_shape.size * 0.5
+		return abs(local_position.x) <= half_size.x and abs(local_position.y) <= half_size.y and abs(local_position.z) <= half_size.z
+
+	var sphere_shape: SphereShape3D = collision_shape.shape as SphereShape3D
+	if sphere_shape != null:
+		return local_position.length() <= sphere_shape.radius
+
+	var cylinder_shape: CylinderShape3D = collision_shape.shape as CylinderShape3D
+	if cylinder_shape != null:
+		var half_height: float = cylinder_shape.height * 0.5
+		var horizontal_distance: float = Vector2(local_position.x, local_position.z).length()
+		return abs(local_position.y) <= half_height and horizontal_distance <= cylinder_shape.radius
+
+	return false
 
 func _update_wind_and_color_uniforms() -> void:
 	var material: ShaderMaterial = generated_material

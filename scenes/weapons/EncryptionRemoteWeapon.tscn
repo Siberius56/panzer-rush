@@ -44,43 +44,37 @@ size = Vector3(0.21, 0.04, 0.035)
 [node name="EncryptionRemoteWeapon" type="Node3D" unique_id=269768954]
 script = ExtResource("1_script")
 weapon_id = "encryption_remote"
-weapon_label = "Encryption Remote"
-weapon_local_position = Vector3(0.12, 1.12, -0.34)
+weapon_label = "Remote"
 weapon_behavior = "objective_item"
-magazine_size = 0
-reload_duration = 0.0
-fire_cooldown = 999.0
-camera_shake_enabled = false
-hand_position = Vector3(0.1, -0.04, -0.04)
-back_position = Vector3(0.1, 0.02, 0.04)
-back_rotation_deg = Vector3(-80, 0, 10)
 
-[node name="Body" type="MeshInstance3D" parent="." unique_id=1633147673]
+[node name="Body" type="Node3D" parent="." unique_id=607544317]
+
+[node name="Base" type="MeshInstance3D" parent="Body" unique_id=1633147673]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, -0.12)
 material_override = SubResource("mat_dark")
 mesh = SubResource("mesh_body")
 
-[node name="Screen" type="MeshInstance3D" parent="." unique_id=2031399528]
-transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.067, -0.21)
+[node name="Screen" type="MeshInstance3D" parent="Body" unique_id=2031399528]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.08515483, -0.20513542)
 material_override = SubResource("mat_blue")
 mesh = SubResource("mesh_screen")
 
-[node name="ButtonLeft" type="MeshInstance3D" parent="." unique_id=135589462]
+[node name="ButtonLeft" type="MeshInstance3D" parent="Body" unique_id=135589462]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, -0.055, 0.072, -0.045)
 material_override = SubResource("mat_metal")
 mesh = SubResource("mesh_button")
 
-[node name="ButtonRight" type="MeshInstance3D" parent="." unique_id=1096076138]
+[node name="ButtonRight" type="MeshInstance3D" parent="Body" unique_id=1096076138]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0.055, 0.072, -0.045)
 material_override = SubResource("mat_orange")
 mesh = SubResource("mesh_button")
 
-[node name="Antenna" type="MeshInstance3D" parent="." unique_id=1323024813]
+[node name="Antenna" type="MeshInstance3D" parent="Body" unique_id=1323024813]
 transform = Transform3D(1, 0, 0, 0, -0.18048511, -0.98357797, 0, 0.98357797, -0.18048511, 0, 0.07747335, -0.44598997)
 material_override = SubResource("mat_metal")
 mesh = SubResource("mesh_antenna")
 
-[node name="Grip" type="MeshInstance3D" parent="." unique_id=882147356]
+[node name="Grip" type="MeshInstance3D" parent="Body" unique_id=882147356]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, -0.08, -0.08)
 material_override = SubResource("mat_metal")
 mesh = SubResource("mesh_grip")

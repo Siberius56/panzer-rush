@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://7f7b6w1ytqb0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d4loj"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(0.36, 0.36, 0.36, 0.32)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="SmokeQuad"]
+material = SubResource("StandardMaterial3D_d4loj")
+size = Vector2(0.32, 0.32)
+
+[node name="Rocket_ExhaustSmoke" type="Node3D" unique_id=1298056264]
+
+[node name="Particles" type="CPUParticles3D" parent="." unique_id=2025054643]
+amount = 30
+lifetime = 2.0
+preprocess = 0.35
+randomness = 0.55
+mesh = SubResource("SmokeQuad")
+emission_shape = 1
+emission_sphere_radius = 0.1
+direction = Vector3(0.4, -0.4, -0.05)
+spread = 18.0
+gravity = Vector3(0, -0.25, 0)
+initial_velocity_min = 0.45
+initial_velocity_max = 0.9
+angular_velocity_min = -30.0
+angular_velocity_max = 30.0
+linear_accel_min = -0.05
+linear_accel_max = 0.04
+damping_min = 0.05
+damping_max = 0.4
+scale_amount_min = 0.6
+color = Color(0.42, 0.42, 0.42, 0.38)

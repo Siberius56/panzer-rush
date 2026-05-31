@@ -423,6 +423,7 @@ transform = Transform3D(0.8000001, 0, 0, 0, 0.8000001, 0, 0, 0, 0.8000001, 0, 1.
 cast_shadow = 0
 amount = 2
 lifetime = 1.7
+fixed_fps = 60
 visibility_aabb = AABB(-4.5, -0.25, -4.5, 9, 0.5, 9)
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_npaug")

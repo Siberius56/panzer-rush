@@ -1,0 +1,108 @@
+[gd_scene format=3 uid="uid://of2tbs2c3ohq"]
+
+[ext_resource type="Script" uid="uid://05jp4bpw3cwi" path="res://scenes/objectives/EncryptionControlPanelObjective.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://ddwu7klxnc2vg" path="res://asset/map/misc-2/indicator-special-arrow.glb" id="2_e51qc"]
+[ext_resource type="PackedScene" uid="uid://ruroxgq7tiqb" path="res://asset/map/station-kit/computer-wide.glb" id="2_ga2yr"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_panel_collision"]
+size = Vector3(1.35, 1.35, 0.35)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_unab2"]
+size = Vector3(3, 3, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dark"]
+albedo_color = Color(0.045, 0.052, 0.06, 1)
+roughness = 0.78
+
+[sub_resource type="BoxMesh" id="BoxMesh_panel"]
+size = Vector3(1.25, 1.15, 0.24)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blue"]
+albedo_color = Color(0.055, 0.36, 0.95, 1)
+roughness = 0.42
+emission_enabled = true
+emission = Color(0.025, 0.24, 0.85, 1)
+emission_energy_multiplier = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_screen"]
+size = Vector3(0.86, 0.42, 0.035)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orange"]
+albedo_color = Color(1, 0.42, 0.08, 1)
+emission_enabled = true
+emission = Color(1, 0.22, 0.03, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_button"]
+size = Vector3(0.18, 0.18, 0.05)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_zone_debug"]
+top_radius = 3.0
+bottom_radius = 3.0
+height = 0.025
+radial_segments = 48
+
+[node name="EncryptionControlPanelObjective" type="StaticBody3D" unique_id=1275300909]
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=579437066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("BoxShape3D_panel_collision")
+
+[node name="indicator-special-arrow2" parent="." unique_id=1375977409 instance=ExtResource("2_e51qc")]
+transform = Transform3D(-1.7484555e-07, 0, 4, 0, 4, 0, -4, 0, -1.7484555e-07, 0, 0.01, -3)
+
+[node name="ActivationArea" type="Area3D" parent="." unique_id=1903579699]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1)
+collision_layer = 0
+collision_mask = 16
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ActivationArea" unique_id=1404335424]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+shape = SubResource("BoxShape3D_unab2")
+debug_color = Color(1, 0.42, 0.08, 0.22)
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=47408151]
+unique_name_in_owner = true
+
+[node name="computer-wide2" parent="VisualRoot" unique_id=949682259 instance=ExtResource("2_ga2yr")]
+transform = Transform3D(-3, 0, 4.5298742e-07, 0, 3.75, 0, -4.5298742e-07, 0, -3, 0, 0, 0)
+
+[node name="Panel" type="MeshInstance3D" parent="VisualRoot" unique_id=187321030]
+transform = Transform3D(1, 0, 0, 0, 0.9063078, -0.42261827, 0, 0.42261827, 0.9063078, 0, 1.25, 0)
+visible = false
+material_override = SubResource("StandardMaterial3D_dark")
+mesh = SubResource("BoxMesh_panel")
+
+[node name="Screen" type="MeshInstance3D" parent="VisualRoot" unique_id=1574486421]
+transform = Transform3D(1, 0, 0, 0, 0.9063078, -0.42261827, 0, 0.42261827, 0.9063078, 0, 1.42, -0.14)
+visible = false
+material_override = SubResource("StandardMaterial3D_blue")
+mesh = SubResource("BoxMesh_screen")
+
+[node name="ButtonLeft" type="MeshInstance3D" parent="VisualRoot" unique_id=635929270]
+transform = Transform3D(1, 0, 0, 0, 0.9063078, -0.42261827, 0, 0.42261827, 0.9063078, -0.28, 1.05, -0.18)
+visible = false
+material_override = SubResource("StandardMaterial3D_orange")
+mesh = SubResource("BoxMesh_button")
+
+[node name="ButtonRight" type="MeshInstance3D" parent="VisualRoot" unique_id=894850225]
+transform = Transform3D(1, 0, 0, 0, 0.9063078, -0.42261827, 0, 0.42261827, 0.9063078, 0.28, 1.05, -0.18)
+visible = false
+material_override = SubResource("StandardMaterial3D_orange")
+mesh = SubResource("BoxMesh_button")
+
+[node name="CountdownLabel" type="Label3D" parent="VisualRoot" unique_id=1601758451]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 3.35, 0)
+billboard = 1
+text = "30.0"
+font_size = 96
+outline_size = 8
+
+[node name="ActivationZoneDebug" type="MeshInstance3D" parent="VisualRoot" unique_id=548087785]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.025, 0)
+visible = false
+mesh = SubResource("CylinderMesh_zone_debug")

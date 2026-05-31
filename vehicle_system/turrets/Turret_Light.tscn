@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvppjv5g8wa6h" path="res://vehicle_system/turrets/VehicleTurretBase.gd" id="1_er7gj"]
 [ext_resource type="PackedScene" uid="uid://2lynf3ba0mdk" path="res://scenes/weapons/ObusBullet.tscn" id="2_df13j"]
-[ext_resource type="Material" uid="uid://dd5p67huvqenc" path="res://asset/texture/Color_Default.tres" id="3_jf7nt"]
+[ext_resource type="Texture2D" uid="uid://bimkh753qymni" path="res://asset/unit/Air_Unit_Blue_AwTextureMap_05.png" id="3_jf7nt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_itmxt"]
 resource_name = "MasterMat"
@@ -48,6 +48,9 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_5risy")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ghym7"]
+albedo_texture = ExtResource("3_jf7nt")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qpvge"]
 resource_name = "MasterMat"
 transparency = 2
@@ -92,6 +95,9 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_fe0ws")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4pwmw"]
+albedo_texture = ExtResource("3_jf7nt")
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_4pwmw"]
 top_radius = 0.08
 bottom_radius = 0.08
@@ -120,7 +126,7 @@ projectile_team = 1
 [node name="Cabin" type="MeshInstance3D" parent="Body" unique_id=122090504]
 transform = Transform3D(1.75, 0, 0, 0, 1.75, 0, 0, 0, 1.75, 0, -2.313841, -0.36819386)
 mesh = SubResource("ArrayMesh_df13j")
-surface_material_override/0 = ExtResource("3_jf7nt")
+surface_material_override/0 = SubResource("StandardMaterial3D_ghym7")
 
 [node name="Canon_1" type="Node3D" parent="Body" unique_id=918618052]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6987407, 0.82666385)
@@ -128,7 +134,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6987407, 0.82666385)
 [node name="TurretMesh" type="MeshInstance3D" parent="Body/Canon_1" unique_id=196425626]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -3.458297, -3.414205)
 mesh = SubResource("ArrayMesh_ghym7")
-surface_material_override/0 = ExtResource("3_jf7nt")
+surface_material_override/0 = SubResource("StandardMaterial3D_4pwmw")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Body/Canon_1/TurretMesh" unique_id=1002116696]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 1.7252705, 2.1415572)

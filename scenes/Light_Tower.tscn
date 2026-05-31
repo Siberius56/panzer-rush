@@ -122,7 +122,7 @@ layers = 136
 use_collision = true
 collision_layer = 136
 collision_mask = 0
-size = Vector3(1.784, 0.2, 1.807)
+size = Vector3(2, 0.2, 2)
 material = SubResource("StandardMaterial3D_ligov")
 
 [node name="Floor_05" type="CSGBox3D" parent="." unique_id=1256589267]

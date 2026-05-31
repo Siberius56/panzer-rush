@@ -1,0 +1,782 @@
+[gd_scene format=3 uid="uid://bqio66mcoweml"]
+
+[ext_resource type="Script" uid="uid://oitpxmk5cpyb" path="res://scenes/procedural_generation/scripts/LevelBlock.gd" id="1_block_script"]
+[ext_resource type="Shader" uid="uid://bout2ybxk10m" path="res://asset/shader_ocean.gdshader" id="2_i8qt0"]
+[ext_resource type="Script" uid="uid://pxtolgq38hhe" path="res://scenes/procedural_generation/scripts/SecondaryPOISocket.gd" id="2_lc1pb"]
+[ext_resource type="Script" uid="uid://bic60a3j42ya3" path="res://scripts/game/zombie_director/PlayableZombieSpawnZone.gd" id="3_ckkv1"]
+[ext_resource type="Texture2D" uid="uid://bqo4kmjisxvgp" path="res://asset/texture/ocean_shader_00003.png" id="3_dtir2"]
+[ext_resource type="Texture2D" uid="uid://xp74i6j2lrks" path="res://asset/texture/ocean_shader_00004.png" id="4_q6yox"]
+[ext_resource type="Texture2D" uid="uid://sdmsa2eafwhe" path="res://asset/texture/ocean_shader_00002.png" id="5_8kcuw"]
+[ext_resource type="Texture2D" uid="uid://c56oytkp3ohe7" path="res://asset/texture/ocean_shader_00001.png" id="6_ot0uv"]
+
+[sub_resource type="BoxShape3D" id="Shape_Terrain"]
+size = Vector3(200, 0.35, 200)
+
+[sub_resource type="StandardMaterial3D" id="Mat_terrain_plain"]
+albedo_color = Color(0.23, 0.39, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Terrain"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(100, 10, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_amec6"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(34, 10, 94)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sctsx"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(40, 10, 94)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bk7o0"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(60, 10, 34)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0vwwc"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(66, 10, 92)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cnlyi"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(50, 10, 92)
+
+[sub_resource type="BoxMesh" id="BoxMesh_i8qt0"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(42, 10, 58)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dtir2"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(22, 10, 24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_q6yox"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(22, 10, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8kcuw"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(70, 10, 74)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ot0uv"]
+material = SubResource("Mat_terrain_plain")
+size = Vector3(134, 10, 32)
+
+[sub_resource type="StandardMaterial3D" id="Mat_water"]
+albedo_color = Color(0.05, 0.18, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_River_NS_Half"]
+material = SubResource("Mat_water")
+size = Vector3(16, 5, 34)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kp2ld"]
+render_priority = 0
+shader = ExtResource("2_i8qt0")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_dtir2")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_ot0uv")
+shader_parameter/wave_normal_texture = ExtResource("5_8kcuw")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0, -0.05)
+shader_parameter/foam_texture = ExtResource("4_q6yox")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_muy0d"]
+material = SubResource("Mat_water")
+size = Vector3(14, 5, 22)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jc3io"]
+render_priority = 0
+shader = ExtResource("2_i8qt0")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_dtir2")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_ot0uv")
+shader_parameter/wave_normal_texture = ExtResource("5_8kcuw")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0.05, 0)
+shader_parameter/foam_texture = ExtResource("4_q6yox")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="BoxMesh" id="Mesh_River_EW_Half"]
+material = SubResource("Mat_water")
+size = Vector3(50, 5, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0dy02"]
+render_priority = 0
+shader = ExtResource("2_i8qt0")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_dtir2")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_ot0uv")
+shader_parameter/wave_normal_texture = ExtResource("5_8kcuw")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(-0.05, 0)
+shader_parameter/foam_texture = ExtResource("4_q6yox")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_kp2ld"]
+material = SubResource("Mat_water")
+size = Vector3(48, 5, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sctsx"]
+render_priority = 0
+shader = ExtResource("2_i8qt0")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_dtir2")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_ot0uv")
+shader_parameter/wave_normal_texture = ExtResource("5_8kcuw")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(-0.05, 0)
+shader_parameter/foam_texture = ExtResource("4_q6yox")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_jc3io"]
+material = SubResource("Mat_water")
+size = Vector3(40, 5, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bk7o0"]
+render_priority = 0
+shader = ExtResource("2_i8qt0")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_dtir2")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_ot0uv")
+shader_parameter/wave_normal_texture = ExtResource("5_8kcuw")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0, -0.05)
+shader_parameter/foam_texture = ExtResource("4_q6yox")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_0dy02"]
+material = SubResource("Mat_water")
+size = Vector3(50, 5, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0vwwc"]
+render_priority = 0
+shader = ExtResource("2_i8qt0")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 5.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("3_dtir2")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("6_ot0uv")
+shader_parameter/wave_normal_texture = ExtResource("5_8kcuw")
+shader_parameter/wave_softness = 3.0
+shader_parameter/wave_scale = Vector2(0.08, 0.08)
+shader_parameter/wave_layer_scale = Vector2(1, 1)
+shader_parameter/wave_highlight = 0.5
+shader_parameter/wave_velocity = Vector2(0, -0.05)
+shader_parameter/foam_texture = ExtResource("4_q6yox")
+shader_parameter/edge_foam_depth_size = 0.1
+shader_parameter/wave_foam_amount = 0.1999999955296
+shader_parameter/foam_start = 0.15000000223518
+shader_parameter/foam_end = 0.20000000298024
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 0.5
+shader_parameter/refraction_exponent = 0.5
+shader_parameter/displacement_amount = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_path"]
+albedo_color = Color(0.33, 0.26, 0.17, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Bridge_Corner"]
+material = SubResource("Mat_path")
+size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="BoxShape3D" id="Shape_Bridge_Corner"]
+size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lc1pb"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.06, 120)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ckkv1"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.06, 20)
+
+[sub_resource type="BoxMesh" id="Mesh_Path_Wide_NS"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.06, 50)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mn527"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.06, 30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_264rr"]
+material = SubResource("Mat_path")
+size = Vector3(10, 0.06, 50)
+
+[sub_resource type="BoxMesh" id="Mesh_Path_Wide_EW"]
+material = SubResource("Mat_path")
+size = Vector3(100, 0.06, 10)
+
+[sub_resource type="StandardMaterial3D" id="Mat_obstacle"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Rock_A"]
+material = SubResource("Mat_obstacle")
+size = Vector3(16, 2.5, 18)
+
+[sub_resource type="BoxShape3D" id="Shape_Rock_A"]
+size = Vector3(16, 2.5, 18)
+
+[sub_resource type="BoxMesh" id="Mesh_Rock_B"]
+material = SubResource("Mat_obstacle")
+size = Vector3(18, 2, 14)
+
+[sub_resource type="BoxShape3D" id="Shape_Rock_B"]
+size = Vector3(18, 2, 14)
+
+[sub_resource type="StandardMaterial3D" id="Mat_poi"]
+albedo_color = Color(0.8, 0.55, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_POI_Reserved"]
+material = SubResource("Mat_poi")
+size = Vector3(60, 0.08, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lc1pb"]
+albedo_color = Color(1, 0.6, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_amec6"]
+transparency = 1
+albedo_color = Color(1, 0.15, 0.08, 0.28)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mn527"]
+transparency = 1
+albedo_color = Color(1, 0.65, 0.05, 0.28)
+
+[node name="Block_Plains_River_L" type="Node3D" unique_id=2043755220]
+script = ExtResource("1_block_script")
+block_id = "Block_Plains_River_L"
+block_type = "plains_river_l"
+compatible_poi_tags = PackedStringArray("land", "plain", "water", "town", "military")
+has_water_near_poi = true
+poi_water_type = "river"
+north_side_profile = "river"
+east_side_profile = "river"
+south_side_profile = "road center"
+west_side_profile = "road center"
+
+[node name="Ground_Body" type="StaticBody3D" parent="." unique_id=1238838290]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground_Body" unique_id=2052368436]
+shape = SubResource("Shape_Terrain")
+
+[node name="Ground" type="Node3D" parent="." unique_id=1549751014]
+
+[node name="Terrain0" type="MeshInstance3D" parent="Ground" unique_id=1994483438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -10, -49)
+mesh = SubResource("Mesh_Terrain")
+
+[node name="Terrain11" type="MeshInstance3D" parent="Ground" unique_id=2069776112]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, -10, -33)
+mesh = SubResource("Mesh_Terrain")
+
+[node name="Terrain1" type="MeshInstance3D" parent="Ground" unique_id=996501660]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83, -5, 52.897)
+mesh = SubResource("BoxMesh_amec6")
+
+[node name="Terrain8" type="MeshInstance3D" parent="Ground" unique_id=1907255131]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -5, 53)
+mesh = SubResource("BoxMesh_sctsx")
+
+[node name="Terrain10" type="MeshInstance3D" parent="Ground" unique_id=102619604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -5, 82.5)
+mesh = SubResource("BoxMesh_bk7o0")
+
+[node name="Terrain9" type="MeshInstance3D" parent="Ground" unique_id=270292264]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67, -5, 54)
+mesh = SubResource("BoxMesh_0vwwc")
+
+[node name="Terrain2" type="MeshInstance3D" parent="Ground" unique_id=1538897719]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75, -5, -54)
+mesh = SubResource("BoxMesh_cnlyi")
+
+[node name="Terrain3" type="MeshInstance3D" parent="Ground" unique_id=444157370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, -5, -71)
+mesh = SubResource("BoxMesh_i8qt0")
+
+[node name="Terrain4" type="MeshInstance3D" parent="Ground" unique_id=1232526080]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -5, -54)
+mesh = SubResource("BoxMesh_dtir2")
+
+[node name="Terrain5" type="MeshInstance3D" parent="Ground" unique_id=679071898]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, -5, -90)
+mesh = SubResource("BoxMesh_q6yox")
+
+[node name="Terrain6" type="MeshInstance3D" parent="Ground" unique_id=789126397]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, -5, -63)
+mesh = SubResource("BoxMesh_8kcuw")
+
+[node name="Terrain7" type="MeshInstance3D" parent="Ground" unique_id=1329314093]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, -5, -10)
+mesh = SubResource("BoxMesh_ot0uv")
+
+[node name="River" type="Node3D" parent="." unique_id=399340779]
+
+[node name="River_NS_Half" type="MeshInstance3D" parent="River" unique_id=129838619]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, -83)
+mesh = SubResource("Mesh_River_NS_Half")
+surface_material_override/0 = SubResource("ShaderMaterial_kp2ld")
+
+[node name="River_NS_Half2" type="MeshInstance3D" parent="River" unique_id=750397205]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -19, -5, -73)
+mesh = SubResource("BoxMesh_muy0d")
+surface_material_override/0 = SubResource("ShaderMaterial_jc3io")
+
+[node name="River_EW_Half" type="MeshInstance3D" parent="River" unique_id=1579530185]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75, -5, 0)
+mesh = SubResource("Mesh_River_EW_Half")
+surface_material_override/0 = SubResource("ShaderMaterial_0dy02")
+
+[node name="River_EW_Half2" type="MeshInstance3D" parent="River" unique_id=70044144]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -5, -34)
+mesh = SubResource("BoxMesh_kp2ld")
+surface_material_override/0 = SubResource("ShaderMaterial_sctsx")
+
+[node name="River_EW_Half4" type="MeshInstance3D" parent="River" unique_id=196284995]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -22, -5, -46)
+mesh = SubResource("BoxMesh_jc3io")
+surface_material_override/0 = SubResource("ShaderMaterial_bk7o0")
+
+[node name="River_EW_Half3" type="MeshInstance3D" parent="River" unique_id=66631084]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 42, -5, -17)
+mesh = SubResource("BoxMesh_0dy02")
+surface_material_override/0 = SubResource("ShaderMaterial_0vwwc")
+
+[node name="Road" type="Node3D" parent="." unique_id=1633410075]
+
+[node name="Bridge_Corner" type="MeshInstance3D" parent="Road" unique_id=510126599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0.1, -35)
+mesh = SubResource("Mesh_Bridge_Corner")
+
+[node name="Bridge_Corner_Body" type="StaticBody3D" parent="Road" unique_id=846554038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0.1, -35)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Road/Bridge_Corner_Body" unique_id=1352758628]
+shape = SubResource("Shape_Bridge_Corner")
+
+[node name="Path_Wide_NS2" type="MeshInstance3D" parent="Road" unique_id=337124760]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.411, 39.609)
+mesh = SubResource("BoxMesh_lc1pb")
+
+[node name="Path_Wide_NS6" type="MeshInstance3D" parent="Road" unique_id=659174729]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 14.2178335, 0.41114166, -15.390823)
+mesh = SubResource("BoxMesh_ckkv1")
+
+[node name="Path_Wide_NS3" type="MeshInstance3D" parent="Road" unique_id=98665837]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 19.217834, 0.41114166, 19.609177)
+mesh = SubResource("Mesh_Path_Wide_NS")
+
+[node name="Path_Wide_NS4" type="MeshInstance3D" parent="Road" unique_id=1810614529]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 49.217834, 0.41114166, 39.609177)
+mesh = SubResource("Mesh_Path_Wide_NS")
+
+[node name="Path_Wide_NS9" type="MeshInstance3D" parent="Road" unique_id=434379971]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 29.217834, 0.41114166, 69.60918)
+mesh = SubResource("Mesh_Path_Wide_NS")
+
+[node name="Path_Wide_NS5" type="MeshInstance3D" parent="Road" unique_id=1363142739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.154922, 0.41114166, -34.21693)
+mesh = SubResource("BoxMesh_mn527")
+
+[node name="Path_Wide_NS7" type="MeshInstance3D" parent="Road" unique_id=1207884154]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 39.154922, 0.41114166, -54.21693)
+mesh = SubResource("BoxMesh_264rr")
+
+[node name="Path_Wide_NS8" type="MeshInstance3D" parent="Road" unique_id=826111468]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -66.84508, 0.41114166, -30.21693)
+mesh = SubResource("BoxMesh_264rr")
+
+[node name="Path_Wide_EW" type="MeshInstance3D" parent="Road" unique_id=1631354465]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0.04, 0)
+mesh = SubResource("Mesh_Path_Wide_EW")
+
+[node name="Rock_A" type="MeshInstance3D" parent="." unique_id=1170501410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51.05562, 1.25, -16.927147)
+mesh = SubResource("Mesh_Rock_A")
+
+[node name="Rock_A_Body" type="StaticBody3D" parent="." unique_id=729721756]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51, 1.25, -17)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Rock_A_Body" unique_id=916798794]
+shape = SubResource("Shape_Rock_A")
+
+[node name="Rock_A2" type="MeshInstance3D" parent="." unique_id=1943113710]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75.94438, 1.25, 39.072853)
+mesh = SubResource("Mesh_Rock_A")
+
+[node name="Rock_A_Body2" type="StaticBody3D" parent="." unique_id=642233129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, 1.25, 39)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Rock_A_Body2" unique_id=2099483739]
+shape = SubResource("Shape_Rock_A")
+
+[node name="Rock_B" type="MeshInstance3D" parent="." unique_id=1063415793]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1, 35)
+mesh = SubResource("Mesh_Rock_B")
+
+[node name="Rock_B_Body" type="StaticBody3D" parent="." unique_id=1800635571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1, 35)
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Rock_B_Body" unique_id=1509518555]
+shape = SubResource("Shape_Rock_B")
+
+[node name="POISocket" type="Node3D" parent="." unique_id=1693500767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0.25, 36)
+
+[node name="POI_Reserved_50x50" type="MeshInstance3D" parent="POISocket" unique_id=1770512947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
+visible = false
+mesh = SubResource("Mesh_POI_Reserved")
+
+[node name="POISocket_Side1" type="Node3D" parent="." unique_id=2127443591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.64227, 0.25, -62.498398)
+script = ExtResource("2_lc1pb")
+
+[node name="POISocket_Side2" type="Node3D" parent="." unique_id=85451257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.357727, 0.25, -70.4984)
+script = ExtResource("2_lc1pb")
+
+[node name="POISocket_Side3" type="Node3D" parent="." unique_id=1531226436]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 58.357727, 0.25, 7.501602)
+script = ExtResource("2_lc1pb")
+secondary_socket_environment = "river"
+
+[node name="SpawnSockets" type="Node3D" parent="." unique_id=1627810835]
+
+[node name="Spawn_A" type="Node3D" parent="SpawnSockets" unique_id=155627230]
+transform = Transform3D(0.7071069, 0, 0.70710665, 0, 1, 0, -0.70710665, 0, 0.7071069, -58, 0.4, 52)
+
+[node name="Spawn_B" type="Node3D" parent="SpawnSockets" unique_id=1193674169]
+transform = Transform3D(0.7071069, 0, -0.70710665, 0, 1, 0, 0.70710665, 0, 0.7071069, 56, 0.4, -52)
+
+[node name="Connectors" type="Node3D" parent="." unique_id=1361075421]
+
+[node name="North" type="Node3D" parent="Connectors" unique_id=445931553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -100)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/North" unique_id=142483761]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_lc1pb")
+
+[node name="East" type="Node3D" parent="Connectors" unique_id=380255633]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0.4, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/East" unique_id=1819575735]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_lc1pb")
+
+[node name="South" type="Node3D" parent="Connectors" unique_id=1127747624]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 100)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/South" unique_id=1643925743]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_lc1pb")
+
+[node name="West" type="Node3D" parent="Connectors" unique_id=2125723941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0.4, 0)
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Connectors/West" unique_id=885884594]
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+material = SubResource("StandardMaterial3D_lc1pb")
+
+[node name="Walls_Limit" type="Node3D" parent="." unique_id=1375821429]
+
+[node name="CSGBox3D1" type="CSGBox3D" parent="Walls_Limit" unique_id=1410181313]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0, -55)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Walls_Limit" unique_id=599657556]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -99, 0, 55)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="Walls_Limit" unique_id=516418148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99, 0, -62)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="Walls_Limit" unique_id=1654149548]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 99, 0, 62)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Walls_Limit" unique_id=69674728]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -62, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Walls_Limit" unique_id=93883387]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 63, 0, -99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 75)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Walls_Limit" unique_id=223079788]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -55, 0, 99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="Walls_Limit" unique_id=834607327]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 55, 0, 99)
+use_collision = true
+collision_layer = 8
+collision_mask = 0
+size = Vector3(2, 10, 90)
+
+[node name="SpawnZones" type="Node3D" parent="." unique_id=1851027722]
+
+[node name="Plans_River_L_West_Horde" type="Node3D" parent="SpawnZones" unique_id=1410068607 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 2.0101318, 77)
+script = ExtResource("3_ckkv1")
+zone_mode = 1
+min_spawn_count = 12
+max_spawn_count = 22
+max_alive_from_zone = 28
+max_distance_from_target = 140.0
+cooldown_seconds = 55.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_L_West_Horde" unique_id=1212630490]
+size = Vector3(20, 0.12, 14)
+material = SubResource("StandardMaterial3D_amec6")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_L_West_Horde" unique_id=1730477243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - flanc gauche
+Spawn dynamique.
+À placer hors champ ou derrière un obstacle."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_L_West_Horde" unique_id=1384925180]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.2, -4)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_L_West_Horde" unique_id=1139913742]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.2, 5)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_L_West_Horde" unique_id=1929285652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.2, -2)
+
+[node name="SpawnPoint_04" type="Marker3D" parent="SpawnZones/Plans_River_L_West_Horde" unique_id=1555416220]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, 4)
+
+[node name="Plans_River_L_South_Horde" type="Node3D" parent="SpawnZones" unique_id=1415920996 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 2.766817, 76)
+script = ExtResource("3_ckkv1")
+zone_mode = 1
+min_spawn_count = 10
+max_spawn_count = 18
+max_alive_from_zone = 24
+max_distance_from_target = 140.0
+cooldown_seconds = 50.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_L_South_Horde" unique_id=244934441]
+size = Vector3(18, 0.12, 12)
+material = SubResource("StandardMaterial3D_amec6")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_L_South_Horde" unique_id=1029518088]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - route latérale
+Le Director l'utilise pendant BUILD_UP.
+Puis il spawn par salves."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_L_South_Horde" unique_id=1323529709]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_L_South_Horde" unique_id=525316308]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_L_South_Horde" unique_id=1751829960]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.2, -2)
+
+[node name="Plans_River_L_East_Mixed" type="Node3D" parent="SpawnZones" unique_id=887583246 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.622398, 4.0951777, 1.8102341)
+script = ExtResource("3_ckkv1")
+zone_mode = 2
+max_spawn_count = 14
+min_distance_from_target = 22.0
+max_distance_from_target = 140.0
+cooldown_seconds = 45.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_L_East_Mixed" unique_id=1335457067]
+size = Vector3(16, 0.12, 16)
+material = SubResource("StandardMaterial3D_mn527")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_L_East_Mixed" unique_id=1527311137]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "MIXTE - carrefour
+Peut être déjà habité.
+Peut aussi servir de renfort dynamique."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_L_East_Mixed" unique_id=540499799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -5)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_L_East_Mixed" unique_id=1190400777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -4)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_L_East_Mixed" unique_id=1583807037]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+
+[node name="Plans_River_L_North_Horde" type="Node3D" parent="SpawnZones" unique_id=775478741 groups=["zombie_spawn_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.6445227, -54)
+script = ExtResource("3_ckkv1")
+zone_mode = 1
+min_spawn_count = 16
+max_spawn_count = 28
+max_alive_from_zone = 34
+min_distance_from_target = 30.0
+max_distance_from_target = 160.0
+cooldown_seconds = 65.0
+
+[node name="DebugArea" type="CSGBox3D" parent="SpawnZones/Plans_River_L_North_Horde" unique_id=1488011724]
+size = Vector3(24, 0.12, 18)
+material = SubResource("StandardMaterial3D_amec6")
+
+[node name="Label3D" type="Label3D" parent="SpawnZones/Plans_River_L_North_Horde" unique_id=2098570327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+billboard = 1
+no_depth_test = true
+text = "HORDE - fin de section
+Grosse pression avant un passageGate.
+À utiliser avec cooldown long."
+font_size = 36
+outline_size = 9
+
+[node name="SpawnPoint_01" type="Marker3D" parent="SpawnZones/Plans_River_L_North_Horde" unique_id=444104378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, -6)
+
+[node name="SpawnPoint_02" type="Marker3D" parent="SpawnZones/Plans_River_L_North_Horde" unique_id=22362253]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 7)
+
+[node name="SpawnPoint_03" type="Marker3D" parent="SpawnZones/Plans_River_L_North_Horde" unique_id=1328292196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, -4)

@@ -14,7 +14,7 @@ layout_mode = 0
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 760.0
-offset_bottom = 620.0
+offset_bottom = 680.0
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=813868041]
 layout_mode = 2
@@ -61,8 +61,31 @@ text = "Top Camera"
 layout_mode = 2
 text = "Player Camera"
 
+[node name="EnemyDebugRow" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EnemyDebugLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/EnemyDebugRow"]
+layout_mode = 2
+text = "Enemy debug"
+
+[node name="EnemyTypeOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/EnemyDebugRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="SpawnEnemyButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/EnemyDebugRow"]
+layout_mode = 2
+text = "Spawn enemy"
+
+[node name="TriggerHordeButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/EnemyDebugRow"]
+layout_mode = 2
+text = "Start horde"
+
+[node name="TriggerSuperHordeButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/EnemyDebugRow"]
+layout_mode = 2
+text = "Start super horde"
+
 [node name="DatabaseText" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1686863890]
-custom_minimum_size = Vector2(700, 500)
+custom_minimum_size = Vector2(700, 440)
 layout_mode = 2
 focus_mode = 2
 bbcode_enabled = true

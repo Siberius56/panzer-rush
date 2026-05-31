@@ -14,6 +14,7 @@ reload_duration = 1.6
 fire_cooldown = 0.8
 shot_dispersion_degrees = 1.5
 projectile_damage = 35
+projectile_penetration = 10
 
 [node name="Body" type="Node3D" parent="." unique_id=875171133]
 
@@ -29,4 +30,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09027201, -0.11542958, -0.
 [node name="RightGrip" type="Node3D" parent="." unique_id=2048794060]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08351433, 0, -0.45762655)
 
-[node name="WeaponLaserSight" parent="." instance=ExtResource("10_laser")]
+[node name="WeaponLaserSight" parent="." unique_id=961232026 instance=ExtResource("10_laser")]

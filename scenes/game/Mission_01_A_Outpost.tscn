@@ -31,7 +31,7 @@
 [ext_resource type="PackedScene" uid="uid://ddwu7klxnc2vg" path="res://asset/map/misc-2/indicator-special-arrow.glb" id="19_16aw6"]
 [ext_resource type="Script" uid="uid://btqrnfrb4i4ti" path="res://scenes/game/MultiMesh.gd" id="21_rlbbb"]
 [ext_resource type="PackedScene" uid="uid://c7q0v7edcdhme" path="res://asset/map/road/road-end.glb" id="21_ug7yg"]
-[ext_resource type="PackedScene" uid="uid://dnq7kmbkjp2vx" path="res://Spawner_Player.tscn" id="22_7w12i"]
+[ext_resource type="PackedScene" uid="uid://dnq7kmbkjp2vx" path="res://asset/Spawner_Player.tscn" id="22_7w12i"]
 [ext_resource type="PackedScene" uid="uid://ct24ndndhorcg" path="res://scenes/ui/NetworkHUD.tscn" id="22_fmmwc"]
 [ext_resource type="ArrayMesh" uid="uid://drt7qx6psabkp" path="res://scenes/props/tree.obj" id="22_tq13h"]
 [ext_resource type="Texture2D" uid="uid://xeo5jn7pwyn7" path="res://asset/map/misc-2/Textures/colormap.png" id="23_tq13h"]
@@ -63,7 +63,6 @@
 [ext_resource type="PackedScene" uid="uid://j86eyhmdi7ry" path="res://asset/map/misc-2/rock-b.glb" id="49_ecv8k"]
 [ext_resource type="PackedScene" uid="uid://dqvmuov624na5" path="res://scenes/props/Physic/Armor_Blue.tscn" id="49_hewey"]
 [ext_resource type="PackedScene" uid="uid://b7nrdtsfjnycv" path="res://scenes/objectives/BombRadarObjective.tscn" id="51_8lmad"]
-[ext_resource type="PackedScene" uid="uid://b3urisa1uyofo" path="res://scenes/weapons/WorldBomb3D.tscn" id="52_8lmad"]
 [ext_resource type="PackedScene" uid="uid://qvga6kqmd8f1" path="res://asset/weapon/crate-wide.glb" id="54_kn2yd"]
 [ext_resource type="PackedScene" uid="uid://vywtkjm3peqj" path="res://scenes/props/Building/Building_B.tscn" id="54_kq56u"]
 [ext_resource type="PackedScene" uid="uid://bgbsr2urbsso5" path="res://asset/map/prefab/Rock_A.tscn" id="56_td225"]
@@ -4561,15 +4560,6 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.8
 [node name="Building_B2" parent="NavigationRegion3D/02_Coast" unique_id=455294865 instance=ExtResource("54_kq56u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.64222, 0.5000019, 21.339397)
 
-[node name="WorldBomb3D" parent="NavigationRegion3D/02_Coast" unique_id=974036771 instance=ExtResource("52_8lmad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.034174, 1.7020049, 27.307892)
-
-[node name="WorldBomb3D2" parent="NavigationRegion3D/02_Coast" unique_id=1502770541 instance=ExtResource("52_8lmad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.392715, 1.7020049, 20.643677)
-
-[node name="WorldBomb3D3" parent="NavigationRegion3D/02_Coast" unique_id=905340871 instance=ExtResource("52_8lmad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1785355, 1.7020049, 52.56446)
-
 [node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D/02_Coast" unique_id=1929322722]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 0, 12)
 collision_layer = 8
@@ -6456,20 +6446,14 @@ collision_mask = 17
 [node name="PassageGate1" parent="Trigger" unique_id=205045320 instance=ExtResource("5_rlbbb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
 tank_tp_path = NodePath("Tank_TP")
-zone_to_activate_path = NodePath("../../NavigationRegion3D/02_Coast")
-zone_to_deactivate_path = NodePath("../../NavigationRegion3D/01_Forest")
 
 [node name="PassageGate2" parent="Trigger" unique_id=387306123 instance=ExtResource("5_rlbbb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -117)
 tank_tp_path = NodePath("Tank_TP")
-zone_to_activate_path = NodePath("../../NavigationRegion3D/03_Outpost")
-zone_to_deactivate_path = NodePath("../../NavigationRegion3D/02_Coast")
 
 [node name="PassageGate3" parent="Trigger" unique_id=691636036 instance=ExtResource("5_rlbbb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -184.75)
 tank_tp_path = NodePath("Tank_TP")
-zone_to_activate_path = NodePath("../../NavigationRegion3D/04_Rivers")
-zone_to_deactivate_path = NodePath("../../NavigationRegion3D/03_Outpost")
 
 [node name="MissionExitZone" parent="Trigger" unique_id=471519185 instance=ExtResource("8_h7tsv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.493076, 1.1000065, -224.68906)

@@ -13,6 +13,12 @@ extends Control
 @onready var refresh_button: Button = $PanelContainer/MarginContainer/VBoxContainer/Buttons/RefreshButton
 @onready var top_down_camera_button: Button = $PanelContainer/MarginContainer/VBoxContainer/Buttons/TopDownCameraButton
 @onready var player_camera_button: Button = $PanelContainer/MarginContainer/VBoxContainer/Buttons/PlayerCameraButton
+@onready var main_vbox: VBoxContainer = $PanelContainer/MarginContainer/VBoxContainer
+
+var enemy_type_option: OptionButton = null
+var spawn_enemy_button: Button = null
+var trigger_horde_button: Button = null
+var trigger_super_horde_button: Button = null
 
 var target_node: Node = null
 var last_plain_summary: String = ""
@@ -32,6 +38,8 @@ func _ready() -> void:
 	top_down_camera_button.pressed.connect(_on_top_down_camera_pressed)
 	player_camera_button.pressed.connect(_on_player_camera_pressed)
 
+	_setup_enemy_debug_controls()
+	_refresh_debug_enemy_options()
 	_refresh_debug_summary()
 
 
@@ -125,6 +133,195 @@ func _on_player_camera_pressed() -> void:
 	_set_status("Caméra joueur restaurée.")
 
 
+func _setup_enemy_debug_controls() -> void:
+	if main_vbox == null:
+		return
+
+	var row: HBoxContainer = main_vbox.get_node_or_null("EnemyDebugRow") as HBoxContainer
+	if row == null:
+		row = HBoxContainer.new()
+		row.name = "EnemyDebugRow"
+		main_vbox.add_child(row)
+		main_vbox.move_child(row, 3)
+
+	var label: Label = row.get_node_or_null("EnemyDebugLabel") as Label
+	if label == null:
+		label = Label.new()
+		label.name = "EnemyDebugLabel"
+		row.add_child(label)
+	label.text = "Enemy debug"
+
+	enemy_type_option = row.get_node_or_null("EnemyTypeOption") as OptionButton
+	if enemy_type_option == null:
+		enemy_type_option = OptionButton.new()
+		enemy_type_option.name = "EnemyTypeOption"
+		row.add_child(enemy_type_option)
+	enemy_type_option.custom_minimum_size = Vector2(150.0, 0.0)
+
+	spawn_enemy_button = row.get_node_or_null("SpawnEnemyButton") as Button
+	if spawn_enemy_button == null:
+		spawn_enemy_button = Button.new()
+		spawn_enemy_button.name = "SpawnEnemyButton"
+		row.add_child(spawn_enemy_button)
+	spawn_enemy_button.text = "Spawn enemy"
+
+	trigger_horde_button = row.get_node_or_null("TriggerHordeButton") as Button
+	if trigger_horde_button == null:
+		trigger_horde_button = Button.new()
+		trigger_horde_button.name = "TriggerHordeButton"
+		row.add_child(trigger_horde_button)
+	trigger_horde_button.text = "Start horde"
+
+	trigger_super_horde_button = row.get_node_or_null("TriggerSuperHordeButton") as Button
+	if trigger_super_horde_button == null:
+		trigger_super_horde_button = Button.new()
+		trigger_super_horde_button.name = "TriggerSuperHordeButton"
+		row.add_child(trigger_super_horde_button)
+	trigger_super_horde_button.text = "Start super horde"
+
+	var spawn_callable: Callable = Callable(self, "_on_spawn_enemy_pressed")
+	if not spawn_enemy_button.pressed.is_connected(spawn_callable):
+		spawn_enemy_button.pressed.connect(spawn_callable)
+
+	var horde_callable: Callable = Callable(self, "_on_trigger_horde_pressed")
+	if not trigger_horde_button.pressed.is_connected(horde_callable):
+		trigger_horde_button.pressed.connect(horde_callable)
+
+	var super_horde_callable: Callable = Callable(self, "_on_trigger_super_horde_pressed")
+	if not trigger_super_horde_button.pressed.is_connected(super_horde_callable):
+		trigger_super_horde_button.pressed.connect(super_horde_callable)
+
+
+func _refresh_debug_enemy_options() -> void:
+	if enemy_type_option == null:
+		return
+
+	enemy_type_option.clear()
+
+	var options_added: int = 0
+	var director: Node = _find_horde_director()
+	if director != null and director.has_method("get_debug_enemy_spawn_options"):
+		var raw_options: Variant = director.call("get_debug_enemy_spawn_options")
+		if raw_options is Array:
+			for option_value: Variant in raw_options:
+				if option_value is Dictionary:
+					var option_dictionary: Dictionary = option_value as Dictionary
+					var option_id: String = String(option_dictionary.get("id", "random"))
+					var option_label: String = String(option_dictionary.get("label", option_id))
+					enemy_type_option.add_item(option_label)
+					enemy_type_option.set_item_metadata(options_added, option_id)
+					options_added += 1
+
+	if options_added <= 0:
+		_add_fallback_enemy_option("Aléatoire", "random")
+		_add_fallback_enemy_option("Tonfa", "tonfa")
+		_add_fallback_enemy_option("Bouclier", "shield")
+		_add_fallback_enemy_option("Fusil", "rifleman")
+		_add_fallback_enemy_option("Anti-tank", "anti_tank")
+		_add_fallback_enemy_option("Hammer", "hammer")
+
+	enemy_type_option.select(0)
+
+
+func _add_fallback_enemy_option(label: String, option_id: String) -> void:
+	var index: int = enemy_type_option.get_item_count()
+	enemy_type_option.add_item(label)
+	enemy_type_option.set_item_metadata(index, option_id)
+
+
+func _on_spawn_enemy_pressed() -> void:
+	var director: Node = _find_horde_director()
+	if director == null:
+		_set_status("HordeDirector introuvable.")
+		return
+
+	if not director.has_method("debug_spawn_enemy_near_player"):
+		_set_status("Le HordeDirector ne possède pas debug_spawn_enemy_near_player().")
+		return
+
+	var enemy_type: String = _get_selected_enemy_type()
+	var spawned_value: Variant = director.call("debug_spawn_enemy_near_player", enemy_type)
+	if spawned_value is Node:
+		_set_status("Spawn debug : %s." % enemy_type)
+	else:
+		_set_status("Spawn debug impossible : %s." % enemy_type)
+
+	call_deferred("_refresh_debug_summary")
+
+
+func _on_trigger_horde_pressed() -> void:
+	var director: Node = _find_horde_director()
+	if director == null:
+		_set_status("HordeDirector introuvable.")
+		return
+
+	var accepted: bool = false
+	if director.has_method("debug_trigger_attack_wave_now"):
+		accepted = bool(director.call("debug_trigger_attack_wave_now"))
+	elif director.has_method("force_horde_now"):
+		director.call("force_horde_now")
+		accepted = true
+
+	_set_status("Horde debug lancée." if accepted else "Horde debug refusée.")
+	call_deferred("_refresh_debug_summary")
+
+
+func _on_trigger_super_horde_pressed() -> void:
+	var director: Node = _find_horde_director()
+	if director == null:
+		_set_status("HordeDirector introuvable.")
+		return
+
+	var accepted: bool = false
+	if director.has_method("debug_trigger_super_horde_now"):
+		accepted = bool(director.call("debug_trigger_super_horde_now"))
+	elif director.has_method("force_super_horde_now"):
+		director.call("force_super_horde_now")
+		accepted = true
+
+	_set_status("Super horde debug lancée." if accepted else "Super horde debug refusée.")
+	call_deferred("_refresh_debug_summary")
+
+
+func _get_selected_enemy_type() -> String:
+	if enemy_type_option == null or enemy_type_option.get_item_count() <= 0:
+		return "random"
+
+	var selected_index: int = enemy_type_option.selected
+	if selected_index < 0:
+		return "random"
+
+	var metadata: Variant = enemy_type_option.get_item_metadata(selected_index)
+	if metadata == null:
+		return "random"
+
+	return String(metadata)
+
+
+func _find_horde_director() -> Node:
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return null
+
+	var directors: Array[Node] = tree.get_nodes_in_group("horde_director")
+	if not directors.is_empty():
+		return directors[0]
+
+	var target: Node = _resolve_target()
+	if target != null:
+		var local_director: Node = target.find_child("*HordeDirector*", true, false)
+		if local_director != null:
+			return local_director
+
+	var current_scene: Node = tree.current_scene
+	if current_scene != null:
+		var scene_director: Node = current_scene.find_child("*HordeDirector*", true, false)
+		if scene_director != null:
+			return scene_director
+
+	return null
+
+
 func _find_top_down_debug_camera() -> Camera3D:
 	var tree: SceneTree = get_tree()
 	if tree == null:
@@ -211,6 +408,8 @@ func _find_first_camera_recursive(root: Node) -> Camera3D:
 
 
 func _refresh_debug_summary() -> void:
+	_refresh_debug_enemy_options()
+
 	var target: Node = _resolve_target()
 	if target == null:
 		summary_text.text = "[color=#aaaaaa]Aucune cible.[/color]"

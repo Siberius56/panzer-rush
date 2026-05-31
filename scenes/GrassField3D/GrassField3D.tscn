@@ -1,39 +1,8 @@
-[gd_scene format=3 uid="uid://bvoa8u5si2g1c"]
+[gd_scene format=3]
 
 [ext_resource type="Script" uid="uid://bot1xr3wlul31" path="res://scenes/GrassField3D/GrassField3D.gd" id="1_script"]
 [ext_resource type="Shader" uid="uid://pjgvyqjolqb6" path="res://scenes/GrassField3D/GrassBladeInteractive.gdshader" id="2_shader"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_xm8wm"]
-resource_local_to_scene = true
-render_priority = 0
-shader = ExtResource("2_shader")
-shader_parameter/bottom_color = Color(0.12, 0.3, 0.08, 1)
-shader_parameter/top_color = Color(0.46, 0.72, 0.22, 1)
-shader_parameter/wind_strength = 0.12
-shader_parameter/wind_speed = 1.25
-shader_parameter/wind_frequency = 1.8
-shader_parameter/wind_direction = Vector2(1, 0.35)
-shader_parameter/vertical_push = 0.35
-shader_parameter/bend_response = 1.0
-shader_parameter/interactor_0 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_1 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_2 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_3 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_4 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_5 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_6 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_7 = Vector4(99999, 0, 99999, 0)
-shader_parameter/interactor_strength_0 = 0.0
-shader_parameter/interactor_strength_1 = 0.0
-shader_parameter/interactor_strength_2 = 0.0
-shader_parameter/interactor_strength_3 = 0.0
-shader_parameter/interactor_strength_4 = 0.0
-shader_parameter/interactor_strength_5 = 0.0
-shader_parameter/interactor_strength_6 = 0.0
-shader_parameter/interactor_strength_7 = 0.0
-
-[node name="GrassField3D" type="Node3D" unique_id=134133502]
+[node name="GrassField3D" type="Node3D"]
 script = ExtResource("1_script")
-blade_mesh_mode = 0
 grass_shader = ExtResource("2_shader")
-generated_material = SubResource("ShaderMaterial_xm8wm")

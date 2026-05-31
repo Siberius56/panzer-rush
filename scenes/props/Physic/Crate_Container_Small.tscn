@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dwpsaqsds3y8g"]
 
 [ext_resource type="Script" uid="uid://c2uin6brpfb46" path="res://scripts/destructible_prop.gd" id="1_fjycs"]
-[ext_resource type="PackedScene" uid="uid://bjx62u48e41hx" path="res://container_small.glb" id="2_cao2b"]
+[ext_resource type="PackedScene" uid="uid://bjx62u48e41hx" path="res://asset/map/misc-2/container_small.glb" id="2_cao2b"]
 [ext_resource type="Texture2D" uid="uid://b3y6ggoaadr4w" path="res://asset/map/train/Textures/colormap.png" id="3_cao2b"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bkvov"]

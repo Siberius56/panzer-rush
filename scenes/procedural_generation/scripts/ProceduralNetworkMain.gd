@@ -4,7 +4,7 @@ class_name ProceduralNetworkMain
 # Nouvelle version pour contourner le cache Godot de l’ancien script.
 
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
-const PLAYER_SCENE: PackedScene = preload("res://scenes/player/NetworkProceduralPlayer.tscn")
+const PLAYER_SCENE: PackedScene = preload("uid://2mul2xilh3fg") # preload("res://scenes/player/NetworkProceduralPlayer.tscn")
 const TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH: String = "res://scenes/enemies/TransportHelicopterEnemySpawner.tscn"
 
 @export var debug_disable_enemy_spawn: bool = true
@@ -70,8 +70,8 @@ func _ready() -> void:
 	_apply_initial_network_zone_states()
 	
 	
-	#if world_environment:
-		#world_environment.environment = ENV_DAY
+	if world_environment:
+		world_environment.environment = ENV_DAY
 	
 	
 	if not NetworkManager.player_list_changed.is_connected(_sync_players):

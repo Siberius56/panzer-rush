@@ -25,5 +25,5 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0
 [node name="Label3D" type="Label3D" parent="." unique_id=741685875]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.6315675, 0)
-text = "Weapon"
+text = "item weapon"
 font_size = 64

@@ -10,6 +10,9 @@ extends Node3D
 @export var requires_water_near_poi: bool = false
 @export_enum("none", "any_water", "river", "sea") var required_water_type: String = "none"
 
+@export_group("Objective dependency")
+@export var poi_objective_scene: PackedScene
+
 
 func can_spawn_on_block(block_node: Node) -> bool:
 	if block_node == null:
@@ -48,7 +51,23 @@ func get_database_summary() -> Dictionary:
 		"poi_tags": Array(poi_tags),
 		"requires_water_near_poi": requires_water_near_poi,
 		"required_water_type": required_water_type,
+		"has_objective_secondary_poi": poi_objective_scene != null,
+		"objective_secondary_poi_scene_path": _get_packed_scene_path(poi_objective_scene),
 	}
+
+
+func get_objective_secondary_poi_scene() -> PackedScene:
+	return poi_objective_scene
+
+
+func has_objective_secondary_poi_scene() -> bool:
+	return poi_objective_scene != null
+
+
+func _get_packed_scene_path(scene: PackedScene) -> String:
+	if scene == null:
+		return ""
+	return scene.resource_path
 
 
 func _read_bool_property(target: Object, property_name: String, fallback: bool) -> bool:

@@ -76,6 +76,9 @@ enum DirectorState {
 @export var spawn_interval_max: float = 0.28
 
 @export_group("Mega Horde")
+# Les super hordes ne sont plus déclenchées automatiquement par défaut.
+# Elles sont prévues pour être appelées par des objectifs externes.
+@export var automatic_super_hordes_enabled: bool = false
 @export var mega_horde_enabled: bool = true
 @export_range(0.0, 1.0, 0.01) var mega_horde_chance: float = 0.12
 @export var mega_horde_cooldown_seconds: float = 240.0
@@ -109,9 +112,18 @@ enum DirectorState {
 @export var max_alive_zombies: int = 80
 @export var idle_population_on_ready: bool = true
 @export var max_idle_zones_populated_on_ready: int = 3
+@export var idle_population_retry_enabled: bool = true
+@export_range(0, 120, 1) var idle_population_retry_attempts: int = 30
+@export var idle_population_retry_delay_seconds: float = 0.25
 
 @export_group("Debug")
 @export var debug_print_events: bool = true
+
+@export_group("Debug Spawn")
+@export var debug_spawn_min_distance: float = 8.0
+@export var debug_spawn_max_distance: float = 16.0
+@export_range(1, 64, 1) var debug_spawn_position_attempts: int = 18
+@export var debug_spawn_ignore_visibility: bool = true
 
 var state: DirectorState = DirectorState.REST
 var state_timer: float = 0.0
@@ -125,6 +137,8 @@ var last_event_text: String = "Initialisation"
 var cached_zones: Array[Node] = []
 var initial_idle_population_done: bool = false
 var waiting_for_idle_population_deferred: bool = false
+var idle_population_retry_count: int = 0
+var idle_population_retry_timer: float = -1.0
 var random: RandomNumberGenerator = RandomNumberGenerator.new()
 var time_since_last_mega_horde: float = 999999.0
 var cleanup_timer: float = 0.0
@@ -158,6 +172,7 @@ func _process(delta: float) -> void:
 	time_since_last_mega_horde += delta
 	_update_state(delta)
 	_update_cleanup(delta)
+	_update_idle_population_retry(delta)
 
 
 func get_debug_info() -> Dictionary:
@@ -187,11 +202,129 @@ func force_horde_now() -> void:
 
 
 func force_mega_horde_now() -> void:
+	request_super_horde_now("force_mega_horde_now")
+
+
+func force_super_horde_now() -> void:
+	request_super_horde_now("force_super_horde_now")
+
+
+func debug_spawn_enemy_near_player(enemy_type: String = "random") -> Node:
+	if not director_enabled:
+		_emit_event("Debug spawn refusé. Director désactivé.")
+		return null
+
+	if server_only and multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		_emit_event("Debug spawn refusé. Seul le serveur peut spawn.")
+		return null
+
+	var scene_to_spawn: PackedScene = _get_debug_enemy_scene(enemy_type)
+	if scene_to_spawn == null:
+		_emit_event("Debug spawn impossible. Type introuvable : %s." % enemy_type)
+		return null
+
+	var center_position: Vector3 = _get_debug_spawn_center()
+	var spawn_position: Vector3 = _pick_debug_spawn_position_around(center_position)
+	var spawned_enemy: Node = _spawn_enemy_scene_at_position(scene_to_spawn, spawn_position, "attack")
+	if spawned_enemy == null:
+		_emit_event("Debug spawn impossible. Instanciation échouée : %s." % enemy_type)
+		return null
+
+	_emit_event("Debug spawn ennemi : %s autour du joueur." % enemy_type)
+	return spawned_enemy
+
+
+func debug_trigger_attack_wave_now() -> bool:
+	if not director_enabled:
+		return false
+
+	if server_only and multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return false
+
 	if state == DirectorState.HORDE or state == DirectorState.SUPER_HORDE:
-		return
+		_emit_event("Debug horde refusée. Une horde est déjà active.")
+		return false
 
-	_start_build_up(true)
+	_start_build_up(false, false)
+	if state != DirectorState.BUILD_UP:
+		return false
 
+	state_timer = 0.0
+	_start_horde()
+	return state == DirectorState.HORDE
+
+
+func debug_trigger_super_horde_now() -> bool:
+	if not director_enabled:
+		return false
+
+	if server_only and multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return false
+
+	if is_super_horde_in_progress() or state == DirectorState.HORDE:
+		_emit_event("Debug super horde refusée. Une horde est déjà active.")
+		return false
+
+	_start_build_up(true, false)
+	if state != DirectorState.BUILD_UP:
+		return false
+
+	state_timer = 0.0
+	_start_horde()
+	return state == DirectorState.SUPER_HORDE
+
+
+func get_debug_enemy_spawn_options() -> Array[Dictionary]:
+	return [
+		{"id": "random", "label": "Aléatoire"},
+		{"id": "tonfa", "label": "Tonfa"},
+		{"id": "shield", "label": "Bouclier"},
+		{"id": "rifleman", "label": "Fusil"},
+		{"id": "anti_tank", "label": "Anti-tank"},
+		{"id": "hammer", "label": "Hammer"},
+	]
+
+
+func request_mega_horde_now(request_source: String = "external") -> bool:
+	return request_super_horde_now(request_source)
+
+
+func request_super_horde_now(request_source: String = "external") -> bool:
+	if not director_enabled:
+		return false
+
+	if server_only and multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return false
+
+	if is_super_horde_in_progress():
+		_emit_event("Super horde refusée. Une super horde est déjà en cours.")
+		return false
+
+	if state == DirectorState.HORDE:
+		_emit_event("Super horde refusée. Une horde standard est déjà active.")
+		return false
+
+	if get_alive_zombie_count() >= max_alive_zombies:
+		_emit_event("Super horde refusée. Trop d'ennemis actifs.")
+		return false
+
+	_start_build_up(true, false)
+
+	var request_accepted: bool = state == DirectorState.BUILD_UP and active_horde_zones.size() > 1
+	if request_accepted and not request_source.strip_edges().is_empty():
+		_emit_event("Super horde demandée par : %s." % request_source)
+
+	return request_accepted
+
+
+func is_super_horde_in_progress() -> bool:
+	if state == DirectorState.SUPER_HORDE:
+		return true
+
+	if state == DirectorState.BUILD_UP and active_horde_zones.size() > 1:
+		return true
+
+	return false
 
 
 func set_active_level_block(block_node: Node, section_id: int, spawn_idle: bool = true) -> void:
@@ -235,6 +368,8 @@ func stop_current_wave_for_level_transition() -> void:
 func spawn_idle_population_for_active_block() -> void:
 	initial_idle_population_done = false
 	waiting_for_idle_population_deferred = false
+	idle_population_retry_count = 0
+	idle_population_retry_timer = -1.0
 	call_deferred("_try_spawn_initial_idle_population_once")
 
 
@@ -312,7 +447,9 @@ func _update_state(delta: float) -> void:
 
 	if state == DirectorState.REST:
 		if state_timer <= 0.0:
-			var wants_mega_horde: bool = _should_start_mega_horde()
+			var wants_mega_horde: bool = false
+			if automatic_super_hordes_enabled:
+				wants_mega_horde = _should_start_mega_horde()
 			_start_build_up(wants_mega_horde)
 		return
 
@@ -342,7 +479,7 @@ func _schedule_rest() -> void:
 	_emit_event("Repos. Prochaine décision dans %.1f s." % state_timer)
 
 
-func _start_build_up(wants_mega_horde: bool = false) -> void:
+func _start_build_up(wants_mega_horde: bool = false, fallback_to_standard_horde: bool = true) -> void:
 	if get_alive_zombie_count() >= max_alive_zombies:
 		state_timer = 8.0
 		_emit_event("Horde refusée. Trop de zombies actifs.")
@@ -357,7 +494,11 @@ func _start_build_up(wants_mega_horde: bool = false) -> void:
 		if active_horde_zones.size() < mega_horde_min_zones:
 			active_horde_zones.clear()
 			_emit_event("Méga horde refusée. Pas assez de zones hors caméra.")
-			_start_build_up(false)
+			if fallback_to_standard_horde:
+				_start_build_up(false)
+			else:
+				state = DirectorState.REST
+				state_timer = 8.0
 			return
 	else:
 		active_horde_zone = _pick_valid_zone(true)
@@ -439,15 +580,16 @@ func _update_horde_spawning(delta: float) -> void:
 	next_spawn_timer = random.randf_range(spawn_interval_min, spawn_interval_max)
 
 
-func _spawn_initial_idle_population() -> void:
+func _spawn_initial_idle_population() -> bool:
 	var populated_count: int = 0
+	var spawned_any: bool = false
 	for zone in cached_zones:
 		if populated_count >= max_idle_zones_populated_on_ready:
-			return
+			return spawned_any
 
 		if get_alive_zombie_count() >= max_alive_zombies:
 			_emit_event("Population idle stoppée. Limite globale atteinte : %d/%d." % [get_alive_zombie_count(), max_alive_zombies])
-			return
+			return true
 
 		if zone == null or not is_instance_valid(zone):
 			continue
@@ -471,13 +613,14 @@ func _spawn_initial_idle_population() -> void:
 		var remaining_budget: int = max_alive_zombies - get_alive_zombie_count()
 		var spawn_count: int = clampi(requested_spawn_count, 0, remaining_budget)
 		if spawn_count <= 0:
-			return
+			return spawned_any
 
 		var actual_spawn_count: int = 0
 		for index in range(spawn_count):
 			var spawned: Node = _spawn_one_from_zone(zone, "idle")
 			if spawned != null:
 				actual_spawn_count += 1
+				spawned_any = true
 
 		if actual_spawn_count <= 0:
 			continue
@@ -490,6 +633,8 @@ func _spawn_initial_idle_population() -> void:
 			_emit_event("Population idle : %s, %d/%d zombies. Budget global atteint." % [_get_zone_name(zone), actual_spawn_count, requested_spawn_count])
 		else:
 			_emit_event("Population idle : %s, %d zombies." % [_get_zone_name(zone), actual_spawn_count])
+
+	return spawned_any
 
 
 func _spawn_one_from_zone(zone: Node, behaviour: String) -> Node:
@@ -507,22 +652,9 @@ func _spawn_one_from_zone(zone: Node, behaviour: String) -> Node:
 		return null
 
 	var spawn_position: Vector3 = _get_navigation_safe_position(point.global_position)
-	var zombie: Node = scene_to_spawn.instantiate()
-	var enemies_root: Node = _get_enemies_root()
-
-	if enemies_root != null:
-		enemies_root.add_child(zombie)
-	else:
-		get_tree().current_scene.add_child(zombie)
-
-	if zombie is Node3D:
-		var zombie_3d: Node3D = zombie as Node3D
-		zombie_3d.global_position = spawn_position
-		zombie_3d.rotation.y = random.randf_range(-PI, PI)
-
-	_add_basic_groups(zombie)
-	_register_spawned_zombie(zombie)
-	_setup_spawned_zombie(zombie, behaviour)
+	var zombie: Node = _spawn_enemy_scene_at_position(scene_to_spawn, spawn_position, behaviour)
+	if zombie == null:
+		return null
 
 	if zone.has_method("register_spawned"):
 		zone.call("register_spawned", zombie)
@@ -530,23 +662,62 @@ func _spawn_one_from_zone(zone: Node, behaviour: String) -> Node:
 	return zombie
 
 
-func _setup_spawned_zombie(zombie: Node, behaviour: String) -> void:
-	var target_position: Vector3 = _get_targets_center()
+func _spawn_enemy_scene_at_position(scene_to_spawn: PackedScene, spawn_position: Vector3, behaviour: String) -> Node:
+	if scene_to_spawn == null:
+		return null
 
-	if zombie.has_method("setup_director_demo"):
-		zombie.call("setup_director_demo", behaviour, target_position)
-		return
+	var zombie: Node = scene_to_spawn.instantiate()
+	if zombie == null:
+		return null
+
+	var zombie_3d: Node3D = zombie as Node3D
+	if zombie_3d != null:
+		zombie_3d.global_position = spawn_position
+		zombie_3d.rotation.y = random.randf_range(-PI, PI)
+
+	var enemies_root: Node = _get_enemies_root()
+	if enemies_root != null:
+		enemies_root.add_child(zombie)
+	elif get_tree() != null and get_tree().current_scene != null:
+		get_tree().current_scene.add_child(zombie)
+	else:
+		add_child(zombie)
+
+	if zombie_3d != null:
+		zombie_3d.global_position = spawn_position
+
+	_add_basic_groups(zombie)
+	_register_spawned_zombie(zombie)
+	_setup_spawned_zombie(zombie, behaviour)
+	return zombie
+
+
+func _setup_spawned_zombie(zombie: Node, behaviour: String) -> void:
+	_refresh_target_manager_if_available()
+
+	var target_position: Vector3 = _get_targets_center()
+	var used_modern_setup: bool = false
 
 	if zombie.has_method("set_spawn_behaviour"):
 		zombie.call("set_spawn_behaviour", behaviour)
+		used_modern_setup = true
 
 	if behaviour == "attack":
-		if zombie.has_method("set_target_position"):
+		var target_node: Node = _get_best_target_node()
+		if target_node != null and zombie.has_method("set_target"):
+			zombie.call("set_target", target_node)
+			used_modern_setup = true
+		elif zombie.has_method("set_target_position"):
 			zombie.call("set_target_position", target_position)
-		elif zombie.has_method("set_target"):
-			var target_node: Node = _get_best_target_node()
-			if target_node != null:
-				zombie.call("set_target", target_node)
+			used_modern_setup = true
+
+		if zombie.has_method("alert_from_director"):
+			zombie.call("alert_from_director")
+		elif zombie.has_method("set_alert_mode"):
+			zombie.call("set_alert_mode", true)
+
+	if not used_modern_setup and zombie.has_method("setup_director_demo"):
+		zombie.call("setup_director_demo", behaviour, target_position)
 
 	if zombie.has_method("set_ai_enabled_delayed"):
 		zombie.call("set_ai_enabled_delayed", random.randf_range(0.1, 1.2))
@@ -577,6 +748,8 @@ func register_spawn_zone(zone: Node) -> void:
 	_prune_cached_zones()
 	if not cached_zones.has(zone):
 		cached_zones.append(zone)
+		initial_idle_population_done = false
+		idle_population_retry_timer = -1.0
 		_emit_event("Zone enregistrée : %s. Total : %d" % [_get_zone_name(zone), cached_zones.size()])
 
 	_schedule_initial_idle_population_once()
@@ -650,10 +823,54 @@ func _try_spawn_initial_idle_population_once() -> void:
 
 	_prune_cached_zones()
 	if cached_zones.is_empty():
+		_collect_zones()
+
+	if cached_zones.is_empty():
+		_schedule_idle_population_retry("aucune zone enregistrée")
 		return
 
-	initial_idle_population_done = true
-	_spawn_initial_idle_population()
+	var spawned_any: bool = _spawn_initial_idle_population()
+	if spawned_any:
+		initial_idle_population_done = true
+		idle_population_retry_count = 0
+		idle_population_retry_timer = -1.0
+		return
+
+	_schedule_idle_population_retry("aucune zone idle prête")
+
+
+func _schedule_idle_population_retry(reason: String) -> void:
+	if not idle_population_retry_enabled:
+		_emit_event("Population idle annulée : %s." % reason)
+		return
+
+	if idle_population_retry_attempts <= 0:
+		_emit_event("Population idle annulée : %s." % reason)
+		return
+
+	if idle_population_retry_count >= idle_population_retry_attempts:
+		_emit_event("Population idle abandonnée après %d essais : %s." % [idle_population_retry_count, reason])
+		return
+
+	idle_population_retry_count += 1
+	idle_population_retry_timer = maxf(idle_population_retry_delay_seconds, 0.05)
+	_emit_event("Population idle différée (%d/%d) : %s." % [idle_population_retry_count, idle_population_retry_attempts, reason])
+
+
+func _update_idle_population_retry(delta: float) -> void:
+	if initial_idle_population_done:
+		idle_population_retry_timer = -1.0
+		return
+
+	if idle_population_retry_timer < 0.0:
+		return
+
+	idle_population_retry_timer -= delta
+	if idle_population_retry_timer > 0.0:
+		return
+
+	idle_population_retry_timer = -1.0
+	_schedule_initial_idle_population_once()
 
 
 func _collect_zones() -> void:
@@ -1115,10 +1332,10 @@ func _unregister_spawned_zombie(zombie: Node) -> void:
 
 func _get_target_positions() -> Array[Vector3]:
 	var positions: Array[Vector3] = []
+	var targets: Array[Node3D] = _get_valid_target_nodes()
 
-	for node in get_tree().get_nodes_in_group(player_group_name):
-		if node is Node3D:
-			positions.append((node as Node3D).global_position)
+	for target_node: Node3D in targets:
+		positions.append(target_node.global_position)
 
 	if not positions.is_empty():
 		return positions
@@ -1136,18 +1353,87 @@ func _get_targets_center() -> Vector3:
 		return global_position
 
 	var center: Vector3 = Vector3.ZERO
-	for position in positions:
-		center += position
+	for target_world_position: Vector3 in positions:
+		center += target_world_position
 
 	return center / float(positions.size())
 
 
 func _get_best_target_node() -> Node:
-	for node in get_tree().get_nodes_in_group(player_group_name):
-		if node is Node3D:
-			return node
+	_refresh_target_manager_if_available()
+
+	var target_manager: Node = _get_target_manager_if_available()
+	if target_manager != null and target_manager.has_method("get_nearest_target"):
+		var manager_target: Variant = target_manager.call("get_nearest_target", global_position, INF)
+		if manager_target is Node3D:
+			return manager_target as Node3D
+
+	var targets: Array[Node3D] = _get_valid_target_nodes()
+	if not targets.is_empty():
+		return targets[0]
 
 	return get_node_or_null(fallback_target_path)
+
+
+func _get_valid_target_nodes() -> Array[Node3D]:
+	var result: Array[Node3D] = []
+	var seen_ids: Dictionary = {}
+
+	var target_manager: Node = _get_target_manager_if_available()
+	if target_manager != null:
+		if target_manager.has_method("get_valid_players"):
+			_add_targets_from_array(result, seen_ids, target_manager.call("get_valid_players"))
+		if target_manager.has_method("get_valid_vehicles"):
+			_add_targets_from_array(result, seen_ids, target_manager.call("get_valid_vehicles"))
+
+	var group_names: Array[StringName] = [StringName(player_group_name), &"player", &"players", &"vehicle", &"vehicles"]
+	for group_name: StringName in group_names:
+		var nodes: Array = get_tree().get_nodes_in_group(group_name)
+		_add_targets_from_array(result, seen_ids, nodes)
+
+	return result
+
+
+func _add_targets_from_array(result: Array[Node3D], seen_ids: Dictionary, source_array: Array) -> void:
+	for value: Variant in source_array:
+		var target_node: Node3D = value as Node3D
+		if target_node == null or not is_instance_valid(target_node):
+			continue
+		if not target_node.is_inside_tree():
+			continue
+
+		var instance_id: int = target_node.get_instance_id()
+		if seen_ids.has(instance_id):
+			continue
+
+		var dead_value: Variant = target_node.get("is_dead")
+		if dead_value is bool and bool(dead_value):
+			continue
+
+		seen_ids[instance_id] = true
+		result.append(target_node)
+
+
+func _get_target_manager_if_available() -> Node:
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return null
+
+	var root_manager: Node = tree.root.get_node_or_null("EnemyTargetManager")
+	if root_manager != null:
+		return root_manager
+
+	var managers: Array = tree.get_nodes_in_group("enemy_target_manager")
+	if not managers.is_empty():
+		return managers[0] as Node
+
+	return null
+
+
+func _refresh_target_manager_if_available() -> void:
+	var target_manager: Node = _get_target_manager_if_available()
+	if target_manager != null and target_manager.has_method("force_refresh_from_groups"):
+		target_manager.call("force_refresh_from_groups")
 
 
 func _get_distance_to_closest_target(world_position: Vector3) -> float:
@@ -1340,6 +1626,74 @@ func _try_get_super_horde_hammer_scene() -> PackedScene:
 	return null
 
 
+func _get_debug_enemy_scene(enemy_type: String) -> PackedScene:
+	var normalized_type: String = enemy_type.strip_edges().to_lower().replace("-", "_").replace(" ", "_")
+
+	match normalized_type:
+		"", "random", "aleatoire", "aléatoire":
+			return _get_random_debug_enemy_scene()
+		"tonfa", "zombie":
+			return _get_default_enemy_scene()
+		"shield", "bouclier":
+			return shield_enemy_scene
+		"rifle", "rifleman", "fusil":
+			return rifleman_enemy_scene
+		"anti_tank", "antitank", "rocket", "lance_roquette":
+			return anti_tank_enemy_scene
+		"hammer", "marteau":
+			return hammer_enemy_scene
+		_:
+			return _get_random_debug_enemy_scene()
+
+
+func _get_random_debug_enemy_scene() -> PackedScene:
+	var entries: Array[PackedScene] = []
+	_add_debug_scene_entry(entries, _get_default_enemy_scene())
+	_add_debug_scene_entry(entries, shield_enemy_scene)
+	_add_debug_scene_entry(entries, rifleman_enemy_scene)
+	_add_debug_scene_entry(entries, anti_tank_enemy_scene)
+	_add_debug_scene_entry(entries, hammer_enemy_scene)
+
+	if entries.is_empty():
+		return null
+
+	return entries[random.randi_range(0, entries.size() - 1)]
+
+
+func _add_debug_scene_entry(entries: Array[PackedScene], scene: PackedScene) -> void:
+	if scene != null:
+		entries.append(scene)
+
+
+func _get_debug_spawn_center() -> Vector3:
+	var target_node: Node = _get_best_target_node()
+	if target_node is Node3D:
+		return (target_node as Node3D).global_position
+
+	return _get_targets_center()
+
+
+func _pick_debug_spawn_position_around(center_position: Vector3) -> Vector3:
+	var min_distance: float = maxf(debug_spawn_min_distance, 0.5)
+	var max_distance: float = maxf(debug_spawn_max_distance, min_distance)
+	var attempt_count: int = max(debug_spawn_position_attempts, 1)
+	var fallback_position: Vector3 = center_position + Vector3.FORWARD * max_distance
+
+	for attempt_index: int in range(attempt_count):
+		var angle: float = random.randf_range(0.0, TAU)
+		var distance_from_center: float = random.randf_range(min_distance, max_distance)
+		var offset: Vector3 = Vector3(cos(angle), 0.0, sin(angle)) * distance_from_center
+		var candidate_position: Vector3 = center_position + offset
+		var safe_position: Vector3 = _get_navigation_safe_position(candidate_position)
+
+		if not debug_spawn_ignore_visibility and not _is_spawn_position_hidden_from_all_players(safe_position):
+			continue
+
+		return safe_position
+
+	return _get_navigation_safe_position(fallback_position)
+
+
 func _get_enemies_root() -> Node:
 	if enemies_root_path.is_empty():
 		return null
@@ -1381,9 +1735,9 @@ func _get_active_zones_text() -> String:
 func _get_next_action_text() -> String:
 	if state == DirectorState.REST:
 		var mega_cd: float = max(mega_horde_cooldown_seconds - time_since_last_mega_horde, 0.0)
-		if mega_horde_enabled and mega_cd > 0.0:
-			return "Repos. Méga horde possible dans %.0f s." % mega_cd
-		return "Le Director attend avant de préparer une horde."
+		if automatic_super_hordes_enabled and mega_horde_enabled and mega_cd > 0.0:
+			return "Repos. Méga horde automatique possible dans %.0f s." % mega_cd
+		return "Le Director attend avant de préparer une horde standard."
 	if state == DirectorState.BUILD_UP:
 		return "Une horde est sélectionnée. Les sons/alertes peuvent être joués maintenant."
 	if state == DirectorState.HORDE:

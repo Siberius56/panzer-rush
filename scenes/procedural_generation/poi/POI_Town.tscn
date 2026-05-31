@@ -102,24 +102,24 @@ shape = SubResource("BoxShape3D_mq65v")
 navigation_mesh = SubResource("NavigationMesh_k6emy")
 
 [node name="NavigationLink3D_North" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=1278760638]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -29)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(0, 0, -3)
 
 [node name="NavigationLink3D_South" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=945435815]
-transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 28)
+transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 0, 29)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(2.682209e-07, 0, -3)
 
 [node name="NavigationLink3D_East" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=1524891303]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 28, 0, 1.2239188e-06)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 29, 0, 1.2239188e-06)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(-1.355053e-06, 0, -3)
 
 [node name="NavigationLink3D_West" type="NavigationLink3D" parent="NavigationRegion3D" unique_id=2070834336]
-transform = Transform3D(-4.569558e-08, 0, 1, 0, 1, 0, -1, 0, -4.569558e-08, -28, 0, -1.2239188e-06)
+transform = Transform3D(-4.569558e-08, 0, 1, 0, 1, 0, -1, 0, -4.569558e-08, -29, 0, -1.2239188e-06)
 start_position = Vector3(0, 0.2, 0)
-end_position = Vector3(0, 0.2, -5)
+end_position = Vector3(-1.0868321e-06, 0, -3)
 
 [node name="Ground" type="Node3D" parent="NavigationRegion3D" unique_id=2050191053]
 

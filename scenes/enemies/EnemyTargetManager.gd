@@ -1,4 +1,6 @@
 extends Node
+#class_name EnemyTargetManager
+
 @export var include_players: bool = true
 @export var include_vehicles: bool = true
 @export var enable_safety_group_refresh: bool = true

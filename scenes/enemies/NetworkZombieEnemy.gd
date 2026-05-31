@@ -19,11 +19,16 @@ class_name NetworkZombieEnemy
 
 @export_group("Zombie Occasional Navigation")
 @export var zombie_use_occasional_navigation: bool = true
-@export_range(15, 300, 1) var zombie_nav_sample_interval_frames: int = 90
-@export_range(1, 60, 1) var zombie_nav_next_position_interval_frames: int = 12
-@export var zombie_nav_direct_distance: float = 2.5
-@export var zombie_nav_target_repath_distance: float = 2.0
-@export var zombie_nav_waypoint_reach_distance: float = 0.6
+@export_range(15, 300, 1) var zombie_nav_sample_interval_frames: int = 30
+@export_range(1, 60, 1) var zombie_nav_next_position_interval_frames: int = 6
+@export var zombie_nav_direct_distance: float = 4.0
+@export var zombie_nav_target_repath_distance: float = 1.0
+@export var zombie_nav_waypoint_reach_distance: float = 1.0
+@export_range(0.1, 2.0, 0.05) var zombie_nav_waypoint_stop_distance: float = 0.45
+@export_range(0.1, 3.0, 0.05) var zombie_nav_tiny_waypoint_distance: float = 0.35
+@export_range(6, 240, 1) var zombie_nav_cached_waypoint_max_age_frames: int = 60
+@export_range(0.5, 8.0, 0.1) var zombie_nav_long_waypoint_distance: float = 2.5
+@export_range(6, 240, 1) var zombie_nav_long_waypoint_min_age_frames: int = 45
 
 @export_group("Zombie Surround Slots")
 @export var zombie_use_surround_slots: bool = true
@@ -63,6 +68,8 @@ var _zombie_nav_next_frame_offset: int = 0
 var _zombie_separation_frame_offset: int = 0
 var _zombie_cached_nav_waypoint: Vector3 = Vector3.ZERO
 var _zombie_has_cached_nav_waypoint: bool = false
+var _zombie_cached_nav_waypoint_frame: int = 0
+var _zombie_cached_nav_waypoint_start_distance: float = 0.0
 var _zombie_last_nav_target_position: Vector3 = Vector3.ZERO
 var _zombie_has_nav_target_position: bool = false
 var _zombie_light_separation_velocity: Vector3 = Vector3.ZERO
@@ -190,11 +197,11 @@ func _simplified_zombie_targeting() -> void:
 	if current_target != null:
 		if not _is_zombie_target_valid_fast(current_target):
 			current_target = null
-		elif global_position.distance_squared_to(current_target.global_position) > max_target_distance * max_target_distance:
+		elif _should_validate_target_distance() and global_position.distance_squared_to(current_target.global_position) > max_target_distance * max_target_distance:
 			current_target = null
 
 	if current_target == null:
-		current_target = _find_nearest_target(max_target_distance)
+		current_target = _find_nearest_target(_get_target_search_distance())
 
 	if current_target != null:
 		_has_last_known_target_position = true
@@ -324,8 +331,11 @@ func _move_zombie_towards_target(target_position: Vector3, stop_distance: float 
 	if distance_squared <= stop_distance_squared:
 		velocity.x = 0.0
 		velocity.z = 0.0
+		_clear_zombie_cached_navigation()
 		return
 
+	# Close range should stay direct. This prevents the agent from orbiting tiny
+	# path points around the target or around its personal surround slot.
 	var direct_distance: float = maxf(zombie_nav_direct_distance, stop_distance + 0.1)
 	if distance_squared <= direct_distance * direct_distance:
 		_clear_zombie_cached_navigation()
@@ -334,36 +344,73 @@ func _move_zombie_towards_target(target_position: Vector3, stop_distance: float 
 
 	var frame: int = int(Engine.get_physics_frames())
 	var sample_interval: int = max(zombie_nav_sample_interval_frames, 1)
-	var next_interval: int = max(zombie_nav_next_position_interval_frames, 1)
 	var repath_distance: float = maxf(zombie_nav_target_repath_distance, 0.1)
 	var target_moved_enough: bool = not _zombie_has_nav_target_position or _zombie_last_nav_target_position.distance_squared_to(flat_target) >= repath_distance * repath_distance
 	var must_sample_path: bool = target_moved_enough or not _zombie_has_cached_nav_waypoint or frame % sample_interval == _zombie_nav_sample_frame_offset
-	var must_sample_next: bool = not _zombie_has_cached_nav_waypoint or frame % next_interval == _zombie_nav_next_frame_offset
+	var must_sample_next: bool = not _zombie_has_cached_nav_waypoint
+
+	var reach_distance: float = maxf(zombie_nav_waypoint_reach_distance, 0.1)
+	var waypoint_age_frames: int = frame - _zombie_cached_nav_waypoint_frame
+	var waypoint_max_age_frames: int = max(zombie_nav_cached_waypoint_max_age_frames, 1)
+	var long_waypoint_distance: float = maxf(zombie_nav_long_waypoint_distance, 0.1)
+	var long_waypoint_min_age_frames: int = max(zombie_nav_long_waypoint_min_age_frames, 1)
+	var is_long_waypoint: bool = _zombie_cached_nav_waypoint_start_distance >= long_waypoint_distance
+	var can_refresh_cached_waypoint: bool = waypoint_age_frames >= waypoint_max_age_frames
+	if is_long_waypoint:
+		can_refresh_cached_waypoint = waypoint_age_frames >= long_waypoint_min_age_frames
+
+	var cached_waypoint_was_reached: bool = false
+	if _zombie_has_cached_nav_waypoint:
+		var waypoint_offset: Vector3 = _zombie_cached_nav_waypoint - global_position
+		waypoint_offset.y = 0.0
+		if waypoint_offset.length_squared() <= reach_distance * reach_distance:
+			cached_waypoint_was_reached = true
+			must_sample_next = true
+		elif must_sample_path and can_refresh_cached_waypoint:
+			must_sample_next = true
 
 	if must_sample_path:
 		navigation_agent.target_position = flat_target
 		_zombie_last_nav_target_position = flat_target
 		_zombie_has_nav_target_position = true
-		must_sample_next = true
 
-	if _zombie_has_cached_nav_waypoint:
-		var waypoint_offset: Vector3 = _zombie_cached_nav_waypoint - global_position
-		waypoint_offset.y = 0.0
-		var reach_distance: float = maxf(zombie_nav_waypoint_reach_distance, 0.1)
-		if waypoint_offset.length_squared() <= reach_distance * reach_distance:
-			must_sample_next = true
+	if navigation_agent.is_navigation_finished():
+		_clear_zombie_cached_navigation()
+		_move_towards_direct_flat(flat_target, stop_distance)
+		return
 
 	if must_sample_next:
-		_zombie_cached_nav_waypoint = navigation_agent.get_next_path_position()
-		_zombie_cached_nav_waypoint.y = global_position.y
+		var next_position: Vector3 = navigation_agent.get_next_path_position()
+		next_position.y = global_position.y
+
+		var next_offset: Vector3 = next_position - global_position
+		next_offset.y = 0.0
+		var tiny_distance: float = maxf(zombie_nav_tiny_waypoint_distance, 0.05)
+
+		# If Godot gives a point nearly under the enemy, do not chase that point.
+		# On a NavigationLink3D, do not clear the current path and rush directly to the target,
+		# because that can make the enemy bounce between the link start and the link end.
+		if next_offset.length_squared() <= tiny_distance * tiny_distance:
+			if _zombie_has_cached_nav_waypoint and not cached_waypoint_was_reached:
+				_move_towards_direct_flat(_zombie_cached_nav_waypoint, maxf(zombie_nav_waypoint_stop_distance, 0.1))
+			else:
+				_move_towards_direct_flat(flat_target, stop_distance)
+			return
+
+		_zombie_cached_nav_waypoint = next_position
 		_zombie_has_cached_nav_waypoint = true
+		_zombie_cached_nav_waypoint_frame = frame
+		_zombie_cached_nav_waypoint_start_distance = sqrt(next_offset.length_squared())
 
 	if _zombie_has_cached_nav_waypoint:
 		var cached_offset: Vector3 = _zombie_cached_nav_waypoint - global_position
 		cached_offset.y = 0.0
-		if cached_offset.length_squared() > 0.0025:
-			_move_towards_direct_flat(_zombie_cached_nav_waypoint, 0.05)
+		var waypoint_stop_distance: float = maxf(zombie_nav_waypoint_stop_distance, 0.1)
+
+		if cached_offset.length_squared() > waypoint_stop_distance * waypoint_stop_distance:
+			_move_towards_direct_flat(_zombie_cached_nav_waypoint, waypoint_stop_distance)
 		else:
+			_zombie_has_cached_nav_waypoint = false
 			_move_towards_direct_flat(flat_target, stop_distance)
 	else:
 		_move_towards_direct_flat(flat_target, stop_distance)
@@ -371,6 +418,8 @@ func _move_zombie_towards_target(target_position: Vector3, stop_distance: float 
 
 func _clear_zombie_cached_navigation() -> void:
 	_zombie_has_cached_nav_waypoint = false
+	_zombie_cached_nav_waypoint_frame = 0
+	_zombie_cached_nav_waypoint_start_distance = 0.0
 	_zombie_has_nav_target_position = false
 
 
@@ -523,7 +572,7 @@ func _get_combat_target(target: Node3D) -> Node3D:
 
 
 func _acquire_target(_allow_global_scan: bool = true) -> void:
-	current_target = _find_nearest_target(max_target_distance)
+	current_target = _find_nearest_target(_get_target_search_distance())
 	if current_target != null:
 		_has_last_known_target_position = true
 		_last_known_target_position = current_target.global_position

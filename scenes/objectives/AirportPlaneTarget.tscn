@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://0p0f4h46h5bi"]
 
 [ext_resource type="Script" uid="uid://chem630wud84m" path="res://scenes/objectives/AirportTargetDestructible.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://bimkh753qymni" path="res://Air_Unit_Blue_AwTextureMap_05.png" id="2_8s0x8"]
+[ext_resource type="Texture2D" uid="uid://bimkh753qymni" path="res://asset/unit/Air_Unit_Blue_AwTextureMap_05.png" id="2_8s0x8"]
 [ext_resource type="PackedScene" uid="uid://c7hxotilt34mx" path="res://vehicle_system/effects/Vehicle_EngineDamageSmoke.tscn" id="2_smoke"]
 [ext_resource type="PackedScene" uid="uid://ccvrst0luot23" path="res://vehicle_system/effects/Vehicle_EngineFire.tscn" id="3_fire"]
 
