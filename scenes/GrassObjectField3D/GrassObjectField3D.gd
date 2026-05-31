@@ -26,6 +26,17 @@ const DEFAULT_SHADER_PATH: String = "res://GrassObjectField3D/GrassObjectInterac
 @export var randomize_seed_on_generate: bool = false
 @export_range(0.0, 1.0, 0.01) var position_jitter: float = 1.0
 
+@export_category("Distribution")
+@export_enum("Uniform", "Fractal Noise") var distribution_mode: int = 1
+@export_range(2.0, 200.0, 0.1) var fractal_noise_scale: float = 22.0
+@export_range(1, 8, 1) var fractal_noise_octaves: int = 4
+@export_range(0.0, 1.0, 0.01) var fractal_noise_gain: float = 0.52
+@export_range(1.0, 4.0, 0.01) var fractal_noise_lacunarity: float = 2.0
+@export_range(0.0, 1.0, 0.01) var minimum_density: float = 0.32
+@export_range(0.25, 4.0, 0.01) var density_contrast: float = 1.8
+@export_range(0.0, 1.0, 0.01) var dense_area_scale_bonus: float = 0.12
+@export var use_world_coordinates_for_noise: bool = true
+
 @export_category("Object Scale")
 @export_range(0.01, 20.0, 0.01) var uniform_scale_min: float = 0.85
 @export_range(0.01, 20.0, 0.01) var uniform_scale_max: float = 1.35
@@ -151,6 +162,7 @@ func setup_grass() -> void:
 		space_state = get_world_3d().direct_space_state
 
 	var exclusion_nodes: Array[Node] = _get_exclusion_candidate_nodes()
+	var distribution_noise: FastNoiseLite = _create_distribution_noise()
 
 	var placed_count: int = 0
 	var attempts: int = 0
@@ -162,11 +174,16 @@ func setup_grass() -> void:
 		var local_position: Vector3 = _get_random_local_position(random, space_state)
 		var world_position: Vector3 = global_transform * local_position
 
+		var density_value: float = _sample_distribution_density(local_position, distribution_noise)
+		if distribution_noise != null and random.randf() > density_value:
+			continue
+
 		if _is_world_position_excluded(world_position, exclusion_nodes):
 			continue
 
 		var rotation_y: float = random.randf_range(0.0, TAU)
-		var uniform_scale: float = random.randf_range(uniform_scale_min, uniform_scale_max)
+		var density_scale_bonus: float = _get_density_scale_bonus(density_value)
+		var uniform_scale: float = random.randf_range(uniform_scale_min, uniform_scale_max) * density_scale_bonus
 		var width_scale: float = random.randf_range(width_scale_min, width_scale_max) * uniform_scale
 		var height_scale: float = random.randf_range(height_scale_min, height_scale_max) * uniform_scale
 
@@ -448,6 +465,46 @@ func _get_random_local_position(random: RandomNumberGenerator, space_state: Phys
 			return to_local(hit_position)
 
 	return Vector3(x, ground_y, z)
+
+func _create_distribution_noise() -> FastNoiseLite:
+	if distribution_mode != 1:
+		return null
+
+	var noise: FastNoiseLite = FastNoiseLite.new()
+	noise.seed = generation_seed + 91371
+	noise.frequency = 1.0 / max(fractal_noise_scale, 0.001)
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	noise.fractal_type = FastNoiseLite.FRACTAL_FBM
+	noise.fractal_octaves = fractal_noise_octaves
+	noise.fractal_gain = fractal_noise_gain
+	noise.fractal_lacunarity = fractal_noise_lacunarity
+	return noise
+
+func _sample_distribution_density(local_position: Vector3, distribution_noise: FastNoiseLite) -> float:
+	if distribution_noise == null:
+		return 1.0
+
+	var sample_position: Vector2 = _get_distribution_sample_position(local_position)
+	var raw_noise: float = distribution_noise.get_noise_2d(sample_position.x, sample_position.y)
+	var normalized_noise: float = clamp((raw_noise + 1.0) * 0.5, 0.0, 1.0)
+	var shaped_noise: float = pow(normalized_noise, max(density_contrast, 0.001))
+	var density: float = lerp(clamp(minimum_density, 0.0, 1.0), 1.0, shaped_noise)
+	return clamp(density, 0.0, 1.0)
+
+func _get_distribution_sample_position(local_position: Vector3) -> Vector2:
+	if use_world_coordinates_for_noise:
+		var world_position: Vector3 = global_transform * local_position
+		return Vector2(world_position.x, world_position.z)
+
+	return Vector2(local_position.x, local_position.z)
+
+func _get_density_scale_bonus(density_value: float) -> float:
+	if dense_area_scale_bonus <= 0.001:
+		return 1.0
+
+	var min_density: float = clamp(minimum_density, 0.0, 0.999)
+	var normalized_density: float = clamp((density_value - min_density) / max(1.0 - min_density, 0.001), 0.0, 1.0)
+	return 1.0 + normalized_density * dense_area_scale_bonus
 
 func _update_bend_states(delta: float) -> void:
 	if delta <= 0.0:

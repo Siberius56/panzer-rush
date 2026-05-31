@@ -29,6 +29,9 @@ class_name NetworkZombieEnemy
 @export_range(6, 240, 1) var zombie_nav_cached_waypoint_max_age_frames: int = 60
 @export_range(0.5, 8.0, 0.1) var zombie_nav_long_waypoint_distance: float = 2.5
 @export_range(6, 240, 1) var zombie_nav_long_waypoint_min_age_frames: int = 45
+@export var zombie_nav_project_targets_to_navmesh: bool = true
+@export var zombie_nav_reject_different_navigation_region: bool = true
+@export_range(0.25, 20.0, 0.25) var zombie_navmesh_projection_max_distance: float = 6.0
 
 @export_group("Zombie Surround Slots")
 @export var zombie_use_surround_slots: bool = true
@@ -72,6 +75,7 @@ var _zombie_cached_nav_waypoint_frame: int = 0
 var _zombie_cached_nav_waypoint_start_distance: float = 0.0
 var _zombie_last_nav_target_position: Vector3 = Vector3.ZERO
 var _zombie_has_nav_target_position: bool = false
+var _zombie_safe_navigation_target: Vector3 = Vector3.ZERO
 var _zombie_light_separation_velocity: Vector3 = Vector3.ZERO
 var _zombie_surround_angle: float = 0.0
 var _zombie_surround_ring_index: int = 0
@@ -370,7 +374,12 @@ func _move_zombie_towards_target(target_position: Vector3, stop_distance: float 
 			must_sample_next = true
 
 	if must_sample_path:
-		navigation_agent.target_position = flat_target
+		if not _try_get_zombie_safe_navigation_target(flat_target):
+			_clear_zombie_cached_navigation()
+			_move_towards_direct_flat(flat_target, stop_distance)
+			return
+
+		navigation_agent.target_position = _zombie_safe_navigation_target
 		_zombie_last_nav_target_position = flat_target
 		_zombie_has_nav_target_position = true
 
@@ -414,6 +423,45 @@ func _move_zombie_towards_target(target_position: Vector3, stop_distance: float 
 			_move_towards_direct_flat(flat_target, stop_distance)
 	else:
 		_move_towards_direct_flat(flat_target, stop_distance)
+
+
+func _try_get_zombie_safe_navigation_target(raw_target: Vector3) -> bool:
+	_zombie_safe_navigation_target = raw_target
+
+	if not zombie_nav_project_targets_to_navmesh:
+		return true
+
+	if navigation_agent == null:
+		return false
+
+	var navigation_map: RID = navigation_agent.get_navigation_map()
+	if not navigation_map.is_valid():
+		return false
+
+	# Avoid querying a navigation map before its first synchronization.
+	# This also prevents occasional startup spam when enemies spawn very early.
+	if NavigationServer3D.map_get_iteration_id(navigation_map) == 0:
+		return false
+
+	var max_projection_distance: float = maxf(zombie_navmesh_projection_max_distance, 0.25)
+	var max_projection_distance_squared: float = max_projection_distance * max_projection_distance
+
+	var projected_self: Vector3 = NavigationServer3D.map_get_closest_point(navigation_map, global_position)
+	if projected_self.distance_squared_to(global_position) > max_projection_distance_squared:
+		return false
+
+	var projected_target: Vector3 = NavigationServer3D.map_get_closest_point(navigation_map, raw_target)
+	if projected_target.distance_squared_to(raw_target) > max_projection_distance_squared:
+		return false
+
+	if zombie_nav_reject_different_navigation_region:
+		var self_owner: RID = NavigationServer3D.map_get_closest_point_owner(navigation_map, projected_self)
+		var target_owner: RID = NavigationServer3D.map_get_closest_point_owner(navigation_map, projected_target)
+		if self_owner.is_valid() and target_owner.is_valid() and self_owner != target_owner:
+			return false
+
+	_zombie_safe_navigation_target = projected_target
+	return true
 
 
 func _clear_zombie_cached_navigation() -> void:

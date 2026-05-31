@@ -1,8 +1,0 @@
-[gd_scene format=3]
-
-[ext_resource type="Script" uid="uid://bot1xr3wlul31" path="res://scenes/GrassField3D/GrassField3D.gd" id="1_script"]
-[ext_resource type="Shader" uid="uid://pjgvyqjolqb6" path="res://scenes/GrassField3D/GrassBladeInteractive.gdshader" id="2_shader"]
-
-[node name="GrassField3D" type="Node3D"]
-script = ExtResource("1_script")
-grass_shader = ExtResource("2_shader")

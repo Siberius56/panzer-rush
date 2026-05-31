@@ -4,7 +4,7 @@ class_name ProceduralNetworkMain
 # Nouvelle version pour contourner le cache Godot de l’ancien script.
 
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
-const PLAYER_SCENE: PackedScene = preload("uid://2mul2xilh3fg") # preload("res://scenes/player/NetworkProceduralPlayer.tscn")
+const PLAYER_SCENE: PackedScene = preload("uid://bnp6yotc2a1np") #preload("uid://2mul2xilh3fg") # preload("res://scenes/player/NetworkProceduralPlayer.tscn")
 const TRANSPORT_HELICOPTER_FALLBACK_SCENE_PATH: String = "res://scenes/enemies/TransportHelicopterEnemySpawner.tscn"
 
 @export var debug_disable_enemy_spawn: bool = true

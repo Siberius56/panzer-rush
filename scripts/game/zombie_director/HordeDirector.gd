@@ -671,24 +671,33 @@ func _spawn_enemy_scene_at_position(scene_to_spawn: PackedScene, spawn_position:
 		return null
 
 	var zombie_3d: Node3D = zombie as Node3D
+
+	var spawn_parent: Node = null
+	var enemies_root: Node = _get_enemies_root()
+
+	if enemies_root != null and enemies_root.is_inside_tree():
+		spawn_parent = enemies_root
+	elif get_tree() != null and get_tree().current_scene != null and get_tree().current_scene.is_inside_tree():
+		spawn_parent = get_tree().current_scene
+	elif is_inside_tree():
+		spawn_parent = self
+
+	if spawn_parent == null:
+		zombie.queue_free()
+		return null
+
+	# Important : d'abord ajouter le node dans l'arbre.
+	spawn_parent.add_child(zombie)
+
+	# Ensuite seulement utiliser global_position / global_transform.
 	if zombie_3d != null:
 		zombie_3d.global_position = spawn_position
 		zombie_3d.rotation.y = random.randf_range(-PI, PI)
 
-	var enemies_root: Node = _get_enemies_root()
-	if enemies_root != null:
-		enemies_root.add_child(zombie)
-	elif get_tree() != null and get_tree().current_scene != null:
-		get_tree().current_scene.add_child(zombie)
-	else:
-		add_child(zombie)
-
-	if zombie_3d != null:
-		zombie_3d.global_position = spawn_position
-
 	_add_basic_groups(zombie)
 	_register_spawned_zombie(zombie)
 	_setup_spawned_zombie(zombie, behaviour)
+
 	return zombie
 
 

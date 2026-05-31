@@ -28,7 +28,7 @@ var owner_level_block_slot: int = -1
 
 @export_group("Spawn Count")
 @export var min_spawn_count: int = 6
-@export var max_spawn_count: int = 12
+@export var max_spawn_count: int = 10
 @export var max_alive_from_zone: int = 20
 
 @export_group("Validation")
