@@ -73,7 +73,6 @@ func _ready() -> void:
 	if world_environment:
 		world_environment.environment = ENV_DAY
 	
-	
 	if not NetworkManager.player_list_changed.is_connected(_sync_players):
 		NetworkManager.player_list_changed.connect(_sync_players)
 	if not NetworkManager.connection_closed.is_connected(_on_connection_closed):
