@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dbqw0xtkdvnch"]
+
+[ext_resource type="Script" uid="uid://cqetb711asooq" path="res://tool/TerrainTool/WorldSyncedTerrainPatch3D.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_default"]
+albedo_color = Color(0.38, 0.52, 0.3, 1)
+roughness = 1.0
+
+[node name="WorldSyncedTerrainPatch3D" type="Node3D"]
+script = ExtResource("1_script")
+terrain_material = SubResource("StandardMaterial3D_default")
+
+[node name="GeneratedMesh" type="MeshInstance3D" parent="."]
+
+[node name="GeneratedCollisionBody" type="StaticBody3D" parent="."]
+collision_layer = 136
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GeneratedCollisionBody"]
