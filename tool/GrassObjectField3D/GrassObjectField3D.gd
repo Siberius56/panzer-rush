@@ -4,6 +4,8 @@ class_name GrassObjectField3D
 
 const GRASS_NODE_NAME: String = "GrassObjectMultiMesh"
 const DEFAULT_SHADER_PATH: String = "res://GrassObjectField3D/GrassObjectInteractive.gdshader"
+const MAX_SHADER_INTERACTORS: int = 8
+const FAR_INTERACTOR_VECTOR4: Vector4 = Vector4(99999.0, 99999.0, 99999.0, 0.0)
 
 @export_category("Editor Buttons")
 @export_tool_button("Setup / Regenerate Objects") var setup_objects_button: Callable = setup_grass
@@ -36,9 +38,8 @@ const DEFAULT_SHADER_PATH: String = "res://GrassObjectField3D/GrassObjectInterac
 
 @export_category("Ground Placement")
 @export var ground_y: float = 0.0
-@export var use_ground_raycast: bool = true
-@export_flags_3d_physics var ground_collision_mask: int = 128
-@export var debug_ground_raycast: bool = false
+@export var use_ground_raycast: bool = false
+@export var ground_collision_mask: int = 1
 @export_range(1.0, 500.0, 1.0) var raycast_height: float = 80.0
 @export_range(1.0, 500.0, 1.0) var raycast_depth: float = 120.0
 
@@ -80,15 +81,10 @@ const DEFAULT_SHADER_PATH: String = "res://GrassObjectField3D/GrassObjectInterac
 @export_range(0.1, 30.0, 0.1) var vehicle_radius: float = 3.25
 @export_range(0.0, 1.0, 0.01) var vehicle_bend_strength: float = 1.0
 @export_range(0.0, 89.0, 0.1) var max_bend_degrees: float = 78.0
-@export_range(0.0, 10.0, 0.01) var bend_down_speed: float = 8.0
-@export_range(0.0, 10.0, 0.01) var bend_recover_speed: float = 1.6
-@export_range(0.0, 5.0, 0.01) var recover_delay_seconds: float = 1.0
-@export_range(0.0, 0.5, 0.01) var interaction_update_interval: float = 0.04
 
 var active_instance_count: int = 0
 var mesh_base_y_cache: float = 0.0
 var mesh_height_cache: float = 1.0
-var interaction_update_accumulator: float = 0.0
 
 var instance_local_positions: Array[Vector3] = []
 var instance_wind_phases: Array[float] = []
@@ -107,17 +103,12 @@ func _ready() -> void:
 		_sync_arrays_from_existing_multimesh_if_needed()
 		refresh_material_params()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Engine.is_editor_hint() and not update_in_editor:
 		return
 
 	_update_wind_and_material_uniforms()
-	interaction_update_accumulator += delta
-
-	if interaction_update_accumulator >= interaction_update_interval:
-		var update_delta: float = interaction_update_accumulator
-		interaction_update_accumulator = 0.0
-		_update_bend_states(update_delta)
+	_update_interactor_uniforms()
 
 func setup_grass() -> void:
 	if randomize_seed_on_generate:
@@ -234,6 +225,7 @@ func refresh_material_params() -> void:
 	var material: ShaderMaterial = _get_or_create_material()
 	_update_mesh_bounds_cache_from_current_source()
 	_update_wind_and_material_uniforms()
+	_update_interactor_uniforms()
 
 	var grass_instance: MultiMeshInstance3D = get_node_or_null(GRASS_NODE_NAME) as MultiMeshInstance3D
 	if grass_instance != null:
@@ -442,90 +434,13 @@ func _get_random_local_position(random: RandomNumberGenerator, space_state: Phys
 		var from_global: Vector3 = global_transform * from_local
 		var ray_to_global: Vector3 = global_transform * ray_to_local
 		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from_global, ray_to_global, ground_collision_mask)
-		query.collide_with_bodies = true
-		query.collide_with_areas = false
-		query.hit_back_faces = true
-		query.hit_from_inside = true
-
 		var hit: Dictionary = space_state.intersect_ray(query)
 
 		if hit.has("position"):
 			var hit_position: Vector3 = hit["position"] as Vector3
 			return to_local(hit_position)
 
-		if debug_ground_raycast and Engine.is_editor_hint():
-			push_warning("[GrassObjectField3D] Ground raycast missed. Check that the target ground uses a collision layer included in Ground Collision Mask. For physics layer 4, the raw mask value is 8.")
-
 	return Vector3(x, ground_y, z)
-
-func _update_bend_states(delta: float) -> void:
-	if delta <= 0.0:
-		return
-
-	var grass_instance: MultiMeshInstance3D = get_node_or_null(GRASS_NODE_NAME) as MultiMeshInstance3D
-	if grass_instance == null or grass_instance.multimesh == null:
-		return
-
-	if active_instance_count <= 0 or instance_local_positions.size() == 0:
-		_sync_arrays_from_existing_multimesh_if_needed()
-
-	if active_instance_count <= 0:
-		return
-
-	var interactors: Array[Dictionary] = _collect_interactors()
-	var has_interactors: bool = interactors.size() > 0
-	var multimesh: MultiMesh = grass_instance.multimesh
-
-	for instance_index in range(active_instance_count):
-		var current_amount: float = instance_bend_amounts[instance_index]
-		var target_amount: float = 0.0
-		var target_angle: float = instance_bend_angles[instance_index]
-
-		if has_interactors:
-			var local_position: Vector3 = instance_local_positions[instance_index]
-			var world_position: Vector3 = global_transform * local_position
-			var strongest_score: float = 0.0
-
-			for interactor in interactors:
-				var interactor_position: Vector3 = interactor["position"] as Vector3
-				var radius: float = float(interactor["radius"])
-				var strength: float = float(interactor["strength"])
-
-				var offset_2d: Vector2 = Vector2(world_position.x - interactor_position.x, world_position.z - interactor_position.z)
-				var distance: float = offset_2d.length()
-
-				if radius <= 0.001 or distance > radius:
-					continue
-
-				var influence: float = _smooth_falloff(radius, distance)
-				var score: float = clamp(influence * strength * instance_bend_variations[instance_index], 0.0, 1.0)
-
-				if score > strongest_score:
-					strongest_score = score
-					target_amount = score
-
-					if distance < 0.001:
-						target_angle = instance_bend_angles[instance_index]
-					else:
-						target_angle = atan2(offset_2d.y, offset_2d.x)
-
-		if target_amount > 0.001:
-			var bend_speed: float = bend_down_speed
-			if target_amount < current_amount:
-				bend_speed = bend_recover_speed
-
-			current_amount = move_toward(current_amount, target_amount, bend_speed * delta)
-			instance_recovery_delays[instance_index] = recover_delay_seconds
-			instance_bend_angles[instance_index] = target_angle
-		else:
-			if instance_recovery_delays[instance_index] > 0.0:
-				instance_recovery_delays[instance_index] = max(0.0, instance_recovery_delays[instance_index] - delta)
-			else:
-				current_amount = move_toward(current_amount, 0.0, bend_recover_speed * delta)
-
-		if abs(current_amount - instance_bend_amounts[instance_index]) > 0.0005 or target_amount > 0.001:
-			instance_bend_amounts[instance_index] = current_amount
-			_write_instance_custom_data(multimesh, instance_index)
 
 func _collect_interactors() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -537,6 +452,39 @@ func _collect_interactors() -> Array[Dictionary]:
 	_append_group_interactors(result, vehicle_group, vehicle_radius, vehicle_bend_strength)
 
 	return result
+
+func _update_interactor_uniforms() -> void:
+	var material: ShaderMaterial = generated_material
+	if material == null:
+		return
+
+	var interactors: Array[Dictionary] = _collect_interactors()
+	var safe_count: int = min(interactors.size(), MAX_SHADER_INTERACTORS)
+
+	material.set_shader_parameter("interactor_count", safe_count)
+
+	var positions: Array[Vector4] = []
+	var strengths: Array[float] = []
+
+	for interactor_index in range(MAX_SHADER_INTERACTORS):
+		var interactor_vector: Vector4 = FAR_INTERACTOR_VECTOR4
+		var interactor_strength: float = 0.0
+
+		if interactor_index < safe_count:
+			var interactor: Dictionary = interactors[interactor_index]
+			var interactor_position: Vector3 = interactor["position"] as Vector3
+			var interactor_radius: float = float(interactor["radius"])
+			interactor_strength = float(interactor["strength"])
+			interactor_vector = Vector4(interactor_position.x, interactor_position.y, interactor_position.z, interactor_radius)
+
+		positions.append(interactor_vector)
+		strengths.append(interactor_strength)
+
+	for interactor_index in range(MAX_SHADER_INTERACTORS):
+		material.set_shader_parameter("interactor_%d" % interactor_index, positions[interactor_index])
+
+	material.set_shader_parameter("interactor_strengths_0", Vector4(strengths[0], strengths[1], strengths[2], strengths[3]))
+	material.set_shader_parameter("interactor_strengths_1", Vector4(strengths[4], strengths[5], strengths[6], strengths[7]))
 
 func _append_group_interactors(result: Array[Dictionary], group_name: StringName, radius: float, strength: float) -> void:
 	if group_name == StringName():

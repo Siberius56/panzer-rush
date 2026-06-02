@@ -17,6 +17,18 @@ uniform vec2 wind_direction = vec2(1.0, 0.35);
 uniform float wind_flattened_multiplier = 0.35;
 
 uniform float max_bend_degrees = 78.0;
+
+uniform int interactor_count = 0;
+uniform vec4 interactor_0 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_1 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_2 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_3 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_4 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_5 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_6 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_7 = vec4(99999.0, 99999.0, 99999.0, 0.0);
+uniform vec4 interactor_strengths_0 = vec4(0.0);
+uniform vec4 interactor_strengths_1 = vec4(0.0);
 uniform float normal_up_blend = 0.95;
 uniform float minimum_light = 0.75;
 uniform float emission_strength = 0.08;
@@ -54,6 +66,56 @@ vec3 bend_axis_from_direction(vec3 horizontal_direction) {
 	return normalize(axis);
 }
 
+float grass_smooth_falloff(float radius, float distance_to_interactor) {
+	float normalized_distance = clamp(1.0 - distance_to_interactor / max(radius, 0.001), 0.0, 1.0);
+	return normalized_distance * normalized_distance * (3.0 - 2.0 * normalized_distance);
+}
+
+vec4 get_interactor_data(int index) {
+	if (index == 0) { return interactor_0; }
+	if (index == 1) { return interactor_1; }
+	if (index == 2) { return interactor_2; }
+	if (index == 3) { return interactor_3; }
+	if (index == 4) { return interactor_4; }
+	if (index == 5) { return interactor_5; }
+	if (index == 6) { return interactor_6; }
+	return interactor_7;
+}
+
+float get_interactor_strength(int index) {
+	if (index == 0) { return interactor_strengths_0.x; }
+	if (index == 1) { return interactor_strengths_0.y; }
+	if (index == 2) { return interactor_strengths_0.z; }
+	if (index == 3) { return interactor_strengths_0.w; }
+	if (index == 4) { return interactor_strengths_1.x; }
+	if (index == 5) { return interactor_strengths_1.y; }
+	if (index == 6) { return interactor_strengths_1.z; }
+	return interactor_strengths_1.w;
+}
+
+vec4 calculate_interactor_bend(vec4 interactor_data, float strength, vec3 pivot_world) {
+	float radius = interactor_data.w;
+	if (radius <= 0.001 || strength <= 0.001) {
+		return vec4(1.0, 0.0, 0.0, 0.0);
+	}
+
+	vec2 offset_2d = pivot_world.xz - interactor_data.xz;
+	float distance_to_interactor = length(offset_2d);
+
+	if (distance_to_interactor > radius) {
+		return vec4(1.0, 0.0, 0.0, 0.0);
+	}
+
+	vec2 bend_direction_2d = vec2(1.0, 0.0);
+	if (distance_to_interactor >= 0.001) {
+		bend_direction_2d = offset_2d / distance_to_interactor;
+	}
+
+	float influence = grass_smooth_falloff(radius, distance_to_interactor);
+	float amount = clamp(influence * strength, 0.0, 1.0);
+	return vec4(bend_direction_2d.x, 0.0, bend_direction_2d.y, amount);
+}
+
 void vertex() {
 	float safe_mesh_height = max(mesh_height, 0.001);
 	float height_factor = clamp((VERTEX.y - mesh_base_y) / safe_mesh_height, 0.0, 1.0);
@@ -64,11 +126,28 @@ void vertex() {
 	vec3 world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	vec3 relative = world_position - pivot_world;
 
-	float bend_amount = clamp(INSTANCE_CUSTOM.b, 0.0, 1.0);
-	float bend_angle_normalized = INSTANCE_CUSTOM.g;
+	float bend_amount = 0.0;
+	vec3 bend_direction = vec3(1.0, 0.0, 0.0);
+	int safe_interactor_count = clamp(interactor_count, 0, 8);
+
+	for (int interactor_index = 0; interactor_index < 8; interactor_index++) {
+		if (interactor_index >= safe_interactor_count) {
+			break;
+		}
+
+		vec4 bend_result = calculate_interactor_bend(
+			get_interactor_data(interactor_index),
+			get_interactor_strength(interactor_index),
+			pivot_world
+		);
+
+		if (bend_result.w > bend_amount) {
+			bend_amount = bend_result.w;
+			bend_direction = bend_result.xyz;
+		}
+	}
+
 	float bend_angle_radians = radians(max_bend_degrees) * bend_amount;
-	float bend_direction_angle = bend_angle_normalized * GRASS_TAU;
-	vec3 bend_direction = vec3(cos(bend_direction_angle), 0.0, sin(bend_direction_angle));
 	vec3 bend_axis = bend_axis_from_direction(bend_direction);
 
 	relative = rotate_around_axis(relative, bend_axis, bend_angle_radians);

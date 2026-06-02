@@ -180,6 +180,21 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="Label_FPS" type="Label" parent="Root" unique_id=1903032996]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -65.0
+offset_right = 65.0
+offset_bottom = 59.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "60f^"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="OnFootPanel" type="MarginContainer" parent="Root" unique_id=1400163101]
 unique_name_in_owner = true
 layout_mode = 1
@@ -729,7 +744,7 @@ text = "Essence 0/0  |  Conso 0/s"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="VehicleSpeedLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox"]
+[node name="VehicleSpeedLabel" type="Label" parent="Root/RightMargin/VehiclePanel/VehicleMargin/VehicleVBox" unique_id=1146229197]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

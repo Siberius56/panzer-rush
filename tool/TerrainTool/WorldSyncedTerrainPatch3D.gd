@@ -2,22 +2,33 @@
 class_name WorldSyncedTerrainPatch3D
 extends Node3D
 
-# v6: Top-side winding with manually upward normals. No negative node scale required.
+# v8: Editor-baked terrain with stable baked resources.
+# Runtime uses the baked mesh by default and does not regenerate it.
 
 const DEFAULT_GROUND_LAYERS: int = 136 # Godot layers 4 + 8, values 8 + 128.
 const GENERATED_MESH_NODE_NAME: StringName = &"GeneratedMesh"
 const COLLISION_BODY_NODE_NAME: StringName = &"GeneratedCollisionBody"
 const COLLISION_SHAPE_NODE_NAME: StringName = &"CollisionShape3D"
 
-# Keep the enum order stable. Existing scenes save the integer value.
+# Keep enum orders stable. Existing scenes save the integer value.
 enum TerrainMode {
 	FLAT,
 	WAVY,
 	BROKEN
 }
 
+enum NoiseSpaceMode {
+	BLOCK_LOCAL,
+	WORLD_SPACE
+}
+
+# Stored on the root node so baked terrain survives scene instancing more reliably.
+# These properties are intentionally hidden from the inspector.
+@export_storage var baked_mesh: ArrayMesh
+@export_storage var baked_collision_shape: Shape3D
+
 @export_group("Tools")
-@export_tool_button("Rebuild Terrain", "Reload") var rebuild_terrain_button: Callable = _editor_rebuild_terrain
+@export_tool_button("Rebuild / Bake Terrain", "Reload") var rebuild_terrain_button: Callable = _editor_rebuild_terrain
 @export_tool_button("Apply Flat Preset", "PlaneMesh") var apply_flat_preset_button: Callable = _editor_apply_flat_preset
 @export_tool_button("Apply Wavy Preset", "PlaneMesh") var apply_wavy_preset_button: Callable = _editor_apply_wavy_preset
 @export_tool_button("Apply Broken Preset", "PlaneMesh") var apply_broken_preset_button: Callable = _editor_apply_broken_preset
@@ -35,7 +46,7 @@ enum TerrainMode {
 @export_range(0.0, 5.0, 0.05, "or_greater") var height_multiplier: float = 1.0
 
 @export_group("Noise")
-@export var use_world_space_noise: bool = true
+@export var noise_space_mode: NoiseSpaceMode = NoiseSpaceMode.BLOCK_LOCAL
 @export var noise_seed: int = 1207
 @export var noise_frequency: float = 0.075
 @export var noise_offset: Vector2 = Vector2.ZERO
@@ -58,7 +69,7 @@ enum TerrainMode {
 @export_group("Visual")
 @export var terrain_material: Material
 @export var fallback_preview_color: Color = Color(0.38, 0.52, 0.30, 1.0)
-@export var use_world_space_uv: bool = true
+@export var use_world_space_uv: bool = false
 @export var uv_scale: float = 8.0
 
 @export_group("Collision")
@@ -66,8 +77,8 @@ enum TerrainMode {
 @export_flags_3d_physics var generated_collision_layer: int = DEFAULT_GROUND_LAYERS
 
 @export_group("Generation")
-@export var generate_on_ready: bool = true
-@export var generate_in_editor_on_ready: bool = true
+@export var generate_in_editor_on_ready: bool = false
+@export var generate_in_game_on_ready: bool = false
 @export var rebuild_on_transform_changed: bool = false
 
 var _rebuild_queued: bool = false
@@ -84,13 +95,18 @@ func _ready() -> void:
 	_ensure_child_nodes()
 	_rebuild_queued = false
 
-	if not generate_on_ready:
+	# Always re-apply baked resources to the generated nodes.
+	# This is important when this tool scene is instanced inside another block scene.
+	_apply_baked_resources_to_nodes()
+	_apply_runtime_settings_without_rebuild()
+
+	if Engine.is_editor_hint():
+		if generate_in_editor_on_ready and baked_mesh == null:
+			_schedule_rebuild()
 		return
 
-	if Engine.is_editor_hint() and not generate_in_editor_on_ready:
-		return
-
-	_schedule_rebuild()
+	if generate_in_game_on_ready:
+		_schedule_rebuild()
 
 
 func _notification(what: int) -> void:
@@ -103,7 +119,7 @@ func _notification(what: int) -> void:
 	if not rebuild_on_transform_changed:
 		return
 
-	if not use_world_space_noise and not use_world_space_uv:
+	if noise_space_mode != NoiseSpaceMode.WORLD_SPACE and not use_world_space_uv:
 		return
 
 	_schedule_rebuild()
@@ -145,6 +161,9 @@ func _editor_no_edge_fade() -> void:
 func _editor_clear_generated_mesh() -> void:
 	_ensure_child_nodes()
 
+	baked_mesh = null
+	baked_collision_shape = null
+
 	var mesh_instance: MeshInstance3D = get_node_or_null(NodePath(GENERATED_MESH_NODE_NAME)) as MeshInstance3D
 	if mesh_instance != null:
 		mesh_instance.mesh = null
@@ -184,22 +203,55 @@ func _rebuild() -> void:
 		push_warning("WorldSyncedTerrainPatch3D: missing generated child nodes.")
 		return
 
-	var generated_mesh: ArrayMesh = _build_terrain_mesh()
-	mesh_instance.mesh = generated_mesh
-	mesh_instance.visible = true
-	mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-
-	var material_to_use: Material = _get_material_to_use()
-	mesh_instance.set_surface_override_material(0, material_to_use)
-
-	collision_body.collision_layer = generated_collision_layer
-	collision_body.collision_mask = 0
-	collision_shape.disabled = not collision_enabled
+	baked_mesh = _build_terrain_mesh()
+	baked_mesh.resource_name = "GeneratedTerrainMesh"
+	baked_mesh.resource_local_to_scene = true
 
 	if collision_enabled:
-		collision_shape.shape = generated_mesh.create_trimesh_shape()
+		baked_collision_shape = baked_mesh.create_trimesh_shape()
+		baked_collision_shape.resource_name = "GeneratedTerrainCollision"
+		baked_collision_shape.resource_local_to_scene = true
 	else:
-		collision_shape.shape = null
+		baked_collision_shape = null
+
+	_apply_baked_resources_to_nodes()
+	_apply_runtime_settings_without_rebuild()
+
+
+func _apply_baked_resources_to_nodes() -> void:
+	var mesh_instance: MeshInstance3D = get_node_or_null(NodePath(GENERATED_MESH_NODE_NAME)) as MeshInstance3D
+	var collision_shape: CollisionShape3D = get_node_or_null(NodePath(String(COLLISION_BODY_NODE_NAME) + "/" + String(COLLISION_SHAPE_NODE_NAME))) as CollisionShape3D
+
+	if mesh_instance != null:
+		if baked_mesh != null:
+			mesh_instance.mesh = baked_mesh
+
+		mesh_instance.visible = true
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+
+		var material_to_use: Material = _get_material_to_use()
+		mesh_instance.set_surface_override_material(0, material_to_use)
+
+	if collision_shape != null:
+		if baked_collision_shape != null:
+			collision_shape.shape = baked_collision_shape
+
+
+func _apply_runtime_settings_without_rebuild() -> void:
+	var collision_body: StaticBody3D = get_node_or_null(NodePath(COLLISION_BODY_NODE_NAME)) as StaticBody3D
+	var collision_shape: CollisionShape3D = get_node_or_null(NodePath(String(COLLISION_BODY_NODE_NAME) + "/" + String(COLLISION_SHAPE_NODE_NAME))) as CollisionShape3D
+	var mesh_instance: MeshInstance3D = get_node_or_null(NodePath(GENERATED_MESH_NODE_NAME)) as MeshInstance3D
+
+	if mesh_instance != null:
+		mesh_instance.visible = true
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+
+	if collision_body != null:
+		collision_body.collision_layer = generated_collision_layer
+		collision_body.collision_mask = 0
+
+	if collision_shape != null:
+		collision_shape.disabled = not collision_enabled
 
 
 func _build_terrain_mesh() -> ArrayMesh:
@@ -214,7 +266,6 @@ func _build_terrain_mesh() -> ArrayMesh:
 	var surface_tool: SurfaceTool = SurfaceTool.new()
 	surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 
-
 	for z: int in range(safe_cells_z):
 		for x: int in range(safe_cells_x):
 			var p00: Vector3 = _make_point(x, z, safe_cells_x, safe_cells_z, safe_size_x, safe_size_z, main_noise, detail_noise)
@@ -222,8 +273,8 @@ func _build_terrain_mesh() -> ArrayMesh:
 			var p01: Vector3 = _make_point(x, z + 1, safe_cells_x, safe_cells_z, safe_size_x, safe_size_z, main_noise, detail_noise)
 			var p11: Vector3 = _make_point(x + 1, z + 1, safe_cells_x, safe_cells_z, safe_size_x, safe_size_z, main_noise, detail_noise)
 
-			# Godot displays this winding from above with standard culling.
-			# Normals are set manually in _add_triangle() so lighting stays upward.
+			# Winding and manual normals are kept from v6.
+			# The mesh is visible from above and lit correctly.
 			_add_triangle(surface_tool, p00, p11, p01, safe_size_x, safe_size_z)
 			_add_triangle(surface_tool, p00, p10, p11, safe_size_x, safe_size_z)
 
@@ -268,7 +319,7 @@ func _make_point(
 
 
 func _get_noise_sample_position(local_x: float, local_z: float) -> Vector2:
-	if use_world_space_noise:
+	if noise_space_mode == NoiseSpaceMode.WORLD_SPACE:
 		var world_position: Vector3 = global_transform * Vector3(local_x, 0.0, local_z)
 		return Vector2(world_position.x, world_position.z) + noise_offset
 
@@ -419,6 +470,7 @@ func _get_material_to_use() -> Material:
 
 func _apply_flat_preset() -> void:
 	terrain_mode = TerrainMode.FLAT
+	noise_space_mode = NoiseSpaceMode.BLOCK_LOCAL
 	cells_x = 8
 	cells_z = 8
 	height_amplitude = 0.0
@@ -430,6 +482,7 @@ func _apply_flat_preset() -> void:
 
 func _apply_wavy_preset() -> void:
 	terrain_mode = TerrainMode.WAVY
+	noise_space_mode = NoiseSpaceMode.BLOCK_LOCAL
 	cells_x = 20
 	cells_z = 20
 	height_amplitude = 0.55
@@ -445,6 +498,7 @@ func _apply_wavy_preset() -> void:
 
 func _apply_broken_preset() -> void:
 	terrain_mode = TerrainMode.BROKEN
+	noise_space_mode = NoiseSpaceMode.BLOCK_LOCAL
 	cells_x = 24
 	cells_z = 24
 	height_amplitude = 1.15

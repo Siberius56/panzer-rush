@@ -208,7 +208,9 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if refresh_every_frame:
 		_refresh_all()
-
+	
+	%Label_FPS.text = str(Engine.get_frames_per_second())+" fps"
+	
 	_update_repair_target_bar(delta)
 	_refresh_aim_target_reticle_from_player()
 	_update_objective_cleanup(delta)
